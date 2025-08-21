@@ -1,0 +1,2 @@
+# Ignore auto-generated files
+src/supabase/db_types.ts

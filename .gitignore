@@ -1,0 +1,11 @@
+# Next.js
+.next
+next-env.d.ts
+out
+
+# Node
+node_modules
+package-lock.json
+
+# VS Code
+.vscode

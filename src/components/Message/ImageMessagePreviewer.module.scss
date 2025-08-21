@@ -1,0 +1,29 @@
+.image {
+  background-color: #f1f3f4;
+}
+
+.toolbarWrapper {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  padding: 0.5rem 1.5rem;
+  color: #fff;
+  font-size: 1.3rem;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 6.6rem;
+  transform: translateX(-50%);
+}
+
+.anticon {
+  padding: 0.9rem;
+  cursor: pointer;
+}
+
+.anticon[disabled] {
+  cursor: not-allowed;
+  opacity: 0.3;
+}
+
+.anticon:hover {
+  opacity: 0.3;
+}
