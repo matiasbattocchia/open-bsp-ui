@@ -16,7 +16,7 @@ export function newMessage(
   file?: File,
 ): MessageInsert {
   if (file) {
-    const mediaId = `${conv.organization_id}/${conv.organization_address}/${crypto.randomUUID()}`;
+    const mediaId = `/${conv.organization_id}/${conv.organization_address}/${crypto.randomUUID()}`;
 
     (message as BaseMessage).media = {
       ...(message as BaseMessage).media,

@@ -19,6 +19,7 @@ import {
   Spinner,
   SegmentedControl,
   Callout,
+  TextField,
 } from "@radix-ui/themes";
 import { ArrowLeft, Wrench, TriangleAlert } from "lucide-react";
 import DeleteAgentButton from "./DeleteAgentButton";
@@ -39,8 +40,8 @@ export default function AgentDetails({
   /* 
   // TODO: Do something with this useful data
   const {
-    data: availableToolkitsAndTools,
-    isPending: isToolkitsAndToolsPending,
+    data: availabletoolsAndTools,
+    isPending: istoolsAndToolsPending,
   } = useQuery({
     queryKey: [activeOrgId, "tools"],
     queryFn: async () => {
@@ -64,7 +65,7 @@ export default function AgentDetails({
       const { data, error } = await supabase
         .from("agents")
         .select(
-          "picture, name, extra->>role, extra->>model, extra->>prompt, extra->temperature, extra->>mode, ai, extra->toolkits",
+          "picture, name, extra->>description, extra->>model, extra->>instructions, extra->temperature, extra->>mode, ai, extra->tools",
         )
         .eq("id", agentIdState)
         .single();
@@ -76,12 +77,12 @@ export default function AgentDetails({
 
   const [form, setForm] = useState({
     name: "",
-    role: "",
-    model: "gpt-4o-mini",
-    prompt: "",
+    description: "",
+    model: "",
+    instructions: "",
     temperature: 0.5,
     mode: "inactive",
-    toolkits: "",
+    tools: "",
   });
 
   const [alert, setAlert] = useState("");
@@ -89,12 +90,12 @@ export default function AgentDetails({
   useEffect(() => {
     setForm({
       name: agent?.name || "",
-      role: agent?.role || "",
-      model: agent?.model || "gpt-4o-mini",
-      prompt: agent?.prompt || "",
+      description: agent?.description || "",
+      model: agent?.model || "",
+      instructions: agent?.instructions || "",
       temperature: Number(agent?.temperature) || 0.5,
       mode: agent?.mode || "inactive",
-      toolkits: JSON.stringify(agent?.toolkits || [], null, 4),
+      tools: JSON.stringify(agent?.tools || [], null, 4),
     });
   }, [agent]);
 
@@ -102,10 +103,10 @@ export default function AgentDetails({
 
   const { mutate, isPending: isMutationPending } = useMutation({
     mutationFn: async (_form: typeof form) => {
-      let toolkits;
+      let tools;
 
       try {
-        toolkits = JSON.parse(_form.toolkits);
+        tools = JSON.parse(_form.tools);
       } catch (error) {
         setAlert("Acciones: JSON inválido.");
         throw error;
@@ -116,12 +117,12 @@ export default function AgentDetails({
         .update({
           name: _form.name,
           extra: {
-            role: _form.role,
+            description: _form.description,
             model: _form.model,
-            prompt: _form.prompt,
+            instructions: _form.instructions,
             temperature: _form.temperature,
             mode: _form.mode,
-            toolkits,
+            tools,
           },
         })
         .eq("id", agentIdState);
@@ -142,10 +143,10 @@ export default function AgentDetails({
   const { mutate: insertMutation, isPending: isInsertMutationPending } =
     useMutation({
       mutationFn: async (_form: typeof form) => {
-        let toolkits;
+        let tools;
 
         try {
-          toolkits = JSON.parse(_form.toolkits);
+          tools = JSON.parse(_form.tools);
         } catch (error) {
           setAlert("Acciones: JSON inválido.");
           throw error;
@@ -158,12 +159,12 @@ export default function AgentDetails({
             organization_id: activeOrgId,
             name: _form.name,
             extra: {
-              role: _form.role,
+              description: _form.description,
               model: _form.model,
-              prompt: _form.prompt,
+              instructions: _form.instructions,
               temperature: _form.temperature,
               mode: _form.mode,
-              toolkits,
+              tools,
             },
           })
           .select()
@@ -233,7 +234,7 @@ export default function AgentDetails({
           />
         </Box>
 
-        {/* Name and role */}
+        {/* Name and description */}
         <Flex direction="column" gap="2" width="100%">
           <LabeledTextField
             label={t("Nombre") as string}
@@ -242,9 +243,9 @@ export default function AgentDetails({
             placeholder="Gori"
           />
           <LabeledTextField
-            label={t("Rol") as string}
-            value={form.role}
-            onChange={(value) => setForm({ ...form, role: value })}
+            label="Rol"
+            value={form.description}
+            onChange={(value) => setForm({ ...form, description: value })}
             placeholder={t("Administrativo") as string}
           />
         </Flex>
@@ -254,7 +255,9 @@ export default function AgentDetails({
       <Tabs.Root defaultValue="instructions">
         <Flex direction="column" gap="4">
           <Tabs.List>
-            <Tabs.Trigger value="instructions">{t("Instrucciones")}</Tabs.Trigger>
+            <Tabs.Trigger value="instructions">
+              {t("Instrucciones")}
+            </Tabs.Trigger>
             <Tabs.Trigger value="actions">
               <Box mr="1">
                 <Wrench size={15} />
@@ -271,32 +274,13 @@ export default function AgentDetails({
                 <Text as="label" size="2" mb="1" weight="bold">
                   {t("Modelo de IA")}
                 </Text>
-
-                <Select.Root
-                  defaultValue="gpt-4o-mini"
+                <TextField.Root
+                  placeholder={t("gpt-5-mini") as string}
                   value={form.model}
-                  onValueChange={(value) => setForm({ ...form, model: value })}
-                >
-                  <Select.Trigger />
-                  <Select.Content>
-                    <Select.Group>
-                      <Select.Label>OpenAI</Select.Label>
-                      <Select.Item value="gpt-4o">GPT-4o</Select.Item>
-                      <Select.Item value="gpt-4o-mini">GPT-4o Mini</Select.Item>
-                      <Select.Item value="o3-mini">o3-mini</Select.Item>
-                    </Select.Group>
-                    <Select.Separator />
-                    <Select.Group>
-                      <Select.Label>Anthropic</Select.Label>
-                      <Select.Item value="claude-3-5-sonnet-20240620">
-                        Claude 3.5 Sonnet
-                      </Select.Item>
-                      <Select.Item value="claude-3-5-haiku-20241022">
-                        Claude 3.5 Haiku
-                      </Select.Item>
-                    </Select.Group>
-                  </Select.Content>
-                </Select.Root>
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setForm({ ...form, model: e.target.value })
+                  }
+                />
               </Flex>
 
               <Flex direction="column">
@@ -306,8 +290,10 @@ export default function AgentDetails({
                 <TextArea
                   placeholder={t("Tus tareas son...") as string}
                   resize="vertical"
-                  value={form.prompt}
-                  onChange={(e) => setForm({ ...form, prompt: e.target.value })}
+                  value={form.instructions}
+                  onChange={(e) =>
+                    setForm({ ...form, instructions: e.target.value })
+                  }
                 />
               </Flex>
 
@@ -341,8 +327,8 @@ export default function AgentDetails({
                 spellCheck="false"
                 rows={9}
                 resize="vertical"
-                value={form.toolkits}
-                onChange={(e) => setForm({ ...form, toolkits: e.target.value })}
+                value={form.tools}
+                onChange={(e) => setForm({ ...form, tools: e.target.value })}
               />
             </Flex>
           </Tabs.Content>

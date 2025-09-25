@@ -79,28 +79,6 @@ export default function OrganizationDetails() {
     <Flex direction="column" gap="4">
       <Flex direction="column">
         <Text as="label" size="2" mb="1" weight="bold">
-          {t("Modo de operación")}
-        </Text>
-        <RadioCards.Root
-          columns={{ initial: "1", sm: "3" }}
-          value={organization?.ai_agents_mode || "active"}
-          onValueChange={(value) => {
-            updateOrganization({ ai_agents_mode: value });
-          }}
-        >
-          {operationModes.map((mode) => (
-            <RadioCards.Item key={mode.value} value={mode.value}>
-              <Flex direction="column" width="100%">
-                <Text weight="bold">{mode.name}</Text>
-                <Text>{mode.description}</Text>
-              </Flex>
-            </RadioCards.Item>
-          ))}
-        </RadioCards.Root>
-      </Flex>
-
-      <Flex direction="column">
-        <Text as="label" size="2" mb="1" weight="bold">
           {t("Mensaje de bienvenida")}
         </Text>
         <TextArea
@@ -113,18 +91,6 @@ export default function OrganizationDetails() {
               : welcome
           }
           onChange={(e) => setWelcome(e.target.value)}
-        />
-      </Flex>
-      <Flex direction="column">
-        <Text as="label" size="2" mb="1" weight="bold">
-          {t("Instrucciones generales")}
-        </Text>
-        <TextArea
-          rows={9}
-          placeholder={t("Somos...") as string}
-          resize="vertical"
-          value={prompt === undefined ? organization?.prompt || "" : prompt}
-          onChange={(e) => setPrompt(e.target.value)}
         />
       </Flex>
       <Flex gap="3" justify="end">
