@@ -1,3 +1,6 @@
+# Env
+.env*
+
 # Next.js
 .next
 next-env.d.ts
@@ -7,5 +10,6 @@ out
 node_modules
 package-lock.json
 
-# VS Code
+# Editors
 .vscode
+.zed

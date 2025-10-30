@@ -152,16 +152,18 @@ export default function AudioMessage({
                 }}
               />
             )}
-            <AudioVisualizer
-              blob={load.blob}
-              width={166}
-              height={24}
-              barWidth={2.5}
-              gap={1.5}
-              barColor={"#b0ceae"}
-              barPlayedColor={"#728977"}
-              currentTime={seekTime || time}
-            />
+            {load.blob && (
+              <AudioVisualizer
+                blob={load.blob}
+                width={166}
+                height={24}
+                barWidth={2.5}
+                gap={1.5}
+                barColor={"#b0ceae"}
+                barPlayedColor={"#728977"}
+                currentTime={seekTime || time}
+              />
+            )}
             {duration > 0 && (
               <div className="absolute left-0 -bottom-[22px] text-[11px] text-[#ced0d1]">
                 {dayjs.duration(time || duration, "seconds").format("m:ss")}

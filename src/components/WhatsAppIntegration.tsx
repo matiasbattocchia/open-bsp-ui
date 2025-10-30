@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import { supabase } from "@/supabase/client";
 import { Translate as T } from "react-dialect";
 
+const FB_API_VERSION = "v24.0";
+
 export default function WhatsAppIntegration({
   orgId,
   onSuccess,
@@ -14,10 +16,10 @@ export default function WhatsAppIntegration({
   useEffect(() => {
     (window as any).fbAsyncInit = function () {
       (window as any).FB.init({
-        appId: "629323992623834",
+        appId: process.env.NEXT_PUBLIC_META_APP_ID,
         autoLogAppEvents: true,
         xfbml: true,
-        version: process.env.NEXT_PUBLIC_FB_API_VERSION,
+        version: FB_API_VERSION,
       });
     };
 
@@ -64,7 +66,7 @@ export default function WhatsAppIntegration({
         }
       },
       {
-        config_id: "791770266269455", // Configuration ID obtained in https://developers.facebook.com/apps/629323992623834/business-login/configurations/?business_id=153181867762503
+        config_id: process.env.NEXT_PUBLIC_FB_LOGIN_CONFIG_ID, // Configuration ID obtained in https://developers.facebook.com/apps/629323992623834/business-login/configurations/?business_id=153181867762503
         response_type: "code", // Must be set to 'code' for System User access token
         override_default_response_type: true,
         extras: {
