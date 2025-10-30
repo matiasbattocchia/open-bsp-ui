@@ -7,6 +7,13 @@ import { Skeleton, Space } from "antd";
 export default function ChatSkeletonLoader() {
   return (
     <div className="flex h-[100dvh] w-full">
+      {/* Loading indicator */}
+      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50">
+        <div className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg">
+          Cargando aplicación...
+        </div>
+      </div>
+      
       <div className="h-[100dvh] z-10 flex flex-col justify-between px-[12px] pb-[10px] bg-gray border-r border-gray-line">
         {/* Upper section */}
         <div className="flex flex-col">
