@@ -1,4 +1,11 @@
-import { MessageRow, OutgoingStatus, supabase } from "@/supabase/client";
+import {
+  MessageRow,
+  MessageInsert,
+  OutgoingStatus,
+  supabase,
+  InternalMessage,
+  ToolInfo,
+} from "@/supabase/client";
 import AudioMessage from "./AudioMessage";
 import DocumentMessage from "./DocumentMessage";
 import ImageMessage from "./ImageMessage";
@@ -142,8 +149,18 @@ export function BaseMessage({
         <div
           className="py-3 border-t border-t-gray-dark text-center text-blue-ack cursor-pointer"
           onClick={() => {
-            pushMessageToStore({ ...draft, type: "outgoing" });
-            pushMessageToDb({ ...draft, type: "outgoing" }, false);
+            // Cast the content as OutgoingMessage since we're sending it as outgoing
+            const outgoingMessage = {
+              organization_id: draft.organization_id,
+              conversation_id: draft.conversation_id,
+              contact_address: draft.contact_address,
+              organization_address: draft.organization_address,
+              agent_id: draft.agent_id,
+              direction: "outgoing" as const,
+              content: draft.content,
+            };
+            pushMessageToStore(outgoingMessage as MessageInsert);
+            pushMessageToDb(outgoingMessage as MessageInsert, false);
           }}
         >
           {t("Enviar")}
@@ -154,18 +171,26 @@ export function BaseMessage({
 }
 
 function TextMessage(message: MessageRow) {
-  if (!(message.type === "incoming" || message.type === "outgoing")) {
+  if (!(message.direction === "incoming" || message.direction === "outgoing")) {
     throw new Error(`Message with id ${message.id} is not a BaseMessage.`);
+  }
+
+  const content = message.content;
+  let body = "";
+
+  // Handle v1 content structure - TextPart
+  if (content.type === "text") {
+    body = content.text || "";
   }
 
   return (
     <BaseMessage
-      header={message.message.header}
-      body={message.message.content || ""}
-      footer={message.message.footer}
-      type={message.type}
+      header={undefined}
+      body={body}
+      footer={undefined}
+      type={message.direction}
       timestamp={message.timestamp}
-      status={message.type === "outgoing" ? message.status : undefined}
+      status={message.direction === "outgoing" ? message.status : undefined}
     />
   );
 }
@@ -316,15 +341,30 @@ function FunctionCallMessage({
   message: MessageRow;
   header: string;
 }) {
-  if (!(message.type === "function_call")) {
-    throw new Error(
-      `Message with id ${message.id} is not a FunctionCallMessage.`,
-    );
-  }
-
   const [showArguments, setShowArguments] = useState(false);
 
   const { translate: t } = useTranslation();
+
+  // Extract tool info from InternalMessage with ToolInfo
+  const content = message.content as InternalMessage;
+  let toolName: string = "unknown";
+  let toolArgs: any = {};
+
+  if ("tool" in content && content.tool) {
+    const toolInfo = content.tool;
+
+    // Extract tool name from provider-specific info
+    if ("name" in toolInfo) {
+      toolName = toolInfo.name as string;
+    } else if ("label" in toolInfo) {
+      toolName = toolInfo.label as string;
+    }
+  }
+
+  // Tool arguments are in the data part for function tools
+  if (content.type === "data" && content.data) {
+    toolArgs = content.data;
+  }
 
   return (
     <div className="relative">
@@ -333,15 +373,14 @@ function FunctionCallMessage({
         {/* Header */}
         <div className="text-[15px] mb-3 font-semibold">{header}</div>
 
-        <pre className="pb-[6px]">{message.message.function.name}</pre>
+        <pre className="pb-[6px]">{toolName}</pre>
 
         {showArguments && (
           <pre
             dangerouslySetInnerHTML={{
-              __html: prettyPrintJson.toHtml(
-                JSON.parse(message.message.function.arguments || "{}"),
-                { indent: 2 },
-              ),
+              __html: prettyPrintJson.toHtml(toolArgs, {
+                indent: 2,
+              }),
             }}
           />
         )}
@@ -368,27 +407,27 @@ function FunctionResponseMessage({
   message: MessageRow;
   header: string;
 }) {
-  if (!(message.type === "function_response")) {
-    throw new Error(
-      `Message with id ${message.id} is not a FunctionResponseMessage.`,
-    );
-  }
-
   const [showResponse, setShowResponse] = useState(false);
 
   const { translate: t } = useTranslation();
 
+  // Extract content from InternalMessage with ToolInfo
+  const content = message.content as InternalMessage;
   let isJson = false;
   let textBody = "";
-  try {
-    textBody = JSON.stringify(
-      JSON.parse(message.message.content || "{}"),
-      null,
-      2,
-    );
-    isJson = true;
-  } catch {
-    textBody = message.message.content || "";
+  let responseData: any = null;
+
+  // Tool results are typically in text or data parts
+  if (content.type === "text") {
+    textBody = content.text || "";
+  } else if (content.type === "data") {
+    responseData = content.data;
+    try {
+      textBody = JSON.stringify(content.data, null, 2);
+      isJson = true;
+    } catch {
+      textBody = String(content.data || "");
+    }
   }
 
   return (
@@ -405,10 +444,9 @@ function FunctionResponseMessage({
               isJson ? (
                 <pre
                   dangerouslySetInnerHTML={{
-                    __html: prettyPrintJson.toHtml(
-                      JSON.parse(message.message.content || "{}"),
-                      { indent: 2 },
-                    ),
+                    __html: prettyPrintJson.toHtml(responseData || {}, {
+                      indent: 2,
+                    }),
                   }}
                 />
               ) : (
@@ -453,43 +491,51 @@ export function SpecialMessageTypeMap(type: string) {
 }
 
 function SpecialMessage(message: MessageRow) {
-  switch (message.type) {
-    case "notification":
-      return (
-        <BaseMessage
-          header={SpecialMessageTypeMap(message.type)}
-          body={message.message.content || ""}
-          type="system"
-          timestamp={message.timestamp}
-        />
-      );
-    case "draft":
-      return (
-        <BaseMessage
-          header={SpecialMessageTypeMap(message.type)}
-          body={message.message.content || ""}
-          type="system"
-          timestamp={message.timestamp}
-          draft={message}
-        />
-      );
-    case "function_call":
-      return (
-        <FunctionCallMessage
-          message={message}
-          header={SpecialMessageTypeMap(message.type) as string}
-        />
-      );
-    case "function_response":
-      return (
-        <FunctionResponseMessage
-          message={message}
-          header={SpecialMessageTypeMap(message.type) as string}
-        />
-      );
-    default:
-      return null;
+  const content = message.content;
+  let bodyText = "";
+
+  // Extract text for display
+  if (content.type === "text") {
+    bodyText = content.text || "";
+  } else if (content.type === "data") {
+    bodyText = JSON.stringify(content.data, null, 2);
   }
+
+  // Check if this is an internal message with tool information
+  // InternalMessage has ToolInfo with event "use" or "result"
+  if (message.direction === "internal") {
+    const internalContent = content as InternalMessage;
+
+    if ("tool" in internalContent && internalContent.tool) {
+      const toolInfo = internalContent.tool;
+
+      if (toolInfo.event === "use") {
+        return (
+          <FunctionCallMessage
+            message={message}
+            header={SpecialMessageTypeMap("function_call") as string}
+          />
+        );
+      } else if (toolInfo.event === "result") {
+        return (
+          <FunctionResponseMessage
+            message={message}
+            header={SpecialMessageTypeMap("function_response") as string}
+          />
+        );
+      }
+    }
+  }
+
+  // Default: render internal messages as system messages
+  return (
+    <BaseMessage
+      header={undefined}
+      body={bodyText}
+      type="system"
+      timestamp={message.timestamp}
+    />
+  );
 }
 
 function SystemMessage({
@@ -531,11 +577,16 @@ export default function Message(props: UIMessage & { message: MessageRow }) {
   let content;
   let text = false;
 
-  switch (props.message.message.type) {
+  const messageContent = props.message.content;
+  const messageKind = messageContent.kind;
+
+  // Determine message type based on v1 content structure
+  switch (messageKind) {
     case "text":
     case "reaction":
-    case "button":
-    case "template": {
+    case "caption":
+    case "transcription":
+    case "description": {
       content = <TextMessage {...props.message} />;
       text = true;
       break;
@@ -561,18 +612,32 @@ export default function Message(props: UIMessage & { message: MessageRow }) {
       content = <ImageMessage {...props.message} />;
       break;
     }
+    case "video": {
+      content = <ImageMessage {...props.message} />; // Reusing ImageMessage for now
+      break;
+    }
+    case "template":
+    case "button":
+    case "interactive":
+    case "contacts":
+    case "location":
+    case "order": {
+      content = <TextMessage {...props.message} />;
+      text = true;
+      break;
+    }
   }
 
   return (
     <>
-      {props.message.type === "incoming" && (
+      {props.message.direction === "incoming" && (
         <InMessage {...{ ...props, text }}>{content}</InMessage>
       )}
-      {props.message.type === "outgoing" && (
+      {props.message.direction === "outgoing" && (
         <OutMessage {...{ ...props, text }}>{content}</OutMessage>
       )}
-      {props.message.type !== "outgoing" &&
-        props.message.type !== "incoming" && (
+      {props.message.direction !== "outgoing" &&
+        props.message.direction !== "incoming" && (
           <SystemMessage {...props}>
             <SpecialMessage {...props.message} />
           </SystemMessage>

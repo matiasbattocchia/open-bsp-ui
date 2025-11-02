@@ -501,6 +501,11 @@ export type ConversationExtra = {
   archived?: string;
   pinned?: string;
   notifications?: "off" | "muted" | "on";
+  draft?: {
+    text: string;
+    origin: string;
+    timestamp: string;
+  };
   test_run?: {
     reference_conversation: {
       organization_address: string;
