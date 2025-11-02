@@ -53,7 +53,7 @@ export const useRealtimeSubscription = (
 
           updateMessagesCache([message]);
 
-          if (message.type === "incoming") {
+          if (message.direction === "incoming") {
             const key =
               message.organization_address + "<>" + message.contact_address;
 
@@ -66,10 +66,11 @@ export const useRealtimeSubscription = (
               setting == NotificationKind.full ||
               setting == NotificationKind.silent
             ) {
-              showNotification(
-                conv?.name || "?",
-                message.message.content || "",
-              );
+              const content = message.content;
+              const notificationText =
+                content.type === "text" ? content.text : "Media message";
+
+              showNotification(conv?.name || "?", notificationText);
             }
           }
         },

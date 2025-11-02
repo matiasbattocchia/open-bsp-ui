@@ -4,14 +4,21 @@ import useBoundStore from "@/store/useBoundStore";
 import { MessageInsert, MessageRow, supabase } from "@/supabase/client";
 
 export function useMedia(message: MessageRow) {
-  if (!(message.type === "incoming" || message.type === "outgoing")) {
-    throw new Error(`Message with id ${message.id} is not a BaseMessage.`);
+  if (!(message.direction === "incoming" || message.direction === "outgoing")) {
+    throw new Error(
+      `Message with id ${message.id} is not an incoming or outgoing message.`,
+    );
   }
 
-  const mediaId = message.message.media?.id;
+  if (message.content.type !== "file") {
+    throw new Error(`Message with id ${message.id} is not a file message.`);
+  }
+
+  const content = message.content;
+  const mediaId = content.file.uri.split("/").pop(); // Extract ID from URI
 
   if (!mediaId) {
-    throw new Error(`Message with id ${message.id} has no media.id property.`);
+    throw new Error(`Message with id ${message.id} has no valid media URI.`);
   }
 
   const load = useBoundStore((store) =>
