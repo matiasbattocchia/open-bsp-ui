@@ -1,20 +1,18 @@
 import { ConversationRow, MessageRow, supabase } from "@/supabase/client";
 import useBoundStore from "@/store/useBoundStore";
 import { useEffect } from "react";
-import useWebNotifications, { NotificationKind } from "../useWebNotifications";
 import { updateMessagesCache } from "@/utils/IdbUtils";
 
 export const useRealtimeSubscription = (
-  authorizedAddresses: string[] | undefined,
+  authorizedOrgs: string[] | undefined,
 ) => {
   const conversations = useBoundStore((state) => state.chat.conversations);
   const activeConvId = useBoundStore((state) => state.ui.activeConvId);
-  const { showNotification } = useWebNotifications();
   // Set up subscription outside of React lifecycle
   useEffect(() => {
-    if (!authorizedAddresses?.length) return;
+    if (!authorizedOrgs?.length) return;
 
-    const filter = `organization_address=in.(${authorizedAddresses?.join(",")})`;
+    const filter = `organization_id=in.(${authorizedOrgs?.join(",")})`;
 
     const channel = supabase
       .channel("rialtaim")
@@ -52,27 +50,6 @@ export const useRealtimeSubscription = (
           useBoundStore.getState().chat.pushMessages([message]);
 
           updateMessagesCache([message]);
-
-          if (message.direction === "incoming") {
-            const key =
-              message.organization_address + "<>" + message.contact_address;
-
-            const conv = conversations.get(key);
-
-            // Default conversation to full
-            const setting = conv?.extra?.notifications || NotificationKind.full;
-
-            if (
-              setting == NotificationKind.full ||
-              setting == NotificationKind.silent
-            ) {
-              const content = message.content;
-              const notificationText =
-                content.type === "text" ? content.text : "Media message";
-
-              showNotification(conv?.name || "?", notificationText);
-            }
-          }
         },
       );
 
@@ -82,5 +59,5 @@ export const useRealtimeSubscription = (
     return () => {
       channel.unsubscribe();
     };
-  }, [activeConvId, authorizedAddresses, conversations, showNotification]);
+  }, [authorizedOrgs]);
 };

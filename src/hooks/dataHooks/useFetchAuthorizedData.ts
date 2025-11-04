@@ -23,34 +23,34 @@ export const useFetchAuthorizedData = (
       setIsLoading(true);
       try {
         const authQuery = await supabase
-          .from("organizations")
-          .select(
-            "id, agents (id, extra->roles), organizations_addresses (address)",
-          )
-          .eq("agents.user_id", userId);
+          .from("agents")
+          .select("id, organization_id, user_id, extra->roles")
+          .eq("user_id", userId);
 
         if (authQuery.error) {
           throw authQuery.error;
         }
 
         /** Set roles section */
-        const roles: Record<
+        const _roles: Record<
           string,
           { agentId: string; role: "admin" | "operator" }
         > = {};
 
-        authQuery.data.forEach((org) => {
-          roles[org.id] = {
-            agentId: org.agents[0].id,
-            role: (org.agents[0].roles as string[])?.includes("admin")
+        authQuery.data.forEach(({ id, organization_id, roles }) => {
+          _roles[organization_id] = {
+            agentId: id,
+            role: ((roles as string[]) || []).includes("admin")
               ? "admin"
               : "operator",
           };
         });
 
-        setRoles(roles);
+        setRoles(_roles);
 
-        const authorizedOrgs = authQuery.data.map((org) => org.id);
+        const authorizedOrgs = authQuery.data.map(
+          (agent) => agent.organization_id,
+        );
 
         if (!authorizedOrgs.length) {
           throw new Error(
@@ -58,21 +58,11 @@ export const useFetchAuthorizedData = (
           );
         }
 
-        const authorizedAddresses = authQuery.data
-          .map((org) => org.organizations_addresses.map((addr) => addr.address))
-          .flat();
-
-        if (!authorizedAddresses.length) {
-          throw new Error(
-            `Empty list of authorized orgs addresses for user id ${userId}.`,
-          );
-        }
         const authData = {
           authorizedOrgs,
-          authorizedAddresses,
+          authorizedAddresses: [],
         };
         setData(authData);
-        updateAuthorizedCache(authData);
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err : new Error(String(err)));

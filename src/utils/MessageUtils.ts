@@ -32,6 +32,7 @@ export function newMessage(
   // Build the insert object based on direction
   // TypeScript needs help with the union types, so we use type assertions
   return {
+    id: crypto.randomUUID(),
     organization_id: conv.organization_id,
     conversation_id: conv.id,
     service: conv.service,
@@ -51,11 +52,9 @@ export function pushMessageToStore(record: MessageInsert) {
   // Create the optimistic record with temporary values
   const optimisticRecord = {
     ...record,
-    id: record.id || crypto.randomUUID(),
-    created_at: now,
     timestamp: now,
+    created_at: now,
     updated_at: now, // important because of timestamp <= updated_at filter in chatSlice.ts
-    external_id: null,
     status: { pending: now },
   };
 
