@@ -7,6 +7,7 @@ import { GoriState } from "./useBoundStore";
 import { StateCreator } from "zustand";
 // @ts-ignore
 import groupBy from "core-js-pure/actual/object/group-by";
+import { MessageRowV0, toV1 } from "@/supabase/messages-v0";
 
 export const SEP = "<>";
 
@@ -101,8 +102,14 @@ export const defaultChatInitState: StateCreator<Partial<GoriState>> = (
         },
       };
     }),
-  pushMessages: (msgs: MessageRow[]) =>
+  pushMessages: (msgsMixedVersions: MessageRow[]) =>
     set((state) => {
+      const msgs = msgsMixedVersions
+        .map((m) =>
+          m.content.version === "1" ? m : toV1(m as unknown as MessageRowV0),
+        )
+        .filter(Boolean) as MessageRow[];
+
       const messages = new Map(state.chat.messages);
 
       const msgsByConv: { [key: string]: MessageRow[] } = groupBy(
