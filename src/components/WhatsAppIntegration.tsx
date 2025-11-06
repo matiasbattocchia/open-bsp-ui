@@ -141,7 +141,7 @@ export default function WhatsAppIntegration({
         response_type: "code", // Must be set to 'code' for System User access token
         override_default_response_type: true,
         extras: {
-          //featureType: "only_waba_sharing", // Bypass phone number selection
+          featureType: "whatsapp_business_app_onboarding", // Coexistence
           setup: {
             // Prefilled data can go here
           },
