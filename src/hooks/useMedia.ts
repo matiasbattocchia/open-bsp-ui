@@ -15,7 +15,7 @@ export function useMedia(message: MessageRow) {
   }
 
   const content = message.content;
-  const mediaId = content.file.uri.split("/").pop(); // Extract ID from URI
+  const mediaId = content.file.uri.replace("internal://media/", ""); // Extract path from URI
 
   if (!mediaId) {
     throw new Error(`Message with id ${message.id} has no valid media URI.`);
