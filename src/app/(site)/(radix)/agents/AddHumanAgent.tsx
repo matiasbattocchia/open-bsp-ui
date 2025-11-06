@@ -20,6 +20,9 @@ export default function AddHumanAgent() {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async () => {
+      if (!activeOrgId) {
+        throw new Error("No active organization");
+      }
       await supabase.from("agents").insert({
         organization_id: activeOrgId,
         name,
@@ -44,7 +47,9 @@ export default function AddHumanAgent() {
       <Dialog.Content maxWidth="450px">
         <Dialog.Title>{t("Agregar humano")}</Dialog.Title>
         <Dialog.Description size="2" mb="4">
-          {t("Envía una invitación a un usuario para que se una a tu organización.")}
+          {t(
+            "Envía una invitación a un usuario para que se una a tu organización.",
+          )}
         </Dialog.Description>
 
         <Flex direction="column" gap="3">

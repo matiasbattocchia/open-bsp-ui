@@ -1,29 +1,38 @@
 import { createClient } from "@supabase/supabase-js";
-import { Database as DatabaseGenerated, Json } from "./db_types";
+import { Database as DatabaseGenerated, Json, Tables } from "./db_types";
 import { MergeDeep } from "type-fest";
 
-export const MediaTypes = [
-  "audio",
-  "document",
-  "image",
-  "video",
-  "sticker",
-] as const;
+//===================================
+// Copied from matiasbattocchia/open-bsp-api/supabase/functions/_shared/supabase.ts
+// without
+// - imports
+// - webhook types
+// - endpoint types
+// - clients
+//===================================
 
-export type AudioMessage = {
-  type: "audio";
-  audio: {
-    id: string;
-    mime_type:
-      | "audio/aac"
-      | "audio/amr"
-      | "audio/mpeg"
-      | "audio/mp4"
-      | "audio/ogg; codecs=opus";
-    voice: boolean;
-  };
+// This is what Supabase webhooks send to functions
+export type WebhookPayload<Record> = {
+  type: "INSERT" | "UPDATE" | "DELETE";
+  table: string;
+  schema: string;
+  record: Record | null;
+  old_record: Record | null;
 };
 
+export type WebhookError = {
+  code: number;
+  title: string;
+  message: string;
+  error_data: {
+    details: string;
+  };
+  href: string;
+};
+
+// Data based
+
+// This message type is produced when the user interacts with a template message button.
 export type ButtonMessage = {
   type: "button";
   button: {
@@ -32,219 +41,70 @@ export type ButtonMessage = {
   };
 };
 
-export type ContactsMessage = {
-  type: "contacts";
-  contacts: {
-    name: {
-      first_name?: string;
-      formatted_name: string;
-      last_name?: string;
-    };
-    phones?: {
-      phone: string;
-      type: string;
-      wa_id?: string;
-    }[];
-  }[];
-};
-
-export type DocumentMessage = {
-  type: "document";
-  document: {
-    caption?: string;
-    filename: string;
-    id: string;
-    mime_type:
-      | "text/plain"
-      | "application/vnd.ms-excel"
-      | "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-      | "application/msword"
-      | "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-      | "application/vnd.ms-powerpoint"
-      | "application/vnd.openxmlformats-officedocument.presentationml.presentation"
-      | "application/pdf";
-  };
-};
-
-export type ImageMessage = {
-  type: "image";
-  image: {
-    id: string;
-    mime_type: "image/jpeg" | "image/png" | "image/webp";
-    caption?: string;
-  };
-};
-
-export type IncomingContextInfo = {
-  context?: {
-    forwarded?: boolean;
-    frequently_forwarded?: boolean;
-    from?: string; // The WhatsApp ID for the customer who replied to an inbound message.
-    id?: string; //  The message ID for the sent message for an inbound reply.
-    referred_product?: {
-      catalog_id: string;
-      product_retailer_id: string;
-    };
-  };
-};
-
-export type IncomingInteractiveMessage = {
+// This message type is produced when the user interacts with an interactive message button or list option.
+export type InteractiveMessage = {
   type: "interactive";
   interactive:
     | { type: "button_reply"; button_reply: { id: string; title: string } }
     | {
         type: "list_reply";
-        list_reply: { id: string; title: string; description: string };
+        list_reply: { id: string; title: string; description?: string };
       };
 };
 
-export type LocationMessage = {
-  type: "location";
-  location: {
-    address: string;
-    latitude: number;
-    longitude: number;
-    name: string;
-    url?: string;
-  };
+// ORDER
+
+export type Order = {
+  catalog_id: string;
+  product_items: {
+    product_retailer_id: string;
+    quantity: string;
+    item_price: string;
+    currency: string;
+  }[];
+  text: string;
 };
 
 export type OrderMessage = {
   type: "order";
-  order: {
-    catalog_id: string;
-    product_items: {
-      product_retailer_id: string;
-      quantity: string;
-      item_price: string;
-      currency: string;
-    }[];
-    text: string;
+  order: Order;
+};
+
+// CONTACTS
+
+export type Contact = {
+  name: {
+    first_name?: string;
+    formatted_name: string;
+    last_name?: string;
+    middle_name?: string;
+    suffix?: string;
+    prefix?: string;
   };
+  phones?: {
+    phone: string;
+    type: string;
+    wa_id?: string;
+  }[];
 };
 
-export type ReactionMessage = {
-  type: "reaction";
-  reaction: {
-    message_id: string;
-    emoji?: string;
-  };
+// LOCATION
+
+export type Location = {
+  address: string;
+  latitude: number;
+  longitude: number;
+  name: string;
+  url?: string;
 };
 
-export type ReferralInfo = {
-  /*
-  type:
-    | "text"
-    | "location"
-    | "contact"
-    | "image"
-    | "video"
-    | "document"
-    | "audio"
-    | "sticker";
-  */
-  referral?: {
-    source_url: string;
-    source_type: "ad" | "post";
-    source_id: string;
-    headline: string;
-    body: string;
-    media_type: "image" | "video";
-    image_url?: string;
-    video_url?: string;
-    thumbnail_url?: string;
-    ctwa_clid: string;
-  };
-};
+//===================================
+// Outgoing message, as stored in the database
+//===================================
 
-export type StickerMessage = {
-  type: "sticker";
-  sticker: {
-    id: string;
-    mime_type: "image/webp";
-    animated: boolean;
-  };
-};
+// TEMPLATE
 
-export type TextMessage = {
-  type: "text";
-  text: {
-    body: string;
-  };
-};
-
-export type VideoMessage = {
-  type: "video";
-  video: {
-    id: string;
-    mime_type: "video/3gp" | "video/mp4";
-    caption?: string;
-    filename: string;
-  };
-};
-
-export type BaseMessage = {
-  type: string;
-  header?: string;
-  content?: string;
-  footer?: string;
-  re_message_id?: string; // replied, reacted or forwarded message id
-  forwarded?: boolean;
-  media?: {
-    id: string;
-    mime_type: string;
-    file_size: number;
-    filename?: string;
-    voice?: boolean;
-    annotation?: string; // image and video textual description
-  };
-};
-
-export type FunctionCallMessage = {
-  type: "function";
-  id: string;
-  function: {
-    arguments: string;
-    name: string;
-  };
-};
-
-export type FunctionResponseMessage = {
-  type: "text";
-  content: string;
-  tool_call_id: string;
-};
-
-export type IncomingMessage = BaseMessage &
-  IncomingContextInfo &
-  ReferralInfo &
-  (
-    | AudioMessage
-    | ButtonMessage
-    | ContactsMessage
-    | DocumentMessage
-    | ImageMessage
-    | IncomingInteractiveMessage
-    | LocationMessage
-    | OrderMessage
-    | ReactionMessage
-    | StickerMessage
-    | TextMessage
-    | VideoMessage
-  );
-
-export type OutgoingContextInfo = {
-  context?: { message_id: string };
-};
-
-export type OutgoingInteractiveMessage = {
-  type: "interactive";
-  interactive: any; // TODO - cabra 2024/05/07
-};
-
-/** TEMPLATES **/
-
-/* Template data */
+// Template data, used to create or update a template message
 
 export type TemplateData = {
   id: string;
@@ -302,29 +162,22 @@ type QuickReply = {
   text: string;
 };
 
-/* Template message */
+// Template message, used to send a template message
 
-type TemplateHeader = {
-  type: "header";
-  parameters: [TextParameter | ImageParameter];
+type CurrencyParameter = {
+  type: "currency";
+  currency: {
+    fallback_value: string;
+    code: string; // ISO 4217
+    amount_1000: number;
+  };
 };
 
-type TemplateBody = {
-  type: "body";
-  parameters: TextParameter[];
-};
-
-type TemplateButton = {
-  type: "button";
-  sub_type: "quick_reply";
-  index: string;
-  parameters: PayloadParameter[];
-};
-
-type ImageParameter = {
-  type: "image";
-  image: {
-    link: string;
+type DateTimeParameter = {
+  type: "date_time";
+  date_time: {
+    fallback_value: string;
+    // localization is not attempted by Cloud API, fallback_value is always used
   };
 };
 
@@ -333,57 +186,274 @@ type TextParameter = {
   text: string;
 };
 
-type PayloadParameter = {
-  type: "payload";
-  payload: string;
+export type OutgoingImage = {
+  type: "image";
+  image: ({ id: string } | { link: string }) & { caption?: string };
+};
+
+export type OutgoingVideo = {
+  type: "video";
+  video: ({ id: string } | { link: string }) & { caption?: string };
+};
+
+export type OutgoingDocument = {
+  type: "document";
+  document: ({ id: string } | { link: string }) & {
+    caption?: string;
+    filename?: string;
+  };
+};
+
+type TemplateParameter =
+  | CurrencyParameter
+  | DateTimeParameter
+  | TextParameter
+  | OutgoingImage
+  | OutgoingVideo
+  | OutgoingDocument;
+
+type TemplateHeader = {
+  type: "header";
+  parameters?: TemplateParameter[];
+};
+
+type TemplateBody = {
+  type: "body";
+  parameters?: TemplateParameter[];
+};
+
+type TemplateButton = {
+  type: "button";
+  index: string; // 0-9
+} & (
+  | {
+      sub_type: "quick_reply";
+      parameters: {
+        type: "payload";
+        payload: string;
+      }[];
+    }
+  | {
+      sub_type: "url";
+      parameters: {
+        type: "url";
+        text: string;
+      }[];
+    }
+);
+
+export type Template = {
+  components?: (TemplateHeader | TemplateBody | TemplateButton)[];
+  language: {
+    code: string; // es, es_AR, etc
+    policy: "deterministic";
+  };
+  name: string;
 };
 
 export type TemplateMessage = {
   type: "template";
-  template: {
-    components?: (TemplateBody | TemplateHeader | TemplateButton)[];
-    language: {
-      code: string; // es, es_AR, etc
-    };
-    name: string;
+  template: Template;
+};
+
+// TODO: InteractiveMessage
+
+//===================================
+// Agent Protocol Types
+//===================================
+
+// The same message can be a task request and a task response.
+// A user message is a task request. The message produced by an agent is a task response.
+// Then, for example, another agent might react to that message, creating a new task request.
+// The message is now a task response and a task request.
+export type TaskInfo = {
+  task?: {
+    id: string;
+    status?: string;
+    session_id?: string;
   };
 };
 
-export type OutgoingMessage = BaseMessage &
-  OutgoingContextInfo &
+export type ToolInfo = {
+  tool?: ToolEventInfo &
+    (LocalToolInfo | GoogleToolInfo | OpenAIToolInfo | AnthropicToolInfo);
+};
+
+export type ToolEventInfo =
+  | { use_id: string; event: "use" }
+  | { use_id: string; event: "result"; is_error?: boolean };
+
+type LocalSimpleToolInfo = {
+  provider: "local";
+  type: "function" | "custom";
+  name: string;
+};
+
+type LocalSpecialToolInfo = {
+  provider: "local";
+  type: "mcp" | "sql" | "http";
+  label: string;
+  name: string;
+};
+
+export type LocalToolInfo = LocalSimpleToolInfo | LocalSpecialToolInfo;
+
+type GoogleToolInfo = {
+  provider: "google";
+  type: "google_search" | "code_execution" | "url_context";
+};
+
+type OpenAIToolInfo = {
+  provider: "openai";
+  type:
+    | "mcp"
+    | "web_search_preview"
+    | "file_search"
+    | "image_generation"
+    | "code_interpreter"
+    | "computer_use_preview";
+};
+
+type AnthropicToolInfo = {
+  provider: "anthropic";
+  type:
+    | "mcp"
+    | "bash"
+    | "code_execution"
+    | "computer"
+    | "str_replace_based_edit_tool"
+    | "web_search";
+};
+
+// Text based
+
+export type TextPart = {
+  type: "text";
+  kind: "text" | "reaction" | "caption" | "transcription" | "description";
+  text: string;
+  artifacts?: Part[];
+};
+
+// File based
+
+export const MediaTypes = [
+  "audio",
+  "image",
+  "video",
+  "document",
+  "sticker",
+] as const;
+
+/**
+ * Represents a file, such as an image, video, or document.
+ * WhatsApp allows media messages to include an accompanying text caption.
+ * For now, this caption is embedded directly within the `text` attribute of the `FilePart`.
+ * A more structured approach, leveraging the `Parts` type, would involve separate
+ * `FilePart` and `TextPart` components for such messages in the future.
+ */
+export type FilePart = {
+  type: "file";
+  kind: (typeof MediaTypes)[number];
+  file: {
+    mime_type: string;
+    uri: string; // --> internal://media/organizations/${organization_id}/attachments/${file_hash}
+    name?: string;
+    size: number;
+  };
+  text?: string; // caption
+  artifacts?: Part[];
+};
+
+// Data based
+
+export type DataPart<Kind = "data", T = Json> = {
+  type: "data";
+  kind: Kind;
+  data: T;
+  artifacts?: Part[];
+};
+
+type ContactsPart = DataPart<"contacts", Contact[]>;
+
+type LocationPart = DataPart<"location", Location>;
+
+type OrderPart = DataPart<"order", Order>;
+
+type InteractivePart = DataPart<
+  "interactive",
+  InteractiveMessage["interactive"]
+>;
+
+type ButtonPart = DataPart<"button", ButtonMessage["button"]>;
+
+type TemplatePart = DataPart<"template", Template>;
+
+type MediaPlaceholderPart = DataPart<"media_placeholder", null>;
+
+// Multi-part messages
+
+export type Part = TextPart | DataPart | FilePart;
+
+// Parts type is not used yet. It is a proof of concept.
+export type Parts = {
+  type: "parts";
+  kind: "parts";
+  parts: Part[];
+  artifacts?: Part[];
+};
+
+/**
+ * WhatsApp Messages
+ * Text (caption for media types)
+ * Media (File)
+ * Data
+ *
+ * Text and/or Media (up to two parts), or Data (one part)
+ *
+ * Excepting Reaction, Contacts and Location, all other types differ depending on the direction (incoming or outgoing)
+ */
+
+export type IncomingMessage = {
+  version: "1";
+  re_message_id?: string; // replied, reacted or forwarded message id
+  forwarded?: boolean;
+} & TaskInfo &
   (
-    | AudioMessage
-    | ContactsMessage
-    | DocumentMessage
-    | ImageMessage
-    | LocationMessage
-    | OutgoingInteractiveMessage
-    | ReactionMessage
-    | StickerMessage
-    | TemplateMessage
-    | TextMessage
-    | VideoMessage
+    | TextPart
+    | FilePart
+    | ContactsPart
+    | LocationPart
+    | OrderPart
+    | InteractivePart
+    | ButtonPart
+    | MediaPlaceholderPart
   );
 
-type ConversationType =
-  | "authentication"
-  | "marketing"
-  | "utility"
-  | "service"
-  | "referral_conversion";
+export type InternalMessage = {
+  version: "1";
+  re_message_id?: string; // replied, reacted or forwarded message id
+  forwarded?: boolean;
+} & TaskInfo &
+  ToolInfo &
+  Part;
 
-/** STATUS
- *
- * 1. Sent messages
- *    WebhookStatus -> OutgoingStatus
- *
- * 2. Received messages
- *    IncomingStatus -> EndpointStatus
- */
+export type OutgoingMessage = {
+  version: "1";
+  re_message_id?: string; // replied, reacted or forwarded message id
+  forwarded?: boolean;
+} & TaskInfo &
+  (TextPart | FilePart | ContactsPart | LocationPart | TemplatePart);
+
+//===================================
+// Statuses
+//===================================
 
 export type IncomingStatus = {
   pending?: string; // new Date().toISOString()
   read?: string;
+  typing?: string;
+  annotating?: string;
+  annotated?: string;
 };
 
 export type OutgoingStatus = {
@@ -394,80 +464,200 @@ export type OutgoingStatus = {
   delivered?: string;
   read?: string;
   failed?: string;
-  conversation?: {
-    id: string;
-    type: ConversationType;
-    expiration_timestamp: string;
-  };
-  errors?: string[];
+  annotating?: string;
+  annotated?: string;
+  errors?: WebhookError[];
 };
+
+//===================================
+// Extra
+//===================================
 
 export type Memory = {
   [key: string]: string | undefined | Memory;
 };
 
-type Database = MergeDeep<
+export type AnnotationConfig = {
+  mode?: "active" | "inactive";
+  model?: "gemini-2.5-pro" | "gemini-2.5-flash";
+  api_key?: string;
+  language?: string;
+  extra_prompt?: string;
+};
+
+export type OrganizationExtra = {
+  response_delay_seconds?: number;
+  welcome_message?: string;
+  authorized_contacts_only?: boolean;
+  default_agent_id?: string;
+  annotations?: AnnotationConfig;
+  error_messages_direction?: "internal" | "outgoing";
+};
+
+export type ConversationExtra = {
+  type?: "personal" | "group" | "test" | "test_run";
+  memory?: Memory;
+  paused?: string;
+  archived?: string;
+  pinned?: string;
+  notifications?: "off" | "muted" | "on";
+  draft?: {
+    text: string;
+    origin: string;
+    timestamp: string;
+  };
+  test_run?: {
+    reference_conversation: {
+      organization_address: string;
+      contact_address: string;
+    };
+    status?: "fail" | "success";
+    reference_message_id?: string;
+  };
+};
+
+export type ContactExtra = {
+  allowed?: boolean;
+  group?: string;
+};
+
+// Function tools have a JSON input (data part).
+export type LocalFunctionToolConfig = {
+  provider: "local";
+  type: "function";
+  name: string;
+};
+
+// Custom tools have a free-grammar input (text part).
+export type LocalCustomToolConfig = {
+  provider: "local";
+  type: "custom";
+  name: string;
+};
+
+export type LocalSimpleToolConfig =
+  | LocalFunctionToolConfig
+  | LocalCustomToolConfig;
+
+export type LocalMCPToolConfig = {
+  provider: "local";
+  type: "mcp";
+  label: string; // server label
+  config: {
+    url: string;
+    headers?: Record<string, string>;
+    allowed_tools?: string[];
+  };
+};
+
+export type LocalSQLToolConfig = {
+  provider: "local";
+  type: "sql";
+  label: string; // database label
+  config: Json;
+};
+
+export type LocalHTTPToolConfig = {
+  provider: "local";
+  type: "http";
+  label: string; // client label
+  config: {
+    headers?: Record<string, string>;
+  };
+};
+
+export type LocalSpecialToolConfig = LocalSQLToolConfig | LocalHTTPToolConfig;
+
+export type ToolConfig =
+  | LocalSimpleToolConfig
+  | LocalSpecialToolConfig
+  | LocalMCPToolConfig;
+
+export type AgentExtra = {
+  mode?: "active" | "draft" | "inactive";
+  description?: string;
+  api_url?: string;
+  api_key?: string;
+  model?: string;
+  // TODO: Deprecate assistants. Add responses (openai), messages (anthropic), generate-content (google).
+  protocol?: "a2a" | "chat_completions" | "assistants";
+  assistant_id?: string;
+  max_messages?: number;
+  temperature?: number;
+  max_tokens?: number;
+  thinking?: "minimal" | "low" | "medium" | "high";
+  instructions?: string;
+  send_inline_files_up_to_size_mb?: number;
+  tools?: ToolConfig[];
+};
+
+export type Database = MergeDeep<
   DatabaseGenerated,
   {
     public: {
       Tables: {
+        organizations: {
+          Row: {
+            extra: OrganizationExtra | null;
+          };
+        };
         conversations: {
           Row: {
-            extra: {
-              type?: "personal" | "group" | "test" | "test_run";
-              memory?: Memory;
-              paused?: string;
-              archived?: string;
-              pinned?: string;
-              notifications?: "off" | "muted" | "on";
-              draft?: Draft;
-            };
+            extra: ConversationExtra | null;
+          };
+          Insert: {
+            organization_id?: string;
           };
         };
         messages: {
           Row:
             | {
-                type: "incoming" | "notification" | "internal";
-                message: BaseMessage;
+                direction: "incoming";
+                content: IncomingMessage;
                 status: IncomingStatus;
               }
             | {
-                type: "outgoing" | "draft";
-                message: BaseMessage;
+                direction: "internal";
+                content: InternalMessage;
+                status: IncomingStatus;
+              }
+            | {
+                direction: "outgoing";
+                content: OutgoingMessage;
                 status: OutgoingStatus;
-              }
-            | {
-                type: "function_call";
-                message: FunctionCallMessage;
-                status: IncomingStatus;
-              }
-            | {
-                type: "function_response";
-                message: FunctionResponseMessage;
-                status: IncomingStatus;
               };
           Insert:
             | {
-                type: "incoming" | "internal";
-                message: BaseMessage;
+                organization_id?: string;
+                conversation_id?: string;
+                direction: "incoming";
+                content: IncomingMessage;
                 status?: IncomingStatus;
               }
             | {
-                type: "outgoing";
-                message: BaseMessage;
-                status?: OutgoingStatus;
-              };
-          Update:
-            | {
-                type: "incoming";
-                message?: BaseMessage;
+                organization_id?: string;
+                conversation_id?: string;
+                direction: "internal";
+                content: InternalMessage;
                 status?: IncomingStatus;
               }
             | {
-                type: "outgoing";
-                message?: BaseMessage;
+                organization_id?: string;
+                conversation_id?: string;
+                direction: "outgoing";
+                content: OutgoingMessage;
                 status?: OutgoingStatus;
               };
+        };
+        contacts: {
+          Row: {
+            extra: ContactExtra | null;
+          };
+        };
+        agents: {
+          Row: {
+            extra: AgentExtra | null;
+          };
         };
       };
     };
@@ -485,11 +675,14 @@ export type ConversationInsert =
 export type ConversationUpdate =
   Database["public"]["Tables"]["conversations"]["Update"];
 
+export type OrganizationRow =
+  Database["public"]["Tables"]["organizations"]["Row"];
 export type OrganizationUpdate =
   Database["public"]["Tables"]["organizations"]["Update"];
 
-export type OrganizationRow =
-  Database["public"]["Tables"]["organizations"]["Row"];
+export type ContactRow = Database["public"]["Tables"]["contacts"]["Row"];
+
+export type AgentRow = Database["public"]["Tables"]["agents"]["Row"];
 
 export const supabase = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -510,13 +703,5 @@ supabase.realtime.reconnectAfterMs = (attempt: number) => {
 
 export type Status = IncomingStatus & OutgoingStatus;
 export type MessageTypes = IncomingMessage["type"] | OutgoingMessage["type"];
-export type MessageRoles = Database["public"]["Enums"]["type"];
 export type Draft = { text: string; origin: string; timestamp: string };
-
-export type WebhookPayload<Record> = {
-  type: "INSERT" | "UPDATE" | "DELETE";
-  table: string;
-  schema: string;
-  record: Record | null;
-  old_record: Record | null;
-};
+export type { Tables };

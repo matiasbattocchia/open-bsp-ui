@@ -18,12 +18,13 @@ export default function AudioMessage({
   orgName: string;
   convName: string;
 }) {
-  if (!(message.type === "incoming" || message.type === "outgoing")) {
+  if (!(message.direction === "incoming" || message.direction === "outgoing")) {
     throw new Error(`Message with id ${message.id} is not a BaseMessage.`);
   }
 
-  if (!message.message.media) {
-    throw new Error(`Message with id ${message.id} has no media property.`);
+  const content = message.content;
+  if (content.type !== "file" || content.kind !== "audio") {
+    throw new Error(`Message with id ${message.id} is not an audio message.`);
   }
 
   const { load, startLoad, cancelLoad } = useMedia(message);
@@ -62,7 +63,7 @@ export default function AudioMessage({
       <div
         className={
           "py-[3px] flex items-center" +
-          (message.type === "incoming"
+          (message.direction === "incoming"
             ? " pl-[11px] pr-[7px]"
             : " pr-[11px] pl-[7px]")
         }
@@ -71,7 +72,7 @@ export default function AudioMessage({
         <div
           className={
             "grow flex items-center pb-[5px]" +
-            (message.type === "incoming" ? " mr-[11px]" : " ml-[11px]")
+            (message.direction === "incoming" ? " mr-[11px]" : " ml-[11px]")
           }
         >
           {/* Load/Play/Pause button */}
@@ -173,11 +174,13 @@ export default function AudioMessage({
             <div
               className={
                 "text-[11px] text-gray-dark absolute -bottom-[22px] flex items-center" +
-                (message.type === "incoming" ? " right-0" : " -right-[7px]")
+                (message.direction === "incoming"
+                  ? " right-0"
+                  : " -right-[7px]")
               }
             >
               {dayjs(message.timestamp).format("HH:mm")}
-              {message.type === "outgoing" && (
+              {message.direction === "outgoing" && (
                 <StatusIcon {...(message.status as OutgoingStatus)} />
               )}
             </div>
@@ -188,13 +191,13 @@ export default function AudioMessage({
         <div
           className={
             "relative" +
-            (message.type === "incoming" ? " order-last" : " order-first")
+            (message.direction === "incoming" ? " order-last" : " order-first")
           }
         >
           <Avatar
             // TODO: use agent name and pic - cabra 16/01/2025
             fallback={nameInitials(
-              (message.type === "incoming" ? convName : orgName) || "?",
+              (message.direction === "incoming" ? convName : orgName) || "?",
             )}
             size={55}
             className="bg-blue-400 text-xl"
@@ -202,7 +205,7 @@ export default function AudioMessage({
           <svg
             className={
               "w-[19px] h-[26px] absolute -bottom-[2px]" +
-              (message.type === "incoming" ? " left-0" : " right-0")
+              (message.direction === "incoming" ? " left-0" : " right-0")
             }
           >
             {/* TODO: out message mic background should match the green background of the message - cabra 05/06/2024 */}
@@ -212,11 +215,26 @@ export default function AudioMessage({
       </div>
 
       {/* Caption */}
-      {message.message.content && (
+      {content.text && (
         <div className="pl-[6px] pt-[6px] pb-[5px] pr-[4px] text-gray-dark">
-          {message.message.content}
+          {content.text}
         </div>
       )}
+
+      {/* Transcription - from artifacts with kind "transcription" */}
+      {content.artifacts &&
+        content.artifacts.some(
+          (a) => a.type === "text" && a.kind === "transcription",
+        ) && (
+          <div className="pl-[6px] pt-[6px] pb-[5px] pr-[4px] text-gray-dark text-[13px] italic">
+            {(() => {
+              const transcription = content.artifacts.find(
+                (a) => a.type === "text" && a.kind === "transcription",
+              );
+              return transcription?.type === "text" ? transcription.text : "";
+            })()}
+          </div>
+        )}
     </div>
   );
 }

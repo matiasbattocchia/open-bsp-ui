@@ -147,7 +147,7 @@ export default function ChatFooter() {
     }
 
     for (const msg of msgs) {
-      if (msg.type === "incoming") {
+      if (msg.direction === "incoming") {
         return msg;
       }
     }
@@ -255,8 +255,10 @@ export default function ChatFooter() {
           ? "incoming"
           : "outgoing",
       {
+        version: "1",
         type: "text",
-        content: message,
+        kind: "text",
+        text: message,
       },
       agentId,
     );

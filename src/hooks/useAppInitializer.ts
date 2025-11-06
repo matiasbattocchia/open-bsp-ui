@@ -26,9 +26,9 @@ export function useAppInit() {
   // Hook the data in
   const { data: authorizedData } = useFetchAuthorizedData(session?.id);
   useOrgData(authorizedData?.authorizedOrgs);
-  useConversationData(authorizedData?.authorizedAddresses);
-  useMessageData(authorizedData?.authorizedAddresses, 30);
-  useRealtimeSubscription(authorizedData?.authorizedAddresses);
+  useConversationData(authorizedData?.authorizedOrgs);
+  useMessageData(authorizedData?.authorizedOrgs, 30);
+  useRealtimeSubscription(authorizedData?.authorizedOrgs);
 
   useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange((event, session) => {

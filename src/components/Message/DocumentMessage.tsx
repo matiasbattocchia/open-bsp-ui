@@ -63,15 +63,17 @@ export function isImage(type: string) {
 }
 
 export default function DocumentMessage(message: MessageRow) {
-  if (!(message.type === "incoming" || message.type === "outgoing")) {
+  if (!(message.direction === "incoming" || message.direction === "outgoing")) {
     throw new Error(`Message with id ${message.id} is not a BaseMessage.`);
   }
 
-  const media = message.message.media;
+  const content = message.content;
 
-  if (!media) {
-    throw new Error(`Message with id ${message.id} has no media property.`);
+  if (content.type !== "file" || content.kind !== "document") {
+    throw new Error(`Message with id ${message.id} is not a document message.`);
   }
+
+  const media = content.file;
 
   const { load, startLoad, cancelLoad, handleLoad } = useMedia(message);
   const [showAnnotation, setShowAnnotation] = useState(false);
@@ -90,28 +92,25 @@ export default function DocumentMessage(message: MessageRow) {
       load.type === "download" &&
       load.status === "done"
     ) {
-      handleLoad(media.filename);
+      handleLoad(media.name);
     }
   }, [load.blob]);
 
   return (
     <div
       className={
-        "w-[320px]" +
-        (message.message.content || message.message.media?.annotation
-          ? ""
-          : " pb-[25px]")
+        "w-[320px]" + (content.text || content.artifacts ? "" : " pb-[25px]")
       }
     >
       {/* File */}
       <div
         className={
           "py-[13px] px-[19px] rounded-md flex items-start cursor-pointer" +
-          (message.type === "outgoing" ? " bg-blue-200" : " bg-[#f5f6f6]")
+          (message.direction === "outgoing" ? " bg-blue-200" : " bg-[#f5f6f6]")
         }
         onClick={() => {
           if (load.status === "done") {
-            handleLoad(media.filename);
+            handleLoad(media.name);
           } else if (load.status === "loading") {
             cancelLoad();
           } else {
@@ -120,17 +119,17 @@ export default function DocumentMessage(message: MessageRow) {
         }}
       >
         {/* Icon */}
-        <img src={iconName(media.filename)} width={26} height={30} />
+        <img src={iconName(media.name)} width={26} height={30} />
 
         {/* Info */}
         <div className="mx-[10px] -top-[2px] grow min-w-0 relative">
-          <div>{media.filename || mediaType(media.mime_type)}</div>
+          <div>{media.name || mediaType(media.mime_type)}</div>
           <div className="text-gray-dark py-[3px] text-[12px]">
-            <span className="uppercase">{extension(media.filename)}</span>
-            {media.filename && !isNaN(media.file_size) && (
+            <span className="uppercase">{extension(media.name)}</span>
+            {media.name && !isNaN(media.size) && (
               <span className="mx-[3px]">•</span>
             )}
-            <span>{fileSize(media.file_size)}</span>
+            <span>{fileSize(media.size)}</span>
           </div>
         </div>
 
@@ -158,42 +157,51 @@ export default function DocumentMessage(message: MessageRow) {
       </div>
 
       {/* Caption */}
-      {message.message.content && (
+      {content.text && (
         <div className="pl-[6px] pt-[6px] pb-[5px] pr-[4px]">
-          <Markdown
-            content={message.message.content || ""}
-            type={message.type}
-          />
+          <Markdown content={content.text || ""} type={message.direction} />
         </div>
       )}
 
-      {/* Annotation */}
-      {message.message.media?.annotation && (
-        <div
-          className={
-            "pl-[6px] pb-[5px] pr-[4px] text-gray-dark" +
-            (message.message.content ? "" : " pt-[6px]")
-          }
-        >
-          {showAnnotation && (
-            <Markdown
-              content={message.message.media.annotation || ""}
-              type={message.type}
-            />
-          )}
+      {/* Description - from artifacts with kind "description" */}
+      {content.artifacts &&
+        content.artifacts.some(
+          (a) => a.type === "text" && a.kind === "description",
+        ) && (
           <div
-            className="text-blue-ack cursor-pointer"
-            onClick={() => setShowAnnotation(!showAnnotation)}
+            className={
+              "pl-[6px] pb-[5px] pr-[4px] text-gray-dark" +
+              (content.text ? "" : " pt-[6px]")
+            }
           >
-            {showAnnotation ? t("ocultar anotación...") : t("ver anotación...")}
+            {showAnnotation && (
+              <Markdown
+                content={(() => {
+                  const description = content.artifacts.find(
+                    (a) => a.type === "text" && a.kind === "description",
+                  );
+                  return description?.type === "text"
+                    ? description.text || ""
+                    : "";
+                })()}
+                type={message.direction}
+              />
+            )}
+            <div
+              className="text-blue-ack cursor-pointer"
+              onClick={() => setShowAnnotation(!showAnnotation)}
+            >
+              {showAnnotation
+                ? t("ocultar descripción...")
+                : t("ver descripción...")}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
       {/* Timestamp */}
       <div className="text-[11px] text-gray-dark absolute bottom-[0px] right-[7px] flex items-center">
         {dayjs(message.timestamp).format("HH:mm")}
-        {message.type === "outgoing" && (
+        {message.direction === "outgoing" && (
           <StatusIcon {...(message.status as OutgoingStatus)} />
         )}
       </div>

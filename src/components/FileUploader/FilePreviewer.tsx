@@ -120,6 +120,8 @@ const FilePreviewer = () => {
     !conv.updated_at && pushConversationToDb(conv);
 
     for (const draft of drafts) {
+      const fileKind = isImage(draft.file.type) ? "image" : "document";
+
       const record = newMessage(
         conv,
         convType === "group"
@@ -128,8 +130,16 @@ const FilePreviewer = () => {
             ? "incoming"
             : "outgoing",
         {
-          type: isImage(draft.file.type) ? "image" : "document",
-          content: draft.caption,
+          version: "1",
+          type: "file",
+          kind: fileKind,
+          file: {
+            uri: "", // Will be set by newMessage
+            mime_type: draft.file.type,
+            name: draft.file.name,
+            size: draft.file.size,
+          },
+          text: draft.caption, // caption
         },
         agentId,
         draft.file,

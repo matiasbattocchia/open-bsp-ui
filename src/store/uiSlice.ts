@@ -21,7 +21,8 @@ export const filters: {
   [key in Filters]: (conv: ConversationRow, msg?: MessageRow) => boolean;
 } = {
   todas: (conv, msg) => !isArchived(conv, msg),
-  pendientes: (conv, msg) => !isArchived(conv, msg) && msg?.type === "incoming",
+  pendientes: (conv, msg) =>
+    !isArchived(conv, msg) && msg?.direction === "incoming",
   "24h": (conv, msg) =>
     !isArchived(conv, msg) &&
     dayjs(msg?.timestamp || 0).isAfter(dayjs().subtract(1, "day")),

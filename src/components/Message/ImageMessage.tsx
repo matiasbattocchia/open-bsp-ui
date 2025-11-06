@@ -23,15 +23,24 @@ const MAX_PORTRAIT_HEIGHT = (PORTRAIT_WIDTH * 4) / 3;
 const MAX_LANDSCAPE_HEIGHT = (LANDSCAPE_WIDTH * 3) / 4;
 
 export default function ImageMessage(message: MessageRow) {
-  if (!(message.type === "incoming" || message.type === "outgoing")) {
+  if (!(message.direction === "incoming" || message.direction === "outgoing")) {
     throw new Error(`Message with id ${message.id} is not a BaseMessage.`);
   }
 
-  const media = message.message.media;
+  const content = message.content;
 
-  if (!media) {
-    throw new Error(`Message with id ${message.id} has no media property.`);
+  if (
+    content.type !== "file" ||
+    (content.kind !== "image" &&
+      content.kind !== "sticker" &&
+      content.kind !== "video")
+  ) {
+    throw new Error(
+      `Message with id ${message.id} is not an image/sticker/video message.`,
+    );
   }
+
+  const media = content.file;
 
   const { load, startLoad, cancelLoad, handleLoad } = useMedia(message);
   const [width, setWidth] = useState(PORTRAIT_WIDTH);
@@ -119,7 +128,7 @@ export default function ImageMessage(message: MessageRow) {
                       <Space size={18} className={styles.toolbarWrapper}>
                         <DownloadOutlined
                           className={styles.anticon}
-                          onClick={() => handleLoad(media.filename)}
+                          onClick={() => handleLoad(media.name)}
                         />
                         <SwapOutlined
                           className={styles.anticon}
@@ -158,7 +167,7 @@ export default function ImageMessage(message: MessageRow) {
             </div>
 
             {/* Shadow */}
-            {!message.message.content && (
+            {!content.text && (
               <div className="absolute rounded-md z-[1] h-[30px] bottom-0 w-full shadow-[inset_0_-30px_10px_-10px_rgba(0,0,0,0.4)]" />
             )}
           </>
@@ -166,7 +175,7 @@ export default function ImageMessage(message: MessageRow) {
 
         {/* Load button */}
         {(load.status === "pending" || load.status === "error") &&
-          !isNaN(media.file_size) && (
+          !isNaN(media.size) && (
             <div className="z-[1] rounded-full h-[44px] pl-[13px] pr-[18px] flex items-center text-white bg-[rgba(11,20,26,.35)] text-[13px]">
               <svg
                 className={
@@ -177,12 +186,12 @@ export default function ImageMessage(message: MessageRow) {
                 <use href="/icons.svg#image-download" />
               </svg>
 
-              <div className="ml-[5px]">{fileSize(media.file_size)}</div>
+              <div className="ml-[5px]">{fileSize(media.size)}</div>
             </div>
           )}
         {/* Alternative load button for when file size is missing, just in case */}
         {(load.status === "pending" || load.status === "error") &&
-          isNaN(media.file_size) && (
+          isNaN(media.size) && (
             <div className="z-[1] rounded-full flex items-center justify-center text-white bg-[rgba(11,20,26,.35)] w-[44px] h-[44px]">
               <svg
                 className={
@@ -205,52 +214,61 @@ export default function ImageMessage(message: MessageRow) {
       </div>
 
       {/* Caption */}
-      {message.message.content && (
+      {content.text && (
         <div className="pl-[6px] pt-[6px] pb-[5px] pr-[4px]" style={{ width }}>
-          <Markdown
-            content={message.message.content || ""}
-            type={message.type}
-          />
+          <Markdown content={content.text || ""} type={message.direction} />
         </div>
       )}
 
-      {/* Annotation */}
-      {message.message.media?.annotation && (
-        <div
-          className={
-            "pl-[6px] pb-[5px] pr-[4px] text-gray-dark" +
-            (message.message.content ? "" : " pt-[6px]")
-          }
-          style={{ width }}
-        >
-          {showAnnotation && (
-            <Markdown
-              content={message.message.media.annotation || ""}
-              type={message.type}
-            />
-          )}
+      {/* Description - from artifacts with kind "description" */}
+      {content.artifacts &&
+        content.artifacts.some(
+          (a) => a.type === "text" && a.kind === "description",
+        ) && (
           <div
-            className="text-blue-ack cursor-pointer"
-            onClick={() => setShowAnnotation(!showAnnotation)}
+            className={
+              "pl-[6px] pb-[5px] pr-[4px] text-gray-dark" +
+              (content.text ? "" : " pt-[6px]")
+            }
+            style={{ width }}
           >
-            {showAnnotation ? t("ocultar anotación...") : t("ver anotación...")}
+            {showAnnotation && (
+              <Markdown
+                content={(() => {
+                  const description = content.artifacts.find(
+                    (a) => a.type === "text" && a.kind === "description",
+                  );
+                  return description?.type === "text"
+                    ? description.text || ""
+                    : "";
+                })()}
+                type={message.direction}
+              />
+            )}
+            <div
+              className="text-blue-ack cursor-pointer"
+              onClick={() => setShowAnnotation(!showAnnotation)}
+            >
+              {showAnnotation
+                ? t("ocultar descripción...")
+                : t("ver descripción...")}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
       {/* Timestamp */}
       <div
         className={
           "z-[2] text-[11px] absolute bottom-[0px] right-[7px] flex items-center" +
-          (message.message.content ||
-          message.message.media?.annotation ||
+          (content.text ||
+          (content.artifacts && content.artifacts.length > 0) ||
           !load.blob
             ? " text-gray-dark"
             : " text-white bottom-[3px]")
         }
       >
         {dayjs(message.timestamp).format("HH:mm")}
-        {message.type === "outgoing" && (
+        {message.direction === "outgoing" && (
           <StatusIcon {...(message.status as OutgoingStatus)} />
         )}
       </div>

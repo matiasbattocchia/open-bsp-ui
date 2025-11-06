@@ -7,142 +7,6 @@ export type Json =
   | Json[]
 
 export type Database = {
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          operationName?: string
-          query?: string
-          variables?: Json
-          extensions?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
-  hotline: {
-    Tables: {
-      events: {
-        Row: {
-          extra: Json | null
-          id: string
-          name: string
-        }
-        Insert: {
-          extra?: Json | null
-          id?: string
-          name: string
-        }
-        Update: {
-          extra?: Json | null
-          id?: string
-          name?: string
-        }
-        Relationships: []
-      }
-      promos: {
-        Row: {
-          code: string
-          created_at: string | null
-          event_id: string | null
-          extra: Json | null
-        }
-        Insert: {
-          code?: string
-          created_at?: string | null
-          event_id?: string | null
-          extra?: Json | null
-        }
-        Update: {
-          code?: string
-          created_at?: string | null
-          event_id?: string | null
-          extra?: Json | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "promos_event_id_fkey"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "events"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      tickets: {
-        Row: {
-          contact_id: string
-          created_at: string
-          event_id: string | null
-          extra: Json | null
-          id: string
-          promo_code: string | null
-          status: Database["hotline"]["Enums"]["ticket_status"] | null
-          updated_at: string
-        }
-        Insert: {
-          contact_id: string
-          created_at?: string
-          event_id?: string | null
-          extra?: Json | null
-          id?: string
-          promo_code?: string | null
-          status?: Database["hotline"]["Enums"]["ticket_status"] | null
-          updated_at?: string
-        }
-        Update: {
-          contact_id?: string
-          created_at?: string
-          event_id?: string | null
-          extra?: Json | null
-          id?: string
-          promo_code?: string | null
-          status?: Database["hotline"]["Enums"]["ticket_status"] | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "tickets_event_id_fkey"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "events"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "tickets_promo_code_fkey"
-            columns: ["promo_code"]
-            isOneToOne: true
-            referencedRelation: "promos"
-            referencedColumns: ["code"]
-          },
-        ]
-      }
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      [_ in never]: never
-    }
-    Enums: {
-      ticket_status: "reserved" | "assigned" | "used" | "returned"
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       agents: {
@@ -152,7 +16,7 @@ export type Database = {
           extra: Json | null
           id: string
           name: string
-          organization_id: string | null
+          organization_id: string
           picture: string | null
           updated_at: string
           user_id: string | null
@@ -163,7 +27,7 @@ export type Database = {
           extra?: Json | null
           id?: string
           name: string
-          organization_id?: string | null
+          organization_id: string
           picture?: string | null
           updated_at?: string
           user_id?: string | null
@@ -174,7 +38,7 @@ export type Database = {
           extra?: Json | null
           id?: string
           name?: string
-          organization_id?: string | null
+          organization_id?: string
           picture?: string | null
           updated_at?: string
           user_id?: string | null
@@ -195,18 +59,21 @@ export type Database = {
           id: string
           key: string
           organization_id: string
+          updated_at: string
         }
         Insert: {
           created_at?: string
           id?: string
           key: string
           organization_id: string
+          updated_at?: string
         }
         Update: {
           created_at?: string
           id?: string
           key?: string
           organization_id?: string
+          updated_at?: string
         }
         Relationships: [
           {
@@ -225,6 +92,7 @@ export type Database = {
           id: string
           name: string
           organization_id: string
+          updated_at: string
         }
         Insert: {
           created_at?: string
@@ -232,6 +100,7 @@ export type Database = {
           id?: string
           name: string
           organization_id: string
+          updated_at?: string
         }
         Update: {
           created_at?: string
@@ -239,6 +108,7 @@ export type Database = {
           id?: string
           name?: string
           organization_id?: string
+          updated_at?: string
         }
         Relationships: [
           {
@@ -256,10 +126,12 @@ export type Database = {
           contact_id: string | null
           created_at: string
           extra: Json | null
-          name: string
+          id: string
+          name: string | null
           organization_address: string
           organization_id: string
           service: Database["public"]["Enums"]["service"]
+          status: string
           updated_at: string
         }
         Insert: {
@@ -267,10 +139,12 @@ export type Database = {
           contact_id?: string | null
           created_at?: string
           extra?: Json | null
-          name: string
+          id?: string
+          name?: string | null
           organization_address: string
           organization_id: string
           service: Database["public"]["Enums"]["service"]
+          status?: string
           updated_at?: string
         }
         Update: {
@@ -278,10 +152,12 @@ export type Database = {
           contact_id?: string | null
           created_at?: string
           extra?: Json | null
-          name?: string
+          id?: string
+          name?: string | null
           organization_address?: string
           organization_id?: string
           service?: Database["public"]["Enums"]["service"]
+          status?: string
           updated_at?: string
         }
         Relationships: [
@@ -312,95 +188,61 @@ export type Database = {
         Row: {
           agent_id: string | null
           contact_address: string
+          content: Json
+          conversation_id: string
           created_at: string
-          direction: Database["public"]["Enums"]["direction"] | null
+          direction: Database["public"]["Enums"]["direction"]
           external_id: string | null
           id: string
-          message: Json
           organization_address: string
+          organization_id: string
           service: Database["public"]["Enums"]["service"]
           status: Json
           timestamp: string
-          type: Database["public"]["Enums"]["type"]
           updated_at: string
         }
         Insert: {
           agent_id?: string | null
           contact_address: string
+          content: Json
+          conversation_id: string
           created_at?: string
-          direction?: Database["public"]["Enums"]["direction"] | null
+          direction: Database["public"]["Enums"]["direction"]
           external_id?: string | null
           id?: string
-          message: Json
           organization_address: string
+          organization_id: string
           service: Database["public"]["Enums"]["service"]
           status?: Json
           timestamp?: string
-          type: Database["public"]["Enums"]["type"]
           updated_at?: string
         }
         Update: {
           agent_id?: string | null
           contact_address?: string
+          content?: Json
+          conversation_id?: string
           created_at?: string
-          direction?: Database["public"]["Enums"]["direction"] | null
+          direction?: Database["public"]["Enums"]["direction"]
           external_id?: string | null
           id?: string
-          message?: Json
           organization_address?: string
+          organization_id?: string
           service?: Database["public"]["Enums"]["service"]
           status?: Json
           timestamp?: string
-          type?: Database["public"]["Enums"]["type"]
           updated_at?: string
-        }
-        Relationships: []
-      }
-      model_usage: {
-        Row: {
-          contact_address: string
-          message_id: string
-          model: string
-          organization_address: string
-          organization_id: string
-          stats: Json
-          timestamp: string
-        }
-        Insert: {
-          contact_address: string
-          message_id: string
-          model: string
-          organization_address: string
-          organization_id: string
-          stats: Json
-          timestamp?: string
-        }
-        Update: {
-          contact_address?: string
-          message_id?: string
-          model?: string
-          organization_address?: string
-          organization_id?: string
-          stats?: Json
-          timestamp?: string
         }
         Relationships: [
           {
-            foreignKeyName: "fk_conversation"
-            columns: ["organization_address", "contact_address"]
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
             isOneToOne: false
             referencedRelation: "conversations"
-            referencedColumns: ["organization_address", "contact_address"]
-          },
-          {
-            foreignKeyName: "fk_message"
-            columns: ["message_id"]
-            isOneToOne: false
-            referencedRelation: "messages"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "fk_organization"
+            foreignKeyName: "messages_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
@@ -414,18 +256,21 @@ export type Database = {
           extra: Json | null
           id: string
           name: string
+          updated_at: string
         }
         Insert: {
           created_at?: string
           extra?: Json | null
           id?: string
           name: string
+          updated_at?: string
         }
         Update: {
           created_at?: string
           extra?: Json | null
           id?: string
           name?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -437,6 +282,7 @@ export type Database = {
           organization_id: string
           service: Database["public"]["Enums"]["service"]
           status: string
+          updated_at: string
         }
         Insert: {
           address: string
@@ -445,6 +291,7 @@ export type Database = {
           organization_id: string
           service: Database["public"]["Enums"]["service"]
           status?: string
+          updated_at?: string
         }
         Update: {
           address?: string
@@ -453,10 +300,46 @@ export type Database = {
           organization_id?: string
           service?: Database["public"]["Enums"]["service"]
           status?: string
+          updated_at?: string
         }
         Relationships: [
           {
             foreignKeyName: "organizations_addresses_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quick_replies: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          name: string
+          organization_id: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          name: string
+          organization_id: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          name?: string
+          organization_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quick_replies_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
@@ -478,7 +361,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
-          operations?: Database["public"]["Enums"]["webhook_operation"][]
+          operations: Database["public"]["Enums"]["webhook_operation"][]
           organization_id: string
           table_name: Database["public"]["Enums"]["webhook_table"]
           token?: string | null
@@ -510,279 +393,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      bulk_update_messages_status: {
-        Args: { records: Json }
-        Returns: undefined
-      }
-      gbt_bit_compress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_bool_compress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_bool_fetch: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_bpchar_compress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_bytea_compress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_cash_compress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_cash_fetch: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_date_compress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_date_fetch: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_decompress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_enum_compress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_enum_fetch: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_float4_compress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_float4_fetch: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_float8_compress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_float8_fetch: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_inet_compress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_int2_compress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_int2_fetch: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_int4_compress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_int4_fetch: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_int8_compress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_int8_fetch: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_intv_compress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_intv_decompress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_intv_fetch: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_macad_compress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_macad_fetch: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_macad8_compress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_macad8_fetch: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_numeric_compress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_oid_compress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_oid_fetch: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_text_compress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_time_compress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_time_fetch: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_timetz_compress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_ts_compress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_ts_fetch: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_tstz_compress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_uuid_compress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_uuid_fetch: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_var_decompress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbt_var_fetch: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbtreekey_var_in: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbtreekey_var_out: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbtreekey16_in: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbtreekey16_out: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbtreekey2_in: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbtreekey2_out: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbtreekey32_in: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbtreekey32_out: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbtreekey4_in: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbtreekey4_out: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbtreekey8_in: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gbtreekey8_out: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      generate_unique_promo_code: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      get_authorized_org_by_api_key: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      get_authorized_orgs: {
-        Args: Record<PropertyKey, never> | { role: string }
-        Returns: string[]
-      }
+      get_authorized_org_by_api_key: { Args: never; Returns: string }
+      get_authorized_orgs:
+        | { Args: never; Returns: string[] }
+        | { Args: { role: string }; Returns: string[] }
       merge_update_jsonb: {
-        Args: { target: Json; path: string[]; object: Json }
+        Args: { object: Json; path: string[]; target: Json }
         Returns: Json
-      }
-      read_secret: {
-        Args: { _name: string }
-        Returns: string
-      }
-      text2timestamp: {
-        Args: { text: string }
-        Returns: string
       }
     }
     Enums: {
       direction: "incoming" | "outgoing" | "internal"
-      service:
-        | "whatsapp"
-        | "instagram"
-        | "telegram"
-        | "web"
-        | "email"
-        | "local"
-      type:
-        | "incoming"
-        | "outgoing"
-        | "draft"
-        | "notification"
-        | "function_call"
-        | "function_response"
-        | "internal"
-      webhook_action: "INSERT" | "UPDATE"
-      webhook_entity: "messages" | "conversations"
-      webhook_operation: "INSERT" | "UPDATE"
+      service: "whatsapp" | "instagram" | "local"
+      webhook_operation: "insert" | "update"
       webhook_table: "messages" | "conversations"
     }
     CompositeTypes: {
@@ -802,6 +425,7 @@ export type Database = {
           owner: string | null
           owner_id: string | null
           public: boolean | null
+          type: Database["storage"]["Enums"]["buckettype"]
           updated_at: string | null
         }
         Insert: {
@@ -814,6 +438,7 @@ export type Database = {
           owner?: string | null
           owner_id?: string | null
           public?: boolean | null
+          type?: Database["storage"]["Enums"]["buckettype"]
           updated_at?: string | null
         }
         Update: {
@@ -826,9 +451,111 @@ export type Database = {
           owner?: string | null
           owner_id?: string | null
           public?: boolean | null
+          type?: Database["storage"]["Enums"]["buckettype"]
           updated_at?: string | null
         }
         Relationships: []
+      }
+      buckets_analytics: {
+        Row: {
+          created_at: string
+          format: string
+          id: string
+          type: Database["storage"]["Enums"]["buckettype"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          format?: string
+          id: string
+          type?: Database["storage"]["Enums"]["buckettype"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          format?: string
+          id?: string
+          type?: Database["storage"]["Enums"]["buckettype"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      iceberg_namespaces: {
+        Row: {
+          bucket_id: string
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          bucket_id: string
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          bucket_id?: string
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "iceberg_namespaces_bucket_id_fkey"
+            columns: ["bucket_id"]
+            isOneToOne: false
+            referencedRelation: "buckets_analytics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      iceberg_tables: {
+        Row: {
+          bucket_id: string
+          created_at: string
+          id: string
+          location: string
+          name: string
+          namespace_id: string
+          updated_at: string
+        }
+        Insert: {
+          bucket_id: string
+          created_at?: string
+          id?: string
+          location: string
+          name: string
+          namespace_id: string
+          updated_at?: string
+        }
+        Update: {
+          bucket_id?: string
+          created_at?: string
+          id?: string
+          location?: string
+          name?: string
+          namespace_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "iceberg_tables_bucket_id_fkey"
+            columns: ["bucket_id"]
+            isOneToOne: false
+            referencedRelation: "buckets_analytics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "iceberg_tables_namespace_id_fkey"
+            columns: ["namespace_id"]
+            isOneToOne: false
+            referencedRelation: "iceberg_namespaces"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       migrations: {
         Row: {
@@ -857,6 +584,7 @@ export type Database = {
           created_at: string | null
           id: string
           last_accessed_at: string | null
+          level: number | null
           metadata: Json | null
           name: string | null
           owner: string | null
@@ -871,6 +599,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           last_accessed_at?: string | null
+          level?: number | null
           metadata?: Json | null
           name?: string | null
           owner?: string | null
@@ -885,6 +614,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           last_accessed_at?: string | null
+          level?: number | null
           metadata?: Json | null
           name?: string | null
           owner?: string | null
@@ -897,6 +627,38 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "objects_bucketId_fkey"
+            columns: ["bucket_id"]
+            isOneToOne: false
+            referencedRelation: "buckets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prefixes: {
+        Row: {
+          bucket_id: string
+          created_at: string | null
+          level: number
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          bucket_id: string
+          created_at?: string | null
+          level?: number
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          bucket_id?: string
+          created_at?: string | null
+          level?: number
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prefixes_bucketId_fkey"
             columns: ["bucket_id"]
             isOneToOne: false
             referencedRelation: "buckets"
@@ -1007,87 +769,143 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      can_insert_object: {
-        Args: { bucketid: string; name: string; owner: string; metadata: Json }
+      add_prefixes: {
+        Args: { _bucket_id: string; _name: string }
         Returns: undefined
       }
-      extension: {
-        Args: { name: string }
-        Returns: string
+      can_insert_object: {
+        Args: { bucketid: string; metadata: Json; name: string; owner: string }
+        Returns: undefined
       }
-      filename: {
-        Args: { name: string }
-        Returns: string
+      delete_prefix: {
+        Args: { _bucket_id: string; _name: string }
+        Returns: boolean
       }
-      foldername: {
-        Args: { name: string }
-        Returns: string[]
-      }
+      extension: { Args: { name: string }; Returns: string }
+      filename: { Args: { name: string }; Returns: string }
+      foldername: { Args: { name: string }; Returns: string[] }
+      get_level: { Args: { name: string }; Returns: number }
+      get_prefix: { Args: { name: string }; Returns: string }
+      get_prefixes: { Args: { name: string }; Returns: string[] }
       get_size_by_bucket: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
-          size: number
           bucket_id: string
+          size: number
         }[]
       }
       list_multipart_uploads_with_delimiter: {
         Args: {
           bucket_id: string
-          prefix_param: string
           delimiter_param: string
           max_keys?: number
           next_key_token?: string
           next_upload_token?: string
+          prefix_param: string
         }
         Returns: {
-          key: string
-          id: string
           created_at: string
+          id: string
+          key: string
         }[]
       }
       list_objects_with_delimiter: {
         Args: {
           bucket_id: string
-          prefix_param: string
           delimiter_param: string
           max_keys?: number
-          start_after?: string
           next_token?: string
+          prefix_param: string
+          start_after?: string
         }
         Returns: {
-          name: string
           id: string
           metadata: Json
+          name: string
           updated_at: string
         }[]
       }
-      operation: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      operation: { Args: never; Returns: string }
       search: {
         Args: {
-          prefix: string
           bucketname: string
-          limits?: number
           levels?: number
+          limits?: number
           offsets?: number
+          prefix: string
           search?: string
           sortcolumn?: string
           sortorder?: string
         }
         Returns: {
-          name: string
-          id: string
-          updated_at: string
           created_at: string
+          id: string
           last_accessed_at: string
           metadata: Json
+          name: string
+          updated_at: string
+        }[]
+      }
+      search_legacy_v1: {
+        Args: {
+          bucketname: string
+          levels?: number
+          limits?: number
+          offsets?: number
+          prefix: string
+          search?: string
+          sortcolumn?: string
+          sortorder?: string
+        }
+        Returns: {
+          created_at: string
+          id: string
+          last_accessed_at: string
+          metadata: Json
+          name: string
+          updated_at: string
+        }[]
+      }
+      search_v1_optimised: {
+        Args: {
+          bucketname: string
+          levels?: number
+          limits?: number
+          offsets?: number
+          prefix: string
+          search?: string
+          sortcolumn?: string
+          sortorder?: string
+        }
+        Returns: {
+          created_at: string
+          id: string
+          last_accessed_at: string
+          metadata: Json
+          name: string
+          updated_at: string
+        }[]
+      }
+      search_v2: {
+        Args: {
+          bucket_name: string
+          levels?: number
+          limits?: number
+          prefix: string
+          start_after?: string
+        }
+        Returns: {
+          created_at: string
+          id: string
+          key: string
+          metadata: Json
+          name: string
+          updated_at: string
         }[]
       }
     }
     Enums: {
-      [_ in never]: never
+      buckettype: "STANDARD" | "ANALYTICS"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1095,21 +913,25 @@ export type Database = {
   }
 }
 
-type DefaultSchema = Database[Extract<keyof Database, "public">]
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
@@ -1127,14 +949,16 @@ export type Tables<
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
@@ -1150,14 +974,16 @@ export type TablesInsert<
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
@@ -1173,14 +999,16 @@ export type TablesUpdate<
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
@@ -1188,55 +1016,33 @@ export type Enums<
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
-> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
-  hotline: {
-    Enums: {
-      ticket_status: ["reserved", "assigned", "used", "returned"],
-    },
-  },
   public: {
     Enums: {
       direction: ["incoming", "outgoing", "internal"],
-      service: [
-        "whatsapp",
-        "instagram",
-        "telegram",
-        "web",
-        "email",
-        "local",
-      ],
-      type: [
-        "incoming",
-        "outgoing",
-        "draft",
-        "notification",
-        "function_call",
-        "function_response",
-        "internal",
-      ],
-      webhook_action: ["INSERT", "UPDATE"],
-      webhook_entity: ["messages", "conversations"],
-      webhook_operation: ["INSERT", "UPDATE"],
+      service: ["whatsapp", "instagram", "local"],
+      webhook_operation: ["insert", "update"],
       webhook_table: ["messages", "conversations"],
     },
   },
   storage: {
-    Enums: {},
+    Enums: {
+      buckettype: ["STANDARD", "ANALYTICS"],
+    },
   },
 } as const
 
