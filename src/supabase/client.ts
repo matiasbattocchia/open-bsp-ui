@@ -119,7 +119,7 @@ export type TemplateData = {
     | "DISABLED"
     | "PAUSED"
     | "LIMIT_EXCEEDED";
-  category: "MARKETING"; // TODO: service and auth categories - cabra 2024/09/12
+  category: "MARKETING" | "UTILITY"; // TODO: service and auth categories - cabra 2024/09/12
   language: string;
   components: (
     | BodyComponent

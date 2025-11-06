@@ -163,7 +163,13 @@ function Template({
       }
     }
 
-    const template = { name, language: { code: language } };
+    const template = {
+      name,
+      language: {
+        code: language,
+        policy: "deterministic" as const,
+      },
+    };
 
     if (components.length) {
       //@ts-expect-error
@@ -581,11 +587,13 @@ export default function WhatsAppTemplates() {
       conv,
       "outgoing",
       {
-        type: "template",
-        template,
-        content: body,
-        header,
-        footer,
+        version: "1",
+        type: "data",
+        kind: "template",
+        data: template,
+        // body,
+        // header,
+        // footer,
       },
       agentId,
     );

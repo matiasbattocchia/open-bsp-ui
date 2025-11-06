@@ -4,7 +4,6 @@ import { getHighestStatus, getStatusIcon } from "@/utils/MessageStatusUtils";
 import useBoundStore from "@/store/useBoundStore";
 import { ChatListType } from "../ChatList";
 import {
-  BaseMessage,
   ConversationRow,
   Draft,
   MessageRow,
@@ -51,13 +50,13 @@ function mediaPreview(t: (content: string) => ReactNode, message?: MessageRow) {
 
   if (
     !message ||
-    !(message.type === "incoming" || message.type === "outgoing") ||
-    !message.message.media
+    !(message.direction === "incoming" || message.direction === "outgoing") ||
+    message.content.type !== "file"
   ) {
     return { mediaIcon, mediaPreviewContent };
   }
 
-  const type = message.message.type;
+  const type = message.content.kind;
   const status = getHighestStatus(message.status);
 
   if (["audio", "document", "image", "sticker", "video"].includes(type)) {
@@ -75,7 +74,7 @@ function mediaPreview(t: (content: string) => ReactNode, message?: MessageRow) {
       case "document":
         mediaIconClass += " h-[20px] w-[13px]";
         mediaPreviewContent =
-          message.message.media?.filename || (t("Documento") as string);
+          message.content.file?.name || (t("Documento") as string);
         break;
       case "image":
         mediaIconClass += " h-[20px] w-[16px]";
@@ -88,8 +87,9 @@ function mediaPreview(t: (content: string) => ReactNode, message?: MessageRow) {
       case "video":
         mediaIconClass += " h-[20px] w-[16px]";
         mediaPreviewContent =
-          message.message.media?.filename || (t("Video") as string);
+          message.content.file?.name || (t("Video") as string);
         break;
+      // @ts-expect-error gif is not declared yet
       case "gif":
         mediaIconClass += " h-[20px] w-[20px]";
         mediaPreviewContent = "GIF";
@@ -200,11 +200,9 @@ export default function ChatListItem({
     (state) => state.ui.roles[state.ui.activeOrgId || ""]?.role,
   );
 
-  // If the role is not admin, then do not show function call and response messages.
+  // If the role is not admin, then do not show internal messages.
   const mostRecent = messages?.find(
-    (m) =>
-      role === "admin" ||
-      !["function_call", "function_response"].includes(m.type),
+    (m) => role === "admin" || m.direction !== "internal",
   );
 
   const draft: Draft | undefined = item?.extra?.draft;
@@ -213,7 +211,13 @@ export default function ChatListItem({
     +new Date(mostRecent?.timestamp || 0) >= +new Date(draft?.timestamp || 0)
       ? mostRecent
       : ({
-          message: { content: draft!.text },
+          direction: "outgoing",
+          content: {
+            version: "1",
+            type: "text",
+            kind: "text",
+            text: draft!.text,
+          },
           timestamp: draft!.timestamp,
         } as MessageRow);
 
@@ -228,12 +232,16 @@ export default function ChatListItem({
 
     // Messages are sorted by most recent first.
     for (const msg of messages) {
-      if (msg.type === "incoming" && !countBreak) {
+      if (msg.direction === "incoming" && !countBreak) {
         count += 1;
-      } else if (msg.type === "notification") {
+      } else if (
+        msg.direction === "internal" &&
+        // @ts-expect-error notification is deprecated
+        msg.content.kind === "notification"
+      ) {
         notification = true;
       } else if (
-        msg.type === "outgoing" &&
+        msg.direction === "outgoing" &&
         agents
           ?.filter((a) => !a.ai)
           .map((a) => a.id)
@@ -241,7 +249,7 @@ export default function ChatListItem({
       ) {
         // Only humans can mark notifications as responded.
         break;
-      } else if (msg.type === "outgoing") {
+      } else if (msg.direction === "outgoing") {
         // Any agent can mark incoming messages as responded.
         countBreak = true;
       }
@@ -330,7 +338,8 @@ export default function ChatListItem({
             </div>
             <div className="lower-row flex justify-between mt-[2px] items-start">
               <div className="min-w-0 flex items-start text-gray-dark">
-                {preview?.type === "outgoing" && statusIcon(preview.status)}
+                {preview?.direction === "outgoing" &&
+                  statusIcon(preview.status)}
                 {preview?.agent_id && preview.agent_id !== currentAgentId && (
                   <div className="text-[14px] mr-1 shrink-0">
                     {agents?.find((a) => a.id === preview.agent_id)?.name ||
@@ -339,33 +348,27 @@ export default function ChatListItem({
                   </div>
                 )}
                 {mediaIcon}
-                {(draft || preview?.type === "draft") && (
+                {draft && (
                   <T as="div" className="text-[14px] text-blue-500 mr-1">
                     Borrador:
                   </T>
                 )}
-                {(preview?.message as TemplateMessage)?.template && (
-                  <T as="div" className="text-[14px] text-blue-500 mr-1">
-                    Plantilla:
-                  </T>
-                )}
-                {[
-                  "notification",
-                  "function_call",
-                  "function_response",
-                ].includes(preview?.type || "") && (
+                {preview?.content.type === "data" &&
+                  preview?.content.kind === "template" && (
+                    <T as="div" className="text-[14px] text-blue-500 mr-1">
+                      Plantilla:
+                    </T>
+                  )}
+                {preview?.direction === "internal" && (
                   <div className="text-[14px] text-gray-dark">
-                    {SpecialMessageTypeMap(preview?.type || "")}
+                    {SpecialMessageTypeMap(preview?.content.kind || "")}
                   </div>
                 )}
-                {![
-                  "notification",
-                  "function_call",
-                  "function_response",
-                ].includes(preview?.type || "") && (
+                {preview?.direction !== "internal" && (
                   <div className="truncate text-[14px]">
-                    {(preview?.message as BaseMessage)?.content ||
-                      mediaPreviewContent}
+                    {preview?.content.type === "text"
+                      ? preview.content.text
+                      : mediaPreviewContent}
                   </div>
                 )}
               </div>

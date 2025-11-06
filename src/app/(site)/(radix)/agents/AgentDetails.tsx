@@ -37,7 +37,7 @@ export default function AgentDetails({
 
   const [agentIdState, setAgentIdState] = useState(agentId);
 
-  /* 
+  /*
   // TODO: Do something with this useful data
   const {
     data: availabletoolsAndTools,
@@ -150,6 +150,10 @@ export default function AgentDetails({
         } catch (error) {
           setAlert("Acciones: JSON inválido.");
           throw error;
+        }
+
+        if (!activeOrgId) {
+          throw new Error("No active organization");
         }
 
         const { data, error } = await supabase

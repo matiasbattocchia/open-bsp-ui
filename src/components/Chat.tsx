@@ -161,17 +161,24 @@ export default function Chat() {
     return { agentId, color: colorMap.get(agentId)! };
   }
 
-  // If the message is internal (teams communication), we need to determine if it's an incoming or outgoing message.
-  function rewriteInternalMessageType(originalMessage: MessageRow): MessageRow {
+  // If the message is internal (teams communication), we need to determine if it's an incoming or outgoing message for display purposes.
+  function rewriteInternalMessageDirection(
+    originalMessage: MessageRow,
+  ): MessageRow {
     let message = { ...originalMessage };
 
-    if (message.type === "internal" && message.agent_id !== activeAgentId) {
-      message = { ...message, type: "incoming" };
+    if (
+      message.direction === "internal" &&
+      message.agent_id !== activeAgentId
+    ) {
+      // @ts-ignore
+      message = { ...message, direction: "incoming" };
     } else if (
-      message.type === "internal" &&
+      message.direction === "internal" &&
       message.agent_id === activeAgentId
     ) {
-      message = { ...message, type: "outgoing" };
+      // @ts-ignore
+      message = { ...message, direction: "outgoing" };
     }
 
     return message;
@@ -196,13 +203,18 @@ export default function Chat() {
       } as SeparatorType);
     }
     function typeMap(row: MessageRow) {
-      if (row.type === "function_call") {
-        return `function-${row.message.id}`;
+      // For internal messages with tool info, use tool use_id to group related calls
+      if (row.direction === "internal" && row.content.tool?.event === "use") {
+        return `tool-use-${row.content.tool.use_id}`;
       }
-      if (row.type === "function_response") {
-        return `function-${row.message.tool_call_id}`;
+      if (
+        row.direction === "internal" &&
+        row.content.tool?.event === "result"
+      ) {
+        return `tool-result-${row.content.tool.use_id}`;
       }
-      return row.type;
+      // For other messages, combine direction and content kind
+      return `${row.direction}-${row.content.kind}`;
     }
 
     let prevMsg: EnvelopeType | null = null;
@@ -319,22 +331,22 @@ export default function Chat() {
     (state) => state.ui.roles[state.ui.activeOrgId || ""]?.role,
   );
 
-  // If the role is not admin, then do not show function call and response messages.
+  // If the role is not admin, then do not show internal messages (tool calls, etc).
   const envelopesAndSeparators = insertDateSeparators(
     messages
       .filter((m, idx, arr) => {
         if (role === "admin") return true;
 
-        if (m.type === "function_call") return false;
-        if (m.type === "function_response") return false;
+        // Hide internal messages for non-admin users
+        if (m.direction === "internal") return false;
 
-        // For draft messages, only keep if this is the most recent message
-        if (m.type === "draft" && idx !== 0) return false;
+        // @ts-expect-error draft is deprecated
+        if (m.kind === "draft" && idx !== 0) return false;
 
         return true;
       })
       .reverse()
-      .map((message) => rewriteInternalMessageType(message)),
+      .map((message) => rewriteInternalMessageDirection(message)),
     t,
   );
 
