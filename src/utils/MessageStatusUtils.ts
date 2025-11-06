@@ -21,6 +21,10 @@ const outgoingStatusHierarchy = [
 export function getHighestStatus(
   status: OutgoingStatus,
 ): (typeof outgoingStatusHierarchy)[number] {
+  if (!status) {
+    return "pending";
+  }
+
   for (const level of toReversed(outgoingStatusHierarchy)) {
     if (level in status) {
       return level;

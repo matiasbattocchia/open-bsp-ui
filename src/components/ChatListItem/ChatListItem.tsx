@@ -219,6 +219,7 @@ export default function ChatListItem({
             text: draft!.text,
           },
           timestamp: draft!.timestamp,
+          status: {},
         } as MessageRow);
 
   const unread = (() => {
