@@ -4,6 +4,16 @@ import { Translate as T } from "react-dialect";
 
 const FB_API_VERSION = "v24.0";
 
+export type SignupPayload = {
+  code: string;
+  application_id?: string;
+  organization_id: string;
+  phone_number_id?: string;
+  waba_id?: string;
+  business_id?: string;
+  flow_type?: "only_waba" | "new_phone_number" | "existing_phone_number";
+};
+
 export default function WhatsAppIntegration({
   orgId,
   onSuccess,
@@ -14,6 +24,8 @@ export default function WhatsAppIntegration({
   setLoading: (loading: boolean) => void;
 }) {
   useEffect(() => {
+    let sessionInfoListener: ((event: MessageEvent) => void) | null = null;
+
     (window as any).fbAsyncInit = function () {
       (window as any).FB.init({
         appId: process.env.NEXT_PUBLIC_META_APP_ID,
@@ -22,6 +34,45 @@ export default function WhatsAppIntegration({
         version: FB_API_VERSION,
       });
     };
+
+    // Session info listener for capturing WhatsApp Business Account details
+    sessionInfoListener = function (event: MessageEvent) {
+      if (!event.origin.endsWith("facebook.com")) return;
+
+      try {
+        const data = JSON.parse(event.data);
+
+        if (data.type === "WA_EMBEDDED_SIGNUP") {
+          console.log("WA_EMBEDDED_SIGNUP event:", data); // Remove after testing
+
+          // Determine flow type based on event
+          let flow_type: SignupPayload["flow_type"] | undefined;
+
+          if (data.event === "FINISH") {
+            flow_type = "new_phone_number";
+          } else if (data.event === "FINISH_ONLY_WABA") {
+            flow_type = "only_waba";
+          } else if (data.event === "FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING") {
+            flow_type = "existing_phone_number";
+          }
+
+          // Store session info for later use in signup
+          if (flow_type) {
+            const sessionInfo = data.data || {};
+            (window as any).__waSessionInfo = {
+              phone_number_id: sessionInfo.phone_number_id,
+              waba_id: sessionInfo.waba_id,
+              business_id: sessionInfo.business_id,
+              flow_type: flow_type,
+            };
+          }
+        }
+      } catch {
+        // Not a JSON message or not a WA event, ignore
+      }
+    };
+
+    window.addEventListener("message", sessionInfoListener);
 
     // Copy-pasted from the Embedded Signup integration helper
     (function (d, s, id) {
@@ -36,6 +87,9 @@ export default function WhatsAppIntegration({
 
     return () => {
       (window as any).fbAsyncInit = undefined;
+      if (sessionInfoListener) {
+        window.removeEventListener("message", sessionInfoListener);
+      }
     };
   }, []);
 
@@ -55,9 +109,26 @@ export default function WhatsAppIntegration({
 
           setLoading(true);
 
+          // Retrieve session info captured from message events
+          const sessionInfo = (window as any).__waSessionInfo || {};
+
+          // Construct payload according to SignupPayload type
+          const payload: SignupPayload = {
+            code,
+            organization_id: orgId,
+            application_id: process.env.NEXT_PUBLIC_META_APP_ID,
+            phone_number_id: sessionInfo.phone_number_id,
+            waba_id: sessionInfo.waba_id,
+            business_id: sessionInfo.business_id,
+            flow_type: sessionInfo.flow_type,
+          };
+
+          console.log("Sending signup payload:", payload); // Remove after testing
+
           supabase.functions
-            .invoke("whatsapp-management", {
-              body: { code, organization_id: orgId },
+            .invoke("whatsapp-management/signup", {
+              method: "POST",
+              body: payload,
             })
             .then(onSuccess)
             .finally(() => setLoading(false));
