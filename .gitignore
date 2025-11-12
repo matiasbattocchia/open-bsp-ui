@@ -17,3 +17,5 @@ package-lock.json
 # Editors
 .vscode
 .zed
+
+mise.toml
