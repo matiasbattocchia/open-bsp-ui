@@ -26,7 +26,7 @@ export default function Agents() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("agents")
-        .select("id, name, picture, ai, user_id, extra->>role")
+        .select("id, name, picture, ai, user_id, extra->>role, extra->>mode")
         .eq("organization_id", activeOrgId!)
         .order("name");
       if (error) throw error;
@@ -53,6 +53,7 @@ export default function Agents() {
               picture={agent.picture}
               ai={agent.ai}
               userId={agent.user_id}
+              mode={agent.mode}
               //department={agent.department}
               onClick={() => {
                 if (!agent.ai) return;
