@@ -531,6 +531,16 @@ export default function Message(props: UIMessage & { message: MessageRow }) {
   let content;
   let text = false;
 
+  // Safety check for message structure
+  if (!props.message.message || typeof props.message.message !== 'object') {
+    console.error('Invalid message structure:', props.message);
+    return (
+      <div className="p-2 text-red-500 bg-red-50 rounded">
+        Error: Invalid message format
+      </div>
+    );
+  }
+
   switch (props.message.message.type) {
     case "text":
     case "reaction":
