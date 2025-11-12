@@ -2,17 +2,11 @@
 .env*
 env
 
-# Next.js
-.next
-next-env.d.ts
-out
-
 # TypeScript
 tsconfig.tsbuildinfo
 
 # Node
 node_modules
-package-lock.json
 
 # Editors
 .vscode

@@ -1,3 +1,171 @@
+@import "tailwindcss";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+TODO:
+1a. El misterio de las letras que están más arriba que abajo
+1b. El color del texto debería ser un poco más gris
+2. Grises distintos para ChatListItem hover y active
+3. La altura del editor de prompt (pasar a contentEditable)
+4. Grosor barras scroll
+5. Revisar los w-full, h-full y calc; tal vez cambiar por flex grow
+6. El scroll empieza arriba
+7. Opacidad de la imagen de fondo
+8. Transiciones
+9. Placeholder overflow
+10. ChatHeader item names truncate
+11. ItemList minimum width debería ser el del panel izquierdo
+NICE:
+Colores para el editor de prompt
+Contador de tokenes
+Integraciones
+Variables
+Cambios no guardados
+*/
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family:
+    Segoe UI,
+    Helvetica Neue,
+    Helvetica,
+    Lucida Grande,
+    Arial,
+    Ubuntu,
+    Cantarell,
+    Fira Sans,
+    sans-serif;
+  font-size: 15px;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+@layer components {
+  .header {
+    @apply h-[59px] py-[10px] px-[16px] border-gray-line flex;
+  }
+
+  .spin {
+    @apply animate-spin [transform-box:fill-box] [transform-origin:center] stroke-current fill-none;
+  }
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  background-color: transparent;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  box-sizing: content-box;
+  height: 12px;
+  width: 12px;
+  border: none;
+}
+
+input[type="range"]::-moz-range-thumb {
+  height: 12px;
+  width: 12px;
+  border: none;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  appearance: none;
+}
+
+input[type="range"]::-moz-range-track {
+  appearance: none;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #ced0d1 transparent;
+}
+
+/* WebKit */
+*::-webkit-scrollbar {
+  width: 0.3rem;
+  height: 0.3rem;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #ced0d1;
+  border-radius: 0.6rem;
+  border: none;
+}
+
+/* Text messages */
+.markdown p + p,
+.markdown p + ul,
+.markdown p + ol,
+.markdown ul + p,
+.markdown ul + ul,
+.markdown ul + ol,
+.markdown ol + p,
+.markdown ol + ul,
+.markdown ol + ol {
+  margin-top: 1rem;
+}
+
+.markdown li,
+.markdown li ul,
+.markdown li ol {
+  margin-left: 1.4rem; /* Adjust margin for nested lists */
+}
+
+.markdown ol li {
+  list-style-type: decimal;
+}
+
+.markdown ul li {
+  list-style-type: disc;
+}
+
+.markdown code,
+pre {
+  text-wrap: wrap;
+}
+
+.templateField {
+  text-decoration: underline;
+  text-decoration-color: #53bdeb;
+  text-decoration-thickness: 2px;
+  background-color: #53bdeb2d;
+}
+
+.template-form {
+  input,
+  select,
+  textarea,
+  button {
+    padding: 6px 12px;
+    border-radius: 7.5px;
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+}
+
+/*
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -66,3 +234,4 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+*/
