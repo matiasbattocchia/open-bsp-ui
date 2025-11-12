@@ -1,8 +1,30 @@
 @import "tailwindcss";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@theme {
+  /* Colors from tailwind.config.js */
+  --color-gray: #f0f2f5;
+  --color-gray-dark: #6f7f88;
+  --color-gray-hover: #f5f6f6;
+  --color-gray-light: #a4aeb3;
+  --color-gray-line: #e9edef;
+  --color-gray-icon: #54656f;
+  --color-gray-icon-bg: #d9dbde;
+  --color-green-wp: #b5a5e5;
+  --color-green-light: #d9fdd3;
+  --color-green-dark: #00a884;
+  --color-blue-ack: #53bdeb;
+  --color-verde: #61f86c;
+  --color-celeste: #85e7e2;
+  --color-azul: #94b6d8;
+  --color-violeta: #d381e8;
+  --color-background: #f0f2f5;
+  --color-hover: #f5f6f6;
+  --color-active: #f0f2f5;
+  --color-border: #e9edef;
+
+  /* Box shadows */
+  --shadow-chat-bubble: 0 1px 0.5px 0 rgba(11, 20, 26, 0.13);
+}
 
 /*
 TODO:
@@ -54,11 +76,23 @@ a {
 
 @layer components {
   .header {
-    @apply h-[59px] py-[10px] px-[16px] border-gray-line flex;
+    @apply h-[59px] py-[10px] px-[16px] border border-gray-line flex;
   }
 
   .spin {
     @apply animate-spin [transform-box:fill-box] [transform-origin:center] stroke-current fill-none;
+  }
+
+  /* Custom background image from tailwind.config.js */
+  .bg-chat {
+    background-image:
+      url("/bg-chat-tile-dark.png"),
+      linear-gradient(
+        to bottom right,
+        rgb(247 254 231),
+        rgb(253 244 255),
+        rgb(240 249 255)
+      );
   }
 }
 
