@@ -39,10 +39,23 @@ export default function WhatsAppIntegration({
     sessionInfoListener = function (event: MessageEvent) {
       console.log("event received", event);
 
-      if (!event.origin.endsWith("facebook.com")) return;
+      // Verify message is from Facebook
+      if (!event.origin.endsWith("facebook.com")) {
+        return;
+      }
+
+      // Filter out messages that are not valid JSON or not from Embedded Signup
+      if (
+        typeof event.data !== "string" ||
+        event.data.startsWith("cb=") ||
+        event.data.startsWith("fb_") ||
+        !event.data.includes("WA_EMBEDDED_SIGNUP")
+      ) {
+        return;
+      }
 
       try {
-        const data = event.data;
+        const data = JSON.parse(event.data);
 
         console.log("event data", data);
 
@@ -71,8 +84,8 @@ export default function WhatsAppIntegration({
             };
           }
         }
-      } catch {
-        console.error("could not JSON parse event data");
+      } catch (error) {
+        console.error("could not JSON parse event data", error);
         // Not a JSON message or not a WA event, ignore
       }
     };
@@ -146,10 +159,9 @@ export default function WhatsAppIntegration({
         response_type: "code", // Must be set to 'code' for System User access token
         override_default_response_type: true,
         extras: {
+          setup: {},
           featureType: "whatsapp_business_app_onboarding", // Coexistence
-          setup: {
-            // Prefilled data can go here
-          },
+          sessionInfoVersion: "3", // Required for receiving embedded signup events
         },
       },
     );
