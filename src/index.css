@@ -153,6 +153,7 @@
 
 @theme {
   /* Colors from tailwind.config.js */
+  /*
   --color-gray: #f0f2f5;
   --color-gray-dark: #6f7f88;
   --color-gray-hover: #f5f6f6;
@@ -172,7 +173,7 @@
   --color-hover: #f5f6f6;
   --color-active: #f0f2f5;
   --color-border: #e9edef;
-
+ */
   /* Box shadows */
   --shadow-chat-bubble: 0 1px 0.5px 0 rgba(11, 20, 26, 0.13);
 }
@@ -227,7 +228,7 @@ a {
 
 @layer components {
   .header {
-    @apply h-[59px] py-[10px] px-[16px] border border-gray-line flex;
+    @apply h-[59px] py-[10px] px-[16px] border border-border flex;
   }
 
   .spin {
@@ -244,6 +245,40 @@ a {
         rgb(253 244 255),
         rgb(240 249 255)
       );
+  }
+
+  /* WhatsApp Web-like Grid Layout */
+  .app-grid {
+    display: grid;
+    grid-template-columns: 64px minmax(300px, 400px) 1fr;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+  }
+
+  /* When right panel is visible */
+  .app-grid.with-right-panel {
+    grid-template-columns: 64px minmax(300px, 400px) 1fr minmax(300px, 400px);
+  }
+
+  /* Responsive breakpoints */
+  @media (max-width: 1024px) {
+    .app-grid {
+      grid-template-columns: 64px minmax(280px, 350px) 1fr;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .app-grid {
+      /* Mobile: show only one panel at a time */
+      grid-template-columns: 1fr;
+    }
+
+    /* Menu overlay on mobile */
+    .app-grid > :first-child {
+      position: absolute;
+      z-index: 10;
+    }
   }
 }
 
@@ -364,59 +399,5 @@ pre {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
 }
 */
