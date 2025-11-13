@@ -42,7 +42,7 @@ export default function WhatsAppIntegration({
       if (!event.origin.endsWith("facebook.com")) return;
 
       try {
-        const data = JSON.parse(event.data);
+        const data = event.data;
 
         console.log("event data", data);
 
