@@ -1,2 +1,3 @@
 # Ignore auto-generated files
 src/supabase/db_types.ts
+src/routeTree.gen.ts
