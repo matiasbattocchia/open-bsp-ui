@@ -37,10 +37,14 @@ export default function WhatsAppIntegration({
 
     // Session info listener for capturing WhatsApp Business Account details
     sessionInfoListener = function (event: MessageEvent) {
+      console.log("event received", event);
+
       if (!event.origin.endsWith("facebook.com")) return;
 
       try {
         const data = JSON.parse(event.data);
+
+        console.log("event data", data);
 
         if (data.type === "WA_EMBEDDED_SIGNUP") {
           console.log("WA_EMBEDDED_SIGNUP event:", data); // Remove after testing
@@ -68,6 +72,7 @@ export default function WhatsAppIntegration({
           }
         }
       } catch {
+        console.error("could not JSON parse event data");
         // Not a JSON message or not a WA event, ignore
       }
     };
