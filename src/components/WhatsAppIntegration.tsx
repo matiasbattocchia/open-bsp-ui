@@ -14,6 +14,45 @@ export type SignupPayload = {
   flow_type?: "only_waba" | "new_phone_number" | "existing_phone_number";
 };
 
+// Successful flow data
+type SuccessfulFlowData = {
+  phone_number_id: string;
+  waba_id: string;
+  business_id: string;
+  ad_account_ids?: string[];
+  page_ids?: string[];
+  dataset_ids?: string[];
+};
+
+// Abandoned flow data
+type AbandonedFlowData = {
+  current_step: string;
+};
+
+// Error flow data
+type ErrorFlowData = {
+  error_message: string;
+  error_id: string;
+  session_id: string;
+  timestamp: string;
+};
+
+// Event listener data type - discriminated union based on event type
+type EventListenerData =
+  | {
+      type: "WA_EMBEDDED_SIGNUP";
+      event:
+        | "FINISH"
+        | "FINISH_ONLY_WABA"
+        | "FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING";
+      data: SuccessfulFlowData;
+    }
+  | {
+      type: "WA_EMBEDDED_SIGNUP";
+      event: "CANCEL";
+      data: AbandonedFlowData | ErrorFlowData;
+    };
+
 export default function WhatsAppIntegration({
   orgId,
   onSuccess,
@@ -37,8 +76,6 @@ export default function WhatsAppIntegration({
 
     // Session info listener for capturing WhatsApp Business Account details
     sessionInfoListener = function (event: MessageEvent) {
-      console.log("event received", event);
-
       // Verify message is from Facebook
       if (!event.origin.endsWith("facebook.com")) {
         return;
@@ -47,47 +84,57 @@ export default function WhatsAppIntegration({
       // Filter out messages that are not valid JSON or not from Embedded Signup
       if (
         typeof event.data !== "string" ||
-        event.data.startsWith("cb=") ||
-        event.data.startsWith("fb_") ||
         !event.data.includes("WA_EMBEDDED_SIGNUP")
       ) {
         return;
       }
 
+      let data: EventListenerData;
+
       try {
-        const data = JSON.parse(event.data);
-
-        console.log("event data", data);
-
-        if (data.type === "WA_EMBEDDED_SIGNUP") {
-          console.log("WA_EMBEDDED_SIGNUP event:", data); // Remove after testing
-
-          // Determine flow type based on event
-          let flow_type: SignupPayload["flow_type"] | undefined;
-
-          if (data.event === "FINISH") {
-            flow_type = "new_phone_number";
-          } else if (data.event === "FINISH_ONLY_WABA") {
-            flow_type = "only_waba";
-          } else if (data.event === "FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING") {
-            flow_type = "existing_phone_number";
-          }
-
-          // Store session info for later use in signup
-          if (flow_type) {
-            const sessionInfo = data.data || {};
-            (window as any).__waSessionInfo = {
-              phone_number_id: sessionInfo.phone_number_id,
-              waba_id: sessionInfo.waba_id,
-              business_id: sessionInfo.business_id,
-              flow_type: flow_type,
-            };
-          }
-        }
+        data = JSON.parse(event.data);
       } catch (error) {
-        console.error("could not JSON parse event data", error);
-        // Not a JSON message or not a WA event, ignore
+        console.error("Could not JSON parse event data", error);
+        return;
       }
+
+      if (data.type !== "WA_EMBEDDED_SIGNUP") {
+        return;
+      }
+
+      // Handle cancel events (abandoned or error flows)
+      if (data.event === "CANCEL") {
+        // TypeScript now knows data.data is AbandonedFlowData | ErrorFlowData
+        if ("error_message" in data.data) {
+          // ErrorFlowData
+          console.warn("Embedded signup error:", data.data);
+        } else {
+          // AbandonedFlowData
+          console.log("User abandoned flow at step:", data.data.current_step);
+        }
+        return;
+      }
+
+      let flow_type: SignupPayload["flow_type"];
+
+      if (data.event === "FINISH") {
+        flow_type = "new_phone_number";
+      } else if (data.event === "FINISH_ONLY_WABA") {
+        flow_type = "only_waba";
+      } else if (data.event === "FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING") {
+        flow_type = "existing_phone_number";
+      } else {
+        console.warn("Unhandled event", data);
+        return;
+      }
+
+      // No type assertion needed - TypeScript knows data.data is SuccessfulFlowData
+      (window as any).__waSessionInfo = {
+        phone_number_id: data.data.phone_number_id,
+        waba_id: data.data.waba_id,
+        business_id: data.data.business_id,
+        flow_type: flow_type,
+      };
     };
 
     window.addEventListener("message", sessionInfoListener);
