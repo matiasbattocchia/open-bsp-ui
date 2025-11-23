@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useEffect } from "react";
 import { supabase } from "@/supabase/client";
 import useBoundStore, { reset } from "@/store/useBoundStore";

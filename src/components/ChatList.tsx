@@ -1,10 +1,11 @@
 import useBoundStore from "@/store/useBoundStore";
 import ChatListItem from "./ChatListItem/ChatListItem";
-import { ConversationRow, MessageRow } from "@/supabase/client";
+import { type ConversationRow, type MessageRow } from "@/supabase/client";
 import { timestampDescending } from "@/store/chatSlice";
 import { filters, Filters } from "@/store/uiSlice";
 import Fuse from "fuse.js";
-import { Translate as T } from "react-dialect";
+import { Translate as T } from "@/hooks/useTranslation";
+import { useOrganizations } from "@/query/useOrgs";
 
 export type ChatListType = "organizations" | "conversations";
 
@@ -31,7 +32,7 @@ function pinnedAscending(a: ConversationRow, b: ConversationRow) {
 
 const ChatList = ({ type }: { type: ChatListType }) => {
   const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
-  const items = useBoundStore((state) => state.chat[type]);
+  const conversations = useBoundStore((state) => state.chat.conversations);
   const messages = useBoundStore((state) => state.chat.messages);
   const filterName = useBoundStore((state) => state.ui.filter);
   const setFilterName = useBoundStore((state) => state.ui.setFilter);
@@ -41,26 +42,40 @@ const ChatList = ({ type }: { type: ChatListType }) => {
     (state) => state.ui.roles[state.ui.activeOrgId || ""]?.role,
   );
 
+  // New hook for organizations
+  const { data: organizations } = useOrganizations();
+
   function getMostRecentMsg(convId: string): MessageRow | undefined {
     return messages.get(convId)?.values().next().value;
   }
 
-  let metaItems: ConvMetadata[] = [...items]
-    .filter(
-      ([convId, conv]) =>
-        role === "admin" || (conv as ConversationRow).service !== "local",
-    )
-    .map(([convId, conv]) => ({
-      convId,
-      conv: conv as ConversationRow,
-      mostRecentMsg: getMostRecentMsg(convId),
-    }))
-    .filter(
-      (a) =>
-        type === "organizations" ||
-        (a.conv.organization_id === activeOrgId &&
-          filters[filterName](a.conv, a.mostRecentMsg)),
-    );
+  let metaItems: ConvMetadata[] = [];
+
+  if (type === "organizations") {
+    // Handle organizations using the new hook data
+    metaItems = (organizations?.data || []).map((org) => ({
+      convId: org.id,
+      conv: org as unknown as ConversationRow, // Temporary cast until we fix types
+      mostRecentMsg: undefined,
+    }));
+  } else {
+    // Handle conversations using Zustand store
+    metaItems = [...conversations]
+      .filter(
+        ([, conv]) =>
+          role === "admin" || (conv as ConversationRow).service !== "local",
+      )
+      .map(([convId, conv]) => ({
+        convId,
+        conv: conv as ConversationRow,
+        mostRecentMsg: getMostRecentMsg(convId),
+      }))
+      .filter(
+        (a) =>
+          a.conv.organization_id === activeOrgId &&
+          filters[filterName](a.conv, a.mostRecentMsg),
+      );
+  }
 
   if (searchPattern) {
     const fuse = new Fuse(metaItems, {
@@ -69,11 +84,16 @@ const ChatList = ({ type }: { type: ChatListType }) => {
     });
     metaItems = fuse.search(searchPattern).map((r) => r.item);
   } else {
-    metaItems.sort(
-      (a, b) =>
-        pinnedAscending(a.conv, b.conv) ||
-        timestampDescending(a.mostRecentMsg, b.mostRecentMsg),
-    );
+    if (type === "conversations") {
+      metaItems.sort(
+        (a, b) =>
+          pinnedAscending(a.conv, b.conv) ||
+          timestampDescending(a.mostRecentMsg, b.mostRecentMsg),
+      );
+    } else {
+      // Sort organizations alphabetically by name
+      metaItems.sort((a, b) => (a.conv.name || "").localeCompare(b.conv.name || ""));
+    }
   }
 
   const itemIds = metaItems.map((a) => a.convId);
@@ -86,7 +106,7 @@ const ChatList = ({ type }: { type: ChatListType }) => {
 
   return (
     isActive && (
-      <div className="[overflow-y:overlay] border-r border-gray-line bg-white w-[calc(100dvw)]">
+      <div className="[overflow-y:overlay] border-r border-gray-line bg-white w-full h-full">
         {itemIds.length ? (
           <div className="chat-list flex flex-col">
             {itemIds.map((key) => (
@@ -100,7 +120,7 @@ const ChatList = ({ type }: { type: ChatListType }) => {
               <T
                 className="p-1 text-blue-ack"
                 as="button"
-                onClick={(e) => {
+                onClick={() => {
                   setSearchPattern("");
                   setFilterName(Filters.ALL);
                 }}

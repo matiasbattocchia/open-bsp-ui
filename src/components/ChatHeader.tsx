@@ -1,7 +1,7 @@
 import { nameInitials } from "./ChatListItem/ChatListItem";
 import Avatar from "./Avatar";
 import useBoundStore from "@/store/useBoundStore";
-import { useTranslation } from "react-dialect";
+import { useTranslation } from "@/hooks/useTranslation";
 import { ArrowLeft } from "lucide-react";
 
 export function formatPhoneNumber(phoneNumber: string): string {

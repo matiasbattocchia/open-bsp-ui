@@ -1,9 +1,8 @@
-import { NotificationKind } from "@/hooks/useWebNotifications";
 import { SEP } from "@/store/chatSlice";
 import useBoundStore from "@/store/useBoundStore";
 import {
-  ConversationInsert,
-  ConversationRow,
+  type ConversationInsert,
+  type ConversationRow,
   supabase,
 } from "@/supabase/client";
 
@@ -88,7 +87,7 @@ export const updateConvExtra = async (
     pinned?: string | null;
     archived?: string | null;
     paused?: string | null;
-    notifications?: NotificationKind | null;
+    notifications?: "off" | "muted" | "on" | null;
   },
 ) => {
   const { error } = await supabase

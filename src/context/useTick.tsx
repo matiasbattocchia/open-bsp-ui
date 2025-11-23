@@ -1,4 +1,4 @@
-import { ReactNode, createContext, useState, useEffect } from "react";
+import { type ReactNode, createContext, useState, useEffect } from "react";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
 import "dayjs/locale/pt";

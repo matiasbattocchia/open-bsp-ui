@@ -9,13 +9,13 @@ import {
   pushConversationToDb,
   updateConvExtra,
 } from "@/utils/ConversationUtils";
-import { FileDraft } from "@/store/chatSlice";
+import { type FileDraft } from "@/store/chatSlice";
 import {
-  ConversationRow,
-  Draft,
-  MessageRow,
+  type ConversationRow,
+  type Draft,
+  type MessageRow,
   supabase,
-  WebhookPayload,
+  type WebhookPayload,
 } from "@/supabase/client";
 import { TickContext } from "@/context/useTick";
 import dayjs from "dayjs";
@@ -23,8 +23,8 @@ import "dayjs/locale/es";
 import "dayjs/locale/pt";
 import { NotepadTextDashed } from "lucide-react";
 import { WandSparkles } from "lucide-react";
-import { Translate as T, useTranslation } from "react-dialect";
-import { Button, Dropdown, MenuProps } from "antd";
+import { Translate as T, useTranslation } from "@/hooks/useTranslation";
+import { Dropdown, type MenuProps } from "antd";
 import { useQuery } from "@tanstack/react-query";
 
 // Taken from https://phuoc.ng/collection/html-dom/move-the-cursor-to-the-end-of-a-content-editable-element
@@ -52,10 +52,10 @@ export async function saveDraft(
     extra: {
       draft: text
         ? {
-            text,
-            timestamp: new Date().toISOString(),
-            origin,
-          }
+          text,
+          timestamp: new Date().toISOString(),
+          origin,
+        }
         : null,
     },
   };
@@ -122,7 +122,7 @@ export default function ChatFooter() {
 
   const convType = conv?.extra?.type;
 
-  const [timer, setTimer] = useState<NodeJS.Timeout>();
+  const [timer, setTimer] = useState<ReturnType<typeof setTimeout>>();
 
   const editableDiv = useRef<HTMLDivElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
@@ -312,7 +312,7 @@ export default function ChatFooter() {
               return;
             }
 
-            const { data, error } = await supabase.functions.invoke("bot", {
+            const { error } = await supabase.functions.invoke("bot", {
               body: {
                 table: "messages",
                 schema: "public",
@@ -447,8 +447,8 @@ export default function ChatFooter() {
               inCSWindow
                 ? undefined
                 : (t(
-                    "WhatsApp cierra la conversación a las 24 horas del último mensaje recibido. Para abrir la conversación debes utilizar una plantilla.",
-                  ) as string)
+                  "WhatsApp cierra la conversación a las 24 horas del último mensaje recibido. Para abrir la conversación debes utilizar una plantilla.",
+                ) as string)
             }
           />
           {!message && (

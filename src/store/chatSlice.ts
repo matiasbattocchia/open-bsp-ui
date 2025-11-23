@@ -1,15 +1,14 @@
-import {
-  OrganizationRow,
+import type {
   ConversationRow,
   MessageRow,
 } from "@/supabase/client";
-import { GoriState } from "./useBoundStore";
-import { StateCreator } from "zustand";
+import type { AppState } from "./useBoundStore";
+import type { StateCreator } from "zustand";
 // @ts-ignore
 import groupBy from "core-js-pure/actual/object/group-by";
-import { MessageRowV0, toV1 } from "@/supabase/messages-v0";
+import { toV1, type MessageRowV0 } from "@/supabase/messages-v0";
 
-export const SEP = "<>";
+export const SEP = "::";
 
 export function timestampDescending(a?: MessageRow, b?: MessageRow) {
   return +new Date(a?.timestamp || 0) > +new Date(b?.timestamp || 0) ? -1 : 1;
@@ -29,7 +28,6 @@ type MediaLoad = {
 };
 
 export type ChatState = {
-  organizations: Map<string, OrganizationRow>;
   conversations: Map<string, ConversationRow>;
   messages: Map<string, Map<string, MessageRow>>; // TODO: replace the nested maps with a data structure capable of prefix search (a Trie) - cabra 2024/07/26
   textDrafts: Map<string, string>;
@@ -38,7 +36,6 @@ export type ChatState = {
 };
 
 export type ChatActions = {
-  setOrganizations: (orgs: OrganizationRow[]) => void;
   pushConversations: (convs: ConversationRow[]) => void;
   pushMessages: (msgs: MessageRow[]) => void;
   setMediaLoad: (messageId: string, mediaLoad: MediaLoad) => void;
@@ -50,41 +47,32 @@ export type ChatActions = {
     caption: string,
   ) => void;
 };
+
 export type ChatSlice = ChatState & ChatActions;
 
-export const defaultChatInitState: StateCreator<Partial<GoriState>> = (
+// @ts-expect-error
+export const createChatSlice: StateCreator<Partial<AppState>> = (
   set: (
     partial:
-      | GoriState
-      | Partial<GoriState>
-      | ((state: GoriState) => GoriState | Partial<GoriState>),
+      | AppState
+      | Partial<AppState>
+      | ((state: AppState) => AppState | Partial<AppState>),
     replace?: boolean | undefined,
   ) => void,
 ) => ({
-  organizations: new Map(),
   conversations: new Map(),
   messages: new Map(),
   textDrafts: new Map(),
   fileDrafts: new Map(),
   mediaLoads: new Map(),
-  setOrganizations: async (orgs: OrganizationRow[]) =>
-    set((state) => {
-      return {
-        chat: {
-          ...state.chat,
-          organizations: new Map(orgs.map((r) => [r.id, r])),
-        },
-      };
-    }),
   pushConversations: (convs: ConversationRow[]) =>
     set((state) => {
       const conversations = new Map(state.chat.conversations);
 
       for (const conv of convs) {
-        const convId = conv.organization_address + SEP + conv.contact_address;
-
         // skip push when the cached conv is more recent than the incoming conv
-        const cachedUpdatedAt = conversations.get(convId)?.updated_at;
+        const cachedUpdatedAt = conversations.get(conv.id)?.updated_at;
+
         if (
           cachedUpdatedAt &&
           +new Date(cachedUpdatedAt) > +new Date(conv.updated_at)
@@ -92,7 +80,7 @@ export const defaultChatInitState: StateCreator<Partial<GoriState>> = (
           continue;
         }
 
-        conversations.set(convId, conv);
+        conversations.set(conv.id, conv);
       }
 
       return {
@@ -114,8 +102,7 @@ export const defaultChatInitState: StateCreator<Partial<GoriState>> = (
 
       const msgsByConv: { [key: string]: MessageRow[] } = groupBy(
         msgs.filter((m) => m.timestamp <= m.updated_at), // do not display scheduled messages (timestamp in the future)
-        (msg: MessageRow) =>
-          msg.organization_address + SEP + msg.contact_address,
+        (msg: MessageRow) => msg.conversation_id,
       );
 
       for (const [convId, convMsgs] of Object.entries(msgsByConv)) {
@@ -125,6 +112,7 @@ export const defaultChatInitState: StateCreator<Partial<GoriState>> = (
         for (const msg of convMsgs!) {
           // skip push when the cached msg is more recent than the incoming msg
           const cachedUpdatedAt = messagesByConv.get(msg.id)?.updated_at;
+
           if (
             cachedUpdatedAt &&
             +new Date(cachedUpdatedAt) > +new Date(msg.updated_at)

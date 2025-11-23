@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import StatusIcon from "./StatusIcon";
 import { useMedia } from "@/hooks/useMedia";
-import { MessageRow, OutgoingStatus } from "@/supabase/client";
+import { type MessageRow, type OutgoingStatus } from "@/supabase/client";
 import dayjs from "dayjs";
 import { Markdown } from "./Message";
-import { useTranslation } from "react-dialect";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export function extension(filename: string | undefined) {
   return filename?.split(".").slice(-1)[0]?.toLowerCase();

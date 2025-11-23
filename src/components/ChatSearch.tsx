@@ -1,7 +1,7 @@
 import { Input } from "antd";
 import { SearchOutlined, CloseOutlined } from "@ant-design/icons";
 import useBoundStore from "@/store/useBoundStore";
-import { useTranslation } from "react-dialect";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function ChatSearch() {
   const searchPattern = useBoundStore((state) => state.ui.searchPattern);

@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
-import { Database as DatabaseGenerated, Json, Tables } from "./db_types";
-import { MergeDeep } from "type-fest";
+import type { Json, Database as DatabaseGenerated, Tables } from "./db_types";
+import type { MergeDeep } from "type-fest";
 
 //===================================
 // Copied from matiasbattocchia/open-bsp-api/supabase/functions/_shared/supabase.ts
@@ -388,7 +388,10 @@ type ButtonPart = DataPart<"button", ButtonMessage["button"]>;
 
 type TemplatePart = DataPart<"template", Template>;
 
-type MediaPlaceholderPart = DataPart<"media_placeholder", null>;
+type MediaPlaceholderPart = DataPart<
+  "media_placeholder",
+  Record<PropertyKey, never>
+>;
 
 // Multi-part messages
 
@@ -685,8 +688,8 @@ export type ContactRow = Database["public"]["Tables"]["contacts"]["Row"];
 export type AgentRow = Database["public"]["Tables"]["agents"]["Row"];
 
 export const supabase = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  import.meta.env.VITE_SUPABASE_URL!,
+  import.meta.env.VITE_SUPABASE_ANON_KEY!,
   // Opt-out the stupid NextJS 14 default caching. It affects the Supabase client.
   {
     global: {

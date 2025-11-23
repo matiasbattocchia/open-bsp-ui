@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useEffect } from "react";
 import { useStore } from "zustand";
 import useBoundStore from "@/store/useBoundStore";

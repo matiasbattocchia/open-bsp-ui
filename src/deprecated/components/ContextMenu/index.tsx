@@ -1,7 +1,7 @@
 import { useContextMenu } from "../../hooks/useContextMenu";
 
 import styles from "./ContextMenu.module.css";
-import { Dispatch, SetStateAction } from "react";
+import { type Dispatch, type SetStateAction } from "react";
 
 const ContextMenu = ({
   setOrgId,

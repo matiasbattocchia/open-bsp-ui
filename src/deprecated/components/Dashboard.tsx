@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { BarDatum, ResponsiveBar } from "@nivo/bar";
 import { supabase } from "@/supabase/client";
-import { useTranslation } from "react-dialect";
+import { useTranslation } from "@/hooks/useTranslation";
 import useBoundStore from "@/store/useBoundStore";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";

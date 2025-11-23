@@ -1,30 +1,30 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { ChatSlice, defaultChatInitState } from "./chatSlice";
-import { UISlice, defaultUIInitState } from "./uiSlice";
+import { type ChatSlice, createChatSlice } from "./chatSlice";
+import { type UISlice, createUISlice } from "./uiSlice";
 
-export type GoriState = {
+export type AppState = {
   chat: ChatSlice;
   ui: UISlice;
 };
 
-const useBoundStore = create<GoriState>()(
+const useBoundStore = create<AppState>()(
   persist(
     (set, get, api) => ({
-      chat: defaultChatInitState(set, get, api) as ChatSlice,
-      ui: defaultUIInitState(set, get, api) as UISlice,
+      chat: createChatSlice(set, get, api) as ChatSlice,
+      ui: createUISlice(set, get, api) as UISlice,
     }),
     {
-      name: "gori-state",
+      name: "app-state",
       storage: createJSONStorage(() => localStorage, {
-        reviver: (key, value: any) => {
+        reviver: (_key, value: any) => {
           // Just in case we decide to store maps
           if (value && value.type === "map") {
             return new Map(value);
           }
           return value;
         },
-        replacer: (key, value) => {
+        replacer: (_key, value) => {
           // Just in case we decide to store maps
           if (value instanceof Map) {
             return { type: "map", value: Array.from(value.entries()) };
@@ -36,7 +36,7 @@ const useBoundStore = create<GoriState>()(
       onRehydrateStorage: (prev) => (state) => {
         if (state) {
           state.ui = {
-            ...defaultUIInitState,
+            ...createUISlice,
             ...prev.ui,
             ...state.ui,
           };
@@ -47,7 +47,6 @@ const useBoundStore = create<GoriState>()(
         ui: {
           searchPattern: state.ui.searchPattern,
           filter: state.ui.filter,
-          organizationsList: state.ui.organizationsList,
           activeOrgId: state.ui.activeOrgId,
         },
       }),

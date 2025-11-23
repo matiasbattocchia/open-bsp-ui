@@ -1,0 +1,11 @@
+.dragger p {
+    pointer-events: none;
+}
+
+.dragger .dragArea>.and-upload-drag {
+    border: 1px dashed black !important;
+}
+
+.dragger .dragArea>.and-upload-drag:hover {
+    border-color: red;
+}

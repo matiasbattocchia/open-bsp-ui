@@ -1,7 +1,6 @@
 import useBoundStore from "@/store/useBoundStore";
 import { ArrowLeft } from "lucide-react";
-import { useTranslation } from "react-dialect";
-import ChatListItem from "./ChatListItem/ChatListItem";
+import { useTranslation } from "@/hooks/useTranslation";
 import { startConversation } from "@/utils/ConversationUtils";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/supabase/client";

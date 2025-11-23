@@ -1,10 +1,9 @@
 import {
-  MessageRow,
-  MessageInsert,
-  OutgoingStatus,
+  type MessageRow,
+  type MessageInsert,
+  type OutgoingStatus,
   supabase,
-  InternalMessage,
-  ToolInfo,
+  type InternalMessage,
 } from "@/supabase/client";
 import AudioMessage from "./AudioMessage";
 import DocumentMessage from "./DocumentMessage";
@@ -12,9 +11,9 @@ import ImageMessage from "./ImageMessage";
 import StatusIcon from "./StatusIcon";
 import dayjs from "dayjs";
 import { Remarkable } from "remarkable";
-import { FormEventHandler, PropsWithChildren, useState } from "react";
+import { type FormEventHandler, type PropsWithChildren, useState } from "react";
 import { prettyPrintJson } from "pretty-print-json";
-import { useTranslation } from "react-dialect";
+import { useTranslation } from "@/hooks/useTranslation";
 import { useQuery } from "@tanstack/react-query";
 import AvatarComponent from "@/components/Avatar";
 import useBoundStore from "@/store/useBoundStore";

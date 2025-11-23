@@ -1,13 +1,13 @@
 import {
   useState,
   useEffect,
-  FormEventHandler,
-  Dispatch,
-  SetStateAction,
+  type FormEventHandler,
+  type Dispatch,
+  type SetStateAction,
   useMemo,
 } from "react";
 import useBoundStore from "@/store/useBoundStore";
-import { supabase, TemplateMessage, TemplateData } from "@/supabase/client";
+import { supabase, type TemplateMessage, type TemplateData } from "@/supabase/client";
 import { OutMessage, InMessage, BaseMessage } from "./Message/Message";
 import {
   newMessage,
@@ -15,13 +15,13 @@ import {
   pushMessageToStore,
 } from "@/utils/MessageUtils";
 import { pushConversationToDb } from "@/utils/ConversationUtils";
-import { Translate as T, useTranslation } from "react-dialect";
+import { Translate as T, useTranslation } from "@/hooks/useTranslation";
 import { LoaderCircle, PencilLine, PlusIcon } from "lucide-react";
 import Input from "antd/es/input/Input";
 import TextArea from "antd/es/input/TextArea";
 
 function Template({
-  template: { id, name, language, components },
+  template: { name, language, components },
   sendTemplateMessage,
   editMode = false,
 }: {
@@ -270,10 +270,10 @@ function TemplateEditor({
         text: body,
         ...(bodyVariablesRange.length
           ? {
-              example: {
-                body_text: [bodyVariables.slice(0, bodyVariablesRange.length)],
-              },
-            }
+            example: {
+              body_text: [bodyVariables.slice(0, bodyVariablesRange.length)],
+            },
+          }
           : {}),
       },
       ...(footer ? [{ type: "FOOTER", text: footer }] : []),
@@ -293,7 +293,7 @@ function TemplateEditor({
       setUpsertLoading(true);
     }
 
-    const { data, error } = await supabase.functions.invoke(
+    const { error } = await supabase.functions.invoke(
       "whatsapp-management/templates",
       {
         method,
@@ -572,9 +572,9 @@ export default function WhatsAppTemplates() {
 
   const sendTemplateMessage = async (
     template: TemplateMessage["template"],
-    body: string,
-    header?: string,
-    footer?: string,
+    _body: string,
+    _header?: string,
+    _footer?: string,
   ) => {
     if (!activeConvId || !conv || !template) {
       return;

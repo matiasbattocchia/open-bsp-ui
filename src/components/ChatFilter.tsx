@@ -1,6 +1,6 @@
 import useBoundStore from "@/store/useBoundStore";
 import { filters, Filters } from "@/store/uiSlice";
-import { useTranslation } from "react-dialect";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function ChatFilter() {
   const appliedFilter = useBoundStore((state) => state.ui.filter);

@@ -1,4 +1,5 @@
-import { useEffect } from "react";
+// @ts-nocheck
+import { useQuery } from "@tanstack/react-query";
 import useBoundStore from "@/store/useBoundStore";
 import {
   fetchMessagesFromBackend,

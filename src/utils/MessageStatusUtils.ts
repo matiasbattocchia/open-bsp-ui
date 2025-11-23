@@ -1,4 +1,4 @@
-import { OutgoingStatus } from "@/supabase/client";
+import { type OutgoingStatus } from "@/supabase/client";
 // @ts-ignore
 import toReversed from "core-js-pure/actual/array/to-reversed";
 

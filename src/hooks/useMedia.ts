@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { pushMessageToDb } from "@/utils/MessageUtils";
 import useBoundStore from "@/store/useBoundStore";
-import { MessageInsert, MessageRow, supabase } from "@/supabase/client";
+import {
+  type MessageInsert,
+  type MessageRow,
+  supabase,
+} from "@/supabase/client";
 
 export function useMedia(message: MessageRow) {
   if (!(message.direction === "incoming" || message.direction === "outgoing")) {

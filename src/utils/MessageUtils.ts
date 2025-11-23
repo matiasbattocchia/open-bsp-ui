@@ -1,11 +1,11 @@
 import {
   supabase,
-  MessageInsert,
-  ConversationRow,
-  MessageRow,
-  OutgoingMessage,
-  IncomingMessage,
-  InternalMessage,
+  type MessageInsert,
+  type ConversationRow,
+  type MessageRow,
+  type OutgoingMessage,
+  type IncomingMessage,
+  type InternalMessage,
 } from "@/supabase/client";
 import useBoundStore from "@/store/useBoundStore";
 

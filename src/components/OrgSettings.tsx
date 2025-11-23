@@ -1,32 +1,17 @@
-"use client";
-
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import useBoundStore from "@/store/useBoundStore";
 import WhatsAppIntegration from "./WhatsAppIntegration";
-import { Translate as T, useTranslation } from "react-dialect";
+import { Translate as T } from "@/hooks/useTranslation";
 import { LoaderCircle } from "lucide-react";
 
 export default function OrgSettings() {
-  const session = useBoundStore((store) => store.ui.session);
   const activeOrgId = useBoundStore((store) => store.ui.activeOrgId);
 
   // TODO: Use react-query for server state - cabra 26/10/2024
-  const [services, setServices] = useState<
+  const [services, _setServices] = useState<
     { service: string; waba_id: string; phone_number: string }[]
   >([]);
-  const [admin, setAdmin] = useState(false);
-  const [embeddedSignupCompleted, setEmbeddedSignupCompleted] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  async function updateConfig(extra: {
-    mode?: string;
-    prompt?: string;
-    notifications?: string;
-  }) {
-    if (!activeOrgId) {
-      return;
-    }
-  }
 
   return (
     activeOrgId && (
@@ -49,7 +34,7 @@ export default function OrgSettings() {
             <WhatsAppIntegration
               orgId={activeOrgId}
               setLoading={setLoading}
-              onSuccess={() => setEmbeddedSignupCompleted(true)}
+              onSuccess={() => { }}
             />
           </div>
           <ul>

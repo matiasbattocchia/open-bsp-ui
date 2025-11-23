@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Badge, Tooltip } from "antd";
+import { useEffect, useRef, useState } from "react";
+import { Badge } from "antd";
 import useBoundStore from "@/store/useBoundStore";
-import { FileDraft } from "@/store/chatSlice";
+import { type FileDraft } from "@/store/chatSlice";
 import {
   isImage,
   extension,
@@ -11,7 +11,6 @@ import {
 import { newMessage, pushMessageToStore } from "@/utils/MessageUtils";
 import { saveDraft } from "../ChatFooter";
 import { pushConversationToDb } from "@/utils/ConversationUtils";
-import { useTranslation } from "react-dialect";
 
 const FilePreviewer = () => {
   const agentId = useBoundStore(

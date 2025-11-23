@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode } from "react";
+import { type ReactNode } from "react";
 import "./globals.css";
 import "@radix-ui/themes/styles.css";
 import { useAppInit } from "@/hooks/useAppInitializer";

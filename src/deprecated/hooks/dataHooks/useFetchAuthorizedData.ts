@@ -1,4 +1,6 @@
+// @ts-nocheck
 import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/supabase/client";
 import useBoundStore from "@/store/useBoundStore";
 import { updateAuthorizedCache } from "@/utils/IdbUtils";

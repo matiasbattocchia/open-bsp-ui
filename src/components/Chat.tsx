@@ -6,11 +6,9 @@ import localizedFormat from "dayjs/plugin/localizedFormat";
 dayjs.extend(localizedFormat);
 import useBoundStore from "@/store/useBoundStore";
 import Message from "./Message/Message";
-import { MessageRow } from "@/supabase/client";
-import { useTranslation } from "react-dialect";
-import useScroller from "@/hooks/useScroller";
-import { ChevronDown } from "lucide-react";
-import { Button } from "@radix-ui/themes";
+import { type MessageRow } from "@/supabase/client";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useOrganization } from "@/query/useOrgs";
 
 const colors = {
   emerald: { text: "text-emerald-500", bg: "bg-emerald-500" },
@@ -73,10 +71,8 @@ export default function Chat() {
       store.chat.messages.get(store.ui.activeConvId || ""),
     )?.values() || [],
   );
-  const orgName = useBoundStore(
-    (store) =>
-      store.chat.organizations.get(store.ui.activeOrgId || "")?.name || "?",
-  );
+  const { data: orgData } = useOrganization(useBoundStore((store) => store.ui.activeOrgId || ""));
+  const orgName = orgData?.data?.[0]?.name || "?";
   const convName = useBoundStore(
     (store) =>
       store.chat.conversations.get(store.ui.activeConvId || "")?.name || "?",
@@ -87,15 +83,6 @@ export default function Chat() {
   );
 
   const scroller = useRef<HTMLDivElement>(null);
-
-  const {
-    fetchMoreMessages,
-    addListeners,
-    removeListeners,
-    showScrollButton,
-    isLoading,
-    isFarFromBottom,
-  } = useScroller(scroller, messages, activeConvId);
 
   const { translate: t, currentLanguage } = useTranslation();
 
@@ -189,19 +176,11 @@ export default function Chat() {
     t: (content: string) => React.ReactNode,
   ): (EnvelopeType | SeparatorType)[] {
     const _chat = [];
-    if (isLoading) {
-      _chat.push({
-        text: t("Cargando mensajes anteriores..."),
-        first: true,
-        last: true,
-      } as SeparatorType);
-    } else {
-      _chat.push({
-        text: t("Inicio de la conversación"),
-        first: true,
-        last: true,
-      } as SeparatorType);
-    }
+    _chat.push({
+      text: t("Inicio de la conversación"),
+      first: true,
+      last: true,
+    } as SeparatorType);
     function typeMap(row: MessageRow) {
       // For internal messages with tool info, use tool use_id to group related calls
       if (row.direction === "internal" && row.content.tool?.event === "use") {
@@ -219,7 +198,7 @@ export default function Chat() {
 
     let prevMsg: EnvelopeType | null = null;
 
-    for (const [index, env] of chat
+    for (const [_index, env] of chat
       .map(
         (message) => ({ message, first: false, last: false }) as EnvelopeType,
       )
@@ -295,19 +274,11 @@ export default function Chat() {
 
   useEffect(() => {
     let scrollerRef = scroller.current;
-    // If a conversation is active and there are no messages, fetch them
-    if (!messages.length && activeConvId) {
-      fetchMoreMessages(activeConvId);
-    }
 
     if (!scrollerRef || !scroller.current) {
       return;
     }
 
-    addListeners();
-    return () => {
-      removeListeners();
-    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages.length, activeConvId]);
 
@@ -320,7 +291,7 @@ export default function Chat() {
   // prevent the scroll from jumping when the user is reading old messages
   useEffect(() => {
     const scrollRef = scroller.current;
-    if (isLoading || !scrollRef || isFarFromBottom()) {
+    if (!scrollRef) {
       return;
     }
     scrollToBottom();
@@ -334,7 +305,7 @@ export default function Chat() {
   // If the role is not admin, then do not show internal messages (tool calls, etc).
   const envelopesAndSeparators = insertDateSeparators(
     messages
-      .filter((m, idx, arr) => {
+      .filter((m, idx) => {
         if (role === "admin") return true;
 
         // Hide internal messages for non-admin users
@@ -380,8 +351,8 @@ export default function Chat() {
             ),
           )}
         </div>
-        {showScrollButton && (
-          <Button
+        {/* (
+          <button
             style={{
               width: "42px",
               height: "42px",
@@ -395,8 +366,8 @@ export default function Chat() {
             onClick={() => scrollToBottom()}
           >
             <ChevronDown className="w-8 h-8 pt-1 text-gray-dark" />
-          </Button>
-        )}
+          </button>
+        ) */}
       </div>
     )
   );

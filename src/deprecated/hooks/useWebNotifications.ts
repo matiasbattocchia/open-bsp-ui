@@ -1,3 +1,5 @@
+// @ts-nocheck
+// @ts-nocheck
 import useBoundStore from "@/store/useBoundStore";
 import { supabase } from "@/supabase/client";
 import { useQuery } from "@tanstack/react-query";

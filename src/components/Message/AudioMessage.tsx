@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import StatusIcon from "./StatusIcon";
 import { useMedia } from "@/hooks/useMedia";
 import Avatar from "../Avatar";
-import { AudioVisualizer } from "react-audio-visualize";
+// COMMENTED OUT: react-audio-visualize is not compatible with React 19
+// import { AudioVisualizer } from "react-audio-visualize";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import { nameInitials } from "../ChatListItem/ChatListItem";
-import { MessageRow, OutgoingStatus } from "@/supabase/client";
+import { type MessageRow, type OutgoingStatus } from "@/supabase/client";
 dayjs.extend(duration);
 
 export default function AudioMessage({
@@ -125,7 +126,7 @@ export default function AudioMessage({
             )}
           </button>
 
-          {/* Progress bar #09d261 */}
+          {/* Progress bar */}
           <div className="relative px-[12px]">
             {audio && (
               <input
@@ -153,6 +154,31 @@ export default function AudioMessage({
                 }}
               />
             )}
+            {/* REPLACED: AudioVisualizer with simple progress bar for React 19 compatibility */}
+            {load.blob && (
+              <div className="relative w-[166px] h-[24px] bg-[#e0e0e0] rounded-sm overflow-hidden">
+                {/* Progress indicator */}
+                <div
+                  className="absolute top-0 left-0 h-full bg-[#728977] transition-all duration-100"
+                  style={{
+                    width: duration > 0 ? `${((seekTime || time) / duration) * 100}%` : '0%'
+                  }}
+                />
+                {/* Simple waveform-like bars */}
+                <div className="absolute top-0 left-0 w-full h-full flex items-center justify-around px-1">
+                  {Array.from({ length: 40 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="w-[2px] bg-[#b0ceae] rounded-full"
+                      style={{
+                        height: `${Math.random() * 60 + 40}%`,
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+            {/* ORIGINAL CODE (commented out for reference):
             {load.blob && (
               <AudioVisualizer
                 blob={load.blob}
@@ -165,6 +191,7 @@ export default function AudioMessage({
                 currentTime={seekTime || time}
               />
             )}
+            */}
             {duration > 0 && (
               <div className="absolute left-0 -bottom-[22px] text-[11px] text-[#ced0d1]">
                 {dayjs.duration(time || duration, "seconds").format("m:ss")}

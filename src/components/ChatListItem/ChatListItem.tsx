@@ -1,16 +1,15 @@
-import { ReactNode, useContext, useState } from "react";
+import { type ReactNode, useContext, useState } from "react";
 import Avatar from "../Avatar";
 import { getHighestStatus, getStatusIcon } from "@/utils/MessageStatusUtils";
 import useBoundStore from "@/store/useBoundStore";
-import { ChatListType } from "../ChatList";
+import type { ChatListType } from "../ChatList";
 import {
-  ConversationRow,
-  Draft,
-  MessageRow,
-  OrganizationRow,
-  OutgoingStatus,
+  type ConversationRow,
+  type Draft,
+  type MessageRow,
+  type OrganizationRow,
+  type OutgoingStatus,
   supabase,
-  TemplateMessage,
 } from "@/supabase/client";
 import ItemActions from "./ItemActions";
 import dayjs from "dayjs";
@@ -19,12 +18,12 @@ import "dayjs/locale/pt";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 dayjs.extend(localizedFormat);
 import { TickContext } from "@/context/useTick";
-import { Translate as T, useTranslation } from "react-dialect";
+import { Translate as T, useTranslation } from "@/hooks/useTranslation";
 import { AtSign, Pause, VolumeOff } from "lucide-react";
 import { SpecialMessageTypeMap } from "../Message/Message";
 import { useQuery } from "@tanstack/react-query";
-import { NotificationKind } from "@/hooks/useWebNotifications";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
+import { useOrganization } from "@/query/useOrgs";
 
 export function nameInitials(name: string): string {
   const names = name.split(" ");
@@ -144,7 +143,7 @@ export default function ChatListItem({
   itemId: string;
   type: ChatListType;
 }) {
-  const router = useRouter();
+  const navigate = useNavigate();
   const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
   const setActiveOrg = useBoundStore((state) => state.ui.setActiveOrg);
 
@@ -156,7 +155,7 @@ export default function ChatListItem({
     if (type === "organizations") {
       setActiveConv(null);
       setActiveOrg(itemId);
-      router.push("/conversations");
+      navigate({ to: "/conversations" });
 
       return;
     }
@@ -165,9 +164,17 @@ export default function ChatListItem({
 
   const toggle = useBoundStore((state) => state.ui.toggle);
 
-  const item = useBoundStore((state) =>
-    state.chat[type].get(itemId),
-  ) as ConversationRow;
+  const { data: organization } = useOrganization(
+    type === "organizations" ? itemId : "",
+  );
+
+  const conversation = useBoundStore((state) =>
+    state.chat.conversations.get(itemId),
+  );
+
+  const item = (
+    type === "organizations" ? organization : conversation
+  ) as ConversationRow | OrganizationRow;
 
   const { data: agents } = useQuery({
     queryKey: [activeOrgId, "agents", "chat-list-item"],
@@ -193,7 +200,7 @@ export default function ChatListItem({
 
   const messages: MessageRow[] | undefined = Array.from(
     useBoundStore((state) => state.chat.messages.get(itemId || ""))?.values() ||
-      [],
+    [],
   );
 
   const role = useBoundStore(
@@ -205,22 +212,22 @@ export default function ChatListItem({
     (m) => role === "admin" || m.direction !== "internal",
   );
 
-  const draft: Draft | undefined = item?.extra?.draft;
+  const draft: Draft | undefined = (item as ConversationRow)?.extra?.draft;
 
   const preview =
     +new Date(mostRecent?.timestamp || 0) >= +new Date(draft?.timestamp || 0)
       ? mostRecent
       : ({
-          direction: "outgoing",
-          content: {
-            version: "1",
-            type: "text",
-            kind: "text",
-            text: draft!.text,
-          },
-          timestamp: draft!.timestamp,
-          status: {},
-        } as MessageRow);
+        direction: "outgoing",
+        content: {
+          version: "1",
+          type: "text",
+          kind: "text",
+          text: draft!.text,
+        },
+        timestamp: draft!.timestamp,
+        status: {},
+      } as MessageRow);
 
   const unread = (() => {
     let count = 0;
@@ -263,11 +270,11 @@ export default function ChatListItem({
 
   const [hovered, setHovered] = useState(false);
 
-  const isPinned = item?.extra?.pinned;
-  const isMuted = item?.extra?.notifications === NotificationKind.disabled;
+  const isPinned = (item as ConversationRow)?.extra?.pinned;
+  const isMuted = (item as ConversationRow)?.extra?.notifications === "off";
 
   const isPaused =
-    +new Date(item?.extra?.paused || 0) > +new Date() - 12 * 60 * 60 * 1000; // Less than 12 hours ago.
+    +new Date((item as ConversationRow)?.extra?.paused || 0) > +new Date() - 12 * 60 * 60 * 1000; // Less than 12 hours ago.
 
   const name = item?.name;
 
@@ -310,8 +317,6 @@ export default function ChatListItem({
             e.stopPropagation();
             e.preventDefault();
             type === "organizations" && toggle("organizationsList");
-            const active =
-              type === "organizations" ? activeOrgId : activeConvId;
 
             setActive();
           }}

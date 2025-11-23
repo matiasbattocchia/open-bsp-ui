@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { supabase } from "@/supabase/client";
-import { Translate as T } from "react-dialect";
+import { Translate as T } from "@/hooks/useTranslation";
 
 const FB_API_VERSION = "v24.0";
 
@@ -67,7 +67,7 @@ export default function WhatsAppIntegration({
 
     (window as any).fbAsyncInit = function () {
       (window as any).FB.init({
-        appId: process.env.NEXT_PUBLIC_META_APP_ID,
+        appId: import.meta.env.VITE_META_APP_ID,
         autoLogAppEvents: true,
         xfbml: true,
         version: FB_API_VERSION,
@@ -181,7 +181,7 @@ export default function WhatsAppIntegration({
           const payload: SignupPayload = {
             code,
             organization_id: orgId,
-            application_id: process.env.NEXT_PUBLIC_META_APP_ID,
+            application_id: import.meta.env.VITE_META_APP_ID,
             phone_number_id: sessionInfo.phone_number_id,
             waba_id: sessionInfo.waba_id,
             business_id: sessionInfo.business_id,
@@ -202,7 +202,7 @@ export default function WhatsAppIntegration({
         }
       },
       {
-        config_id: process.env.NEXT_PUBLIC_FB_LOGIN_CONFIG_ID, // Configuration ID obtained in https://developers.facebook.com/apps/629323992623834/business-login/configurations/?business_id=153181867762503
+        config_id: import.meta.env.VITE_FB_LOGIN_CONFIG_ID, // Configuration ID obtained in https://developers.facebook.com/apps/629323992623834/business-login/configurations/?business_id=153181867762503
         response_type: "code", // Must be set to 'code' for System User access token
         override_default_response_type: true,
         extras: {

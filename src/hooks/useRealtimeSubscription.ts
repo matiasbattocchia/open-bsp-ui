@@ -1,14 +1,20 @@
-import { ConversationRow, MessageRow, supabase } from "@/supabase/client";
+import {
+  type ConversationRow,
+  type MessageRow,
+  supabase,
+} from "@/supabase/client";
 import useBoundStore from "@/store/useBoundStore";
 import { useEffect } from "react";
-import { updateMessagesCache } from "@/utils/IdbUtils";
+import { useAuthOrgs } from "@/query/useAuthOrgs";
 
-export const useRealtimeSubscription = (
-  authorizedOrgs: string[] | undefined,
-) => {
-  const conversations = useBoundStore((state) => state.chat.conversations);
-  const activeConvId = useBoundStore((state) => state.ui.activeConvId);
-  // Set up subscription outside of React lifecycle
+export const useRealtimeSubscription = () => {
+  const { data: authorizedOrgs } = useAuthOrgs();
+
+  const pushConversations = useBoundStore(
+    (state) => state.chat.pushConversations,
+  );
+  const pushMessages = useBoundStore((state) => state.chat.pushMessages);
+
   useEffect(() => {
     if (!authorizedOrgs?.length) return;
 
@@ -28,9 +34,9 @@ export const useRealtimeSubscription = (
           // TODO: https://github.com/supabase/supabase/issues/32817
           if (payload.table !== "conversations") return;
 
-          useBoundStore
-            .getState()
-            .chat.pushConversations([payload.new as ConversationRow]);
+          const conversation = payload.new as ConversationRow;
+
+          pushConversations([conversation]);
         },
       )
       .on(
@@ -47,9 +53,9 @@ export const useRealtimeSubscription = (
 
           const message = payload.new as MessageRow;
 
-          useBoundStore.getState().chat.pushMessages([message]);
+          pushMessages([message]);
 
-          updateMessagesCache([message]);
+          //updateMessagesCache([message]);
         },
       );
 

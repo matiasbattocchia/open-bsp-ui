@@ -1,8 +1,8 @@
-import { StateCreator } from "zustand";
-import { User } from "@supabase/supabase-js";
-import useBoundStore, { GoriState } from "./useBoundStore";
+import type { StateCreator } from "zustand";
+import type { User } from "@supabase/supabase-js";
+import type { AppState } from "./useBoundStore";
 import dayjs from "dayjs";
-import { ConversationRow, MessageRow } from "@/supabase/client";
+import type { ConversationRow, MessageRow } from "@/supabase/client";
 
 export function isArchived(conv: ConversationRow, msg?: MessageRow) {
   const archivedTimestamp: string | null | undefined = conv.extra?.archived;
@@ -10,12 +10,14 @@ export function isArchived(conv: ConversationRow, msg?: MessageRow) {
   return +new Date(archivedTimestamp || 0) > +new Date(msg?.timestamp || 0);
 }
 
-export enum Filters {
-  ALL = "todas",
-  UNREAD = "pendientes",
-  H24 = "24h",
-  ARCHIVED = "archivadas",
-}
+export const Filters = {
+  ALL: "todas",
+  UNREAD: "pendientes",
+  H24: "24h",
+  ARCHIVED: "archivadas",
+} as const;
+
+export type Filters = (typeof Filters)[keyof typeof Filters];
 
 export const filters: {
   [key in Filters]: (conv: ConversationRow, msg?: MessageRow) => boolean;
@@ -38,22 +40,22 @@ export type UIState = {
   newChat: boolean;
   activeOrgId: string | null;
   activeConvId: string | null;
-  session: User | undefined;
+  user: User | null;
   sendAsContact: boolean;
   filter: keyof typeof filters;
   searchPattern: string;
-  initialized: boolean;
+  isLoading: boolean;
   roles: {
     [orgId: string]: { agentId: string; role: "admin" | "operator" };
   };
 };
 
 export type UIActions = {
-  toggle: (component: keyof UIState) => void;
+  toggle: (component: keyof UIState, value?: boolean) => void;
   setUI: (ui: Partial<UIState>) => void;
   setActiveOrg: (id: string | null) => void;
   setActiveConv: (id: string | null) => void;
-  setSession: (session: User | undefined) => void;
+  setUser: (user: User | null) => void;
   setSendAsContact: (sendAsContact: boolean) => void;
   setFilter: (filter: keyof typeof filters) => void;
   setSearchPattern: (searchPattern: string) => void;
@@ -64,12 +66,13 @@ export type UIActions = {
 
 export type UISlice = UIState & UIActions;
 
-export const defaultUIInitState: StateCreator<Partial<GoriState>> = (
+// @ts-expect-error
+export const createUISlice: StateCreator<Partial<AppState>> = (
   set: (
     partial:
-      | GoriState
-      | Partial<GoriState>
-      | ((state: GoriState) => GoriState | Partial<GoriState>),
+      | AppState
+      | Partial<AppState>
+      | ((state: AppState) => AppState | Partial<AppState>),
     replace?: boolean | undefined,
   ) => void,
 ) => ({
@@ -82,19 +85,19 @@ export const defaultUIInitState: StateCreator<Partial<GoriState>> = (
   newChat: false,
   activeOrgId: null,
   activeConvId: null,
-  session: undefined,
+  user: null,
   sendAsContact: false,
   filter: "todas" as keyof typeof filters,
   searchPattern: "",
-  initialized: false,
+  isLoading: false,
   roles: {},
   setUI: (ui: Partial<UIState>) =>
     set((state) => ({ ui: { ...state.ui, ...ui } })),
-  toggle: (component: keyof UIState) =>
+  toggle: (component: keyof UIState, value?: boolean) =>
     set((state) => ({
       ui: {
         ...state.ui,
-        [component]: !state.ui[component],
+        [component]: value ?? !state.ui[component],
       },
     })),
   setActiveOrg: (activeOrgId: string | null) =>
@@ -111,11 +114,11 @@ export const defaultUIInitState: StateCreator<Partial<GoriState>> = (
         activeConvId,
       },
     })),
-  setSession: (session: User | undefined) =>
+  setUser: (user: User | null) =>
     set((state) => ({
       ui: {
         ...state.ui,
-        session,
+        user,
       },
     })),
   setSendAsContact: (sendAsContact: boolean) =>

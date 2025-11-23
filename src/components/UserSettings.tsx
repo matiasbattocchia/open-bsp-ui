@@ -4,7 +4,7 @@
 import { useState, useEffect } from "react";
 import useBoundStore from "@/store/useBoundStore";
 import OrganizationUserService from "@/services/OrganizationUserService";
-import { Translate as T, useTranslation } from "react-dialect";
+import { Translate as T, useTranslation } from "@/hooks/useTranslation";
 
 export default function UserSettings() {
   const session = useBoundStore((store) => store.ui.session);

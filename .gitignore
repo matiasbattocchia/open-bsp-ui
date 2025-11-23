@@ -13,3 +13,5 @@ node_modules
 .zed
 
 mise.toml
+
+.tanstack

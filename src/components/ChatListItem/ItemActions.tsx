@@ -1,11 +1,10 @@
-import { Dropdown, MenuProps } from "antd";
+import { Dropdown, type MenuProps } from "antd";
 import useBoundStore from "@/store/useBoundStore";
-import { ChatListType } from "../ChatList";
-import { MessageRow } from "@/supabase/client";
+import { type ChatListType } from "../ChatList";
+import { type MessageRow } from "@/supabase/client";
 import { isArchived } from "@/store/uiSlice";
-import { useTranslation } from "react-dialect";
+import { useTranslation } from "@/hooks/useTranslation";
 import { updateConvExtra } from "@/utils/ConversationUtils";
-import { NotificationKind } from "@/hooks/useWebNotifications";
 
 export default function ItemActions({
   children,
@@ -74,16 +73,16 @@ export default function ItemActions({
     },
     {
       label:
-        notifications != NotificationKind.disabled
+        notifications != "off"
           ? t("Silenciar notificationes")
           : t("Desactivar silencio de notificaciones"),
       key: "3",
       onClick: () =>
         updateConvExtra(conversation, {
           notifications:
-            notifications != NotificationKind.disabled
-              ? NotificationKind.disabled
-              : NotificationKind.full,
+            notifications != "off"
+              ? "off"
+              : "on",
         }),
     },
     /*{

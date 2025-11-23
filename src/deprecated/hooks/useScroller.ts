@@ -1,3 +1,5 @@
+// @ts-nocheck
+// @ts-nocheck
 import { RefObject, useEffect, useState } from "react";
 import {
   fetchConversationMessages,
@@ -53,7 +55,7 @@ const useScroller = (
     if (!scroller.current) return false;
     return (scroller.current.scrollTop + scroller.current.clientHeight) <
       (scroller.current.scrollHeight * 0.8)
-    ;
+      ;
   }
 
   const doShowScrollButton = () => setShowScrollButton(isFarFromBottom());

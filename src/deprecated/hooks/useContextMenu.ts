@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useEffect, useCallback, useState } from "react";
 
 type AnchorPoint = {
