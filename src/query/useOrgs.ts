@@ -11,9 +11,9 @@ export function useOrganizations() {
       await supabase
         .from("organizations")
         .select()
-        //.eq("agents.id", user!.id)
         .throwOnError(),
     enabled: !!user,
+    select: (data) => data.data,
   });
 }
 
@@ -26,9 +26,10 @@ export function useOrganization(id: string) {
       await supabase
         .from("organizations")
         .select()
-        .eq("agent.id", user!.id)
         .eq("id", id)
-        .throwOnError(),
+        .throwOnError()
+        .single(),
     enabled: !!user,
+    select: (data) => data.data,
   });
 }

@@ -1,10 +1,12 @@
 import { supabase } from "@/supabase/client";
 import useBoundStore from "@/store/useBoundStore";
 import { useEffect } from "react";
-import { useAuthOrgs } from "@/query/useAuthOrgs";
+import { useOrganizations } from "@/query/useOrgs";
 
 export const useInitialDataFetch = () => {
-  const { data: authorizedOrgs } = useAuthOrgs();
+  const { data } = useOrganizations();
+
+  const orgIds = data?.map((o) => o.id) || [];
 
   const pushConversations = useBoundStore(
     (state) => state.chat.pushConversations,
@@ -15,7 +17,7 @@ export const useInitialDataFetch = () => {
     const { data: conversations } = await supabase
       .from("conversations")
       .select()
-      .in("organization_id", authorizedOrgs!)
+      .in("organization_id", orgIds)
       .order("updated_at", { ascending: false })
       .limit(999)
       .throwOnError();
@@ -27,7 +29,7 @@ export const useInitialDataFetch = () => {
     const { data: messages } = await supabase
       .from("messages")
       .select()
-      .in("organization_id", authorizedOrgs!)
+      .in("organization_id", orgIds)
       .order("updated_at", { ascending: false })
       .limit(999)
       .throwOnError();
@@ -36,11 +38,11 @@ export const useInitialDataFetch = () => {
   };
 
   useEffect(() => {
-    if (!authorizedOrgs?.length) {
+    if (!orgIds.length) {
       return;
     }
 
     loadConvs();
     loadMsgs();
-  }, [authorizedOrgs]);
+  }, [orgIds]);
 };
