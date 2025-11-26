@@ -5,8 +5,6 @@ import useBoundStore from "@/store/useBoundStore";
 export function useAuthOrgs() {
   const user = useBoundStore((state) => state.ui.user);
 
-  console.log("authorg user", user);
-
   return useQuery({
     queryKey: ["authOrgs"],
     queryFn: async () =>

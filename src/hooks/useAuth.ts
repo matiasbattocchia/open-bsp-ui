@@ -2,6 +2,7 @@ import { supabase } from "@/supabase/client";
 import useBoundStore from "@/store/useBoundStore";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
+import { Route } from "@/routes/__root";
 
 /**
  * Hook to manage authentication state
@@ -11,21 +12,34 @@ import { useEffect } from "react";
 export function useAuth() {
   const setUser = useBoundStore((state) => state.ui.setUser);
   const navigate = useNavigate();
+  const { redirect } = Route.useSearch();
 
   useEffect(() => {
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth event:", event);
+
       const user = session?.user ?? null;
       setUser(user);
 
-      // Redirect to login if user is null (logged out)
-      if (!user) {
-        navigate({ to: "/login", search: { redirect: window.location.pathname } });
+      // Signed in
+      if (user && event === "SIGNED_IN") {
+        navigate({
+          to: redirect || "/",
+        });
+      }
+
+      // Signed out
+      if (!user && !window.location.pathname.startsWith("/login")) {
+        navigate({
+          to: "/login",
+          search: { redirect: window.location.pathname },
+        });
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [setUser, navigate]);
+  }, [redirect]);
 }

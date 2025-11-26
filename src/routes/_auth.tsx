@@ -1,6 +1,5 @@
 import { createFileRoute, redirect, Outlet } from "@tanstack/react-router";
 import useBoundStore from "@/store/useBoundStore";
-import { supabase } from "@/supabase/client";
 import Menu from "@/components/Menu";
 import Chat from "@/components/Chat";
 import ChatHeader from "@/components/ChatHeader";
@@ -8,40 +7,20 @@ import ChatFooter from "@/components/ChatFooter";
 import { useEffect } from "react";
 
 export const Route = createFileRoute("/_auth")({
-  beforeLoad: async ({ location }) => {
-    let user = useBoundStore.getState().ui.user;
-
-    if (!user) {
-      const { data } = await supabase.auth.getSession();
-      user = data?.session?.user ?? null;
-    }
-
-    if (!user) {
-      throw redirect({
-        to: "/login",
-        search: {
-          redirect: location.href,
-        },
-      });
-    }
-  },
-  component: AuthLayout,
+  component: AppLayout,
 });
 
-function AuthLayout() {
+function AppLayout() {
   const activeConvId = useBoundStore((state) => state.ui.activeConvId);
   const setActiveConv = useBoundStore((state) => state.ui.setActiveConv);
 
-  // Sync hash with activeConvId
+  // Sync fragment identifier with activeConvId
+  // i.e. /conversations#1234
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash;
-      if (hash.startsWith("#convId=")) {
-        const id = hash.replace("#convId=", "");
-        if (id !== activeConvId) {
-          setActiveConv(id);
-        }
-      }
+      const convId = hash.slice(1);
+      setActiveConv(convId);
     };
 
     // Initial check
@@ -49,21 +28,10 @@ function AuthLayout() {
 
     window.addEventListener("hashchange", handleHashChange);
     return () => window.removeEventListener("hashchange", handleHashChange);
-  }, [setActiveConv, activeConvId]);
+  }, []);
 
   useEffect(() => {
-    if (activeConvId) {
-      window.location.hash = `convId=${activeConvId}`;
-    } else {
-      if (window.location.hash.includes("convId=")) {
-        // Remove hash without reloading
-        history.pushState(
-          "",
-          document.title,
-          window.location.pathname + window.location.search,
-        );
-      }
-    }
+    window.location.hash = activeConvId || "";
   }, [activeConvId]);
 
   return (
@@ -82,7 +50,7 @@ function AuthLayout() {
           <>
             <ChatHeader />
             <Chat />
-            <ChatFooter />
+            {/*<ChatFooter />*/}
           </>
         ) : (
           <div className="flex items-center justify-center h-full text-gray-500">

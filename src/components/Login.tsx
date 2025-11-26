@@ -79,13 +79,12 @@ export default function Login() {
           <div className="self-center text-red-500 text-md">{message}</div>
         )}
 
-        <T
-          as="button"
+        <button
           className="py-[7px] px-[20px] border border-gray-dark hover:bg-white rounded-lg w-full flex items-center justify-center"
           onClick={handleLogInWithEmail}
         >
-          Entrar
-        </T>
+          {t("Entrar")}
+        </button>
       </div>
     </div>
   )
