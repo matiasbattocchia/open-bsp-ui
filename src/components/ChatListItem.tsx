@@ -1,15 +1,11 @@
 import { type ReactNode, useContext, useState } from "react";
-import Avatar from "../Avatar";
+import Avatar from "./Avatar";
 import { getHighestStatus, getStatusIcon } from "@/utils/MessageStatusUtils";
-import useBoundStore from "@/store/useBoundStore";
-import type { ChatListType } from "../ChatList";
+import useBoundStore from "@/stores/useBoundStore";
 import {
-  type ConversationRow,
   type Draft,
   type MessageRow,
-  type OrganizationRow,
   type OutgoingStatus,
-  supabase,
 } from "@/supabase/client";
 import ItemActions from "./ItemActions";
 import dayjs from "dayjs";
@@ -17,30 +13,12 @@ import "dayjs/locale/es";
 import "dayjs/locale/pt";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 dayjs.extend(localizedFormat);
-import { TickContext } from "@/context/useTick";
+import { TickContext } from "@/contexts/useTick";
 import { Translate as T, useTranslation } from "@/hooks/useTranslation";
 import { AtSign, Pause, VolumeOff } from "lucide-react";
-import { SpecialMessageTypeMap } from "../Message/Message";
-import { useQuery } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
-import { useOrganization } from "@/query/useOrgs";
-
-export function nameInitials(name: string): string {
-  const names = name.split(" ");
-
-  if (names.length === 1) {
-    return names[0].slice(0, 2);
-  }
-
-  if (names.length > 1) {
-    return names
-      .slice(0, 2)
-      .map((name) => name[0])
-      .join("");
-  }
-
-  return "?";
-}
+import { SpecialMessageTypeMap } from "./Message/Message";
+import { useAgents, useCurrentAgent } from "@/queries/useAgents";
+import { nameInitials } from "@/utils/FormatUtils";
 
 function mediaPreview(t: (content: string) => ReactNode, message?: MessageRow) {
   let mediaIcon = null;
@@ -138,65 +116,24 @@ function severityClass(hours: number) {
 
 export default function ChatListItem({
   itemId,
-  type,
 }: {
   itemId: string;
-  type: ChatListType;
 }) {
-  const navigate = useNavigate();
-  const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
-  const setActiveOrg = useBoundStore((state) => state.ui.setActiveOrg);
 
   const activeConvId = useBoundStore((state) => state.ui.activeConvId);
   const setActiveConv = useBoundStore((state) => state.ui.setActiveConv);
 
-  const active = itemId === activeConvId || itemId === activeOrgId;
+  const active = itemId === activeConvId;
   const setActive = () => {
-    if (type === "organizations") {
-      setActiveConv(null);
-      setActiveOrg(itemId);
-      navigate({ to: "/conversations" });
-
-      return;
-    }
     setActiveConv(itemId);
   };
-
-  const toggle = useBoundStore((state) => state.ui.toggle);
-
-  const { data: organization } = useOrganization(
-    type === "organizations" ? itemId : "",
-  );
 
   const conversation = useBoundStore((state) =>
     state.chat.conversations.get(itemId),
   );
 
-  const item = (
-    type === "organizations" ? organization : conversation
-  ) as ConversationRow | OrganizationRow;
-
-  const { data: agents } = useQuery({
-    queryKey: [activeOrgId, "agents", "chat-list-item"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("agents")
-        .select("id, name, ai")
-        .eq("organization_id", activeOrgId!);
-
-      if (error) {
-        throw error;
-      }
-
-      return data;
-    },
-    enabled: !!activeOrgId,
-    staleTime: 1000 * 60 * 60 * 6, // 6 hours
-  });
-
-  const currentAgentId = useBoundStore(
-    (state) => state.ui.roles[state.ui.activeOrgId || ""].agentId,
-  );
+  const { data: agent } = useCurrentAgent();
+  const { data: agents } = useAgents();
 
   const messages: MessageRow[] | undefined = Array.from(
     useBoundStore((state) => state.chat.messages.get(itemId || ""))?.values() ||
@@ -212,7 +149,7 @@ export default function ChatListItem({
     (m) => role === "admin" || m.direction !== "internal",
   );
 
-  const draft: Draft | undefined = (item as ConversationRow)?.extra?.draft;
+  const draft: Draft | undefined = conversation?.extra?.draft;
 
   const preview =
     +new Date(mostRecent?.timestamp || 0) >= +new Date(draft?.timestamp || 0)
@@ -244,7 +181,7 @@ export default function ChatListItem({
         count += 1;
       } else if (
         msg.direction === "internal" &&
-        // @ts-expect-error notification is deprecated
+        // @ts-expect-error notification is deprecated (TODO: remove)
         msg.content.kind === "notification"
       ) {
         notification = true;
@@ -270,13 +207,13 @@ export default function ChatListItem({
 
   const [hovered, setHovered] = useState(false);
 
-  const isPinned = (item as ConversationRow)?.extra?.pinned;
-  const isMuted = (item as ConversationRow)?.extra?.notifications === "off";
+  const isPinned = conversation?.extra?.pinned;
+  const isMuted = conversation?.extra?.notifications === "off";
 
   const isPaused =
-    +new Date((item as ConversationRow)?.extra?.paused || 0) > +new Date() - 12 * 60 * 60 * 1000; // Less than 12 hours ago.
+    +new Date(conversation?.extra?.paused || 0) > +new Date() - 12 * 60 * 60 * 1000; // Less than 12 hours ago.
 
-  const name = item?.name;
+  const name = conversation?.name;
 
   const { translate: t, currentLanguage } = useTranslation();
 
@@ -300,14 +237,11 @@ export default function ChatListItem({
   // `mostRecent` does not distinguish between incoming/outgoing. Nonetheless
   // `severity` is used when `unread` is greater than zero. This only happens
   // when the most recent messages are of the incoming type.
-  const severity =
-    type === "organizations"
-      ? { text: "text-green-500", bg: "bg-green-500" }
-      : severityClass(tick.diff(mostRecent?.timestamp, "hours", true));
+  const severity = severityClass(tick.diff(mostRecent?.timestamp, "hours", true));
 
   return (
-    item && (
-      <ItemActions trigger={["contextMenu"]} type={type} itemId={itemId}>
+    conversation && (
+      <ItemActions trigger={["contextMenu"]} itemId={itemId}>
         <div
           className={
             "chat-list-item h-[72px] flex cursor-pointer" +
@@ -316,8 +250,6 @@ export default function ChatListItem({
           onClick={(e) => {
             e.stopPropagation();
             e.preventDefault();
-            type === "organizations" && toggle("organizationsList");
-
             setActive();
           }}
           onMouseEnter={() => setHovered(true)}
@@ -346,7 +278,7 @@ export default function ChatListItem({
               <div className="min-w-0 flex items-start text-gray-dark">
                 {preview?.direction === "outgoing" &&
                   statusIcon(preview.status)}
-                {preview?.agent_id && preview.agent_id !== currentAgentId && (
+                {preview?.agent_id && preview.agent_id !== agent?.id && (
                   <div className="text-[14px] mr-1 shrink-0">
                     {agents?.find((a) => a.id === preview.agent_id)?.name ||
                       "Asistente"}
@@ -389,7 +321,7 @@ export default function ChatListItem({
                   <Pause className="h-[19px] w-[19px] ml-[6px] fill-gray-dark stroke-0" />
                 )}
                 {/* Pin - For now just conversations can be fixed */}
-                {type === "conversations" && isPinned && (
+                {isPinned && (
                   <svg className="h-[18px] w-[12px] ml-[6px] text-gray-dark">
                     <use href="/icons.svg#pin" />
                   </svg>
@@ -413,18 +345,15 @@ export default function ChatListItem({
                 {/* Dropdown menu */}
                 <ItemActions
                   trigger={["click"]}
-                  type={type}
                   visible={hovered}
                   itemId={itemId}
                 >
-                  {type === "conversations" && (
-                    <svg
-                      className="h-[20px] w-[19px] ml-[6px] text-gray-dark"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <use href="/icons.svg#down" />
-                    </svg>
-                  )}
+                  <svg
+                    className="h-[20px] w-[19px] ml-[6px] text-gray-dark"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <use href="/icons.svg#down" />
+                  </svg>
                 </ItemActions>
               </div>
             </div>
@@ -434,3 +363,4 @@ export default function ChatListItem({
     )
   );
 }
+

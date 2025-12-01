@@ -1,6 +1,6 @@
-import useBoundStore from "@/store/useBoundStore";
+import useBoundStore from "@/stores/useBoundStore";
 import { useTranslation } from "@/hooks/useTranslation";
-import { useOrganization } from "@/query/useOrgs";
+import { useOrganization } from "@/queries/useOrgs";
 import { Menu } from "lucide-react";
 
 export default function Header() {
@@ -11,7 +11,7 @@ export default function Header() {
 
   const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
   const { data: orgData } = useOrganization(activeOrgId || "");
-  const orgName = orgData?.data?.[0]?.name || "?";
+  const orgName = orgData?.name || "?";
 
   const { translate: t } = useTranslation();
 

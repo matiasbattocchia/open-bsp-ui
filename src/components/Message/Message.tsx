@@ -16,7 +16,7 @@ import { prettyPrintJson } from "pretty-print-json";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useQuery } from "@tanstack/react-query";
 import AvatarComponent from "@/components/Avatar";
-import useBoundStore from "@/store/useBoundStore";
+import useBoundStore from "@/stores/useBoundStore";
 import { pushMessageToDb } from "@/utils/MessageUtils";
 import { pushMessageToStore } from "@/utils/MessageUtils";
 

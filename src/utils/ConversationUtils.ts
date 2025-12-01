@@ -1,5 +1,5 @@
-import { SEP } from "@/store/chatSlice";
-import useBoundStore from "@/store/useBoundStore";
+import { SEP } from "@/stores/chatSlice";
+import useBoundStore from "@/stores/useBoundStore";
 import {
   type ConversationInsert,
   type ConversationRow,
@@ -7,13 +7,15 @@ import {
 } from "@/supabase/client";
 
 const FIRST_NAMES =
-  "Nicolás,Tiago,Mateo,Sebastián,Lucas,Valentina,Victoria,Luna,Aurora,Catalina,Lisandro,Camila,Leonardo,Ana,Tomás,Natalia,Santiago,Isabella,Emilia,Martín,Sofía,Joaquín,Emma,Benjamín,Olivia,Alejandro,Lucía,Maximiliano,Renata,Daniel,Antonella,Javier,Valeria,Gabriel,Agustina,Thiago,Delfina,Santino,Mía,Bautista,Alma,Felipe,Clara,Ignacio,Zoe,Facundo,Pilar,Julián".split(
-    ",",
-  );
+  "Nicolás,Tiago,Mateo,Sebastián,Lucas,Valentina,Victoria,Luna,Aurora,Catalina,Lisandro,Camila,Leonardo,Ana,Tomás,Natalia,Santiago,Isabella,Emilia,Martín,Sofía,Joaquín,Emma,Benjamín,Olivia,Alejandro,Lucía,Maximiliano,Renata,Daniel,Antonella,Javier,Valeria,Gabriel,Agustina,Thiago,Delfina,Santino,Mía,Bautista,Alma,Felipe,Clara,Ignacio,Zoe,Facundo,Pilar,Julián"
+    .split(
+      ",",
+    );
 const LAST_NAMES =
-  "Díaz,Pérez,Gómez,Sosa,López,García,Romero,Flores,Cruz,Quiroga,Espejo,Figueroa,Villanueva,Zapata,Calderón,Manzur,Rodríguez,Martínez,Fernández,González,Sánchez,Ramírez,Torres,Hernández,Acosta,Rojas,Medina,Silva,Molina,Vargas,Castro,Morales,Gutiérrez,Ortega,Núñez,Peralta,Giménez,Aguirre,Benítez,Vega,Mendoza,Ríos,Cabrera,Navarro,Ramos,Herrera,Suárez,Moreno,Paz".split(
-    ",",
-  );
+  "Díaz,Pérez,Gómez,Sosa,López,García,Romero,Flores,Cruz,Quiroga,Espejo,Figueroa,Villanueva,Zapata,Calderón,Manzur,Rodríguez,Martínez,Fernández,González,Sánchez,Ramírez,Torres,Hernández,Acosta,Rojas,Medina,Silva,Molina,Vargas,Castro,Morales,Gutiérrez,Ortega,Núñez,Peralta,Giménez,Aguirre,Benítez,Vega,Mendoza,Ríos,Cabrera,Navarro,Ramos,Herrera,Suárez,Moreno,Paz"
+    .split(
+      ",",
+    );
 
 function pushConversationToStore(record: ConversationInsert) {
   // TODO: optimistic insert lacks some fields that the store considers as present - cabra 2024/07/28

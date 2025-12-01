@@ -1,5 +1,5 @@
 import { useState } from "react";
-import useBoundStore from "@/store/useBoundStore";
+import useBoundStore from "@/stores/useBoundStore";
 import WhatsAppIntegration from "./WhatsAppIntegration";
 import { Translate as T } from "@/hooks/useTranslation";
 import { LoaderCircle } from "lucide-react";

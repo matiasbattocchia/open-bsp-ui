@@ -1,9 +1,10 @@
 import { supabase } from "@/supabase/client";
-import useBoundStore from "@/store/useBoundStore";
+import useBoundStore from "@/stores/useBoundStore";
 import { useEffect } from "react";
-import { useOrganizations } from "@/query/useOrgs";
+import { useOrganizations } from "@/queries/useOrgs";
 
 export const useInitialDataFetch = () => {
+  const setActiveOrg = useBoundStore((state) => state.ui.setActiveOrg);
   const { data } = useOrganizations();
 
   const orgIds = data?.map((o) => o.id) || [];
@@ -41,6 +42,8 @@ export const useInitialDataFetch = () => {
     if (!orgIds.length) {
       return;
     }
+
+    setActiveOrg(orgIds.at(-1)!);
 
     loadConvs();
     loadMsgs();

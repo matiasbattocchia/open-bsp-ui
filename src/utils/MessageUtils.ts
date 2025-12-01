@@ -1,13 +1,13 @@
 import {
-  supabase,
-  type MessageInsert,
   type ConversationRow,
-  type MessageRow,
-  type OutgoingMessage,
   type IncomingMessage,
   type InternalMessage,
+  type MessageInsert,
+  type MessageRow,
+  type OutgoingMessage,
+  supabase,
 } from "@/supabase/client";
-import useBoundStore from "@/store/useBoundStore";
+import useBoundStore from "@/stores/useBoundStore";
 
 export function newMessage(
   conv: ConversationRow,
@@ -18,7 +18,8 @@ export function newMessage(
 ): MessageInsert {
   // If a file is provided, update the FilePart with file metadata
   if (file && content.type === "file") {
-    const fileUri = `internal://media/organizations/${conv.organization_id}/attachments/${crypto.randomUUID()}`;
+    const fileUri =
+      `internal://media/organizations/${conv.organization_id}/attachments/${crypto.randomUUID()}`;
 
     content.file = {
       ...content.file,

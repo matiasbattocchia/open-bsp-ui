@@ -6,7 +6,7 @@ import Avatar from "../Avatar";
 // import { AudioVisualizer } from "react-audio-visualize";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
-import { nameInitials } from "../ChatListItem/ChatListItem";
+import { nameInitials } from "@/utils/FormatUtils";
 import { type MessageRow, type OutgoingStatus } from "@/supabase/client";
 dayjs.extend(duration);
 

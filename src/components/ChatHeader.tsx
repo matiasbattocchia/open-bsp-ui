@@ -1,6 +1,6 @@
-import { nameInitials } from "./ChatListItem/ChatListItem";
+import { nameInitials } from "@/utils/FormatUtils";
 import Avatar from "./Avatar";
-import useBoundStore from "@/store/useBoundStore";
+import useBoundStore from "@/stores/useBoundStore";
 import { useTranslation } from "@/hooks/useTranslation";
 import { ArrowLeft } from "lucide-react";
 

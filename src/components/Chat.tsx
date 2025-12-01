@@ -4,11 +4,11 @@ import "dayjs/locale/es";
 import "dayjs/locale/pt";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 dayjs.extend(localizedFormat);
-import useBoundStore from "@/store/useBoundStore";
+import useBoundStore from "@/stores/useBoundStore";
 import Message from "./Message/Message";
 import { type MessageRow } from "@/supabase/client";
 import { useTranslation } from "@/hooks/useTranslation";
-import { useOrganization } from "@/query/useOrgs";
+import { useOrganization } from "@/queries/useOrgs";
 
 const colors = {
   emerald: { text: "text-emerald-500", bg: "bg-emerald-500" },
@@ -72,7 +72,7 @@ export default function Chat() {
     )?.values() || [],
   );
   const { data: orgData } = useOrganization(useBoundStore((store) => store.ui.activeOrgId || ""));
-  const orgName = orgData?.data?.[0]?.name || "?";
+  const orgName = orgData?.name || "?";
   const convName = useBoundStore(
     (store) =>
       store.chat.conversations.get(store.ui.activeConvId || "")?.name || "?",

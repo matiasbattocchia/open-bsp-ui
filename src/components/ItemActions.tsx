@@ -1,8 +1,7 @@
 import { Dropdown, type MenuProps } from "antd";
-import useBoundStore from "@/store/useBoundStore";
-import { type ChatListType } from "../ChatList";
+import useBoundStore from "@/stores/useBoundStore";
 import { type MessageRow } from "@/supabase/client";
-import { isArchived } from "@/store/uiSlice";
+import { isArchived } from "@/stores/uiSlice";
 import { useTranslation } from "@/hooks/useTranslation";
 import { updateConvExtra } from "@/utils/ConversationUtils";
 
@@ -15,7 +14,6 @@ export default function ItemActions({
   children: React.ReactNode;
   itemId: string;
   trigger: ("contextMenu" | "click" | "hover")[] | undefined;
-  type: ChatListType;
   visible?: boolean;
 }) {
   const conversation = useBoundStore((state) =>

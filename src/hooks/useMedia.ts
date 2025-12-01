@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { pushMessageToDb } from "@/utils/MessageUtils";
-import useBoundStore from "@/store/useBoundStore";
+import useBoundStore from "@/stores/useBoundStore";
 import {
   type MessageInsert,
   type MessageRow,
@@ -25,13 +25,12 @@ export function useMedia(message: MessageRow) {
     throw new Error(`Message with id ${message.id} has no valid media URI.`);
   }
 
-  const load = useBoundStore((store) =>
-    store.chat.mediaLoads.get(message.id),
-  ) || {
-    type: "download",
-    status: "pending",
-    handledOnce: false,
-  };
+  const load =
+    useBoundStore((store) => store.chat.mediaLoads.get(message.id)) || {
+      type: "download",
+      status: "pending",
+      handledOnce: false,
+    };
   const setLoad = useBoundStore((store) => store.chat.setMediaLoad);
   const [cancel, setCancel] = useState(false);
 

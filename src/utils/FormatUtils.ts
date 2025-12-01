@@ -12,8 +12,25 @@ const removeAccents = (str: string): string => {
 const isIncludedIn = (searchCriteria: string, term: string) =>
   searchCriteria.length
     ? removeAccents(term)
-        .toLowerCase()
-        .includes(removeAccents(searchCriteria).toLowerCase())
+      .toLowerCase()
+      .includes(removeAccents(searchCriteria).toLowerCase())
     : true;
 
-export { removeAccents, isIncludedIn };
+const nameInitials = (name: string): string => {
+  const names = name.split(" ");
+
+  if (names.length === 1) {
+    return names[0].slice(0, 2);
+  }
+
+  if (names.length > 1) {
+    return names
+      .slice(0, 2)
+      .map((name) => name[0])
+      .join("");
+  }
+
+  return "?";
+};
+
+export { isIncludedIn, nameInitials, removeAccents };

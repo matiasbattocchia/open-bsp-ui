@@ -1,5 +1,5 @@
 import { supabase } from "@/supabase/client";
-import useBoundStore from "@/store/useBoundStore";
+import useBoundStore from "@/stores/useBoundStore";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { Route } from "@/routes/__root";

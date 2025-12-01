@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Badge } from "antd";
-import useBoundStore from "@/store/useBoundStore";
-import { type FileDraft } from "@/store/chatSlice";
+import useBoundStore from "@/stores/useBoundStore";
+import { type FileDraft } from "@/stores/chatSlice";
 import {
   isImage,
   extension,

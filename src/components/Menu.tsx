@@ -1,6 +1,6 @@
 import { supabase } from "@/supabase/client";
 import Avatar from "./Avatar";
-import useBoundStore from "@/store/useBoundStore";
+import useBoundStore from "@/stores/useBoundStore";
 import { SwitchLanguage, useTranslation } from "@/hooks/useTranslation";
 import {
   LogOut,

@@ -1,5 +1,5 @@
-import useBoundStore from "@/store/useBoundStore";
-import { filters, Filters } from "@/store/uiSlice";
+import useBoundStore from "@/stores/useBoundStore";
+import { filters, Filters } from "@/stores/uiSlice";
 import { useTranslation } from "@/hooks/useTranslation";
 
 export default function ChatFilter() {

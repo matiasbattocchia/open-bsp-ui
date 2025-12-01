@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/supabase/client";
-import useBoundStore from "@/store/useBoundStore";
+import useBoundStore from "@/stores/useBoundStore";
 
 export function useOrganizations() {
-  const user = useBoundStore((state) => state.ui.user);
+  const userId = useBoundStore((state) => state.ui.user?.id);
 
   return useQuery({
     queryKey: ["organizations"],
@@ -11,14 +11,15 @@ export function useOrganizations() {
       await supabase
         .from("organizations")
         .select()
+        .order("name")
         .throwOnError(),
-    enabled: !!user,
+    enabled: !!userId,
     select: (data) => data.data,
   });
 }
 
 export function useOrganization(id: string) {
-  const user = useBoundStore((state) => state.ui.user);
+  const userId = useBoundStore((state) => state.ui.user?.id);
 
   return useQuery({
     queryKey: ["organizations", id],
@@ -29,7 +30,13 @@ export function useOrganization(id: string) {
         .eq("id", id)
         .throwOnError()
         .single(),
-    enabled: !!user,
+    enabled: !!userId,
     select: (data) => data.data,
   });
+}
+
+export function useCurrentOrganization() {
+  const orgId = useBoundStore((state) => state.ui.activeOrgId);
+
+  return useOrganization(orgId || "");
 }

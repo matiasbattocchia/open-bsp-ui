@@ -4,12 +4,12 @@ import {
   pushMessageToStore,
   pushMessageToDb,
 } from "@/utils/MessageUtils";
-import useBoundStore from "@/store/useBoundStore";
+import useBoundStore from "@/stores/useBoundStore";
 import {
   pushConversationToDb,
   updateConvExtra,
 } from "@/utils/ConversationUtils";
-import { type FileDraft } from "@/store/chatSlice";
+import { type FileDraft } from "@/stores/chatSlice";
 import {
   type ConversationRow,
   type Draft,
@@ -17,7 +17,7 @@ import {
   supabase,
   type WebhookPayload,
 } from "@/supabase/client";
-import { TickContext } from "@/context/useTick";
+import { TickContext } from "@/contexts/useTick";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
 import "dayjs/locale/pt";

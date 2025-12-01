@@ -10,7 +10,7 @@ function Conversations() {
     return (
         <div className="flex flex-col h-full bg-white">
             <ChatSearch />
-            <ChatList type="conversations" />
+            <ChatList />
         </div>
     );
 }

@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import useBoundStore from "@/store/useBoundStore";
+import useBoundStore from "@/stores/useBoundStore";
 import OrganizationUserService from "@/services/OrganizationUserService";
 import { Translate as T, useTranslation } from "@/hooks/useTranslation";
 

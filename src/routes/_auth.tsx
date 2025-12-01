@@ -1,5 +1,5 @@
-import { createFileRoute, redirect, Outlet } from "@tanstack/react-router";
-import useBoundStore from "@/store/useBoundStore";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
+import useBoundStore from "@/stores/useBoundStore";
 import Menu from "@/components/Menu";
 import Chat from "@/components/Chat";
 import ChatHeader from "@/components/ChatHeader";
@@ -11,6 +11,7 @@ export const Route = createFileRoute("/_auth")({
 });
 
 function AppLayout() {
+  const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
   const activeConvId = useBoundStore((state) => state.ui.activeConvId);
   const setActiveConv = useBoundStore((state) => state.ui.setActiveConv);
 
@@ -34,6 +35,10 @@ function AppLayout() {
     window.location.hash = activeConvId || "";
   }, [activeConvId]);
 
+  console.log("--------")
+  console.log("active org ", activeOrgId)
+  console.log("active conv", activeConvId)
+
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-background">
       {/* Menu - Fixed width */}
@@ -50,7 +55,7 @@ function AppLayout() {
           <>
             <ChatHeader />
             <Chat />
-            {/*<ChatFooter />*/}
+            <ChatFooter />
           </>
         ) : (
           <div className="flex items-center justify-center h-full text-gray-500">

@@ -1,6 +1,6 @@
 import { Input } from "antd";
 import { SearchOutlined, CloseOutlined } from "@ant-design/icons";
-import useBoundStore from "@/store/useBoundStore";
+import useBoundStore from "@/stores/useBoundStore";
 import { useTranslation } from "@/hooks/useTranslation";
 
 export default function ChatSearch() {

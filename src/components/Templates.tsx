@@ -6,7 +6,7 @@ import {
   type SetStateAction,
   useMemo,
 } from "react";
-import useBoundStore from "@/store/useBoundStore";
+import useBoundStore from "@/stores/useBoundStore";
 import { supabase, type TemplateMessage, type TemplateData } from "@/supabase/client";
 import { OutMessage, InMessage, BaseMessage } from "./Message/Message";
 import {
