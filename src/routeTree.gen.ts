@@ -15,8 +15,9 @@ import { Route as AuthIndexRouteImport } from './routes/_auth/index'
 import { Route as AuthSettingsRouteImport } from './routes/_auth/settings'
 import { Route as AuthOrganizationsRouteImport } from './routes/_auth/organizations'
 import { Route as AuthIntegrationsRouteImport } from './routes/_auth/integrations'
-import { Route as AuthConversationsRouteImport } from './routes/_auth/conversations'
 import { Route as AuthAgentsRouteImport } from './routes/_auth/agents'
+import { Route as AuthConversationsIndexRouteImport } from './routes/_auth/conversations/index'
+import { Route as AuthConversationsNewRouteImport } from './routes/_auth/conversations/new'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -47,75 +48,86 @@ const AuthIntegrationsRoute = AuthIntegrationsRouteImport.update({
   path: '/integrations',
   getParentRoute: () => AuthRoute,
 } as any)
-const AuthConversationsRoute = AuthConversationsRouteImport.update({
-  id: '/conversations',
-  path: '/conversations',
-  getParentRoute: () => AuthRoute,
-} as any)
 const AuthAgentsRoute = AuthAgentsRouteImport.update({
   id: '/agents',
   path: '/agents',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthConversationsIndexRoute = AuthConversationsIndexRouteImport.update({
+  id: '/conversations/',
+  path: '/conversations/',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthConversationsNewRoute = AuthConversationsNewRouteImport.update({
+  id: '/conversations/new',
+  path: '/conversations/new',
   getParentRoute: () => AuthRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/agents': typeof AuthAgentsRoute
-  '/conversations': typeof AuthConversationsRoute
   '/integrations': typeof AuthIntegrationsRoute
   '/organizations': typeof AuthOrganizationsRoute
   '/settings': typeof AuthSettingsRoute
   '/': typeof AuthIndexRoute
+  '/conversations/new': typeof AuthConversationsNewRoute
+  '/conversations': typeof AuthConversationsIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/agents': typeof AuthAgentsRoute
-  '/conversations': typeof AuthConversationsRoute
   '/integrations': typeof AuthIntegrationsRoute
   '/organizations': typeof AuthOrganizationsRoute
   '/settings': typeof AuthSettingsRoute
   '/': typeof AuthIndexRoute
+  '/conversations/new': typeof AuthConversationsNewRoute
+  '/conversations': typeof AuthConversationsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_auth': typeof AuthRouteWithChildren
   '/login': typeof LoginRoute
   '/_auth/agents': typeof AuthAgentsRoute
-  '/_auth/conversations': typeof AuthConversationsRoute
   '/_auth/integrations': typeof AuthIntegrationsRoute
   '/_auth/organizations': typeof AuthOrganizationsRoute
   '/_auth/settings': typeof AuthSettingsRoute
   '/_auth/': typeof AuthIndexRoute
+  '/_auth/conversations/new': typeof AuthConversationsNewRoute
+  '/_auth/conversations/': typeof AuthConversationsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/login'
     | '/agents'
-    | '/conversations'
     | '/integrations'
     | '/organizations'
     | '/settings'
     | '/'
+    | '/conversations/new'
+    | '/conversations'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
     | '/agents'
-    | '/conversations'
     | '/integrations'
     | '/organizations'
     | '/settings'
     | '/'
+    | '/conversations/new'
+    | '/conversations'
   id:
     | '__root__'
     | '/_auth'
     | '/login'
     | '/_auth/agents'
-    | '/_auth/conversations'
     | '/_auth/integrations'
     | '/_auth/organizations'
     | '/_auth/settings'
     | '/_auth/'
+    | '/_auth/conversations/new'
+    | '/_auth/conversations/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -167,13 +179,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthIntegrationsRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/_auth/conversations': {
-      id: '/_auth/conversations'
-      path: '/conversations'
-      fullPath: '/conversations'
-      preLoaderRoute: typeof AuthConversationsRouteImport
-      parentRoute: typeof AuthRoute
-    }
     '/_auth/agents': {
       id: '/_auth/agents'
       path: '/agents'
@@ -181,25 +186,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthAgentsRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/conversations/': {
+      id: '/_auth/conversations/'
+      path: '/conversations'
+      fullPath: '/conversations'
+      preLoaderRoute: typeof AuthConversationsIndexRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/conversations/new': {
+      id: '/_auth/conversations/new'
+      path: '/conversations/new'
+      fullPath: '/conversations/new'
+      preLoaderRoute: typeof AuthConversationsNewRouteImport
+      parentRoute: typeof AuthRoute
+    }
   }
 }
 
 interface AuthRouteChildren {
   AuthAgentsRoute: typeof AuthAgentsRoute
-  AuthConversationsRoute: typeof AuthConversationsRoute
   AuthIntegrationsRoute: typeof AuthIntegrationsRoute
   AuthOrganizationsRoute: typeof AuthOrganizationsRoute
   AuthSettingsRoute: typeof AuthSettingsRoute
   AuthIndexRoute: typeof AuthIndexRoute
+  AuthConversationsNewRoute: typeof AuthConversationsNewRoute
+  AuthConversationsIndexRoute: typeof AuthConversationsIndexRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthAgentsRoute: AuthAgentsRoute,
-  AuthConversationsRoute: AuthConversationsRoute,
   AuthIntegrationsRoute: AuthIntegrationsRoute,
   AuthOrganizationsRoute: AuthOrganizationsRoute,
   AuthSettingsRoute: AuthSettingsRoute,
   AuthIndexRoute: AuthIndexRoute,
+  AuthConversationsNewRoute: AuthConversationsNewRoute,
+  AuthConversationsIndexRoute: AuthConversationsIndexRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)

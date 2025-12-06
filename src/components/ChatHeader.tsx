@@ -1,21 +1,8 @@
-import { nameInitials } from "@/utils/FormatUtils";
+import { nameInitials, formatPhoneNumber } from "@/utils/FormatUtils";
 import Avatar from "./Avatar";
 import useBoundStore from "@/stores/useBoundStore";
 import { useTranslation } from "@/hooks/useTranslation";
 import { ArrowLeft } from "lucide-react";
-
-export function formatPhoneNumber(phoneNumber: string): string {
-  const areaCodeLenght = phoneNumber.slice(3, 5) === "11" ? 2 : 3;
-
-  // Format phone number with spaces and hyphen using splice
-  const chars = phoneNumber.split("");
-  chars.splice(2, 0, " "); // Country code
-  chars.splice(4, 0, " "); // Nine
-  chars.splice(5 + areaCodeLenght, 0, " "); // Area code
-  chars.splice(12, 0, "-"); // Hyphen
-
-  return "+" + chars.join("");
-}
 
 export default function Header() {
   const activeConvId = useBoundStore((state) => state.ui.activeConvId);

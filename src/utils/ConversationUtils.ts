@@ -1,21 +1,9 @@
-import { SEP } from "@/stores/chatSlice";
 import useBoundStore from "@/stores/useBoundStore";
 import {
   type ConversationInsert,
   type ConversationRow,
   supabase,
 } from "@/supabase/client";
-
-const FIRST_NAMES =
-  "Nicolás,Tiago,Mateo,Sebastián,Lucas,Valentina,Victoria,Luna,Aurora,Catalina,Lisandro,Camila,Leonardo,Ana,Tomás,Natalia,Santiago,Isabella,Emilia,Martín,Sofía,Joaquín,Emma,Benjamín,Olivia,Alejandro,Lucía,Maximiliano,Renata,Daniel,Antonella,Javier,Valeria,Gabriel,Agustina,Thiago,Delfina,Santino,Mía,Bautista,Alma,Felipe,Clara,Ignacio,Zoe,Facundo,Pilar,Julián"
-    .split(
-      ",",
-    );
-const LAST_NAMES =
-  "Díaz,Pérez,Gómez,Sosa,López,García,Romero,Flores,Cruz,Quiroga,Espejo,Figueroa,Villanueva,Zapata,Calderón,Manzur,Rodríguez,Martínez,Fernández,González,Sánchez,Ramírez,Torres,Hernández,Acosta,Rojas,Medina,Silva,Molina,Vargas,Castro,Morales,Gutiérrez,Ortega,Núñez,Peralta,Giménez,Aguirre,Benítez,Vega,Mendoza,Ríos,Cabrera,Navarro,Ramos,Herrera,Suárez,Moreno,Paz"
-    .split(
-      ",",
-    );
 
 function pushConversationToStore(record: ConversationInsert) {
   // TODO: optimistic insert lacks some fields that the store considers as present - cabra 2024/07/28
@@ -58,21 +46,13 @@ export function startConversation({
     );
   }
 
-  const randomName =
-    FIRST_NAMES[Math.floor(Math.random() * FIRST_NAMES.length)] +
-    " " +
-    LAST_NAMES[Math.floor(Math.random() * LAST_NAMES.length)];
-
-  //const contact_id = crypto.randomUUID();
-
-  const key = organization_address + SEP + contact_address;
-
   const record: ConversationInsert = {
+    id: crypto.randomUUID(),
     organization_address,
     contact_address,
     service,
     organization_id, // The presence of this field makes the before insert trigger to skip, thus no contact is created.
-    name: name || randomName,
+    name,
     extra: {
       type,
     },
@@ -80,7 +60,7 @@ export function startConversation({
 
   pushConversationToStore(record);
 
-  return key;
+  return record.id;
 }
 
 export const updateConvExtra = async (
@@ -89,7 +69,6 @@ export const updateConvExtra = async (
     pinned?: string | null;
     archived?: string | null;
     paused?: string | null;
-    notifications?: "off" | "muted" | "on" | null;
   },
 ) => {
   const { error } = await supabase
@@ -102,3 +81,37 @@ export const updateConvExtra = async (
     throw error;
   }
 };
+
+export async function saveDraft(
+  conv: ConversationRow,
+  text: string | null,
+  sendAsContact?: boolean,
+) {
+  let origin = "human";
+
+  if (sendAsContact !== undefined) {
+    origin = sendAsContact ? "human-as-contact" : "human-as-organization";
+  }
+
+  const payload = {
+    extra: {
+      draft: text
+        ? {
+          text,
+          timestamp: new Date().toISOString(),
+          origin,
+        }
+        : null,
+    },
+  };
+
+  const { error } = await supabase
+    .from("conversations")
+    .update(payload)
+    .eq("organization_address", conv.organization_address)
+    .eq("contact_address", conv.contact_address);
+
+  if (error) {
+    throw error;
+  }
+}

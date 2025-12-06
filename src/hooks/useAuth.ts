@@ -21,21 +21,27 @@ export function useAuth() {
     } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("Auth event:", event);
 
+      // There is a SIGNED_IN event at tab focus. Checking if the user is
+      // already logged in to avoid navigating to "/" or "/login".
+      const loggedUser = useBoundStore.getState().ui.user;
+
       const user = session?.user ?? null;
       setUser(user);
 
       // Signed in
-      if (user && event === "SIGNED_IN") {
+      if (!loggedUser && user && event === "SIGNED_IN") {
         navigate({
           to: redirect || "/",
         });
       }
 
       // Signed out
-      if (!user && !window.location.pathname.startsWith("/login")) {
+      if (
+        loggedUser && !user && !window.location.pathname.startsWith("/login")
+      ) {
         navigate({
           to: "/login",
-          search: { redirect: window.location.pathname },
+          search: { redirect: window.location.pathname + window.location.hash },
         });
       }
     });

@@ -67,7 +67,7 @@ export function useMedia(message: MessageRow) {
 
     setLoad(message.id, { ...load, status: "done" });
 
-    !error && pushMessageToDb(message as MessageInsert);
+    !error && await pushMessageToDb(message as MessageInsert);
   };
 
   const downloadTask = async () => {

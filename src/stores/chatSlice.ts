@@ -1,14 +1,9 @@
-import type {
-  ConversationRow,
-  MessageRow,
-} from "@/supabase/client";
+import type { ConversationRow, MessageRow } from "@/supabase/client";
 import type { AppState } from "./useBoundStore";
 import type { StateCreator } from "zustand";
 // @ts-ignore
 import groupBy from "core-js-pure/actual/object/group-by";
-import { toV1, type MessageRowV0 } from "@/supabase/messages-v0";
-
-export const SEP = "::";
+import { type MessageRowV0, toV1 } from "@/supabase/messages-v0";
 
 export function timestampDescending(a?: MessageRow, b?: MessageRow) {
   return +new Date(a?.timestamp || 0) > +new Date(b?.timestamp || 0) ? -1 : 1;
@@ -94,7 +89,7 @@ export const createChatSlice: StateCreator<Partial<AppState>> = (
     set((state) => {
       const msgs = msgsMixedVersions
         .map((m) =>
-          m.content.version === "1" ? m : toV1(m as unknown as MessageRowV0),
+          m.content.version === "1" ? m : toV1(m as unknown as MessageRowV0)
         )
         .filter(Boolean) as MessageRow[];
 
@@ -190,8 +185,8 @@ export const createChatSlice: StateCreator<Partial<AppState>> = (
     set((state) => {
       const fileDrafts = new Map(state.chat.fileDrafts);
 
-      const draft =
-        fileDrafts.get(convId) && fileDrafts.get(convId)![draftIndex];
+      const draft = fileDrafts.get(convId) &&
+        fileDrafts.get(convId)![draftIndex];
 
       if (!draft) {
         return {};

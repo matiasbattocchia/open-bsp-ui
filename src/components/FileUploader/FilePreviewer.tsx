@@ -9,13 +9,16 @@ import {
   fileSize,
 } from "@/components/Message/DocumentMessage";
 import { newMessage, pushMessageToStore } from "@/utils/MessageUtils";
-import { saveDraft } from "../ChatFooter";
+import { saveDraft } from "@/utils/ConversationUtils";
 import { pushConversationToDb } from "@/utils/ConversationUtils";
 
+import { useCurrentAgent } from "@/queries/useAgents";
+
+// ...
+
 const FilePreviewer = () => {
-  const agentId = useBoundStore(
-    (store) => store.ui.roles[store.ui.activeOrgId || ""]?.agentId,
-  );
+  const { data: agent } = useCurrentAgent();
+  const agentId = agent?.id;
   const activeConvId = useBoundStore((store) => store.ui.activeConvId);
   const conv = useBoundStore((store) =>
     store.chat.conversations.get(store.ui.activeConvId || ""),
@@ -116,7 +119,7 @@ const FilePreviewer = () => {
     }
 
     // If the conv has the `updated_at` unset, it means it has not been pushed to the DB yet.
-    !conv.updated_at && pushConversationToDb(conv);
+    !conv.updated_at && await pushConversationToDb(conv);
 
     for (const draft of drafts) {
       const fileKind = isImage(draft.file.type) ? "image" : "document";

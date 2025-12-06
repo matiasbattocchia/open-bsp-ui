@@ -19,6 +19,7 @@ import { AtSign, Pause, VolumeOff } from "lucide-react";
 import { SpecialMessageTypeMap } from "./Message/Message";
 import { useAgents, useCurrentAgent } from "@/queries/useAgents";
 import { nameInitials } from "@/utils/FormatUtils";
+import { useNavigate } from "@tanstack/react-router";
 
 function mediaPreview(t: (content: string) => ReactNode, message?: MessageRow) {
   let mediaIcon = null;
@@ -119,14 +120,10 @@ export default function ChatListItem({
 }: {
   itemId: string;
 }) {
-
+  const navigate = useNavigate();
   const activeConvId = useBoundStore((state) => state.ui.activeConvId);
-  const setActiveConv = useBoundStore((state) => state.ui.setActiveConv);
 
   const active = itemId === activeConvId;
-  const setActive = () => {
-    setActiveConv(itemId);
-  };
 
   const conversation = useBoundStore((state) =>
     state.chat.conversations.get(itemId),
@@ -134,19 +131,16 @@ export default function ChatListItem({
 
   const { data: agent } = useCurrentAgent();
   const { data: agents } = useAgents();
+  const isAdmin = agent?.extra?.roles?.includes("admin");
 
   const messages: MessageRow[] | undefined = Array.from(
     useBoundStore((state) => state.chat.messages.get(itemId || ""))?.values() ||
     [],
   );
 
-  const role = useBoundStore(
-    (state) => state.ui.roles[state.ui.activeOrgId || ""]?.role,
-  );
-
   // If the role is not admin, then do not show internal messages.
   const mostRecent = messages?.find(
-    (m) => role === "admin" || m.direction !== "internal",
+    (m) => isAdmin || m.direction !== "internal",
   );
 
   const draft: Draft | undefined = conversation?.extra?.draft;
@@ -250,7 +244,8 @@ export default function ChatListItem({
           onClick={(e) => {
             e.stopPropagation();
             e.preventDefault();
-            setActive();
+            // setActiveConv(itemId);
+            navigate({ to: "/conversations", hash: itemId });
           }}
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}

@@ -37,7 +37,6 @@ export type UIState = {
   leftPanel: boolean;
   rightPanel: boolean;
   templatePicker: boolean;
-  newChat: boolean;
   activeOrgId: string | null;
   activeConvId: string | null;
   user: User | null;
@@ -45,23 +44,16 @@ export type UIState = {
   filter: keyof typeof filters;
   searchPattern: string;
   isLoading: boolean;
-  roles: {
-    [orgId: string]: { agentId: string; role: "admin" | "operator" };
-  };
 };
 
 export type UIActions = {
   toggle: (component: keyof UIState, value?: boolean) => void;
-  setUI: (ui: Partial<UIState>) => void;
   setActiveOrg: (id: string | null) => void;
   setActiveConv: (id: string | null) => void;
   setUser: (user: User | null) => void;
   setSendAsContact: (sendAsContact: boolean) => void;
   setFilter: (filter: keyof typeof filters) => void;
   setSearchPattern: (searchPattern: string) => void;
-  setRoles: (roles: {
-    [orgId: string]: { agentId: string; role: "admin" | "operator" };
-  }) => void;
 };
 
 export type UISlice = UIState & UIActions;
@@ -76,13 +68,7 @@ export const createUISlice: StateCreator<Partial<AppState>> = (
     replace?: boolean | undefined,
   ) => void,
 ) => ({
-  menu: false,
-  organizationsList: true,
-  leftPanel: false,
-  rightPanel: false,
-  information: false,
   templatePicker: false,
-  newChat: false,
   activeOrgId: null,
   activeConvId: null,
   user: null,
@@ -90,9 +76,6 @@ export const createUISlice: StateCreator<Partial<AppState>> = (
   filter: "todas" as keyof typeof filters,
   searchPattern: "",
   isLoading: false,
-  roles: {},
-  setUI: (ui: Partial<UIState>) =>
-    set((state) => ({ ui: { ...state.ui, ...ui } })),
   toggle: (component: keyof UIState, value?: boolean) =>
     set((state) => ({
       ui: {
@@ -140,15 +123,6 @@ export const createUISlice: StateCreator<Partial<AppState>> = (
       ui: {
         ...state.ui,
         searchPattern,
-      },
-    })),
-  setRoles: (roles: {
-    [orgId: string]: { agentId: string; role: "admin" | "operator" };
-  }) =>
-    set((state) => ({
-      ui: {
-        ...state.ui,
-        roles,
       },
     })),
 });

@@ -11,35 +11,16 @@ import {
   Users,
 } from "lucide-react";
 import { Link, useLocation } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
 import { resetAuthorizedCache } from "@/utils/IdbUtils";
+import { useCurrentAgent } from "@/queries/useAgents";
 
 export default function Menu() {
   const user = useBoundStore((state) => state.ui.user);
-  const organizationId = useBoundStore((state) => state.ui.activeOrgId);
-  const { data: agent } = useQuery({
-    queryKey: ["users", organizationId, user?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("agents")
-        .select("name, picture")
-        .eq("organization_id", organizationId!)
-        .eq("user_id", user!.id)
-        .single();
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!organizationId && !!user,
-    staleTime: 1000 * 60 * 60 * 24,
-  });
-  const role = useBoundStore(
-    (state) => state.ui.roles[state.ui.activeOrgId || ""]?.role,
-  );
-  const menu = useBoundStore((state) => state.ui.menu);
-  const setUI = useBoundStore((state) => state.ui.setUI);
-  const organizationsList = useBoundStore(
-    (state) => state.ui.organizationsList,
-  );
+
+  const { data: agent } = useCurrentAgent();
+  const isAdmin = agent?.extra?.roles?.includes("admin");
+
+  const activeConvId = useBoundStore((state) => state.ui.activeConvId);
 
   const organizationsSize = 1;
 
@@ -54,8 +35,8 @@ export default function Menu() {
   return (
     <div
       className={
-        "absolute lg:static h-[100dvh] z-10 flex flex-col justify-between px-[12px] pb-[10px] bg-gray border-r border-gray-line" +
-        (menu ? "" : " invisible lg:visible")
+        "absolute lg:static h-[100dvh] z-10 flex flex-col justify-between px-[12px] pb-[10px] bg-gray border-r border-gray-line"
+        /*TODO + (menu ? "" : " invisible lg:visible")*/
       }
     >
       {/* Upper section */}
@@ -64,10 +45,10 @@ export default function Menu() {
         {organizationsSize !== 1 && (
           <Link
             to="/organizations"
-            onClick={() => setUI({ organizationsList: true, menu: false })}
+            hash={activeConvId || undefined}
             className={
               "p-[8px] mt-[10px] rounded-full" +
-              (pathname === "/organizations" && organizationsList
+              (pathname === "/organizations"
                 ? " bg-gray-icon-bg"
                 : " active:bg-gray-icon-bg")
             }
@@ -80,10 +61,10 @@ export default function Menu() {
         {/* Messages button */}
         <Link
           to="/conversations"
-          onClick={() => setUI({ organizationsList: false, menu: false })}
+          hash={activeConvId || undefined}
           className={
             "p-[8px] mt-[10px] rounded-full active:bg-gray-icon-bg" +
-            (pathname === "/conversations" && !organizationsList
+            (pathname === "/conversations"
               ? " bg-gray-icon-bg"
               : "")
           }
@@ -95,11 +76,11 @@ export default function Menu() {
         {/* Settings button */}
         <Link
           to="/settings"
-          onClick={() => setUI({ menu: false })}
+          hash={activeConvId || undefined}
           className={
             "p-[8px] mt-[10px] rounded-full active:bg-gray-icon-bg" +
             (pathname === "/settings" ? " bg-gray-icon-bg" : "") +
-            (role === "admin" ? "" : " hidden")
+            (isAdmin ? "" : " hidden")
           }
           title={t("Preferencias") as string}
         >
@@ -109,7 +90,7 @@ export default function Menu() {
         {/* Agents button */}
         <Link
           to="/agents"
-          onClick={() => setUI({ menu: false })}
+          hash={activeConvId || undefined}
           className={
             "p-[8px] mt-[10px] rounded-full active:bg-gray-icon-bg" +
             (pathname === "/agents" ? " bg-gray-icon-bg" : "")
@@ -122,7 +103,7 @@ export default function Menu() {
         {/* Integrations button */}
         <Link
           to="/integrations"
-          onClick={() => setUI({ menu: false })}
+          hash={activeConvId || undefined}
           className={
             "p-[8px] mt-[10px] rounded-full active:bg-gray-icon-bg hidden" +
             (pathname === "/integrations" ? " bg-gray-icon-bg" : "")

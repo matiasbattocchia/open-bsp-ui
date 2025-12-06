@@ -34,7 +34,6 @@ export default function ItemActions({
   }
 
   const isPinned = conversation.extra?.pinned;
-  const notifications = conversation.extra?.notifications;
 
   const isPaused =
     +new Date(conversation.extra?.paused || 0) >
@@ -67,20 +66,6 @@ export default function ItemActions({
       onClick: () =>
         updateConvExtra(conversation, {
           pinned: isPinned ? null : new Date().toISOString(),
-        }),
-    },
-    {
-      label:
-        notifications != "off"
-          ? t("Silenciar notificationes")
-          : t("Desactivar silencio de notificaciones"),
-      key: "3",
-      onClick: () =>
-        updateConvExtra(conversation, {
-          notifications:
-            notifications != "off"
-              ? "off"
-              : "on",
         }),
     },
     /*{

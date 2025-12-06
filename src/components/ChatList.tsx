@@ -35,9 +35,6 @@ const ChatList = () => {
   const setFilterName = useBoundStore((state) => state.ui.setFilter);
   const searchPattern = useBoundStore((state) => state.ui.searchPattern);
   const setSearchPattern = useBoundStore((state) => state.ui.setSearchPattern);
-  const role = useBoundStore(
-    (state) => state.ui.roles[state.ui.activeOrgId || ""]?.role,
-  );
 
   function getMostRecentMsg(convId: string): MessageRow | undefined {
     return messages.get(convId)?.values().next().value;

@@ -8,7 +8,8 @@ import useBoundStore from "@/stores/useBoundStore";
 import Message from "./Message/Message";
 import { type MessageRow } from "@/supabase/client";
 import { useTranslation } from "@/hooks/useTranslation";
-import { useOrganization } from "@/queries/useOrgs";
+import { useCurrentOrganization } from "@/queries/useOrgs";
+import { useCurrentAgent } from "@/queries/useAgents";
 
 const colors = {
   emerald: { text: "text-emerald-500", bg: "bg-emerald-500" },
@@ -71,16 +72,18 @@ export default function Chat() {
       store.chat.messages.get(store.ui.activeConvId || ""),
     )?.values() || [],
   );
-  const { data: orgData } = useOrganization(useBoundStore((store) => store.ui.activeOrgId || ""));
-  const orgName = orgData?.name || "?";
+
+  const { data: org } = useCurrentOrganization();
+  const orgName = org?.name || "?";
+
   const convName = useBoundStore(
     (store) =>
       store.chat.conversations.get(store.ui.activeConvId || "")?.name || "?",
   );
 
-  const activeAgentId = useBoundStore(
-    (store) => store.ui.roles[store.ui.activeOrgId || ""]?.agentId,
-  );
+  const { data: agent } = useCurrentAgent();
+  const activeAgentId = agent?.id;
+  const isAdmin = agent?.extra?.roles?.includes("admin");
 
   const scroller = useRef<HTMLDivElement>(null);
 
@@ -298,15 +301,11 @@ export default function Chat() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages.length]);
 
-  const role = useBoundStore(
-    (state) => state.ui.roles[state.ui.activeOrgId || ""]?.role,
-  );
-
   // If the role is not admin, then do not show internal messages (tool calls, etc).
   const envelopesAndSeparators = insertDateSeparators(
     messages
       .filter((m, idx) => {
-        if (role === "admin") return true;
+        if (isAdmin) return true;
 
         // Hide internal messages for non-admin users
         if (m.direction === "internal") return false;

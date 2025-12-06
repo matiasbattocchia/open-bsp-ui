@@ -493,15 +493,19 @@ function TemplateEditor({
   );
 }
 
+import { useCurrentAgent } from "@/queries/useAgents";
+
+// ...
+
 export default function WhatsAppTemplates() {
   const activeConvId = useBoundStore((store) => store.ui.activeConvId);
   const conv = useBoundStore((store) =>
     store.chat.conversations.get(store.ui.activeConvId || ""),
   );
   const templatePicker = useBoundStore((store) => store.ui.templatePicker);
-  const agentId = useBoundStore(
-    (store) => store.ui.roles[store.ui.activeOrgId || ""]?.agentId,
-  );
+
+  const { data: agent } = useCurrentAgent();
+  const agentId = agent?.id;
 
   const [templates, setTemplates] = useState<TemplateData[]>();
   const [loading, setLoading] = useState(false);
@@ -581,7 +585,7 @@ export default function WhatsAppTemplates() {
     }
 
     // If the conv has the `updated_at` unset, it means it has not been pushed to the DB yet.
-    !conv.updated_at && pushConversationToDb(conv);
+    !conv.updated_at && await pushConversationToDb(conv);
 
     const record = newMessage(
       conv,
@@ -598,7 +602,7 @@ export default function WhatsAppTemplates() {
       agentId,
     );
     pushMessageToStore(record);
-    pushMessageToDb(record);
+    await pushMessageToDb(record);
   };
 
   return (

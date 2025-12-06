@@ -2,7 +2,6 @@ import {
   type MessageRow,
   type MessageInsert,
   type OutgoingStatus,
-  supabase,
   type InternalMessage,
 } from "@/supabase/client";
 import AudioMessage from "./AudioMessage";
@@ -14,11 +13,10 @@ import { Remarkable } from "remarkable";
 import { type FormEventHandler, type PropsWithChildren, useState } from "react";
 import { prettyPrintJson } from "pretty-print-json";
 import { useTranslation } from "@/hooks/useTranslation";
-import { useQuery } from "@tanstack/react-query";
 import AvatarComponent from "@/components/Avatar";
-import useBoundStore from "@/stores/useBoundStore";
 import { pushMessageToDb } from "@/utils/MessageUtils";
 import { pushMessageToStore } from "@/utils/MessageUtils";
+import { useAgent } from "@/queries/useAgents";
 
 const md = new Remarkable({ breaks: true, html: true });
 
@@ -203,21 +201,7 @@ function Avatar({
   color: { text: string; bg: string };
   display: "name" | "picture-left" | "picture-right";
 }) {
-  const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
-
-  const { data: agent } = useQuery({
-    queryKey: [activeOrgId, "agents", "avatar", agentId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("agents")
-        .select("*")
-        .eq("id", agentId)
-        .single();
-      if (error) throw error;
-      return data;
-    },
-    staleTime: 1000 * 60 * 60 * 6, // Six hours
-  });
+  const { data: agent } = useAgent(agentId);
 
   if (display === "picture-left" || display === "picture-right") {
     return (

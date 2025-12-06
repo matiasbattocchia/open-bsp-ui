@@ -15,8 +15,8 @@ function RootLayout() {
 }
 
 export const Route = createRootRoute({
-  validateSearch: (search) => ({
-    redirect: search.redirect as string,
+  validateSearch: (search): { redirect?: string } => ({
+    redirect: (search.redirect as string) || undefined,
   }),
   beforeLoad: async ({ search, location }) => {
     let user = useBoundStore.getState().ui.user;

@@ -5,6 +5,7 @@ import Chat from "@/components/Chat";
 import ChatHeader from "@/components/ChatHeader";
 import ChatFooter from "@/components/ChatFooter";
 import { useEffect } from "react";
+import { useLocation } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_auth")({
   component: AppLayout,
@@ -14,26 +15,14 @@ function AppLayout() {
   const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
   const activeConvId = useBoundStore((state) => state.ui.activeConvId);
   const setActiveConv = useBoundStore((state) => state.ui.setActiveConv);
+  const location = useLocation();
 
   // Sync fragment identifier with activeConvId
   // i.e. /conversations#1234
   useEffect(() => {
-    const handleHashChange = () => {
-      const hash = window.location.hash;
-      const convId = hash.slice(1);
-      setActiveConv(convId);
-    };
-
-    // Initial check
-    handleHashChange();
-
-    window.addEventListener("hashchange", handleHashChange);
-    return () => window.removeEventListener("hashchange", handleHashChange);
-  }, []);
-
-  useEffect(() => {
-    window.location.hash = activeConvId || "";
-  }, [activeConvId]);
+    const convId = location.hash;
+    setActiveConv(convId);
+  }, [location.hash]);
 
   console.log("--------")
   console.log("active org ", activeOrgId)
@@ -63,6 +52,6 @@ function AppLayout() {
           </div>
         )}
       </div>
-    </div>
+    </div >
   );
 }
