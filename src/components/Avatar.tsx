@@ -15,7 +15,7 @@ const Avatar = ({
 
   return (
     <div
-      className={`rounded-full flex items-center justify-center font-bold text-white uppercase ${className}`}
+      className={`rounded-full flex items-center justify-center font-bold uppercase ${className}`}
       style={{ width: size, height: size, overflow: "hidden" }}
     >
       {src && !imageError ? (

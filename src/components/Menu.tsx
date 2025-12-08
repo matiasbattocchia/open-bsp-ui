@@ -35,12 +35,13 @@ export default function Menu() {
   return (
     <div
       className={
-        "absolute lg:static h-[100dvh] z-10 flex flex-col justify-between px-[12px] pb-[10px] bg-gray border-r border-gray-line"
+        "absolute lg:static h-full z-10 flex flex-col justify-between px-[12px] pb-[10px] bg-sidebar text-sidebar-foreground border-r border-sidebar-border"
         /*TODO + (menu ? "" : " invisible lg:visible")*/
       }
     >
       {/* Upper section */}
       <div className="flex flex-col">
+
         {/* Organizations button */}
         {organizationsSize !== 1 && (
           <Link
@@ -54,23 +55,23 @@ export default function Menu() {
             }
             title={t("Organizaciones") as string}
           >
-            <Building className="w-[24px] h-[24px] text-gray-icon stroke-[2]" />
+            <Building className="w-[24px] h-[24px] stroke-[2]" />
           </Link>
         )}
 
-        {/* Messages button */}
+        {/* Conversations button */}
         <Link
           to="/conversations"
           hash={activeConvId || undefined}
           className={
-            "p-[8px] mt-[10px] rounded-full active:bg-gray-icon-bg" +
+            "p-[8px] mt-[10px] rounded-full active:bg-black" +
             (pathname === "/conversations"
-              ? " bg-gray-icon-bg"
-              : "")
+              ? " bg-primary"
+              : " bg-accent")
           }
           title={t("Mensajes") as string}
         >
-          <MessageSquareText className="w-[24px] h-[24px] text-gray-icon stroke-[2]" />
+          <MessageSquareText className="w-[24px] h-[24px] stroke-[2]" />
         </Link>
 
         {/* Settings button */}
@@ -84,7 +85,7 @@ export default function Menu() {
           }
           title={t("Preferencias") as string}
         >
-          <Settings className="w-[24px] h-[24px] text-gray-icon stroke-[2]" />
+          <Settings className="w-[24px] h-[24px] stroke-[2]" />
         </Link>
 
         {/* Agents button */}
@@ -97,7 +98,7 @@ export default function Menu() {
           }
           title={t("Agentes") as string}
         >
-          <Users className="w-[24px] h-[24px] text-gray-icon stroke-[2]" />
+          <Users className="w-[24px] h-[24px] stroke-[2]" />
         </Link>
 
         {/* Integrations button */}
@@ -110,13 +111,13 @@ export default function Menu() {
           }
           title={t("Integraciones") as string}
         >
-          <Unplug className="w-[24px] h-[24px] text-gray-icon stroke-[2]" />
+          <Unplug className="w-[24px] h-[24px] stroke-[2]" />
         </Link>
       </div>
 
       {/* Lower section */}
       <div className="flex flex-col items-center">
-        <SwitchLanguage className="w-[40px] py-[5px] mt-[10px] bg-gray text-lg text-gray-icon" />
+        <SwitchLanguage className="w-[40px] mt-[10px]" />
 
         <button
           className="px-[8px] py-[10px] mt-[10px] rounded-full active:bg-gray-icon-bg"
@@ -126,7 +127,7 @@ export default function Menu() {
             resetAuthorizedCache();
           }}
         >
-          <LogOut className="w-[24px] h-[19px] text-gray-icon stroke-[2.4]" />
+          <LogOut className="w-[24px] h-[19px] stroke-[2.4]" />
         </button>
 
         {/* User profile */}
@@ -140,7 +141,7 @@ export default function Menu() {
               "?"
             ).charAt(0)}
             size={32}
-            className="bg-azul text-md"
+            className="bg-primary text-primary-foreground text-[14px]"
           />
         </div>
       </div>

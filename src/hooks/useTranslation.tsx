@@ -19,5 +19,5 @@ export function Translate({ children, as: Component = 'span', ...props }: any) {
 
 // Export a no-op SwitchLanguage component
 export function SwitchLanguage({ className }: { className?: string }) {
-    return <div className={className}>ES</div>;
+    return <div className={className + " text-center"}>ES</div>;
 }

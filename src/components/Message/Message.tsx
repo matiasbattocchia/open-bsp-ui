@@ -113,7 +113,7 @@ export function BaseMessage({
 
           {/* Footer */}
           {footer && (
-            <div className="text-[13px] text-gray-dark mt-1">
+            <div className="text-[13px] text-muted-foreground mt-1">
               {footer}
               <span className="text-[11px] mx-[4px] invisible">
                 {dayjs(timestamp).format("HH:mm")}
@@ -126,7 +126,7 @@ export function BaseMessage({
         </div>
 
         {/* Timestamp */}
-        <div className="text-[11px] text-gray-dark absolute bottom-[0px] right-[7px] flex items-center">
+        <div className="text-[11px] text-muted-foreground absolute bottom-[0px] right-[7px] flex items-center">
           {dayjs(timestamp).format("HH:mm")}
           {type === "outgoing" && !!status && <StatusIcon {...status} />}
         </div>
@@ -136,7 +136,7 @@ export function BaseMessage({
       {buttons?.map((text, idx) => (
         <div
           key={idx}
-          className="py-3 border-t border-t-gray-dark text-center text-blue-ack"
+          className="py-3 border-t border-t-gray-dark text-center text-primary"
         >
           {text}
         </div>
@@ -144,7 +144,7 @@ export function BaseMessage({
 
       {draft && (
         <div
-          className="py-3 border-t border-t-gray-dark text-center text-blue-ack cursor-pointer"
+          className="py-3 border-t border-border text-center text-primary cursor-pointer"
           onClick={() => {
             // Cast the content as OutgoingMessage since we're sending it as outgoing
             const outgoingMessage = {
@@ -198,7 +198,7 @@ function Avatar({
   display,
 }: {
   agentId: string;
-  color: { text: string; bg: string };
+  color: string;
   display: "name" | "picture-left" | "picture-right";
 }) {
   const { data: agent } = useAgent(agentId);
@@ -210,7 +210,7 @@ function Avatar({
         fallback={agent?.name.charAt(0) || "A"}
         size={28}
         className={
-          `${color.bg || "bg-gray-500"} absolute` +
+          `${color ? `bg-${color}-500` : ""} absolute` +
           (display === "picture-left" ? " -left-[38px]" : " -right-[38px]")
         }
       />
@@ -220,7 +220,7 @@ function Avatar({
   if (display === "name") {
     return (
       <div
-        className={`text-[14px] p-[6px] pb-0 ${color.text || "text-gray-500"}`}
+        className={`text-[14px] p-[6px] pb-0 ${color ? `text-${color}-500` : ""}`}
       >
         {agent?.name || "Asistente"}
       </div>
@@ -233,7 +233,7 @@ const msgRowClasses = "px-[18px] lg:px-[63px] flex";
 const avatarMsgRowClasses = "px-[calc(18px+28px)] lg:px-[calc(63px+38px)] flex";
 
 const msgBubbleClasses =
-  "relative rounded-lg shadow-chat-bubble break-words text-[14.2px] leading-[19px] p-[3px]";
+  "relative rounded-lg shadow break-words text-[14.2px] leading-[19px] p-[3px]";
 
 const textMsgMaxWidth = " max-w-[90%] lg:max-w-[65%]";
 
@@ -258,7 +258,7 @@ export function InMessage({
         className={
           // max-w-65% applies to text only but could not find a way to abstract it
           msgBubbleClasses +
-          " bg-white" +
+          " bg-incoming-chat-bubble text-foreground" +
           (first ? " rounded-tl-none" : "") +
           (text ? textMsgMaxWidth : "")
         }
@@ -266,7 +266,7 @@ export function InMessage({
         {first && (
           <>
             {avatar && <Avatar {...avatar} display="picture-left" />}
-            <svg className={msgTailClasses + " text-white -left-[8px]"}>
+            <svg className={msgTailClasses + " text-incoming-chat-bubble -left-[8px]"}>
               <use href="/icons.svg#tail-in" />
             </svg>
           </>
@@ -297,7 +297,7 @@ export function OutMessage({
         className={
           // max-w-65% applies to text only but could not find a way to abstract it
           msgBubbleClasses +
-          " bg-blue-100" +
+          " bg-outgoing-chat-bubble text-foreground" +
           (first ? " rounded-tr-none" : "") +
           (text ? textMsgMaxWidth : "")
         }
@@ -305,7 +305,7 @@ export function OutMessage({
         {first && (
           <>
             {!!avatar && <Avatar {...avatar} display="picture-right" />}
-            <svg className={msgTailClasses + " text-blue-100 -right-[8px]"}>
+            <svg className={msgTailClasses + " text-outgoing-chat-bubble -right-[8px]"}>
               <use href="/icons.svg#tail-out" />
             </svg>
           </>
@@ -368,7 +368,7 @@ function FunctionCallMessage({
           />
         )}
         <div
-          className="text-blue-ack cursor-pointer"
+          className="text-primary cursor-pointer"
           onClick={() => setShowArguments(!showArguments)}
         >
           {showArguments ? t("ocultar argumentos...") : t("ver argumentos...")}
@@ -376,7 +376,7 @@ function FunctionCallMessage({
       </div>
 
       {/* Timestamp */}
-      <div className="text-[11px] text-gray-dark absolute bottom-[0px] right-[7px] flex items-center">
+      <div className="text-[11px] text-muted-foreground absolute bottom-[0px] right-[7px] flex items-center">
         {dayjs(message.timestamp).format("HH:mm")}
       </div>
     </div>
@@ -443,7 +443,7 @@ function FunctionResponseMessage({
             )}
 
             <div
-              className="text-blue-ack cursor-pointer"
+              className="text-primary cursor-pointer"
               onClick={() => setShowResponse(!showResponse)}
             >
               {showResponse ? t("ver menos...") : t("ver más...")}
@@ -455,7 +455,7 @@ function FunctionResponseMessage({
       </div>
 
       {/* Timestamp */}
-      <div className="text-[11px] text-gray-dark absolute bottom-[0px] right-[7px] flex items-center">
+      <div className="text-[11px] text-muted-foreground absolute bottom-[0px] right-[7px] flex items-center">
         {dayjs(message.timestamp).format("HH:mm")}
       </div>
     </div>
@@ -553,7 +553,7 @@ type UIMessage = {
   last?: boolean;
   orgName?: string;
   convName?: string;
-  avatar?: { agentId: string; color: { text: string; bg: string } };
+  avatar?: { agentId: string; color: string };
 };
 
 export default function Message(props: UIMessage & { message: MessageRow }) {

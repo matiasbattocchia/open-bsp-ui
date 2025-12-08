@@ -29,17 +29,17 @@ function AppLayout() {
   console.log("active conv", activeConvId)
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-background">
+    <div className="app-grid">
       {/* Menu - Fixed width */}
       <Menu />
 
       {/* Left Panel - Router Outlet */}
-      <div className="w-[350px] flex flex-col border-r border-border bg-background">
+      <div className="flex flex-col overflow-hidden">
         <Outlet />
       </div>
 
       {/* Center Panel - Chat */}
-      <div className="flex-1 flex flex-col min-w-0 bg-chat relative">
+      <div className="flex flex-col min-w-0 relative overflow-hidden bg-chat">
         {activeConvId ? (
           <>
             <ChatHeader />
@@ -47,11 +47,11 @@ function AppLayout() {
             <ChatFooter />
           </>
         ) : (
-          <div className="flex items-center justify-center h-full text-gray-500">
+          <div className="flex items-center justify-center h-full">
             Select a conversation to start chatting
           </div>
         )}
       </div>
-    </div >
+    </div>
   );
 }

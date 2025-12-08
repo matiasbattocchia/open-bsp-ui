@@ -41,14 +41,14 @@ export default function Header() {
   }
 
   return (
-    <div className="header border-b border-r bg-gray z-30">
+    <div className="header border-b border-border bg-background z-30 shadow">
       {/* Back button */}
       <button
         className={"mr-4" + (activeConvId ? " md:hidden" : "")}
         title={t("Volver") as string}
         onClick={() => activeConvId && setActiveConv(null)}
       >
-        <ArrowLeft className="w-[24px] h-[24px] text-gray-icon" />
+        <ArrowLeft className="w-[24px] h-[24px] text-foreground" />
       </button>
 
       {/* Contact info */}
@@ -56,12 +56,12 @@ export default function Header() {
         <Avatar
           fallback={convInitials}
           size={40}
-          className="bg-gray-dark text-xl"
+          className="bg-accent text-accent-foreground border border-border text-[16px]"
         />
       </div>
       <div className="info flex flex-col justify-center mr-[12px] truncate">
-        <div className="text-[16px] truncate">{convName}</div>
-        <div className="text-[13px] text-gray-dark truncate">
+        <div className="text-[16px] text-foreground truncate">{convName}</div>
+        <div className="text-[13px] text-muted-foreground truncate">
           {service === "local" &&
             convType !== "group" &&
             t("Contacto de prueba")}
@@ -73,7 +73,7 @@ export default function Header() {
       {/* Options button - Hidden, does nothing yet. */}
       <div className="options flex justify-end w-full hidden">
         <button className="p-[8px] ml-[10px] rounded-full active:bg-gray-icon-bg">
-          <svg className="w-[24px] h-[24px] text-gray-icon">
+          <svg className="w-[24px] h-[24px] text-foreground">
             <use href="/icons.svg#options" />
           </svg>
         </button>

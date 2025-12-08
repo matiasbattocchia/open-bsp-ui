@@ -1,4 +1,5 @@
 @import "tailwindcss";
+
 :root {
   --background: oklch(0.98 0.01 95.1);
   --foreground: oklch(0.34 0.03 95.72);
@@ -31,22 +32,9 @@
   --sidebar-accent-foreground: oklch(0.33 0 0);
   --sidebar-border: oklch(0.94 0 0);
   --sidebar-ring: oklch(0.77 0 0);
-  --destructive-foreground: oklch(1 0 0);
-  --radius: 0.5rem;
-  --shadow-2xs: 0px 4px 8px -1px hsl(0 0% 0% / 0.05);
-  --shadow-xs: 0px 4px 8px -1px hsl(0 0% 0% / 0.05);
-  --shadow-sm:
-    0px 4px 8px -1px hsl(0 0% 0% / 0.1), 0px 1px 2px -2px hsl(0 0% 0% / 0.1);
-  --shadow:
-    0px 4px 8px -1px hsl(0 0% 0% / 0.1), 0px 1px 2px -2px hsl(0 0% 0% / 0.1);
-  --shadow-md:
-    0px 4px 8px -1px hsl(0 0% 0% / 0.1), 0px 2px 4px -2px hsl(0 0% 0% / 0.1);
-  --shadow-lg:
-    0px 4px 8px -1px hsl(0 0% 0% / 0.1), 0px 4px 6px -2px hsl(0 0% 0% / 0.1);
-  --shadow-xl:
-    0px 4px 8px -1px hsl(0 0% 0% / 0.1), 0px 8px 10px -2px hsl(0 0% 0% / 0.1);
-  --shadow-2xl: 0px 4px 8px -1px hsl(0 0% 0% / 0.25);
-  --tracking-normal: 0em;
+  
+  --chat-out: oklch(91.619% 0.0445 38.665);
+  --chat-in: oklch(1 0 0);
 }
 
 .dark {
@@ -81,21 +69,9 @@
   --sidebar-accent-foreground: oklch(0.81 0.01 93.01);
   --sidebar-border: oklch(0.94 0 0);
   --sidebar-ring: oklch(0.77 0 0);
-  --destructive-foreground: oklch(1 0 0);
-  --radius: 0.5rem;
-  --shadow-2xs: 0px 4px 8px -1px hsl(0 0% 0% / 0.05);
-  --shadow-xs: 0px 4px 8px -1px hsl(0 0% 0% / 0.05);
-  --shadow-sm:
-    0px 4px 8px -1px hsl(0 0% 0% / 0.1), 0px 1px 2px -2px hsl(0 0% 0% / 0.1);
-  --shadow:
-    0px 4px 8px -1px hsl(0 0% 0% / 0.1), 0px 1px 2px -2px hsl(0 0% 0% / 0.1);
-  --shadow-md:
-    0px 4px 8px -1px hsl(0 0% 0% / 0.1), 0px 2px 4px -2px hsl(0 0% 0% / 0.1);
-  --shadow-lg:
-    0px 4px 8px -1px hsl(0 0% 0% / 0.1), 0px 4px 6px -2px hsl(0 0% 0% / 0.1);
-  --shadow-xl:
-    0px 4px 8px -1px hsl(0 0% 0% / 0.1), 0px 8px 10px -2px hsl(0 0% 0% / 0.1);
-  --shadow-2xl: 0px 4px 8px -1px hsl(0 0% 0% / 0.25);
+
+  --chat-out: oklch(43.696% 0.08141 40.805);
+  --chat-in: oklch(0.31 0 106.6);
 }
 
 @theme inline {
@@ -130,53 +106,33 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --color-destructive-foreground: var(--destructive-foreground);
 
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-mono);
-  --font-serif: var(--font-serif);
-
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-
-  --shadow-2xs: var(--shadow-2xs);
-  --shadow-xs: var(--shadow-xs);
-  --shadow-sm: var(--shadow-sm);
-  --shadow: var(--shadow);
-  --shadow-md: var(--shadow-md);
-  --shadow-lg: var(--shadow-lg);
-  --shadow-xl: var(--shadow-xl);
-  --shadow-2xl: var(--shadow-2xl);
+  --color-incoming-chat-bubble: var(--chat-in);
+  --color-outgoing-chat-bubble: var(--chat-out);
 }
 
-@theme {
-  /* Colors from tailwind.config.js */
-  /*
-  --color-gray: #f0f2f5;
-  --color-gray-dark: #6f7f88;
-  --color-gray-hover: #f5f6f6;
-  --color-gray-light: #a4aeb3;
-  --color-gray-line: #e9edef;
-  --color-gray-icon: #54656f;
-  --color-gray-icon-bg: #d9dbde;
-  --color-green-wp: #b5a5e5;
-  --color-green-light: #d9fdd3;
-  --color-green-dark: #00a884;
-  --color-blue-ack: #53bdeb;
-  --color-verde: #61f86c;
-  --color-celeste: #85e7e2;
-  --color-azul: #94b6d8;
-  --color-violeta: #d381e8;
-  --color-background: #f0f2f5;
-  --color-hover: #f5f6f6;
-  --color-active: #f0f2f5;
-  --color-border: #e9edef;
- */
-  /* Box shadows */
-  --shadow-chat-bubble: 0 1px 0.5px 0 rgba(11, 20, 26, 0.13);
-}
+/* Deprecated colors
+
+--color-gray: #f0f2f5;
+--color-gray-dark: #6f7f88;
+--color-gray-hover: #f5f6f6;
+--color-gray-light: #a4aeb3;
+--color-gray-line: #e9edef;
+--color-gray-icon: #54656f;
+--color-gray-icon-bg: #d9dbde;
+--color-green-wp: #b5a5e5;
+--color-green-light: #d9fdd3;
+--color-green-dark: #00a884;
+--color-blue-ack: #53bdeb;
+--color-verde: #61f86c;
+--color-celeste: #85e7e2;
+--color-azul: #94b6d8;
+--color-violeta: #d381e8;
+--color-background: #f0f2f5;
+--color-hover: #f5f6f6;
+--color-active: #f0f2f5;
+--color-border: #e9edef;
+*/
 
 /*
 TODO:
@@ -214,7 +170,6 @@ body {
     Cantarell,
     Fira Sans,
     sans-serif;
-  font-size: 15px;
 }
 
 a {
@@ -228,23 +183,36 @@ a {
 
 @layer components {
   .header {
-    @apply h-[59px] py-[10px] px-[16px] border border-border flex;
+    @apply h-[60px] py-[10px] px-[20px] flex;
   }
 
   .spin {
     @apply animate-spin [transform-box:fill-box] [transform-origin:center] stroke-current fill-none;
   }
 
-  /* Custom background image from tailwind.config.js */
   .bg-chat {
-    background-image:
-      url("/bg-chat-tile-dark.png"),
-      linear-gradient(
-        to bottom right,
-        rgb(247 254 231),
-        rgb(253 244 255),
-        rgb(240 249 255)
-      );
+    background-color: var(--color-muted);
+    z-index: 0;
+  }
+
+  .bg-chat::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("/bg-chat-tile-dark.png");
+    background-repeat: repeat;
+    opacity: 0.06; /* Subtle pattern for light mode */
+    filter: invert(1); /* Invert to make dark pattern on light background if original is light-on-dark */
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .dark .bg-chat::before {
+    opacity: 0.12;
+    filter: none; /* Keep original for dark mode */
   }
 
   /* WhatsApp Web-like Grid Layout */

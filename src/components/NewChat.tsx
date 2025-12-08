@@ -60,7 +60,7 @@ export default function NewChat() {
   }
 
   return (
-    <div className="border-r border-gray-line bg-white flex flex-col">
+    <div className="border-r border-gray-line bg-white flex flex-col h-full">
       <div className="flex items-center truncate h-[59px] px-[16px]">
         {/* Back button */}
         <Link

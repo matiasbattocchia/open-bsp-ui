@@ -15,15 +15,15 @@ export default function Header() {
   const { translate: t } = useTranslation();
 
   return (
-    <div className="header border-r bg-white flex justify-between w-[calc(100dvw)] md:w-auto">
+    <div className="header border-r border-border bg-background text-foreground flex justify-between w-full md:w-auto">
       <div className="flex items-center truncate">
         <div>
           <Menu
-            className="text-gray-icon stroke-[2] lg:hidden mr-4 cursor-pointer"
+            className="stroke-[2] lg:hidden mr-4 cursor-pointer"
             onClick={() => toggle("menu")}
           />
         </div>
-        <div className="font-bold text-2xl truncate">
+        <div className="text-primary tracking-tighter font-bold text-[24px] truncate">
           {orgName}
         </div>
       </div>
@@ -31,10 +31,10 @@ export default function Header() {
         <Link
           to="/conversations/new"
           hash={activeConvId || undefined}
-          className="p-[8px] ml-[10px] rounded-full active:bg-gray-icon-bg"
+          className="p-[8px] ml-[10px] rounded-full active:bg-sidebar"
           title={t("Nueva conversación") as string}
         >
-          <svg className="w-[24px] h-[24px] text-gray-icon">
+          <svg className="w-[24px] h-[24px]">
             <use href="/icons.svg#new-chat" />
           </svg>
         </Link>

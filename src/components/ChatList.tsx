@@ -73,7 +73,7 @@ const ChatList = () => {
   const itemIds = items.map((a) => a.convId);
 
   return (
-    <div className="[overflow-y:overlay] border-r border-gray-line bg-white w-full h-full">
+    <div className="[overflow-y:overlay] border-r border-border bg-background w-full h-full">
       {itemIds.length ? (
         <div className="chat-list flex flex-col">
           {itemIds.map((key) => (
@@ -81,11 +81,11 @@ const ChatList = () => {
           ))}
         </div>
       ) : (
-        <div className="h-full flex items-center justify-center flex-col">
-          <T className="text-lg">Nada por aquí</T>
+        <div className="h-full flex items-center justify-center flex-col text-foreground text-[15px]">
+          <T>Nada por aquí</T>
           {(searchPattern || filterName !== Filters.ALL) && (
             <T
-              className="p-1 text-blue-ack"
+              className="text-[13px] text-primary"
               as="button"
               onClick={() => {
                 setSearchPattern("");

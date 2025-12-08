@@ -11,30 +11,30 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { useCurrentOrganization } from "@/queries/useOrgs";
 import { useCurrentAgent } from "@/queries/useAgents";
 
-const colors = {
-  emerald: { text: "text-emerald-500", bg: "bg-emerald-500" },
-  red: { text: "text-red-500", bg: "bg-red-500" },
-  teal: { text: "text-teal-500", bg: "bg-teal-500" },
-  amber: { text: "text-amber-500", bg: "bg-amber-500" },
-  cyan: { text: "text-cyan-500", bg: "bg-cyan-500" },
-  orange: { text: "text-orange-500", bg: "bg-orange-500" },
-  sky: { text: "text-sky-500", bg: "bg-sky-500" },
-  blue: { text: "text-blue-500", bg: "bg-blue-500" },
-  yellow: { text: "text-yellow-500", bg: "bg-yellow-500" },
-  lime: { text: "text-lime-500", bg: "bg-lime-500" },
-  green: { text: "text-green-500", bg: "bg-green-500" },
-  indigo: { text: "text-indigo-500", bg: "bg-indigo-500" },
-  violet: { text: "text-violet-500", bg: "bg-violet-500" },
-  purple: { text: "text-purple-500", bg: "bg-purple-500" },
-  fuchsia: { text: "text-fuchsia-500", bg: "bg-fuchsia-500" },
-  pink: { text: "text-pink-500", bg: "bg-pink-500" },
-  rose: { text: "text-rose-500", bg: "bg-rose-500" },
-  slate: { text: "text-slate-500", bg: "bg-slate-500" },
-  gray: { text: "text-gray-500", bg: "bg-gray-500" },
-  zinc: { text: "text-zinc-500", bg: "bg-zinc-500" },
-  neutral: { text: "text-neutral-500", bg: "bg-neutral-500" },
-  stone: { text: "text-stone-500", bg: "bg-stone-500" },
-};
+const colors = [
+  "emerald",
+  "red",
+  "teal",
+  "amber",
+  "cyan",
+  "orange",
+  "sky",
+  "blue",
+  "yellow",
+  "lime",
+  "green",
+  "indigo",
+  "violet",
+  "purple",
+  "fuchsia",
+  "pink",
+  "rose",
+  "slate",
+  "gray",
+  "zinc",
+  "neutral",
+  "stone",
+];
 
 type EnvelopeType = { message: MessageRow; first: boolean; last: boolean };
 type SeparatorType = { text: string; first: true; last: true };
@@ -48,15 +48,15 @@ function Separator({ text }: { text: string }) {
       className={
         "flex justify-center mb-[12px]" +
         (type === "unread"
-          ? " py-[5px] bg-white/25 border-t border-t-white/15 border-b border-b-gray-dark/15"
+          ? " py-[5px] bg-incoming-chat-bubble/25"
           : "")
       }
     >
       {/* unreads has rounded-16px px-22px py-0 but I prefer to keep the date style */}
       <div
         className={
-          "px-[12px] pt-[5px] pb-[6px] uppercase text-[12.5px] bg-white rounded-lg" +
-          (type === "unread" ? "" : " text-gray-dark shadow-chat-bubble")
+          "px-[12px] pt-[4px] pb-[5px] capitalize text-[12px] bg-incoming-chat-bubble rounded-lg text-foreground" +
+          (type === "unread" ? "" : " shadow")
         }
       >
         {text}
@@ -119,8 +119,8 @@ export default function Chat() {
 
   function assignAgentColors(
     agentIds: Set<string>,
-  ): Map<string, { text: string; bg: string }> {
-    const colorMap = new Map<string, { text: string; bg: string }>();
+  ): Map<string, string> {
+    const colorMap = new Map<string, string>();
     let colorIndex = 0;
 
     // Ensure consistent color assignment by sorting agent IDs
@@ -129,7 +129,7 @@ export default function Chat() {
     for (const agentId of sortedAgentIds) {
       colorMap.set(
         agentId,
-        Object.values(colors)[colorIndex % Object.keys(colors).length],
+        colors[colorIndex % colors.length],
       );
       colorIndex++;
     }
@@ -141,7 +141,7 @@ export default function Chat() {
 
   function getAgentAvatar(
     agentId: string | null,
-  ): { agentId: string; color: { text: string; bg: string } } | undefined {
+  ): { agentId: string; color: string } | undefined {
     // Incoming messages don't have an agent id
     if (!agentId) return undefined;
 
@@ -176,14 +176,9 @@ export default function Chat() {
 
   function insertDateSeparators(
     chat: MessageRow[],
-    t: (content: string) => React.ReactNode,
   ): (EnvelopeType | SeparatorType)[] {
     const _chat = [];
-    _chat.push({
-      text: t("Inicio de la conversación"),
-      first: true,
-      last: true,
-    } as SeparatorType);
+
     function typeMap(row: MessageRow) {
       // For internal messages with tool info, use tool use_id to group related calls
       if (row.direction === "internal" && row.content.tool?.event === "use") {
@@ -317,7 +312,6 @@ export default function Chat() {
       })
       .reverse()
       .map((message) => rewriteInternalMessageDirection(message)),
-    t,
   );
 
   const scrollToBottom = (isSmooth: boolean = true) => {
@@ -331,7 +325,7 @@ export default function Chat() {
 
   return (
     activeConvId && (
-      <div ref={scroller} className="grow pb-[8px] bg-chat [overflow-y:scroll]">
+      <div ref={scroller} className="grow pb-[8px] [overflow-y:scroll]">
         <div className="min-h-[12px]" />
         <div className="flex flex-col">
           {envelopesAndSeparators.map((envOrSep, index) =>
@@ -364,7 +358,7 @@ export default function Chat() {
             }}
             onClick={() => scrollToBottom()}
           >
-            <ChevronDown className="w-8 h-8 pt-1 text-gray-dark" />
+            <ChevronDown className="w-8 h-8 pt-1 text-foreground" />
           </button>
         ) */}
       </div>

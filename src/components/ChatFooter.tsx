@@ -223,7 +223,7 @@ export default function ChatFooter() {
           onClick={() => toggle("templatePicker")}
           title={t("Plantillas") as string}
         >
-          <NotepadTextDashed className="w-[24px] h-[24px] text-gray-icon" />
+          <NotepadTextDashed className="w-[24px] h-[24px]" />
         </button>
       </>
     );
@@ -258,7 +258,7 @@ export default function ChatFooter() {
           }}
           title={t("Generar respuesta") as string}
         >
-          <WandSparkles className="w-[24px] h-[24px] p-[1px] text-gray-icon" />
+          <WandSparkles className="w-[24px] h-[24px] p-[1px]" />
         </button>
       </>
     );
@@ -297,10 +297,8 @@ export default function ChatFooter() {
   return (
     activeConvId &&
     conv && (
-      <div className="flex items-end bg-gray py-[11px] px-[16px] ">
+      <div className="flex items-end bg-incoming-chat-bubble text-foreground p-[5px] mx-[12px] mb-[12px] rounded-[24px] shadow">
         <div className="hidden lg:block shrink-0">
-          {templateButton}
-          {generateButton}
           {attachButton}
         </div>
         <div className="block lg:hidden">
@@ -310,7 +308,7 @@ export default function ChatFooter() {
               className="p-[8px]"
               title={t("Más acciones") as string}
             >
-              <svg className={"w-[24px] h-[24px] text-gray-icon"}>
+              <svg className={"w-[24px] h-[24px]"}>
                 <use href="/icons.svg#attach" />
               </svg>
             </button>
@@ -346,7 +344,7 @@ export default function ChatFooter() {
           <div
             ref={editableDiv}
             contentEditable={inCSWindow}
-            className={`${!inCSWindow ? "bg-gray-line cursor-pointer" : "bg-white"} rounded-lg py-[10px] px-[13px] mx-[8px] outline-none min-h-[40px] max-h-40 overflow-y-auto text-[15px] leading-[20px] break-words`}
+            className={`${!inCSWindow ? "bg-muted cursor-pointer" : ""} outline-none mx-[5px] py-[10px] min-h-[40px] max-h-40 overflow-y-auto text-[15px] leading-[20px] break-words`}
             onInput={(event) => {
               if (!(event.target instanceof Element)) {
                 return;
@@ -356,10 +354,13 @@ export default function ChatFooter() {
               //const message = event.target.textContent || "";
               const message =
                 event.target.innerHTML
+                  .replace(/<br>/, "")
                   .replace(/<br>/g, "\n")
                   .replace(/<\/div><div>/g, "\n")
                   .replace(/<\/?div>/g, "") || "";
+
               setMessage(message);
+
               if (conv.created_at !== conv.updated_at) {
                 // no drafts for new convs, sorry!
                 debounce(() => saveDraft(conv, message, sendAsContact), 3000); // milliseconds
@@ -386,7 +387,7 @@ export default function ChatFooter() {
           {!message && (
             <div
               className={
-                "absolute bottom-[2px] left-[8px] py-[10px] pl-[20px] max-h-[40px] text-[15px] text-gray-dark" +
+                "absolute bottom-[1px] py-[10px] mx-[5px] max-h-[40px] text-[15px] text-muted-foreground" +
                 (inCSWindow ? "" : " cursor-pointer")
               }
               onClick={() =>
@@ -427,7 +428,7 @@ export default function ChatFooter() {
         {/* Send button */}
         <button
           disabled={!inCSWindow}
-          className="p-[8px]"
+          className="p-[8px] rounded-full bg-primary"
           onClick={() => {
             if (message) {
               sendTextMessage();
@@ -444,7 +445,7 @@ export default function ChatFooter() {
         >
           <svg
             className={
-              "w-[24px] h-[24px] text-blue-400 transition" +
+              "w-[24px] h-[24px] text-primary-foreground transition" +
               (sendAsContact ? " -scale-x-100" : "")
             }
           >

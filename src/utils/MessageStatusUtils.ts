@@ -66,12 +66,12 @@ export function getStatusIcon(
     case "read":
       return {
         icon: "double-check",
-        color: "text-blue-ack",
+        color: "text-primary",
       };
     case "failed":
       return {
         icon: "x",
-        color: "text-red-500",
+        color: "text-destructive",
       };
     default:
       return { icon: "", color: "" };

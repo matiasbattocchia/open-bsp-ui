@@ -1,4 +1,4 @@
-import { type ReactNode, useContext, useState } from "react";
+import { type ReactNode, useContext } from "react";
 import Avatar from "./Avatar";
 import { getHighestStatus, getStatusIcon } from "@/utils/MessageStatusUtils";
 import useBoundStore from "@/stores/useBoundStore";
@@ -111,7 +111,7 @@ function severityClass(hours: number) {
   } else if (hours < 24) {
     return { text: "text-red-500", bg: "bg-red-500" }; // Remaining twelve hours (red)
   } else {
-    return { text: "text-gray-dark", bg: "bg-gray-dark" }; // Overdue (gray)
+    return { text: "text-muted-foreground", bg: "bg-muted-foreground" }; // Overdue (gray)
   }
 }
 
@@ -149,7 +149,7 @@ export default function ChatListItem({
     +new Date(mostRecent?.timestamp || 0) >= +new Date(draft?.timestamp || 0)
       ? mostRecent
       : ({
-        direction: "outgoing",
+        direction: "incoming", // direction is not important, except that incoming does not display status icons, which is correct for drafts
         content: {
           version: "1",
           type: "text",
@@ -199,8 +199,6 @@ export default function ChatListItem({
 
   const tick = useContext(TickContext); // one-minute ticks
 
-  const [hovered, setHovered] = useState(false);
-
   const isPinned = conversation?.extra?.pinned;
   const isMuted = conversation?.extra?.notifications === "off";
 
@@ -238,8 +236,8 @@ export default function ChatListItem({
       <ItemActions trigger={["contextMenu"]} itemId={itemId}>
         <div
           className={
-            "chat-list-item h-[72px] flex cursor-pointer" +
-            (active ? " bg-gray" : " hover:bg-gray-hover")
+            "chat-list-item h-[72px] flex cursor-pointer mx-[10px] my-[2px] rounded-xl group" +
+            (active ? " bg-accent" : " hover:bg-accent")
           }
           onClick={(e) => {
             e.stopPropagation();
@@ -247,30 +245,28 @@ export default function ChatListItem({
             // setActiveConv(itemId);
             navigate({ to: "/conversations", hash: itemId });
           }}
-          onMouseEnter={() => setHovered(true)}
-          onMouseLeave={() => setHovered(false)}
         >
-          <div className="profile-picture pl-[13px] pr-[15px] flex items-center">
+          <div className="profile-picture pl-[10px] pr-[15px] flex items-center">
             <Avatar
               fallback={nameInitials(name || "?")}
               size={49}
-              className="bg-gray-dark text-xl"
+              className="bg-accent text-accent-foreground border border-border text-[16px]"
             />
           </div>
-          <div className="info flex flex-col justify-center grow min-w-0 pr-[15px] border-b border-gray-line">
+          <div className="info flex flex-col justify-center grow min-w-0 pr-[15px]">
             <div className="upper-row flex justify-between items-baseline">
-              <div className="truncate text-[17px]">{name || "?"}</div>
+              <div className="truncate text-foreground text-[16px]">{name || "?"}</div>
               <div
                 className={
-                  "text-[12px] text-gray-dark ml-[6px] capitalize" +
-                  (unread.count ? ` ${severity.text} font-bold` : "")
+                  "text-[12px] ml-[6px] capitalize" +
+                  (unread.count ? ` ${severity.text} font-bold` : " text-muted-foreground")
                 }
               >
                 {preview && formatTime(preview.timestamp)}
               </div>
             </div>
             <div className="lower-row flex justify-between mt-[2px] items-start">
-              <div className="min-w-0 flex items-start text-gray-dark">
+              <div className="min-w-0 flex items-start text-muted-foreground">
                 {preview?.direction === "outgoing" &&
                   statusIcon(preview.status)}
                 {preview?.agent_id && preview.agent_id !== agent?.id && (
@@ -282,18 +278,18 @@ export default function ChatListItem({
                 )}
                 {mediaIcon}
                 {draft && (
-                  <T as="div" className="text-[14px] text-blue-500 mr-1">
+                  <T as="div" className="text-[14px] text-primary mr-1">
                     Borrador:
                   </T>
                 )}
                 {preview?.content.type === "data" &&
                   preview?.content.kind === "template" && (
-                    <T as="div" className="text-[14px] text-blue-500 mr-1">
+                    <T as="div" className="text-[14px] text-primary mr-1">
                       Plantilla:
                     </T>
                   )}
                 {preview?.direction === "internal" && (
-                  <div className="text-[14px] text-gray-dark">
+                  <div className="text-[14px] text-muted-foreground">
                     {SpecialMessageTypeMap(preview?.content.kind || "")}
                   </div>
                 )}
@@ -309,15 +305,15 @@ export default function ChatListItem({
               <div className="flex flex-row items-center">
                 {/* Muted - Notifications is turned off */}
                 {isMuted && (
-                  <VolumeOff className="h-[19px] w-[19px] ml-[6px] stroke-gray-dark" />
+                  <VolumeOff className="h-[19px] w-[19px] ml-[6px] stroke-muted-foreground" />
                 )}
                 {/* Pause - AI assistant paused */}
                 {isPaused && (
-                  <Pause className="h-[19px] w-[19px] ml-[6px] fill-gray-dark stroke-0" />
+                  <Pause className="h-[19px] w-[19px] ml-[6px] fill-muted-foreground stroke-0" />
                 )}
                 {/* Pin - For now just conversations can be fixed */}
                 {isPinned && (
-                  <svg className="h-[18px] w-[12px] ml-[6px] text-gray-dark">
+                  <svg className="h-[18px] w-[12px] ml-[6px] text-muted-foreground">
                     <use href="/icons.svg#pin" />
                   </svg>
                 )}
@@ -340,11 +336,10 @@ export default function ChatListItem({
                 {/* Dropdown menu */}
                 <ItemActions
                   trigger={["click"]}
-                  visible={hovered}
                   itemId={itemId}
                 >
                   <svg
-                    className="h-[20px] w-[19px] ml-[6px] text-gray-dark"
+                    className="h-[20px] w-[19px] ml-[6px] text-muted-foreground hidden group-hover:block"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <use href="/icons.svg#down" />
