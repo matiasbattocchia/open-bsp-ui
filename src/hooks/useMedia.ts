@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { pushMessageToDb } from "@/utils/MessageUtils";
-import useBoundStore from "@/store/useBoundStore";
-import { MessageInsert, MessageRow, supabase } from "@/supabase/client";
+import useBoundStore from "@/stores/useBoundStore";
+import {
+  type MessageInsert,
+  type MessageRow,
+  supabase,
+} from "@/supabase/client";
 
 export function useMedia(message: MessageRow) {
   if (!(message.direction === "incoming" || message.direction === "outgoing")) {
@@ -21,13 +25,12 @@ export function useMedia(message: MessageRow) {
     throw new Error(`Message with id ${message.id} has no valid media URI.`);
   }
 
-  const load = useBoundStore((store) =>
-    store.chat.mediaLoads.get(message.id),
-  ) || {
-    type: "download",
-    status: "pending",
-    handledOnce: false,
-  };
+  const load =
+    useBoundStore((store) => store.chat.mediaLoads.get(message.id)) || {
+      type: "download",
+      status: "pending",
+      handledOnce: false,
+    };
   const setLoad = useBoundStore((store) => store.chat.setMediaLoad);
   const [cancel, setCancel] = useState(false);
 
@@ -64,7 +67,7 @@ export function useMedia(message: MessageRow) {
 
     setLoad(message.id, { ...load, status: "done" });
 
-    !error && pushMessageToDb(message as MessageInsert);
+    !error && await pushMessageToDb(message as MessageInsert);
   };
 
   const downloadTask = async () => {

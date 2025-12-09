@@ -1,4 +1,4 @@
-import { ReactEventHandler, useEffect, useState } from "react";
+import { type ReactEventHandler, useEffect, useState } from "react";
 import StatusIcon from "./StatusIcon";
 import { useMedia } from "@/hooks/useMedia";
 import { fileSize } from "./DocumentMessage";
@@ -12,10 +12,10 @@ import {
   ZoomInOutlined,
   ZoomOutOutlined,
 } from "@ant-design/icons";
-import styles from "./ImageMessagePreviewer.module.scss";
-import { MessageRow, OutgoingStatus } from "@/supabase/client";
+import styles from "./ImageMessagePreviewer.module.css";
+import { type MessageRow, type OutgoingStatus } from "@/supabase/client";
 import { Markdown } from "./Message";
-import { useTranslation } from "react-dialect";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const PORTRAIT_WIDTH = 240;
 const LANDSCAPE_WIDTH = 320;
@@ -261,8 +261,8 @@ export default function ImageMessage(message: MessageRow) {
         className={
           "z-[2] text-[11px] absolute bottom-[0px] right-[7px] flex items-center" +
           (content.text ||
-          (content.artifacts && content.artifacts.length > 0) ||
-          !load.blob
+            (content.artifacts && content.artifacts.length > 0) ||
+            !load.blob
             ? " text-gray-dark"
             : " text-white bottom-[3px]")
         }

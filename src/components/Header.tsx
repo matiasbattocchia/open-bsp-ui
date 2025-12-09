@@ -1,46 +1,43 @@
-import React from "react";
-import useBoundStore from "@/store/useBoundStore";
-import { useTranslation } from "react-dialect";
+import useBoundStore from "@/stores/useBoundStore";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useCurrentOrganization } from "@/queries/useOrgs";
 import { Menu } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 export default function Header() {
   const toggle = useBoundStore((state) => state.ui.toggle);
-  const organizationsList = useBoundStore(
-    (state) => state.ui.organizationsList,
-  );
 
-  const orgName = useBoundStore(
-    (state) =>
-      state.chat.organizations.get(state.ui.activeOrgId || "")?.name || "?",
-  );
+  const { data: org } = useCurrentOrganization();
+  const orgName = org?.name || "?";
+
+  const activeConvId = useBoundStore((state) => state.ui.activeConvId);
 
   const { translate: t } = useTranslation();
 
   return (
-    <div className="header border-r bg-white flex justify-between w-[calc(100dvw)] md:w-auto">
+    <div className="header border-r border-border bg-background text-foreground flex justify-between w-full md:w-auto">
       <div className="flex items-center truncate">
         <div>
           <Menu
-            className="text-gray-icon stroke-[2] lg:hidden mr-4 cursor-pointer"
+            className="stroke-[2] lg:hidden mr-4 cursor-pointer"
             onClick={() => toggle("menu")}
           />
         </div>
-        <div className="font-bold text-2xl truncate">
-          {organizationsList ? (t("Organizaciones") as string) : orgName}
+        <div className="text-primary tracking-tighter font-bold text-[24px] truncate">
+          {orgName}
         </div>
       </div>
       <div className="flex justify-end">
-        <button
-          className="p-[8px] ml-[10px] rounded-full active:bg-gray-icon-bg"
+        <Link
+          to="/conversations/new"
+          hash={activeConvId || undefined}
+          className="p-[8px] ml-[10px] rounded-full active:bg-sidebar"
           title={t("Nueva conversación") as string}
-          onClick={() => {
-            toggle("newChat");
-          }}
         >
-          <svg className="w-[24px] h-[24px] text-gray-icon">
+          <svg className="w-[24px] h-[24px]">
             <use href="/icons.svg#new-chat" />
           </svg>
-        </button>
+        </Link>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { MessageRow, supabase } from "@/supabase/client";
+import { type MessageRow, supabase } from "@/supabase/client";
 import dayjs from "dayjs";
 import { del, get, set } from "idb-keyval";
 

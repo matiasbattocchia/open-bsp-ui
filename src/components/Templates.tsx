@@ -1,13 +1,13 @@
 import {
   useState,
   useEffect,
-  FormEventHandler,
-  Dispatch,
-  SetStateAction,
+  type FormEventHandler,
+  type Dispatch,
+  type SetStateAction,
   useMemo,
 } from "react";
-import useBoundStore from "@/store/useBoundStore";
-import { supabase, TemplateMessage, TemplateData } from "@/supabase/client";
+import useBoundStore from "@/stores/useBoundStore";
+import { supabase, type TemplateMessage, type TemplateData } from "@/supabase/client";
 import { OutMessage, InMessage, BaseMessage } from "./Message/Message";
 import {
   newMessage,
@@ -15,13 +15,13 @@ import {
   pushMessageToStore,
 } from "@/utils/MessageUtils";
 import { pushConversationToDb } from "@/utils/ConversationUtils";
-import { Translate as T, useTranslation } from "react-dialect";
+import { Translate as T, useTranslation } from "@/hooks/useTranslation";
 import { LoaderCircle, PencilLine, PlusIcon } from "lucide-react";
 import Input from "antd/es/input/Input";
 import TextArea from "antd/es/input/TextArea";
 
 function Template({
-  template: { id, name, language, components },
+  template: { name, language, components },
   sendTemplateMessage,
   editMode = false,
 }: {
@@ -270,10 +270,10 @@ function TemplateEditor({
         text: body,
         ...(bodyVariablesRange.length
           ? {
-              example: {
-                body_text: [bodyVariables.slice(0, bodyVariablesRange.length)],
-              },
-            }
+            example: {
+              body_text: [bodyVariables.slice(0, bodyVariablesRange.length)],
+            },
+          }
           : {}),
       },
       ...(footer ? [{ type: "FOOTER", text: footer }] : []),
@@ -293,7 +293,7 @@ function TemplateEditor({
       setUpsertLoading(true);
     }
 
-    const { data, error } = await supabase.functions.invoke(
+    const { error } = await supabase.functions.invoke(
       "whatsapp-management/templates",
       {
         method,
@@ -493,15 +493,19 @@ function TemplateEditor({
   );
 }
 
+import { useCurrentAgent } from "@/queries/useAgents";
+
+// ...
+
 export default function WhatsAppTemplates() {
   const activeConvId = useBoundStore((store) => store.ui.activeConvId);
   const conv = useBoundStore((store) =>
     store.chat.conversations.get(store.ui.activeConvId || ""),
   );
   const templatePicker = useBoundStore((store) => store.ui.templatePicker);
-  const agentId = useBoundStore(
-    (store) => store.ui.roles[store.ui.activeOrgId || ""]?.agentId,
-  );
+
+  const { data: agent } = useCurrentAgent();
+  const agentId = agent?.id;
 
   const [templates, setTemplates] = useState<TemplateData[]>();
   const [loading, setLoading] = useState(false);
@@ -572,16 +576,16 @@ export default function WhatsAppTemplates() {
 
   const sendTemplateMessage = async (
     template: TemplateMessage["template"],
-    body: string,
-    header?: string,
-    footer?: string,
+    _body: string,
+    _header?: string,
+    _footer?: string,
   ) => {
     if (!activeConvId || !conv || !template) {
       return;
     }
 
     // If the conv has the `updated_at` unset, it means it has not been pushed to the DB yet.
-    !conv.updated_at && pushConversationToDb(conv);
+    !conv.updated_at && await pushConversationToDb(conv);
 
     const record = newMessage(
       conv,
@@ -598,7 +602,7 @@ export default function WhatsAppTemplates() {
       agentId,
     );
     pushMessageToStore(record);
-    pushMessageToDb(record);
+    await pushMessageToDb(record);
   };
 
   return (

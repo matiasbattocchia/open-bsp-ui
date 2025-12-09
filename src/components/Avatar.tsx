@@ -1,4 +1,4 @@
-import * as RadixAvatar from "@radix-ui/react-avatar";
+import { useState } from "react";
 
 const Avatar = ({
   src,
@@ -11,14 +11,24 @@ const Avatar = ({
   size: number;
   className: string;
 }) => {
+  const [imageError, setImageError] = useState(false);
+
   return (
-    <RadixAvatar.Root
-      className={`rounded-full flex items-center justify-center font-bold text-white uppercase ${className}`}
-      style={{ width: size, height: size }}
+    <div
+      className={`rounded-full flex items-center justify-center font-bold uppercase ${className}`}
+      style={{ width: size, height: size, overflow: "hidden" }}
     >
-      {src && <RadixAvatar.Image src={src} className="rounded-full" />}
-      {fallback && <RadixAvatar.Fallback>{fallback}</RadixAvatar.Fallback>}
-    </RadixAvatar.Root>
+      {src && !imageError ? (
+        <img
+          src={src}
+          className="w-full h-full object-cover"
+          onError={() => setImageError(true)}
+          alt="Avatar"
+        />
+      ) : (
+        fallback
+      )}
+    </div>
   );
 };
 

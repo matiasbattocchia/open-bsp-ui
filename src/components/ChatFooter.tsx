@@ -4,75 +4,31 @@ import {
   pushMessageToStore,
   pushMessageToDb,
 } from "@/utils/MessageUtils";
-import useBoundStore from "@/store/useBoundStore";
+import useBoundStore from "@/stores/useBoundStore";
 import {
   pushConversationToDb,
   updateConvExtra,
+  saveDraft,
 } from "@/utils/ConversationUtils";
-import { FileDraft } from "@/store/chatSlice";
+import { type FileDraft } from "@/stores/chatSlice";
 import {
-  ConversationRow,
-  Draft,
-  MessageRow,
+  type Draft,
+  type MessageRow,
   supabase,
-  WebhookPayload,
+  type WebhookPayload,
 } from "@/supabase/client";
-import { TickContext } from "@/context/useTick";
+import { TickContext } from "@/contexts/useTick";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
 import "dayjs/locale/pt";
 import { NotepadTextDashed } from "lucide-react";
 import { WandSparkles } from "lucide-react";
-import { Translate as T, useTranslation } from "react-dialect";
-import { Button, Dropdown, MenuProps } from "antd";
-import { useQuery } from "@tanstack/react-query";
-
-// Taken from https://phuoc.ng/collection/html-dom/move-the-cursor-to-the-end-of-a-content-editable-element
-export async function moveCursorToEnd(element: HTMLDivElement) {
-  const range = document.createRange();
-  const selection = window.getSelection();
-  range.setStart(element, element.childNodes.length);
-  range.collapse(true);
-  selection?.removeAllRanges();
-  selection?.addRange(range);
-}
-
-export async function saveDraft(
-  conv: ConversationRow,
-  text: string | null,
-  sendAsContact?: boolean,
-) {
-  let origin = "human";
-
-  if (sendAsContact !== undefined) {
-    origin = sendAsContact ? "human-as-contact" : "human-as-organization";
-  }
-
-  const payload = {
-    extra: {
-      draft: text
-        ? {
-            text,
-            timestamp: new Date().toISOString(),
-            origin,
-          }
-        : null,
-    },
-  };
-
-  const { error } = await supabase
-    .from("conversations")
-    .update(payload)
-    .eq("organization_address", conv.organization_address)
-    .eq("contact_address", conv.contact_address);
-
-  if (error) {
-    throw error;
-  }
-}
+import { Translate as T, useTranslation } from "@/hooks/useTranslation";
+import { Dropdown, type MenuProps } from "antd";
+import { useCurrentAgent } from "@/queries/useAgents";
+import { moveCursorToEnd } from "@/utils/UtilityFunctions";
 
 export default function ChatFooter() {
-  const activeOrgId = useBoundStore((store) => store.ui.activeOrgId);
   const activeConvId = useBoundStore((store) => store.ui.activeConvId);
   const conv = useBoundStore((store) =>
     store.chat.conversations.get(store.ui.activeConvId || ""),
@@ -85,44 +41,27 @@ export default function ChatFooter() {
   const message = useBoundStore((store) =>
     store.chat.textDrafts.get(store.ui.activeConvId || ""),
   );
-  const setMessage = useBoundStore(
-    (store) => (message: string) =>
-      store.chat.setConversationTextDraft(store.ui.activeConvId || "", message),
+  const setConversationTextDraft = useBoundStore(
+    (store) => store.chat.setConversationTextDraft,
   );
+  const setMessage = (message: string) =>
+    setConversationTextDraft(activeConvId || "", message);
+
   const fileDrafts = useBoundStore((store) =>
     store.chat.fileDrafts.get(store.ui.activeConvId || ""),
   );
-  const setFileDrafts = useBoundStore(
-    (store) => (fileDrafts: FileDraft[]) =>
-      store.chat.setConversationFileDrafts(
-        store.ui.activeConvId || "",
-        fileDrafts,
-      ),
+  const setConversationFileDrafts = useBoundStore(
+    (store) => store.chat.setConversationFileDrafts,
   );
-  const agentId = useBoundStore(
-    (store) => store.ui.roles[store.ui.activeOrgId || ""]?.agentId,
-  );
+  const setFileDrafts = (fileDrafts: FileDraft[]) =>
+    setConversationFileDrafts(activeConvId || "", fileDrafts);
 
-  const orgMode = useQuery({
-    queryKey: ["orgs", activeOrgId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("organizations")
-        .select("extra->>mode")
-        .eq("id", activeOrgId!)
-        .single();
-      if (error) {
-        throw error;
-      }
-      return data.mode as "auto" | "manual" | "draft" | undefined;
-    },
-    enabled: !!activeOrgId,
-    staleTime: 1000 * 60 * 60 * 6, // 6 hours
-  });
+  const { data: agent } = useCurrentAgent();
+  const agentId = agent?.id;
 
   const convType = conv?.extra?.type;
 
-  const [timer, setTimer] = useState<NodeJS.Timeout>();
+  const [timer, setTimer] = useState<ReturnType<typeof setTimeout>>();
 
   const editableDiv = useRef<HTMLDivElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
@@ -174,10 +113,10 @@ export default function ChatFooter() {
     }
 
     editableDiv.current.textContent = message || "";
-    moveCursorToEnd(editableDiv.current);
 
     // do not steal the focus from the file previewer
     if (!fileDrafts?.length) {
+      moveCursorToEnd(editableDiv.current);
       // focus on the text input only on desktop
       //window.matchMedia("(min-width: 768px)").matches &&
       //  editableDiv.current.focus();
@@ -227,25 +166,8 @@ export default function ChatFooter() {
 
     clearTimeout(timer);
 
-    const isPaused =
-      +new Date(conv.extra?.paused || 0) > +new Date() - 12 * 60 * 60 * 1000; // Less than 12 hours ago.
-
-    // Human response pauses the bot
-    // TODO: not done in media messages - cabra 2025-01-11
-    if (
-      orgMode.data !== "manual" &&
-      convType !== "group" &&
-      !sendAsContact &&
-      !isPaused &&
-      conv.updated_at
-    ) {
-      updateConvExtra(conv, {
-        paused: new Date().toISOString(),
-      });
-    }
-
     // If the conv has the `updated_at` unset, it means it has not been pushed to the DB yet.
-    !conv.updated_at && pushConversationToDb(conv);
+    !conv.updated_at && await pushConversationToDb(conv);
 
     const record = newMessage(
       conv,
@@ -262,8 +184,9 @@ export default function ChatFooter() {
       },
       agentId,
     );
+
     pushMessageToStore(record);
-    pushMessageToDb(record);
+    await pushMessageToDb(record);
 
     setMessage("");
     // TODO: optimization: combine with the updateConvExtra call - cabra 2025-01-16
@@ -291,7 +214,7 @@ export default function ChatFooter() {
           onClick={() => toggle("templatePicker")}
           title={t("Plantillas") as string}
         >
-          <NotepadTextDashed className="w-[24px] h-[24px] text-gray-icon" />
+          <NotepadTextDashed className="w-[24px] h-[24px]" />
         </button>
       </>
     );
@@ -312,7 +235,7 @@ export default function ChatFooter() {
               return;
             }
 
-            const { data, error } = await supabase.functions.invoke("bot", {
+            const { error } = await supabase.functions.invoke("bot", {
               body: {
                 table: "messages",
                 schema: "public",
@@ -326,7 +249,7 @@ export default function ChatFooter() {
           }}
           title={t("Generar respuesta") as string}
         >
-          <WandSparkles className="w-[24px] h-[24px] p-[1px] text-gray-icon" />
+          <WandSparkles className="w-[24px] h-[24px] p-[1px]" />
         </button>
       </>
     );
@@ -340,7 +263,7 @@ export default function ChatFooter() {
         onClick={() => fileInput.current?.click()}
         title={t("Adjuntar") as string}
       >
-        <svg className={"w-[24px] h-[24px] text-gray-icon"}>
+        <svg className={"w-[24px] h-[24px] text-foreground"}>
           <use href="/icons.svg#attach" />
         </svg>
       </button>
@@ -365,10 +288,8 @@ export default function ChatFooter() {
   return (
     activeConvId &&
     conv && (
-      <div className="flex items-end bg-gray py-[11px] px-[16px] ">
+      <div className="flex items-end bg-incoming-chat-bubble text-foreground p-[5px] mx-[12px] mb-[12px] rounded-[24px] shadow">
         <div className="hidden lg:block shrink-0">
-          {templateButton}
-          {generateButton}
           {attachButton}
         </div>
         <div className="block lg:hidden">
@@ -378,7 +299,7 @@ export default function ChatFooter() {
               className="p-[8px]"
               title={t("Más acciones") as string}
             >
-              <svg className={"w-[24px] h-[24px] text-gray-icon"}>
+              <svg className={"w-[24px] h-[24px]"}>
                 <use href="/icons.svg#attach" />
               </svg>
             </button>
@@ -414,7 +335,7 @@ export default function ChatFooter() {
           <div
             ref={editableDiv}
             contentEditable={inCSWindow}
-            className={`${!inCSWindow ? "bg-gray-line cursor-pointer" : "bg-white"} rounded-lg py-[10px] px-[13px] mx-[8px] outline-none min-h-[40px] max-h-40 overflow-y-auto text-[15px] leading-[20px] break-words`}
+            className={`${!inCSWindow ? "bg-muted cursor-pointer" : ""} outline-none mx-[5px] py-[10px] min-h-[40px] max-h-40 overflow-y-auto text-[15px] leading-[20px] break-words`}
             onInput={(event) => {
               if (!(event.target instanceof Element)) {
                 return;
@@ -424,10 +345,13 @@ export default function ChatFooter() {
               //const message = event.target.textContent || "";
               const message =
                 event.target.innerHTML
+                  .replace(/<br>/, "")
                   .replace(/<br>/g, "\n")
                   .replace(/<\/div><div>/g, "\n")
                   .replace(/<\/?div>/g, "") || "";
+
               setMessage(message);
+
               if (conv.created_at !== conv.updated_at) {
                 // no drafts for new convs, sorry!
                 debounce(() => saveDraft(conv, message, sendAsContact), 3000); // milliseconds
@@ -447,14 +371,14 @@ export default function ChatFooter() {
               inCSWindow
                 ? undefined
                 : (t(
-                    "WhatsApp cierra la conversación a las 24 horas del último mensaje recibido. Para abrir la conversación debes utilizar una plantilla.",
-                  ) as string)
+                  "WhatsApp cierra la conversación a las 24 horas del último mensaje recibido. Para abrir la conversación debes utilizar una plantilla.",
+                ) as string)
             }
           />
           {!message && (
             <div
               className={
-                "absolute bottom-[2px] left-[8px] py-[10px] pl-[20px] max-h-[40px] text-[15px] text-gray-dark" +
+                "absolute bottom-[1px] py-[10px] mx-[5px] max-h-[40px] text-[15px] text-muted-foreground" +
                 (inCSWindow ? "" : " cursor-pointer")
               }
               onClick={() =>
@@ -495,7 +419,7 @@ export default function ChatFooter() {
         {/* Send button */}
         <button
           disabled={!inCSWindow}
-          className="p-[8px]"
+          className="p-[8px] rounded-full bg-primary"
           onClick={() => {
             if (message) {
               sendTextMessage();
@@ -512,7 +436,7 @@ export default function ChatFooter() {
         >
           <svg
             className={
-              "w-[24px] h-[24px] text-blue-400 transition" +
+              "w-[24px] h-[24px] text-primary-foreground transition" +
               (sendAsContact ? " -scale-x-100" : "")
             }
           >

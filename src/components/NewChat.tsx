@@ -1,27 +1,20 @@
-import useBoundStore from "@/store/useBoundStore";
-import { ArrowLeft } from "lucide-react";
-import { useTranslation } from "react-dialect";
-import ChatListItem from "./ChatListItem/ChatListItem";
+import useBoundStore from "@/stores/useBoundStore";
+import { ArrowLeft, Search, X } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 import { startConversation } from "@/utils/ConversationUtils";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/supabase/client";
-import { Input } from "antd";
-import { SearchOutlined, CloseOutlined } from "@ant-design/icons";
 import { useState } from "react";
-import { formatPhoneNumber } from "./ChatHeader";
+import { formatPhoneNumber } from "@/utils/FormatUtils";
+import { useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 
 export default function NewChat() {
-  const newChat = useBoundStore((state) => state.ui.newChat);
-  const toggle = useBoundStore((state) => state.ui.toggle);
-
   const { translate: t } = useTranslation();
+  const navigate = useNavigate();
 
   const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
-  const setActiveConv = useBoundStore((state) => state.ui.setActiveConv);
-
-  const role = useBoundStore(
-    (state) => state.ui.roles[state.ui.activeOrgId || ""]?.role,
-  );
+  const activeConvId = useBoundStore((state) => state.ui.activeConvId);
 
   const addresses = useQuery({
     queryKey: [activeOrgId, "addresses"],
@@ -65,83 +58,68 @@ export default function NewChat() {
   }
 
   return (
-    newChat && (
-      <div className="border-r border-gray-line bg-white flex flex-col absolute w-full h-full z-20 ">
-        <div className="flex items-center truncate h-[59px] px-[16px]">
-          {/* Back button */}
-          <button
-            className={"mr-4"}
-            title={t("Volver") as string}
-            onClick={() => {
-              toggle("newChat");
-              setPhoneNumber("");
-            }}
-          >
-            <ArrowLeft className="w-[24px] h-[24px] text-gray-icon" />
-          </button>
-          <div className="text-[16px]">{t("Nueva conversación")}</div>
+    <div className="border-r border-border bg-background flex flex-col h-full">
+      <div className="flex items-center truncate h-[60px] px-[16px] bg-background">
+        {/* Back button */}
+        <Link
+          to="/conversations"
+          hash={activeConvId || undefined}
+          className="mr-4"
+          title={t("Volver") as string}
+        >
+          <ArrowLeft className="w-[24px] h-[24px] text-foreground" />
+        </Link>
+        <div className="text-[16px] text-foreground">
+          {t("Nueva conversación")}
         </div>
+      </div>
 
-        <div className="px-[12px] py-[7px] flex bg-white">
-          <Input
+      <div className="px-[12px] pb-[7px] flex bg-background">
+        <div className="flex items-center w-full bg-incoming-chat-bubble h-[40px] rounded-full hover:ring ring-border px-[12px] text-foreground">
+          <Search className="text-muted-foreground w-[16px] h-[16px] stroke-[3px]" />
+          <input
             placeholder={t("Buscar nombre o número de teléfono") as string}
-            variant="borderless"
-            className="bg-gray h-[35px] text-gray-dark"
+            className="bg-transparent border-none outline-none w-full h-full text-[15px] mx-[12px] placeholder:text-muted-foreground"
             value={phoneNumber}
-            prefix={<SearchOutlined className="mr-[15px]" />}
-            allowClear={{ clearIcon: <CloseOutlined /> }}
             onChange={(e) => setPhoneNumber(e.target.value)}
           />
+          {phoneNumber && (
+            <X
+              className="cursor-pointer text-muted-foreground w-[16px] h-[16px] stroke-[3px]"
+              onClick={() => setPhoneNumber("")}
+            />
+          )}
         </div>
+      </div>
 
-        <div className="flex flex-col gap-2 mt-4 px-[12px]">
-          {role === "admin" && internalAddress && (
-            <button
-              className="px-4 py-2 bg-gray-hover hover:bg-gray rounded"
-              onClick={() => {
-                activeOrgId &&
-                  setActiveConv(
-                    startConversation({
-                      organization_id: activeOrgId,
-                      organization_address: internalAddress,
-                      contact_address: crypto.randomUUID(),
-                      service: "local",
-                      type: "test",
-                    }),
-                  );
-                toggle("newChat");
-                setPhoneNumber("");
-              }}
-            >
-              {t("Nueva definición de prueba")}
-            </button>
-          )}
+      <div className="flex flex-col gap-2 mt-4 px-[12px]">
+        {internalAddress && (
+          <button
+            className="px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/80 rounded-full text-center"
+            onClick={() => {
+              if (!activeOrgId) {
+                return;
+              }
 
-          {internalAddress && (
-            <button
-              className="px-4 py-2 bg-gray-hover hover:bg-gray rounded"
-              onClick={() => {
-                activeOrgId &&
-                  setActiveConv(
-                    startConversation({
-                      organization_id: activeOrgId,
-                      organization_address: internalAddress,
-                      contact_address: crypto.randomUUID(),
-                      service: "local",
-                      type: "personal",
-                    }),
-                  );
-                toggle("newChat");
-                setPhoneNumber("");
-              }}
-            >
-              {t("Nueva conversación de prueba")}
-            </button>
-          )}
+              const convId = startConversation({
+                organization_id: activeOrgId,
+                organization_address: internalAddress,
+                contact_address: crypto.randomUUID(),
+                service: "local",
+                type: "personal",
+              });
 
-          {internalAddress && (
+              //setActiveConv(convId!);
+              navigate({ to: "/conversations", hash: convId });
+            }}
+          >
+            {t("Nueva conversación de prueba")}
+          </button>
+        )}
+
+        {/* internalAddress && (
             <button
-              className="px-4 py-2 bg-gray-hover hover:bg-gray rounded"
+              className="px-4 py-2 bg-sidebar-accent hover:bg-sidebar-accent/80 rounded text-foreground text-left"
               onClick={() => {
                 activeOrgId &&
                   setActiveConv(
@@ -154,41 +132,37 @@ export default function NewChat() {
                       name: "Nuevo grupo",
                     }),
                   );
-                toggle("newChat");
-                setPhoneNumber("");
+                navigate({ to: "/conversations" });
               }}
             >
               {t("Nuevo grupo")}
             </button>
-          )}
+          )*/}
 
-          {!!whatsappAddresses?.length &&
-            phoneNumber.replace(/\D/g, "").length >= 10 && (
-              <button
-                className="px-4 py-2 bg-gray-hover hover:bg-gray rounded"
-                onClick={() => {
-                  activeOrgId &&
-                    setActiveConv(
-                      startConversation({
-                        organization_id: activeOrgId,
-                        organization_address: whatsappAddresses[0].address,
-                        contact_address: sanitizePhoneNumber(phoneNumber),
-                        service: "whatsapp",
-                        type: "personal",
-                        name: formatPhoneNumber(
-                          sanitizePhoneNumber(phoneNumber),
-                        ),
-                      }),
-                    );
-                  toggle("newChat");
-                  setPhoneNumber("");
-                }}
-              >
-                {formatPhoneNumber(sanitizePhoneNumber(phoneNumber))}
-              </button>
-            )}
-        </div>
+        {!!whatsappAddresses?.length &&
+          phoneNumber.replace(/\D/g, "").length >= 10 && (
+            <button
+              className="px-4 py-2 bg-sidebar-accent hover:bg-sidebar-accent/80 rounded text-foreground text-left"
+              onClick={() => {
+                if (!activeOrgId) return;
+
+                const convId = startConversation({
+                  organization_id: activeOrgId,
+                  organization_address: whatsappAddresses[0].address,
+                  contact_address: sanitizePhoneNumber(phoneNumber),
+                  service: "whatsapp",
+                  type: "personal",
+                  name: formatPhoneNumber(sanitizePhoneNumber(phoneNumber)),
+                });
+
+                // setActiveConv(convId!);
+                navigate({ to: "/conversations", hash: convId });
+              }}
+            >
+              {formatPhoneNumber(sanitizePhoneNumber(phoneNumber))}
+            </button>
+          )}
       </div>
-    )
+    </div>
   );
 }

@@ -1,6 +1,6 @@
-import useBoundStore from "@/store/useBoundStore";
-import { filters, Filters } from "@/store/uiSlice";
-import { useTranslation } from "react-dialect";
+import useBoundStore from "@/stores/useBoundStore";
+import { filters, Filters } from "@/stores/uiSlice";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function ChatFilter() {
   const appliedFilter = useBoundStore((state) => state.ui.filter);
@@ -16,15 +16,15 @@ export default function ChatFilter() {
   };
 
   return (
-    <div className="px-[16px] pt-[2px] pb-[7px] flex gap-3 w-[calc(100dvw)] md:w-auto bg-white border-b border-r border-gray-line [overflow-x:overlay]">
+    <div className="px-[20px] pb-[12px] flex gap-3 w-full md:w-auto bg-background border-r border-border [overflow-x:overlay] shrink-0">
       {(Object.keys(filters) as Filters[]).map((filter) => (
         <button
           key={filter}
           className={
             "text-[14px] text-nowrap capitalize px-[12px] py-[6px] rounded-full" +
             (filter === appliedFilter
-              ? " text-blue-500 bg-blue-100"
-              : " text-gray-dark bg-gray hover:bg-gray-hover")
+              ? " text-foreground bg-primary/10 hover:bg-primary/20 border border-primary"
+              : " text-foreground bg-background hover:bg-accent border border-border")
           }
           onClick={() => {
             setFilter(filter);

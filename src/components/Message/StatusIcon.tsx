@@ -1,4 +1,4 @@
-import { OutgoingStatus } from "@/supabase/client";
+import { type OutgoingStatus } from "@/supabase/client";
 import { getHighestStatus, getStatusIcon } from "@/utils/MessageStatusUtils";
 
 export default function StatusIcon(status: OutgoingStatus) {

@@ -1,4 +1,4 @@
-import { OutgoingStatus } from "@/supabase/client";
+import { type OutgoingStatus } from "@/supabase/client";
 // @ts-ignore
 import toReversed from "core-js-pure/actual/array/to-reversed";
 
@@ -66,12 +66,12 @@ export function getStatusIcon(
     case "read":
       return {
         icon: "double-check",
-        color: "text-blue-ack",
+        color: "text-primary",
       };
     case "failed":
       return {
         icon: "x",
-        color: "text-red-500",
+        color: "text-destructive",
       };
     default:
       return { icon: "", color: "" };

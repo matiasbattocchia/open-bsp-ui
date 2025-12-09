@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
-import { Database as DatabaseGenerated, Json, Tables } from "./db_types";
-import { MergeDeep } from "type-fest";
+import type { Database as DatabaseGenerated, Json, Tables } from "./db_types";
+import type { MergeDeep } from "type-fest";
 
 //===================================
 // Copied from matiasbattocchia/open-bsp-api/supabase/functions/_shared/supabase.ts
@@ -47,9 +47,9 @@ export type InteractiveMessage = {
   interactive:
     | { type: "button_reply"; button_reply: { id: string; title: string } }
     | {
-        type: "list_reply";
-        list_reply: { id: string; title: string; description?: string };
-      };
+      type: "list_reply";
+      list_reply: { id: string; title: string; description?: string };
+    };
 };
 
 // ORDER
@@ -222,25 +222,27 @@ type TemplateBody = {
   parameters?: TemplateParameter[];
 };
 
-type TemplateButton = {
-  type: "button";
-  index: string; // 0-9
-} & (
-  | {
+type TemplateButton =
+  & {
+    type: "button";
+    index: string; // 0-9
+  }
+  & (
+    | {
       sub_type: "quick_reply";
       parameters: {
         type: "payload";
         payload: string;
       }[];
     }
-  | {
+    | {
       sub_type: "url";
       parameters: {
         type: "url";
         text: string;
       }[];
     }
-);
+  );
 
 export type Template = {
   components?: (TemplateHeader | TemplateBody | TemplateButton)[];
@@ -275,8 +277,9 @@ export type TaskInfo = {
 };
 
 export type ToolInfo = {
-  tool?: ToolEventInfo &
-    (LocalToolInfo | GoogleToolInfo | OpenAIToolInfo | AnthropicToolInfo);
+  tool?:
+    & ToolEventInfo
+    & (LocalToolInfo | GoogleToolInfo | OpenAIToolInfo | AnthropicToolInfo);
 };
 
 export type ToolEventInfo =
@@ -388,7 +391,10 @@ type ButtonPart = DataPart<"button", ButtonMessage["button"]>;
 
 type TemplatePart = DataPart<"template", Template>;
 
-type MediaPlaceholderPart = DataPart<"media_placeholder", null>;
+type MediaPlaceholderPart = DataPart<
+  "media_placeholder",
+  Record<PropertyKey, never>
+>;
 
 // Multi-part messages
 
@@ -413,12 +419,14 @@ export type Parts = {
  * Excepting Reaction, Contacts and Location, all other types differ depending on the direction (incoming or outgoing)
  */
 
-export type IncomingMessage = {
-  version: "1";
-  re_message_id?: string; // replied, reacted or forwarded message id
-  forwarded?: boolean;
-} & TaskInfo &
-  (
+export type IncomingMessage =
+  & {
+    version: "1";
+    re_message_id?: string; // replied, reacted or forwarded message id
+    forwarded?: boolean;
+  }
+  & TaskInfo
+  & (
     | TextPart
     | FilePart
     | ContactsPart
@@ -429,20 +437,24 @@ export type IncomingMessage = {
     | MediaPlaceholderPart
   );
 
-export type InternalMessage = {
-  version: "1";
-  re_message_id?: string; // replied, reacted or forwarded message id
-  forwarded?: boolean;
-} & TaskInfo &
-  ToolInfo &
-  Part;
+export type InternalMessage =
+  & {
+    version: "1";
+    re_message_id?: string; // replied, reacted or forwarded message id
+    forwarded?: boolean;
+  }
+  & TaskInfo
+  & ToolInfo
+  & Part;
 
-export type OutgoingMessage = {
-  version: "1";
-  re_message_id?: string; // replied, reacted or forwarded message id
-  forwarded?: boolean;
-} & TaskInfo &
-  (TextPart | FilePart | ContactsPart | LocationPart | TemplatePart);
+export type OutgoingMessage =
+  & {
+    version: "1";
+    re_message_id?: string; // replied, reacted or forwarded message id
+    forwarded?: boolean;
+  }
+  & TaskInfo
+  & (TextPart | FilePart | ContactsPart | LocationPart | TemplatePart);
 
 //===================================
 // Statuses
@@ -573,6 +585,8 @@ export type ToolConfig =
   | LocalSpecialToolConfig
   | LocalMCPToolConfig;
 
+type Role = "admin";
+
 export type AgentExtra = {
   mode?: "active" | "draft" | "inactive";
   description?: string;
@@ -589,6 +603,7 @@ export type AgentExtra = {
   instructions?: string;
   send_inline_files_up_to_size_mb?: number;
   tools?: ToolConfig[];
+  roles?: Role[];
 };
 
 export type Database = MergeDeep<
@@ -612,42 +627,42 @@ export type Database = MergeDeep<
         messages: {
           Row:
             | {
-                direction: "incoming";
-                content: IncomingMessage;
-                status: IncomingStatus;
-              }
+              direction: "incoming";
+              content: IncomingMessage;
+              status: IncomingStatus;
+            }
             | {
-                direction: "internal";
-                content: InternalMessage;
-                status: IncomingStatus;
-              }
+              direction: "internal";
+              content: InternalMessage;
+              status: IncomingStatus;
+            }
             | {
-                direction: "outgoing";
-                content: OutgoingMessage;
-                status: OutgoingStatus;
-              };
+              direction: "outgoing";
+              content: OutgoingMessage;
+              status: OutgoingStatus;
+            };
           Insert:
             | {
-                organization_id?: string;
-                conversation_id?: string;
-                direction: "incoming";
-                content: IncomingMessage;
-                status?: IncomingStatus;
-              }
+              organization_id?: string;
+              conversation_id?: string;
+              direction: "incoming";
+              content: IncomingMessage;
+              status?: IncomingStatus;
+            }
             | {
-                organization_id?: string;
-                conversation_id?: string;
-                direction: "internal";
-                content: InternalMessage;
-                status?: IncomingStatus;
-              }
+              organization_id?: string;
+              conversation_id?: string;
+              direction: "internal";
+              content: InternalMessage;
+              status?: IncomingStatus;
+            }
             | {
-                organization_id?: string;
-                conversation_id?: string;
-                direction: "outgoing";
-                content: OutgoingMessage;
-                status?: OutgoingStatus;
-              };
+              organization_id?: string;
+              conversation_id?: string;
+              direction: "outgoing";
+              content: OutgoingMessage;
+              status?: OutgoingStatus;
+            };
         };
         contacts: {
           Row: {
@@ -685,8 +700,8 @@ export type ContactRow = Database["public"]["Tables"]["contacts"]["Row"];
 export type AgentRow = Database["public"]["Tables"]["agents"]["Row"];
 
 export const supabase = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  import.meta.env.VITE_SUPABASE_URL!,
+  import.meta.env.VITE_SUPABASE_ANON_KEY!,
   // Opt-out the stupid NextJS 14 default caching. It affects the Supabase client.
   {
     global: {

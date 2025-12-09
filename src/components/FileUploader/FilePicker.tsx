@@ -1,10 +1,10 @@
 import React from "react";
 import type { UploadProps } from "antd";
 import { Upload } from "antd";
-import useBoundStore from "@/store/useBoundStore";
-import { FileDraft } from "@/store/chatSlice";
+import useBoundStore from "@/stores/useBoundStore";
+import { type FileDraft } from "@/stores/chatSlice";
 import { UploadOutlined } from "@ant-design/icons";
-import styles from "./FilePicker.module.scss";
+import styles from "./FilePicker.module.css";
 
 const { Dragger } = Upload;
 

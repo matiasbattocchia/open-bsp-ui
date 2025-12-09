@@ -1,6 +1,6 @@
 // @ts-nocheck
-import { type MessageRow } from "./client";
-import { Database as DatabaseGenerated, Json } from "./db_types";
+import type { MessageRow } from "./client";
+import type { Database as DatabaseGenerated, Json } from "./db_types";
 
 // MINIMAL VERSION of supabase.ts for MessageRowV0
 
