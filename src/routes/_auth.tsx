@@ -7,7 +7,7 @@ import ChatFooter from "@/components/ChatFooter";
 import { useEffect, useState } from "react";
 import { useLocation } from "@tanstack/react-router";
 import FilePicker from "@/components/FileUploader/FilePicker";
-import FilePreviewer from "@/components/FileUploader/FilePreviewer";
+import FilePreviewer from "@/components/FilePreviewer";
 import Templates from "@/components/Templates";
 
 export const Route = createFileRoute("/_auth")({

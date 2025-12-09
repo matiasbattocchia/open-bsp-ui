@@ -81,7 +81,7 @@ const ChatList = () => {
           ))}
         </div>
       ) : (
-        <div className="h-full flex items-center justify-center flex-col text-foreground text-[15px]">
+        <div className="h-full flex items-center justify-center flex-col text-foreground text-[15px] mt-[-24px]">
           <T>Nada por aquí</T>
           {(searchPattern || filterName !== Filters.ALL) && (
             <T

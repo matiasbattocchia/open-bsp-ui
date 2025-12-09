@@ -1,11 +1,9 @@
 import useBoundStore from "@/stores/useBoundStore";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Search, X } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { startConversation } from "@/utils/ConversationUtils";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/supabase/client";
-import { Input } from "antd";
-import { SearchOutlined, CloseOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import { formatPhoneNumber } from "@/utils/FormatUtils";
 import { useNavigate } from "@tanstack/react-router";
@@ -60,8 +58,8 @@ export default function NewChat() {
   }
 
   return (
-    <div className="border-r border-gray-line bg-white flex flex-col h-full">
-      <div className="flex items-center truncate h-[59px] px-[16px]">
+    <div className="border-r border-border bg-background flex flex-col h-full">
+      <div className="flex items-center truncate h-[60px] px-[16px] bg-background">
         {/* Back button */}
         <Link
           to="/conversations"
@@ -69,38 +67,47 @@ export default function NewChat() {
           className="mr-4"
           title={t("Volver") as string}
         >
-          <ArrowLeft className="w-[24px] h-[24px] text-gray-icon" />
+          <ArrowLeft className="w-[24px] h-[24px] text-foreground" />
         </Link>
-        <div className="text-[16px]">{t("Nueva conversación")}</div>
+        <div className="text-[16px] text-foreground">
+          {t("Nueva conversación")}
+        </div>
       </div>
 
-      <div className="px-[12px] py-[7px] flex bg-white">
-        <Input
-          placeholder={t("Buscar nombre o número de teléfono") as string}
-          variant="borderless"
-          className="bg-gray h-[35px] text-gray-dark"
-          value={phoneNumber}
-          prefix={<SearchOutlined className="mr-[15px]" />}
-          allowClear={{ clearIcon: <CloseOutlined /> }}
-          onChange={(e) => setPhoneNumber(e.target.value)}
-        />
+      <div className="px-[12px] pb-[7px] flex bg-background">
+        <div className="flex items-center w-full bg-incoming-chat-bubble h-[40px] rounded-full hover:ring ring-border px-[12px] text-foreground">
+          <Search className="text-muted-foreground w-[16px] h-[16px] stroke-[3px]" />
+          <input
+            placeholder={t("Buscar nombre o número de teléfono") as string}
+            className="bg-transparent border-none outline-none w-full h-full text-[15px] mx-[12px] placeholder:text-muted-foreground"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+          />
+          {phoneNumber && (
+            <X
+              className="cursor-pointer text-muted-foreground w-[16px] h-[16px] stroke-[3px]"
+              onClick={() => setPhoneNumber("")}
+            />
+          )}
+        </div>
       </div>
 
       <div className="flex flex-col gap-2 mt-4 px-[12px]">
         {internalAddress && (
           <button
-            className="px-4 py-2 bg-gray-hover hover:bg-gray rounded"
+            className="px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/80 rounded-full text-center"
             onClick={() => {
-              if (!activeOrgId) { return }
+              if (!activeOrgId) {
+                return;
+              }
 
-              const convId =
-                startConversation({
-                  organization_id: activeOrgId,
-                  organization_address: internalAddress,
-                  contact_address: crypto.randomUUID(),
-                  service: "local",
-                  type: "personal",
-                })
+              const convId = startConversation({
+                organization_id: activeOrgId,
+                organization_address: internalAddress,
+                contact_address: crypto.randomUUID(),
+                service: "local",
+                type: "personal",
+              });
 
               //setActiveConv(convId!);
               navigate({ to: "/conversations", hash: convId });
@@ -112,7 +119,7 @@ export default function NewChat() {
 
         {/* internalAddress && (
             <button
-              className="px-4 py-2 bg-gray-hover hover:bg-gray rounded"
+              className="px-4 py-2 bg-sidebar-accent hover:bg-sidebar-accent/80 rounded text-foreground text-left"
               onClick={() => {
                 activeOrgId &&
                   setActiveConv(
@@ -135,7 +142,7 @@ export default function NewChat() {
         {!!whatsappAddresses?.length &&
           phoneNumber.replace(/\D/g, "").length >= 10 && (
             <button
-              className="px-4 py-2 bg-gray-hover hover:bg-gray rounded"
+              className="px-4 py-2 bg-sidebar-accent hover:bg-sidebar-accent/80 rounded text-foreground text-left"
               onClick={() => {
                 if (!activeOrgId) return;
 
@@ -145,9 +152,7 @@ export default function NewChat() {
                   contact_address: sanitizePhoneNumber(phoneNumber),
                   service: "whatsapp",
                   type: "personal",
-                  name: formatPhoneNumber(
-                    sanitizePhoneNumber(phoneNumber),
-                  ),
+                  name: formatPhoneNumber(sanitizePhoneNumber(phoneNumber)),
                 });
 
                 // setActiveConv(convId!);
