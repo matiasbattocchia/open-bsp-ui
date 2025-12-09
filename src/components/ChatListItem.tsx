@@ -23,7 +23,7 @@ import { useNavigate } from "@tanstack/react-router";
 
 function mediaPreview(t: (content: string) => ReactNode, message?: MessageRow) {
   let mediaIcon = null;
-  let mediaIconClass = "mr-[3px] text-gray-dark";
+  let mediaIconClass = "mr-[3px]";
   let mediaPreviewContent = "";
 
   if (
@@ -43,7 +43,7 @@ function mediaPreview(t: (content: string) => ReactNode, message?: MessageRow) {
         mediaIconClass += " h-[20px] w-[12px]";
 
         if (status === "read") {
-          mediaIconClass += " text-blue-ack";
+          mediaIconClass += " text-primary";
         }
 
         // TODO: Should be the audio length - cabra 24/05/2024
@@ -271,9 +271,7 @@ export default function ChatListItem({
                   statusIcon(preview.status)}
                 {preview?.agent_id && preview.agent_id !== agent?.id && (
                   <div className="text-[14px] mr-1 shrink-0">
-                    {agents?.find((a) => a.id === preview.agent_id)?.name ||
-                      "Asistente"}
-                    :
+                    {agents?.find((a) => a.id === preview.agent_id)?.name || "?"}:
                   </div>
                 )}
                 {mediaIcon}
@@ -295,7 +293,7 @@ export default function ChatListItem({
                 )}
                 {preview?.direction !== "internal" && (
                   <div className="truncate text-[14px]">
-                    {preview?.content.type === "text"
+                    {preview?.content.type === "text" || preview?.content.type === "file"
                       ? preview.content.text
                       : mediaPreviewContent}
                   </div>
@@ -327,7 +325,7 @@ export default function ChatListItem({
                 {unread.count > 0 && (
                   <div className="ml-[6px]">
                     <span
-                      className={`font-bold text-[12px] text-white rounded-full py-[3px] px-[7px] ${severity.bg}`}
+                      className={`font-bold text-[12px] text-white rounded-full py-[3px] px-[6px] ${severity.bg}`}
                     >
                       {unread.count}
                     </span>

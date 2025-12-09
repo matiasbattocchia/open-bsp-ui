@@ -4,8 +4,11 @@ import Menu from "@/components/Menu";
 import Chat from "@/components/Chat";
 import ChatHeader from "@/components/ChatHeader";
 import ChatFooter from "@/components/ChatFooter";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "@tanstack/react-router";
+import FilePicker from "@/components/FileUploader/FilePicker";
+import FilePreviewer from "@/components/FileUploader/FilePreviewer";
+import Templates from "@/components/Templates";
 
 export const Route = createFileRoute("/_auth")({
   component: AppLayout,
@@ -16,6 +19,8 @@ function AppLayout() {
   const activeConvId = useBoundStore((state) => state.ui.activeConvId);
   const setActiveConv = useBoundStore((state) => state.ui.setActiveConv);
   const location = useLocation();
+
+  const [isHoveringFiles, setIsHoveringFiles] = useState(false);
 
   // Sync fragment identifier with activeConvId
   // i.e. /conversations#1234
@@ -39,9 +44,18 @@ function AppLayout() {
       </div>
 
       {/* Center Panel - Chat */}
-      <div className="flex flex-col min-w-0 relative overflow-hidden bg-chat">
+      <div
+        className="flex flex-col min-w-0 relative overflow-hidden bg-chat"
+        onDragEnter={() => setIsHoveringFiles(true)}
+        onDrop={() => setIsHoveringFiles(false)}
+      >
         {activeConvId ? (
           <>
+            {isHoveringFiles && (
+              <FilePicker setHovering={setIsHoveringFiles} />
+            )}
+            <FilePreviewer />
+            <Templates />
             <ChatHeader />
             <Chat />
             <ChatFooter />

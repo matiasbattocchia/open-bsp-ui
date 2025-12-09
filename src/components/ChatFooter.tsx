@@ -26,16 +26,7 @@ import { WandSparkles } from "lucide-react";
 import { Translate as T, useTranslation } from "@/hooks/useTranslation";
 import { Dropdown, type MenuProps } from "antd";
 import { useCurrentAgent } from "@/queries/useAgents";
-
-// Taken from https://phuoc.ng/collection/html-dom/move-the-cursor-to-the-end-of-a-content-editable-element
-async function moveCursorToEnd(element: HTMLDivElement) {
-  const range = document.createRange();
-  const selection = window.getSelection();
-  range.setStart(element, element.childNodes.length);
-  range.collapse(true);
-  selection?.removeAllRanges();
-  selection?.addRange(range);
-}
+import { moveCursorToEnd } from "@/utils/UtilityFunctions";
 
 export default function ChatFooter() {
   const activeConvId = useBoundStore((store) => store.ui.activeConvId);
@@ -122,10 +113,10 @@ export default function ChatFooter() {
     }
 
     editableDiv.current.textContent = message || "";
-    moveCursorToEnd(editableDiv.current);
 
     // do not steal the focus from the file previewer
     if (!fileDrafts?.length) {
+      moveCursorToEnd(editableDiv.current);
       // focus on the text input only on desktop
       //window.matchMedia("(min-width: 768px)").matches &&
       //  editableDiv.current.focus();
@@ -272,7 +263,7 @@ export default function ChatFooter() {
         onClick={() => fileInput.current?.click()}
         title={t("Adjuntar") as string}
       >
-        <svg className={"w-[24px] h-[24px] text-gray-icon"}>
+        <svg className={"w-[24px] h-[24px] text-foreground"}>
           <use href="/icons.svg#attach" />
         </svg>
       </button>
