@@ -1,5 +1,5 @@
 import useBoundStore from "@/stores/useBoundStore";
-import { ArrowLeft, Search, X } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { startConversation } from "@/utils/ConversationUtils";
 import { useQuery } from "@tanstack/react-query";
@@ -7,14 +7,13 @@ import { supabase } from "@/supabase/client";
 import { useState } from "react";
 import { formatPhoneNumber } from "@/utils/FormatUtils";
 import { useNavigate } from "@tanstack/react-router";
-import { Link } from "@tanstack/react-router";
+import SectionHeader from "./SectionHeader"
 
 export default function NewChat() {
   const { translate: t } = useTranslation();
   const navigate = useNavigate();
 
   const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
-  const activeConvId = useBoundStore((state) => state.ui.activeConvId);
 
   const addresses = useQuery({
     queryKey: [activeOrgId, "addresses"],
@@ -59,20 +58,7 @@ export default function NewChat() {
 
   return (
     <div className="border-r border-border bg-background flex flex-col h-full">
-      <div className="flex items-center truncate h-[60px] px-[16px] bg-background">
-        {/* Back button */}
-        <Link
-          to="/conversations"
-          hash={activeConvId || undefined}
-          className="mr-4"
-          title={t("Volver") as string}
-        >
-          <ArrowLeft className="w-[24px] h-[24px] text-foreground" />
-        </Link>
-        <div className="text-[16px] text-foreground">
-          {t("Nueva conversación")}
-        </div>
-      </div>
+      <SectionHeader title="Nueva conversación" backTo="/conversations" />
 
       <div className="px-[12px] pb-[7px] flex bg-background">
         <div className="flex items-center w-full bg-incoming-chat-bubble h-[40px] rounded-full hover:ring ring-border px-[12px] text-foreground">

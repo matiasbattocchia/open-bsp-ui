@@ -124,7 +124,7 @@ export default function DocumentMessage(message: MessageRow) {
         {/* Info */}
         <div className="mx-[10px] -top-[2px] grow min-w-0 relative">
           <div>{media.name || mediaType(media.mime_type)}</div>
-          <div className="text-gray-dark py-[3px] text-[12px]">
+          <div className="text-muted-foreground py-[3px] text-[12px]">
             <span className="uppercase">{extension(media.name)}</span>
             {media.name && !isNaN(media.size) && (
               <span className="mx-[3px]">•</span>
@@ -170,7 +170,7 @@ export default function DocumentMessage(message: MessageRow) {
         ) && (
           <div
             className={
-              "pl-[6px] pb-[5px] pr-[4px] text-gray-dark" +
+              "pl-[6px] pb-[5px] pr-[4px] text-muted-foreground" +
               (content.text ? "" : " pt-[6px]")
             }
           >
@@ -188,7 +188,7 @@ export default function DocumentMessage(message: MessageRow) {
               />
             )}
             <div
-              className="text-blue-ack cursor-pointer"
+              className="text-primary cursor-pointer"
               onClick={() => setShowAnnotation(!showAnnotation)}
             >
               {showAnnotation
@@ -199,7 +199,7 @@ export default function DocumentMessage(message: MessageRow) {
         )}
 
       {/* Timestamp */}
-      <div className="text-[11px] text-gray-dark absolute bottom-[0px] right-[7px] flex items-center">
+      <div className="text-[11px] text-muted-foreground absolute bottom-[0px] right-[7px] flex items-center">
         {dayjs(message.timestamp).format("HH:mm")}
         {message.direction === "outgoing" && (
           <StatusIcon {...(message.status as OutgoingStatus)} />

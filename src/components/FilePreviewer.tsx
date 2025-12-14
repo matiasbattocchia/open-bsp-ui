@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "@/hooks/useTranslation";
 import { X, Plus } from "lucide-react";
-import { Badge } from "antd";
+
 import useBoundStore from "@/stores/useBoundStore";
 import { type FileDraft } from "@/stores/chatSlice";
 import {
@@ -16,6 +17,7 @@ import { useCurrentAgent } from "@/queries/useAgents";
 import { moveCursorToEnd } from "@/utils/UtilityFunctions";
 
 const FilePreviewer = () => {
+  const { translate: t } = useTranslation();
   const { data: agent } = useCurrentAgent();
   const agentId = agent?.id;
   const activeConvId = useBoundStore((store) => store.ui.activeConvId);
@@ -194,9 +196,8 @@ const FilePreviewer = () => {
   /**
    * File Picker TODO
    *
-   * 1. Sombras de previsualización y botón de enviar
    * 2. Contención de la previsualización (ahora atado con alambre)
-   * 3. Estilo badge botón enviar
+   * 3. Badge botón enviar
    * 4. Placeholder caption ("escribe un mensaje")
    * 7. Cartel de previsualización no disponible
    * 8. Borrador en ChatListItem (si guarda borrador y se cierra, el borrador permanece y escribe el mensaje)
@@ -208,7 +209,7 @@ const FilePreviewer = () => {
       <div className="flex flex-col bg-background text-foreground z-50 absolute top-[60px] h-[calc(100dvh-60px)] w-full">
         {/* Close button - Filename */}
         <div className="py-[8px] px-[16px] min-h-[60px] flex justify-between items-center">
-          <button onClick={quitPreviewer}>
+          <button onClick={quitPreviewer} className="cursor-pointer">
             <X className="w-[24px] h-[24px] text-foreground" />
           </button>
           <div className="grow flex justify-center items-center mx-[16px] pr-[24px]">
@@ -221,11 +222,11 @@ const FilePreviewer = () => {
           {isImage(previewDraft.file.type) ? (
             <img
               src={URL.createObjectURL(previewDraft.file)}
-              className="max-h-[25vw] max-w-[25hw]"
+              className="max-h-[25vw] max-w-[25hw] shadow"
             /> // TODO: not to memoize URL.createObjectURL could be potentially *stupid* - cabra 30/05/2024
           ) : (
             <>
-              <img src={iconName(previewDraft.file.name)} height={90} />
+              <img src={iconName(previewDraft.file.name)} height={90} className="shadow" />
 
               <div className="text-gray-dark py-[3px] text-[12px]">
                 <span className="uppercase">
@@ -240,30 +241,40 @@ const FilePreviewer = () => {
 
         {/* Caption input */}
         <div className="shrink-0 py-[8px] mx-[80px] flex justify-center items-center">
-          <div
-            ref={editableDiv}
-            contentEditable
-            className="relative grow max-w-[650px] py-[10px] px-[13px] bg-incoming-chat-bubble rounded-lg outline-none max-h-20 overflow-y-auto text-[18px] leading-[24px] break-words"
-            onInput={(event) => {
-              if (!(event.target instanceof Element)) {
-                return;
-              }
-              setConversationFileDraftCaption(
-                activeConvId,
-                previewIndex,
-                event.target.textContent || "",
-              );
-            }}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" && event.ctrlKey) {
-                // toggle("sendAsContact") is handled at window level, nonetheless this
-                // no-op block prevents from sending the message when pressing ctrl+enter
-              } else if (event.key === "Enter" && !event.shiftKey) {
-                event.preventDefault();
-                sendMediaMessages();
-              }
-            }}
-          />
+          <div className="relative grow max-w-[650px]">
+            <div
+              ref={editableDiv}
+              contentEditable
+              className="w-full py-[10px] px-[16px] bg-incoming-chat-bubble rounded-lg outline-none max-h-20 overflow-y-auto text-[17px] leading-[24px] break-words"
+              onInput={(event) => {
+                if (!(event.target instanceof Element)) {
+                  return;
+                }
+                setConversationFileDraftCaption(
+                  activeConvId,
+                  previewIndex,
+                  event.target.textContent || "",
+                );
+              }}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" && event.ctrlKey) {
+                  // toggle("sendAsContact") is handled at window level, nonetheless this
+                  // no-op block prevents from sending the message when pressing ctrl+enter
+                } else if (event.key === "Enter" && !event.shiftKey) {
+                  event.preventDefault();
+                  sendMediaMessages();
+                }
+              }}
+            />
+            {!previewDraft.caption && (
+              <div
+                className="absolute top-[10px] left-[16px] text-[17px] leading-[24px] text-muted-foreground pointer-events-none"
+                onClick={() => editableDiv.current?.focus()}
+              >
+                {t("Escribe un mensaje")}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Carousel */}
@@ -325,7 +336,7 @@ const FilePreviewer = () => {
                   }}
                 />
                 <button
-                  className="border border-foreground mx-[5px] mt-[8px] mb-[10px] w-[52px] h-[52px] rounded-sm flex justify-center items-center"
+                  className="border border-foreground mx-[5px] mt-[8px] mb-[10px] w-[52px] h-[52px] rounded-sm flex justify-center items-center cursor-pointer"
                   onClick={() => fileInput.current?.click()}
                 >
                   <Plus className="w-[24px] h-[24px]" />
@@ -336,24 +347,19 @@ const FilePreviewer = () => {
 
           {/* Send button */}
           <div className="mx-4 mt-1">
-            <Badge
-              count={drafts.length > 1 ? drafts.length : 0}
-              style={{ backgroundColor: "white", color: "#3b82f6" }}
+            <button
+              onClick={sendMediaMessages}
+              className="h-[60px] w-[60px] bg-primary rounded-full flex justify-center items-center cursor-pointer shadow-lg"
             >
-              <button
-                onClick={sendMediaMessages}
-                className="h-[60px] w-[60px] bg-primary rounded-full flex justify-center items-center"
+              <svg
+                className={
+                  "mb-[1px] w-[24px] h-[24px] text-primary-foreground transition" +
+                  (sendAsContact ? " -scale-x-100 mr-[4px] " : " ml-[4px] ")
+                }
               >
-                <svg
-                  className={
-                    "mb-[1px] w-[24px] h-[24px] text-primary-foreground transition" +
-                    (sendAsContact ? " -scale-x-100 mr-[4px] " : " ml-[4px] ")
-                  }
-                >
-                  <use href="/icons.svg#send" />
-                </svg>
-              </button>
-            </Badge>
+                <use href="/icons.svg#send" />
+              </svg>
+            </button>
           </div>
         </div>
       </div>

@@ -200,7 +200,7 @@ export default function AudioMessage({
             {/* Timestamp */}
             <div
               className={
-                "text-[11px] text-gray-dark absolute -bottom-[22px] flex items-center" +
+                "text-[11px] text-muted-foreground absolute -bottom-[22px] flex items-center" +
                 (message.direction === "incoming"
                   ? " right-0"
                   : " -right-[7px]")
@@ -243,7 +243,7 @@ export default function AudioMessage({
 
       {/* Caption */}
       {content.text && (
-        <div className="pl-[6px] pt-[6px] pb-[5px] pr-[4px] text-gray-dark">
+        <div className="pl-[6px] pt-[6px] pb-[5px] pr-[4px] text-muted-foreground">
           {content.text}
         </div>
       )}
@@ -253,7 +253,7 @@ export default function AudioMessage({
         content.artifacts.some(
           (a) => a.type === "text" && a.kind === "transcription",
         ) && (
-          <div className="pl-[6px] pt-[6px] pb-[5px] pr-[4px] text-gray-dark text-[13px] italic">
+          <div className="pl-[6px] pt-[6px] pb-[5px] pr-[4px] text-muted-foreground text-[13px] italic">
             {(() => {
               const transcription = content.artifacts.find(
                 (a) => a.type === "text" && a.kind === "transcription",
