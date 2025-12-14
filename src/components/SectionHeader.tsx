@@ -9,7 +9,7 @@ export default function SectionHeader(props: { title: string, backTo?: string })
   const activeConvId = useBoundStore((state) => state.ui.activeConvId);
 
   return (
-    <div className="header items-center truncate bg-background text-foreground border-r border-border">
+    <div className="header items-center truncate">
       {/* Back button */}
       {props.backTo && <Link
         to={props.backTo} // TODO: path minus one level

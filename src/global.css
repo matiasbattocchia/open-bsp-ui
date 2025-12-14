@@ -179,36 +179,36 @@ a {
   /* WhatsApp Web-like Grid Layout */
   .app-grid {
     display: grid;
-    grid-template-columns: 64px minmax(300px, 400px) 1fr;
+    /* Default (xl+): Menu | Left Panel | Chat */
+    grid-template-columns: 64px minmax(300px, 1fr) 2fr;
     height: 100vh;
     width: 100vw;
     overflow: hidden;
   }
 
-  /* When right panel is visible */
-  .app-grid.with-right-panel {
-    grid-template-columns: 64px minmax(300px, 400px) 1fr minmax(300px, 400px);
-  }
-
   /* Responsive breakpoints */
-  @media (max-width: 1024px) {
-    .app-grid {
-      grid-template-columns: 64px minmax(280px, 350px) 1fr;
-    }
-  }
+  
+  /* 
+   Tailwind CSS v4 default breakpoints:
 
-  @media (max-width: 768px) {
-    .app-grid {
-      /* Mobile: show only one panel at a time */
-      grid-template-columns: 1fr;
-    }
+   - sm: 640px
+   - md: 768px
+   - lg: 1024px
+   - xl: 1280px
+   - 2xl: 1536px
 
-    /* Menu overlay on mobile */
-    .app-grid > :first-child {
-      position: absolute;
-      z-index: 10;
-    }
-  }
+   Responsive Strategy:
+  
+   - xl+: 3 columns. Menu (64px) | Left Panel (max 400px) | Chat (1fr).
+   - xl-lg: 3 columns. Left Panel grows (35%).
+   - lg-md: 3 columns. Left Panel (min 300px).
+   - md-: Mobile, 2 views:
+     1. Menu (64px) | Left panel (1fr).
+     2. Chat (1fr).
+     
+     Content toggles between views based on active conversation.
+     Controlled by Tailwind classes in _auth.tsx (hidden/flex).
+  */
 }
 
 input[type="range"] {

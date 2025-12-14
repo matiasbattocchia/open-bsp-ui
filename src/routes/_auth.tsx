@@ -36,16 +36,25 @@ function AppLayout() {
   return (
     <div className="app-grid">
       {/* Menu - Fixed width */}
-      <Menu />
-
+      <div className={activeConvId ? "hidden md:flex" : "flex"}>
+        <Menu />
+      </div>
       {/* Left Panel - Router Outlet */}
-      <div className="flex flex-col overflow-hidden">
+      <div
+        className={
+          "flex-col overflow-hidden border-border md:border-r bg-background text-foreground col-span-2 md:col-span-1 " +
+          (activeConvId ? "hidden md:flex" : "flex")
+        }
+      >
         <Outlet />
       </div>
 
       {/* Center Panel - Chat */}
       <div
-        className="flex flex-col min-w-0 relative overflow-hidden bg-chat"
+        className={
+          "flex-col min-w-0 relative overflow-hidden bg-chat col-span-full md:col-span-1 " +
+          (activeConvId ? "flex" : "hidden md:flex")
+        }
         onDragEnter={() => setIsHoveringFiles(true)}
         onDrop={() => setIsHoveringFiles(false)}
       >

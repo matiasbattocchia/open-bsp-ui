@@ -57,7 +57,7 @@ export default function NewChat() {
   }
 
   return (
-    <div className="border-r border-border bg-background flex flex-col h-full">
+    <div className="flex flex-col h-full">
       <SectionHeader title="Nueva conversación" backTo="/conversations" />
 
       <div className="px-[12px] pb-[7px] flex bg-background">
