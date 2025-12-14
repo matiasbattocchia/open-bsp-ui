@@ -16,7 +16,7 @@ export default function SectionItem({
   return (
     <div
       className={
-        "h-[72px] flex cursor-pointer mx-[10px] my-[2px] rounded-xl group" +
+        "h-[72px] flex cursor-pointer my-[2px] rounded-xl group" +
         (active ? " bg-accent" : " hover:bg-accent")
       }
       onClick={onClick}

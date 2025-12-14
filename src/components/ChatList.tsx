@@ -73,7 +73,7 @@ const ChatList = () => {
   const itemIds = items.map((a) => a.convId);
 
   return (
-    <div className="[overflow-y:overlay] border-r border-border bg-background w-full h-full">
+    <div className="[overflow-y:overlay] w-full h-full">
       {itemIds.length ? (
         <div className="chat-list flex flex-col">
           {itemIds.map((key) => (

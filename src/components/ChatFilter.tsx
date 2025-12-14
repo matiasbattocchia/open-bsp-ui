@@ -16,7 +16,7 @@ export default function ChatFilter() {
   };
 
   return (
-    <div className="px-[20px] pb-[12px] flex gap-3 w-full md:w-auto bg-background border-r border-border [overflow-x:overlay] shrink-0">
+    <div className="px-[20px] pb-[12px] flex gap-3 w-full [overflow-x:overlay] shrink-0">
       {(Object.keys(filters) as Filters[]).map((filter) => (
         <button
           key={filter}

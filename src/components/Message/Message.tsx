@@ -229,8 +229,8 @@ function Avatar({
 }
 
 // Shared in/out message classes. I could not find a better way to do it. - cabra 15/05/2024
-const msgRowClasses = "px-[18px] lg:px-[63px] flex";
-const avatarMsgRowClasses = "px-[calc(18px+28px)] lg:px-[calc(63px+38px)] flex";
+const msgRowClasses = "px-[63px] flex";
+const avatarMsgRowClasses = "px-[calc(63px+38px)] flex";
 
 const msgBubbleClasses =
   "relative rounded-lg shadow break-words text-[14.2px] leading-[19px] p-[3px]";

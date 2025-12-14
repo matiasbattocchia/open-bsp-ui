@@ -32,11 +32,6 @@ export const filters: {
 } as const;
 
 export type UIState = {
-  menu: boolean;
-  organizationsList: boolean;
-  leftPanel: boolean;
-  rightPanel: boolean;
-  templatePicker: boolean;
   activeOrgId: string | null;
   activeConvId: string | null;
   user: User | null;

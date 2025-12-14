@@ -3,8 +3,11 @@ import Avatar from "./Avatar";
 import useBoundStore from "@/stores/useBoundStore";
 import { useTranslation } from "@/hooks/useTranslation";
 import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
 
 export default function Header() {
+  const navigate = useNavigate();
+
   const activeConvId = useBoundStore((state) => state.ui.activeConvId);
 
   const convName = useBoundStore(
@@ -41,12 +44,12 @@ export default function Header() {
   }
 
   return (
-    <div className="header border-b border-border bg-background z-30 shadow">
+    <div className="header border-b border-border bg-background z-30 shadow-md">
       {/* Back button */}
       <button
-        className={"mr-4" + (activeConvId ? " md:hidden" : "")}
+        className="mr-4 md:hidden"
         title={t("Volver") as string}
-        onClick={() => activeConvId && setActiveConv(null)}
+        onClick={() => navigate({ to: "/conversations" })}
       >
         <ArrowLeft className="w-[24px] h-[24px] text-foreground" />
       </button>
@@ -78,6 +81,6 @@ export default function Header() {
           </svg>
         </button>
       </div>
-    </div>
+    </div >
   );
 }

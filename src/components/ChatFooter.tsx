@@ -288,7 +288,7 @@ export default function ChatFooter() {
   return (
     activeConvId &&
     conv && (
-      <div className="flex items-end bg-incoming-chat-bubble text-foreground p-[5px] mx-[12px] mb-[12px] rounded-[24px] shadow">
+      <div className="flex items-end bg-incoming-chat-bubble text-foreground p-[5px] mx-[12px] mb-[12px] rounded-[24px] shadow-[0_0_4px_0px_rgba(0,0,0,0.1)] z-10">
         <div className="hidden lg:block shrink-0">
           {attachButton}
         </div>
