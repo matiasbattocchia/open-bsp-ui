@@ -33,7 +33,6 @@ export default function Header() {
       state.chat.conversations.get(state.ui.activeConvId || "")
         ?.contact_address,
   );
-  const setActiveConv = useBoundStore((state) => state.ui.setActiveConv);
 
   const convInitials = nameInitials(convName);
 

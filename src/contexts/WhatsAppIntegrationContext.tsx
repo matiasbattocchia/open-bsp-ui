@@ -5,7 +5,7 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
-import { supabase } from "@/supabase/client";
+import { useWhatsAppSignup } from "@/queries/useWhatsAppSignup";
 
 const FB_API_VERSION = "v24.0";
 
@@ -171,6 +171,8 @@ export function WhatsAppIntegrationProvider({
     };
   }, []);
 
+  const { mutateAsync: signup } = useWhatsAppSignup();
+
   const launchWhatsAppSignup = useCallback(
     (
       orgId: string,
@@ -207,13 +209,16 @@ export function WhatsAppIntegrationProvider({
 
             console.log("Sending signup payload:", payload); // Remove after testing
 
-            supabase.functions
-              .invoke("whatsapp-management/signup", {
-                method: "POST",
-                body: payload,
+            signup(payload)
+              .then(() => {
+                onSuccess();
               })
-              .then(onSuccess)
-              .finally(() => setLoading(false));
+              .catch((error: Error) => {
+                console.error("Signup failed:", error);
+              })
+              .finally(() => {
+                setLoading(false);
+              });
           } else {
             console.log("User cancelled login or did not fully authorize.");
           }

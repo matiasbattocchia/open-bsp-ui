@@ -12,7 +12,7 @@ export function useIntegrations() {
         .from("organizations_addresses")
         .select("*")
         .eq("organization_id", activeOrgId!)
-        //.neq("service", "local")
+        .neq("service", "local")
         .throwOnError(),
     enabled: !!activeOrgId,
     select: (data) => data.data,

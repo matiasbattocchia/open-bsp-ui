@@ -32,6 +32,7 @@ export const filters: {
 } as const;
 
 export type UIState = {
+  templatePicker: boolean;
   activeOrgId: string | null;
   activeConvId: string | null;
   user: User | null;
