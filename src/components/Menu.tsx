@@ -106,7 +106,7 @@ export default function Menu() {
           to="/integrations"
           hash={activeConvId || undefined}
           className={
-            "p-[8px] mt-[10px] rounded-full active:bg-gray-icon-bg hidden" +
+            "p-[8px] mt-[10px] rounded-full active:bg-gray-icon-bg" +
             (pathname === "/integrations" ? " bg-gray-icon-bg" : "")
           }
           title={t("Integraciones") as string}

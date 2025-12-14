@@ -227,7 +227,7 @@ export default function ImageMessage(message: MessageRow) {
         ) && (
           <div
             className={
-              "pl-[6px] pb-[5px] pr-[4px] text-gray-dark" +
+              "pl-[6px] pb-[5px] pr-[4px] text-muted-foreground" +
               (content.text ? "" : " pt-[6px]")
             }
             style={{ width }}
@@ -246,7 +246,7 @@ export default function ImageMessage(message: MessageRow) {
               />
             )}
             <div
-              className="text-blue-ack cursor-pointer"
+              className="text-primary cursor-pointer"
               onClick={() => setShowAnnotation(!showAnnotation)}
             >
               {showAnnotation
@@ -263,7 +263,7 @@ export default function ImageMessage(message: MessageRow) {
           (content.text ||
             (content.artifacts && content.artifacts.length > 0) ||
             !load.blob
-            ? " text-gray-dark"
+            ? " text-muted-foreground"
             : " text-white bottom-[3px]")
         }
       >

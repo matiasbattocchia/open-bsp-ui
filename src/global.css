@@ -19,11 +19,6 @@
   --border: oklch(0.88 0.01 97.36);
   --input: oklch(0.76 0.02 98.35);
   --ring: oklch(0.59 0.17 253.06);
-  --chart-1: oklch(0.56 0.13 43);
-  --chart-2: oklch(0.69 0.16 290.41);
-  --chart-3: oklch(0.88 0.03 93.13);
-  --chart-4: oklch(0.88 0.04 298.18);
-  --chart-5: oklch(0.56 0.13 42.06);
   --sidebar: oklch(0.97 0.01 98.88);
   --sidebar-foreground: oklch(0.36 0.01 106.65);
   --sidebar-primary: oklch(0.62 0.14 39.04);
@@ -56,12 +51,6 @@
   --border: oklch(0.36 0.01 106.89);
   --input: oklch(0.43 0.01 100.22);
   --ring: oklch(0.59 0.17 253.06);
-  --chart-1: oklch(0.56 0.13 43);
-  --chart-2: oklch(0.69 0.16 290.41);
-  --chart-3: oklch(0.21 0.01 95.42);
-  --chart-4: oklch(0.31 0.05 289.32);
-  --chart-5: oklch(0.56 0.13 42.06);
-  --sidebar: oklch(0.24 0 67.71);
   --sidebar-foreground: oklch(0.81 0.01 93.01);
   --sidebar-primary: oklch(0.33 0 0);
   --sidebar-primary-foreground: oklch(0.99 0 0);
@@ -93,11 +82,6 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -110,29 +94,6 @@
   --color-incoming-chat-bubble: var(--chat-in);
   --color-outgoing-chat-bubble: var(--chat-out);
 }
-
-/* Deprecated colors
-
---color-gray: #f0f2f5;
---color-gray-dark: #6f7f88;
---color-gray-hover: #f5f6f6;
---color-gray-light: #a4aeb3;
---color-gray-line: #e9edef;
---color-gray-icon: #54656f;
---color-gray-icon-bg: #d9dbde;
---color-green-wp: #b5a5e5;
---color-green-light: #d9fdd3;
---color-green-dark: #00a884;
---color-blue-ack: #53bdeb;
---color-verde: #61f86c;
---color-celeste: #85e7e2;
---color-azul: #94b6d8;
---color-violeta: #d381e8;
---color-background: #f0f2f5;
---color-hover: #f5f6f6;
---color-active: #f0f2f5;
---color-border: #e9edef;
-*/
 
 /*
 TODO:
