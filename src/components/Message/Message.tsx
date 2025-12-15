@@ -17,6 +17,7 @@ import AvatarComponent from "@/components/Avatar";
 import { pushMessageToDb } from "@/utils/MessageUtils";
 import { pushMessageToStore } from "@/utils/MessageUtils";
 import { useAgent } from "@/queries/useAgents";
+import { AVATAR_BG_COLORS, AVATAR_TEXT_COLORS } from "@/utils/colors";
 
 const md = new Remarkable({ breaks: true, html: true });
 
@@ -210,7 +211,7 @@ function Avatar({
         fallback={agent?.name.charAt(0) || "A"}
         size={28}
         className={
-          `${color ? `bg-${color}-500` : ""} absolute` +
+          `${(color && AVATAR_BG_COLORS[color]) || ""} absolute text-foreground border border-border -top-[0.25px]` +
           (display === "picture-left" ? " -left-[38px]" : " -right-[38px]")
         }
       />
@@ -220,9 +221,9 @@ function Avatar({
   if (display === "name") {
     return (
       <div
-        className={`text-[14px] p-[6px] pb-0 ${color ? `text-${color}-500` : ""}`}
+        className={`text-[12.8px] p-[6px] pb-0 ${(color && AVATAR_TEXT_COLORS[color]) || ""}`}
       >
-        {agent?.name || "Asistente"}
+        {agent?.name || "?"}
       </div>
     );
   }

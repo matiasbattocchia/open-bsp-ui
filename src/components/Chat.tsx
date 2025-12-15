@@ -10,31 +10,7 @@ import { type MessageRow } from "@/supabase/client";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useCurrentOrganization } from "@/queries/useOrgs";
 import { useCurrentAgent } from "@/queries/useAgents";
-
-const colors = [
-  "emerald",
-  "red",
-  "teal",
-  "amber",
-  "cyan",
-  "orange",
-  "sky",
-  "blue",
-  "yellow",
-  "lime",
-  "green",
-  "indigo",
-  "violet",
-  "purple",
-  "fuchsia",
-  "pink",
-  "rose",
-  "slate",
-  "gray",
-  "zinc",
-  "neutral",
-  "stone",
-];
+import { AVATAR_COLORS } from "@/utils/colors";
 
 type EnvelopeType = { message: MessageRow; first: boolean; last: boolean };
 type SeparatorType = { text: string; first: true; last: true };
@@ -129,7 +105,7 @@ export default function Chat() {
     for (const agentId of sortedAgentIds) {
       colorMap.set(
         agentId,
-        colors[colorIndex % colors.length],
+        AVATAR_COLORS[colorIndex % AVATAR_COLORS.length],
       );
       colorIndex++;
     }

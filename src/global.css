@@ -180,10 +180,17 @@ a {
   .app-grid {
     display: grid;
     /* Default (xl+): Menu | Left Panel | Chat */
-    grid-template-columns: 64px minmax(300px, 1fr) 2fr;
+    /* Default (xl+): Menu | Left Panel | Chat */
+    grid-template-columns: 48px minmax(300px, 1fr) 2fr;
     height: 100vh;
     width: 100vw;
     overflow: hidden;
+  }
+
+  @media (min-width: 1024px) {
+    .app-grid {
+      grid-template-columns: 64px minmax(300px, 1fr) 2fr;
+    }
   }
 
   /* Responsive breakpoints */

@@ -1,9 +1,11 @@
 import useBoundStore from "@/stores/useBoundStore";
 import { useTranslation } from "@/hooks/useTranslation";
 import { Link } from "@tanstack/react-router";
+import { useCurrentOrganization } from "@/queries/useOrgs";
 
 export default function Header() {
   const activeConvId = useBoundStore((state) => state.ui.activeConvId);
+  const { data: org } = useCurrentOrganization();
 
   const { translate: t } = useTranslation();
 
@@ -11,7 +13,7 @@ export default function Header() {
     <div className="header flex justify-between w-full">
       <div className="flex items-center truncate">
         <div className="text-primary tracking-tighter font-bold text-[24px]">
-          Open BSP
+          {org?.name || "Open BSP"}
         </div>
       </div>
       <div className="flex justify-end">

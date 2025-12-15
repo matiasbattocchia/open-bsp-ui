@@ -7,22 +7,17 @@ import {
 import useBoundStore from "@/stores/useBoundStore";
 import {
   pushConversationToDb,
-  updateConvExtra,
   saveDraft,
 } from "@/utils/ConversationUtils";
 import { type FileDraft } from "@/stores/chatSlice";
 import {
   type Draft,
   type MessageRow,
-  supabase,
-  type WebhookPayload,
 } from "@/supabase/client";
 import { TickContext } from "@/contexts/useTick";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
 import "dayjs/locale/pt";
-import { NotepadTextDashed } from "lucide-react";
-import { WandSparkles } from "lucide-react";
 import { Translate as T, useTranslation } from "@/hooks/useTranslation";
 import { Dropdown, type MenuProps } from "antd";
 import { useCurrentAgent } from "@/queries/useAgents";
@@ -202,64 +197,12 @@ export default function ChatFooter() {
     setTimer(setTimeout(fn, ms));
   }
 
-  const templateButton =
-    convType === "group" ? null : (
-      <>
-        {/* Templates button */}
-        <button
-          className={
-            "p-[8px] rounded-full" +
-            (templatePicker ? " bg-gray-icon-bg" : " active:bg-gray-icon-bg")
-          }
-          onClick={() => toggle("templatePicker")}
-          title={t("Plantillas") as string}
-        >
-          <NotepadTextDashed className="w-[24px] h-[24px]" />
-        </button>
-      </>
-    );
-
-  const generateButton =
-    convType === "group" ? null : (
-      <>
-        {/* Generate message button */}
-        <button
-          disabled={!inCSWindow}
-          className="p-[8px]"
-          onClick={async () => {
-            if (conv && conv.extra?.paused) {
-              await updateConvExtra(conv, { paused: null });
-            }
-
-            if (!mostRecent) {
-              return;
-            }
-
-            const { error } = await supabase.functions.invoke("bot", {
-              body: {
-                table: "messages",
-                schema: "public",
-                record: mostRecent,
-              } as WebhookPayload<MessageRow>,
-            });
-
-            if (error) {
-              console.error(error);
-            }
-          }}
-          title={t("Generar respuesta") as string}
-        >
-          <WandSparkles className="w-[24px] h-[24px] p-[1px]" />
-        </button>
-      </>
-    );
-
   const attachButton = (
     <>
       {/* Attach files button */}
       <button
         disabled={!inCSWindow}
-        className="p-[8px]"
+        className={"p-[8px] " + (!inCSWindow ? "" : " cursor-pointer")}
         onClick={() => fileInput.current?.click()}
         title={t("Adjuntar") as string}
       >
@@ -273,14 +216,6 @@ export default function ChatFooter() {
   const footerActions: MenuProps["items"] = [
     {
       key: "1",
-      label: templateButton,
-    },
-    {
-      key: "2",
-      label: generateButton,
-    },
-    {
-      key: "3",
       label: attachButton,
     },
   ];
@@ -288,22 +223,9 @@ export default function ChatFooter() {
   return (
     activeConvId &&
     conv && (
-      <div className="flex items-end bg-incoming-chat-bubble text-foreground p-[5px] mx-[12px] mb-[12px] rounded-[24px] shadow-[0_0_4px_0px_rgba(0,0,0,0.1)] z-10">
-        <div className="hidden lg:block shrink-0">
+      <div className={"flex items-end text-foreground p-[5px] mx-[12px] mb-[12px] rounded-[24px] shadow-[0_0_4px_0px_rgba(0,0,0,0.1)] z-10" + (!inCSWindow ? " bg-background" : " bg-incoming-chat-bubble")}>
+        <div className="shrink-0">
           {attachButton}
-        </div>
-        <div className="block lg:hidden">
-          <Dropdown menu={{ items: footerActions }} placement="topLeft">
-            <button
-              disabled={!inCSWindow}
-              className="p-[8px]"
-              title={t("Más acciones") as string}
-            >
-              <svg className={"w-[24px] h-[24px]"}>
-                <use href="/icons.svg#attach" />
-              </svg>
-            </button>
-          </Dropdown>
         </div>
 
         <input
@@ -335,7 +257,7 @@ export default function ChatFooter() {
           <div
             ref={editableDiv}
             contentEditable={inCSWindow}
-            className={`${!inCSWindow ? "bg-muted cursor-pointer" : ""} outline-none mx-[5px] py-[10px] min-h-[40px] max-h-40 overflow-y-auto text-[15px] leading-[20px] break-words`}
+            className={`${!inCSWindow ? "cursor-pointer" : ""} outline-none mx-[5px] py-[10px] min-h-[40px] max-h-40 overflow-y-auto text-[15px] leading-[20px] break-words`}
             onInput={(event) => {
               if (!(event.target instanceof Element)) {
                 return;
@@ -388,7 +310,14 @@ export default function ChatFooter() {
               }
             >
               {!inCSWindow ? (
-                <T as="span">Conversación cerrada</T>
+                <>
+                  <T as="span" className="md:hidden">
+                    Conversación cerrada
+                  </T>
+                  <T as="span" className="hidden md:inline">
+                    Conversación cerrada, abre la conversación con una plantilla
+                  </T>
+                </>
               ) : sendAsContact ? (
                 <>
                   <T as="span" className="md:hidden">
@@ -419,7 +348,7 @@ export default function ChatFooter() {
         {/* Send button */}
         <button
           disabled={!inCSWindow}
-          className="p-[8px] rounded-full bg-primary"
+          className={"p-[8px] rounded-full bg-primary " + (!inCSWindow ? "" : " cursor-pointer")}
           onClick={() => {
             if (message) {
               sendTextMessage();
@@ -436,8 +365,9 @@ export default function ChatFooter() {
         >
           <svg
             className={
-              "w-[24px] h-[24px] text-primary-foreground transition" +
-              (sendAsContact ? " -scale-x-100" : "")
+              "w-[24px] h-[24px] transition" +
+              (sendAsContact ? " -scale-x-100" : "") +
+              (!inCSWindow ? " text-background" : " text-primary-foreground")
             }
           >
             <use href="/icons.svg#send" />

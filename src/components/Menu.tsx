@@ -13,6 +13,8 @@ import {
 import { Link, useLocation } from "@tanstack/react-router";
 import { resetAuthorizedCache } from "@/utils/IdbUtils";
 import { useCurrentAgent } from "@/queries/useAgents";
+import { Dropdown } from "antd";
+import { useOrganizations } from "@/queries/useOrgs";
 
 export default function Menu() {
   const user = useBoundStore((state) => state.ui.user);
@@ -21,6 +23,10 @@ export default function Menu() {
   const isAdmin = agent?.extra?.roles?.includes("admin");
 
   const activeConvId = useBoundStore((state) => state.ui.activeConvId);
+  const setActiveOrg = useBoundStore((state) => state.ui.setActiveOrg);
+  const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
+
+  const { data: organizations } = useOrganizations();
 
   const organizationsSize = 1;
 
@@ -35,29 +41,11 @@ export default function Menu() {
   return (
     <div
       className={
-        "absolute lg:static h-full z-10 flex flex-col justify-between px-[12px] pb-[10px] bg-sidebar text-sidebar-foreground border-r border-sidebar-border"
-        /*TODO + (menu ? "" : " invisible lg:visible")*/
+        "h-full w-full z-10 flex flex-col justify-between pb-[10px] bg-sidebar text-sidebar-foreground border-r border-sidebar-border"
       }
     >
       {/* Upper section */}
-      <div className="flex flex-col">
-
-        {/* Organizations button */}
-        {organizationsSize !== 1 && (
-          <Link
-            to="/organizations"
-            hash={activeConvId || undefined}
-            className={
-              "p-[8px] mt-[10px] rounded-full" +
-              (pathname === "/organizations"
-                ? " bg-gray-icon-bg"
-                : " active:bg-gray-icon-bg")
-            }
-            title={t("Organizaciones") as string}
-          >
-            <Building className="w-[24px] h-[24px] stroke-[2]" />
-          </Link>
-        )}
+      <div className="flex flex-col items-center">
 
         {/* Conversations button */}
         <Link
@@ -119,30 +107,51 @@ export default function Menu() {
       <div className="flex flex-col items-center">
         <SwitchLanguage className="w-[40px] mt-[10px]" />
 
-        <button
-          className="px-[8px] py-[10px] mt-[10px] rounded-full active:bg-gray-icon-bg"
-          title={t("Cerrar sesión") as string}
-          onClick={() => {
-            supabase.auth.signOut();
-            resetAuthorizedCache();
-          }}
-        >
-          <LogOut className="w-[24px] h-[19px] stroke-[2.4]" />
-        </button>
-
-        {/* User profile */}
         <div className="mt-[10px] p-[4px]">
-          <Avatar
-            src={agent?.picture || user?.user_metadata?.picture}
-            fallback={(
-              agent?.name ||
-              user?.user_metadata?.name ||
-              user?.email ||
-              "?"
-            ).charAt(0)}
-            size={32}
-            className="bg-primary text-primary-foreground text-[14px]"
-          />
+          <Dropdown
+            menu={{
+              items: [
+                {
+                  key: "orgs",
+                  type: "group",
+                  label: "Organizaciones",
+                  children:
+                    organizations?.map((org) => ({
+                      key: org.id,
+                      label: org.name,
+                      onClick: () => setActiveOrg(org.id),
+                    })) || [],
+                },
+                { type: "divider" },
+                {
+                  key: "logout",
+                  label: t("Cerrar sesión"),
+                  icon: <LogOut className="w-[16px] h-[16px]" />,
+                  onClick: () => {
+                    supabase.auth.signOut();
+                    resetAuthorizedCache();
+                  },
+                },
+              ],
+              selectable: true,
+              selectedKeys: activeOrgId ? [activeOrgId] : [],
+            }}
+            trigger={["click"]}
+          >
+            <div className="cursor-pointer">
+              <Avatar
+                src={agent?.picture || user?.user_metadata?.picture}
+                fallback={(
+                  agent?.name ||
+                  user?.user_metadata?.name ||
+                  user?.email ||
+                  "?"
+                ).charAt(0)}
+                size={32}
+                className="bg-primary text-primary-foreground text-[14px] border border-sidebar-border"
+              />
+            </div>
+          </Dropdown>
         </div>
       </div>
     </div>
