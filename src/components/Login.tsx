@@ -21,7 +21,9 @@ export default function Login() {
     });
   }
 
-  async function handleLogInWithEmail() {
+  async function handleLogInWithEmail(e?: React.FormEvent) {
+    if (e) e.preventDefault();
+
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -36,56 +38,61 @@ export default function Login() {
   }
 
   return (
-    <div className="flex flex-col gap-6 justify-center items-center bg-gray absolute z-50 h-dvh w-screen">
-      <img width={250} height={250} src="/logo.png" alt="ChatScript logo" />
+    <div className="flex flex-col gap-9 justify-center items-center bg-background text-foreground h-dvh w-screen">
+      <div className="text-primary tracking-tighter font-bold text-[36px]">
+        Open BSP
+      </div>
 
       <div className="flex flex-col gap-3 w-[250px]">
         <button
-          className="py-[7px] px-[20px] border border-blue-400 hover:bg-blue-400 rounded-lg w-full flex items-center justify-center gap-2 bg-blue-500 text-white"
+          type="button"
+          className="py-[7px] px-[20px] hover:bg-blue-400/90 rounded-lg w-full flex items-center justify-center gap-2 bg-blue-500 text-white"
           onClick={handleLogInWithOauth}
         >
           <GoogleOutlined /> {t("Continuar con Google")}
         </button>
 
-        <div className="border-b border-gray-line w-full" />
+        <div className="border-b border-border w-full" />
 
-        <div>
-          <T as="label" className="block text-md">
-            Correo electrónico
-          </T>
-          <input
-            className="py-[10px] px-[20px] h-[40px] border border-gray-line bg-white rounded-lg w-full"
-            placeholder="gori@gmail.com"
-            type="email"
-            onChange={(e) => setEmail(e.target.value)}
-            value={email}
-          />
-        </div>
+        <form onSubmit={handleLogInWithEmail} className="flex flex-col gap-3">
+          <div>
+            <T as="label" className="block text-md">
+              Correo electrónico
+            </T>
+            <input
+              className="py-[10px] px-[20px] h-[40px] border border-border bg-incoming-chat-bubble rounded-lg w-full"
+              placeholder="gori@gmail.com"
+              type="email"
+              onChange={(e) => setEmail(e.target.value)}
+              value={email}
+            />
+          </div>
 
-        <div>
-          <T as="label" className="block text-md">
-            Contraseña
-          </T>
-          <input
-            className="py-[10px] px-[20px] h-[40px] border border-gray-line bg-white rounded-lg w-full"
-            placeholder="******"
-            type="password"
-            onChange={(e) => setPassword(e.target.value)}
-            value={password}
-          />
-        </div>
+          <div>
+            <T as="label" className="block text-md">
+              Contraseña
+            </T>
+            <input
+              className="py-[10px] px-[20px] h-[40px] border border-border bg-incoming-chat-bubble rounded-lg w-full"
+              placeholder="******"
+              type="password"
+              onChange={(e) => setPassword(e.target.value)}
+              value={password}
+            />
+          </div>
 
-        {message && (
-          <div className="self-center text-red-500 text-md">{message}</div>
-        )}
+          {message && (
+            <div className="self-center text-destructive text-md">{message}</div>
+          )}
 
-        <button
-          className="py-[7px] px-[20px] border border-gray-dark hover:bg-white rounded-lg w-full flex items-center justify-center"
-          onClick={handleLogInWithEmail}
-        >
-          {t("Entrar")}
-        </button>
+          <button
+            type="submit"
+            className="py-[7px] px-[20px] mt-[16px] text-primary-foreground bg-primary hover:bg-primary/90 rounded-lg w-full flex items-center justify-center"
+          >
+            {t("Entrar")}
+          </button>
+        </form>
       </div>
     </div>
-  )
+  );
 }
