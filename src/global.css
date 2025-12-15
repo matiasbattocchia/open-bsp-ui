@@ -182,7 +182,7 @@ a {
     /* Default (xl+): Menu | Left Panel | Chat */
     /* Default (xl+): Menu | Left Panel | Chat */
     grid-template-columns: 48px minmax(300px, 1fr) 2fr;
-    height: 100vh;
+    height: 100dvh;
     width: 100vw;
     overflow: hidden;
   }
