@@ -36,7 +36,7 @@ export default function Login() {
   }
 
   return (
-    <div className="flex flex-col gap-6 justify-center items-center bg-gray absolute z-50 h-[100dvh] w-screen">
+    <div className="flex flex-col gap-6 justify-center items-center bg-gray absolute z-50 h-dvh w-screen">
       <img width={250} height={250} src="/logo.png" alt="ChatScript logo" />
 
       <div className="flex flex-col gap-3 w-[250px]">
