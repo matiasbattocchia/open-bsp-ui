@@ -6,7 +6,6 @@ import {
   LogOut,
   Settings,
   MessageSquareText,
-  Building,
   Unplug,
   Users,
 } from "lucide-react";
@@ -27,8 +26,6 @@ export default function Menu() {
   const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
 
   const { data: organizations } = useOrganizations();
-
-  const organizationsSize = 1;
 
   // react-dialect may have issues with React 19, add fallback
   const translation = useTranslation();

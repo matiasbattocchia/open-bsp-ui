@@ -19,7 +19,6 @@ import dayjs from "dayjs";
 import "dayjs/locale/es";
 import "dayjs/locale/pt";
 import { Translate as T, useTranslation } from "@/hooks/useTranslation";
-import { Dropdown, type MenuProps } from "antd";
 import { useCurrentAgent } from "@/queries/useAgents";
 import { moveCursorToEnd } from "@/utils/UtilityFunctions";
 
@@ -32,7 +31,6 @@ export default function ChatFooter() {
   const sendAsContact = useBoundStore((store) => store.ui.sendAsContact);
   const setSendAsContact = useBoundStore((store) => store.ui.setSendAsContact);
   const toggle = useBoundStore((store) => store.ui.toggle);
-  const templatePicker = useBoundStore((store) => store.ui.templatePicker);
   const message = useBoundStore((store) =>
     store.chat.textDrafts.get(store.ui.activeConvId || ""),
   );
@@ -64,14 +62,6 @@ export default function ChatFooter() {
   const { translate: t, currentLanguage } = useTranslation();
 
   const tick = useContext(TickContext); // one-minute ticks
-
-  const mostRecent: MessageRow | undefined = useBoundStore(
-    (store) =>
-      store.chat.messages
-        .get(store.ui.activeConvId || "")
-        ?.values()
-        .next().value,
-  );
 
   const mostRecentIncoming: MessageRow | undefined = useBoundStore((store) => {
     const msgs = store.chat.messages.get(store.ui.activeConvId || "")?.values();
@@ -110,11 +100,8 @@ export default function ChatFooter() {
     editableDiv.current.textContent = message || "";
 
     // do not steal the focus from the file previewer
-    if (!fileDrafts?.length) {
+    if (!fileDrafts?.length && window.matchMedia("(min-width: 768px)").matches) {
       moveCursorToEnd(editableDiv.current);
-      // focus on the text input only on desktop
-      //window.matchMedia("(min-width: 768px)").matches &&
-      //  editableDiv.current.focus();
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -147,7 +134,9 @@ export default function ChatFooter() {
 
       if (editableDiv.current) {
         editableDiv.current.textContent = draft.text;
-        moveCursorToEnd(editableDiv.current);
+        if (window.matchMedia("(min-width: 768px)").matches) {
+          moveCursorToEnd(editableDiv.current);
+        }
       }
     }
 
@@ -212,13 +201,6 @@ export default function ChatFooter() {
       </button>
     </>
   );
-
-  const footerActions: MenuProps["items"] = [
-    {
-      key: "1",
-      label: attachButton,
-    },
-  ];
 
   return (
     activeConvId &&
