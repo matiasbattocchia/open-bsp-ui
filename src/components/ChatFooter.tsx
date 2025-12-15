@@ -205,7 +205,7 @@ export default function ChatFooter() {
   return (
     activeConvId &&
     conv && (
-      <div className={"flex items-end text-foreground p-[5px] mx-[12px] mb-[12px] rounded-[24px] shadow-[0_0_4px_0px_rgba(0,0,0,0.1)] z-10" + (!inCSWindow ? " bg-background" : " bg-incoming-chat-bubble")}>
+      <div className={"flex items-end text-foreground p-[5px] mx-[12px] mb-[12px] mt-[4px] lg:mt-[0px] rounded-[24px] shadow-[0_0_4px_0px_rgba(0,0,0,0.1)] z-10" + (!inCSWindow ? " bg-background" : " bg-incoming-chat-bubble")}>
         <div className="shrink-0">
           {attachButton}
         </div>
@@ -265,7 +265,11 @@ export default function ChatFooter() {
               if (event.key === "Enter" && event.ctrlKey) {
                 // toggle("sendAsContact") is handled at window level, nonetheless this
                 // no-op block prevents from sending the message when pressing ctrl+enter
-              } else if (event.key === "Enter" && !event.shiftKey) {
+              } else if (
+                event.key === "Enter" &&
+                !event.shiftKey &&
+                window.matchMedia("(min-width: 768px)").matches
+              ) {
                 event.preventDefault();
                 sendTextMessage();
               }
@@ -293,28 +297,28 @@ export default function ChatFooter() {
             >
               {!inCSWindow ? (
                 <>
-                  <T as="span" className="md:hidden">
+                  <T as="span" className="lg:hidden">
                     Conversación cerrada
                   </T>
-                  <T as="span" className="hidden md:inline">
+                  <T as="span" className="hidden lg:inline">
                     Conversación cerrada, abre la conversación con una plantilla
                   </T>
                 </>
               ) : sendAsContact ? (
                 <>
-                  <T as="span" className="md:hidden">
+                  <T as="span" className="lg:hidden">
                     Mensaje entrante
                   </T>
-                  <T as="span" className="hidden md:inline">
+                  <T as="span" className="hidden lg:inline">
                     Simula un mensaje entrante
                   </T>
                 </>
               ) : conv.service === "whatsapp" ? (
                 <>
-                  <T as="span" className="md:hidden">
+                  <T as="span" className="lg:hidden">
                     Cerrará en
                   </T>
-                  <T as="span" className="hidden md:inline">
+                  <T as="span" className="hidden lg:inline">
                     La conversación cerrará en
                   </T>
                   {/* I had to split T and span because react-dialect is not working as expected with interpolated strings - cabra 2024-11-04 */}
