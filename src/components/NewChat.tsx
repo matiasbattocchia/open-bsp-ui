@@ -58,7 +58,7 @@ export default function NewChat() {
 
   return (
     <div className="flex flex-col h-full">
-      <SectionHeader title="Nueva conversación" backTo="/conversations" />
+      <SectionHeader title="Nueva conversación" />
 
       <div className="px-[12px] pb-[7px] flex bg-background">
         <div className="flex items-center w-full bg-incoming-chat-bubble h-[40px] rounded-full hover:ring ring-border px-[12px] text-foreground">

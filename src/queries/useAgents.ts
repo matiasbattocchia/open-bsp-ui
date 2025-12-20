@@ -1,22 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/supabase/client";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  type AgentInsert,
+  type AgentUpdate,
+  supabase,
+} from "@/supabase/client";
 import useBoundStore from "@/stores/useBoundStore";
-
-export function useAgents() {
-  const userId = useBoundStore((state) => state.ui.user?.id);
-
-  return useQuery({
-    queryKey: ["agents"],
-    queryFn: async () =>
-      await supabase
-        .from("agents")
-        .select()
-        .order("name")
-        .throwOnError(),
-    enabled: !!userId,
-    select: (data) => data.data,
-  });
-}
 
 export function useAgent(id: string) {
   const userId = useBoundStore((state) => state.ui.user?.id);
@@ -36,11 +24,11 @@ export function useAgent(id: string) {
 }
 
 export function useCurrentAgent() {
-  const orgId = useBoundStore((state) => state.ui.activeOrgId);
   const userId = useBoundStore((state) => state.ui.user?.id);
+  const orgId = useBoundStore((state) => state.ui.activeOrgId);
 
   return useQuery({
-    queryKey: ["agents", { orgId, userId }],
+    queryKey: [orgId, "agents", "current"],
     queryFn: async () =>
       await supabase
         .from("agents")
@@ -51,5 +39,83 @@ export function useCurrentAgent() {
         .single(),
     enabled: !!userId && !!orgId,
     select: (data) => data.data,
+  });
+}
+
+export function useCurrentAgents() {
+  const userId = useBoundStore((state) => state.ui.user?.id);
+  const orgId = useBoundStore((state) => state.ui.activeOrgId);
+
+  return useQuery({
+    queryKey: [orgId, "agents"],
+    queryFn: async () =>
+      await supabase
+        .from("agents")
+        .select()
+        .eq("organization_id", orgId!)
+        .throwOnError(),
+    enabled: !!userId && !!orgId,
+    select: (data) => data.data,
+  });
+}
+
+export function useCreateAgent() {
+  const queryClient = useQueryClient();
+  const orgId = useBoundStore((state) => state.ui.activeOrgId);
+
+  return useMutation({
+    mutationFn: async (data: AgentInsert) => {
+      if (!orgId) throw new Error("No active organization");
+
+      const { data: agent } = await supabase
+        .from("agents")
+        .insert(data)
+        .select()
+        .single()
+        .throwOnError();
+
+      return agent;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [orgId, "agents"] });
+    },
+  });
+}
+
+export function useUpdateAgent() {
+  const queryClient = useQueryClient();
+  const orgId = useBoundStore((state) => state.ui.activeOrgId);
+
+  return useMutation({
+    mutationFn: async (data: AgentUpdate) => {
+      if (!orgId) throw new Error("No active organization");
+      if (!data.id) throw new Error("No agent id");
+
+      await supabase
+        .from("agents")
+        .update(data)
+        .eq("id", data.id)
+        .throwOnError();
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: [orgId, "agents"] });
+      queryClient.invalidateQueries({ queryKey: ["agents", variables.id] });
+    },
+  });
+}
+
+export function useDeleteAgent() {
+  const queryClient = useQueryClient();
+  const orgId = useBoundStore((state) => state.ui.activeOrgId);
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      if (!orgId) throw new Error("No active organization");
+
+      await supabase.from("agents").delete().eq("id", id).throwOnError();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [orgId, "agents"] });
+    },
   });
 }

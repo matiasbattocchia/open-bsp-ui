@@ -647,7 +647,7 @@ export default function WhatsAppTemplates() {
 
                   <button
                     title={t("Editar") as string}
-                    className="absolute right-0 top-0 opacity-0 group-hover:opacity-100 cursor-pointer z-50"
+                    className="absolute right-0 top-0 opacity-0 group-hover:opacity-100 z-50"
                     onClick={() => {
                       setTemplateToEdit(template);
                       setShowEditor(true);

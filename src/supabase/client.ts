@@ -585,9 +585,15 @@ export type ToolConfig =
   | LocalSpecialToolConfig
   | LocalMCPToolConfig;
 
-type Role = "admin";
+export type HumanAgentExtra = {
+  role: "user" | "admin" | "owner";
+  invitation?: {
+    email: string;
+    status: "pending" | "accepted" | "rejected";
+  };
+};
 
-export type AgentExtra = {
+export type AIAgentExtra = {
   mode?: "active" | "draft" | "inactive";
   description?: string;
   api_url?: string;
@@ -603,7 +609,6 @@ export type AgentExtra = {
   instructions?: string;
   send_inline_files_up_to_size_mb?: number;
   tools?: ToolConfig[];
-  roles?: Role[];
 };
 
 export type Database = MergeDeep<
@@ -671,7 +676,25 @@ export type Database = MergeDeep<
         };
         agents: {
           Row: {
-            extra: AgentExtra | null;
+            ai: true;
+            extra?: AIAgentExtra;
+          } | {
+            ai: false;
+            extra?: HumanAgentExtra;
+          };
+          Insert: {
+            ai: true;
+            extra?: AIAgentExtra;
+          } | {
+            ai: false;
+            extra?: HumanAgentExtra;
+          };
+          Update: {
+            ai?: true;
+            extra?: AIAgentExtra;
+          } | {
+            ai?: false;
+            extra?: HumanAgentExtra;
           };
         };
       };
@@ -692,24 +715,20 @@ export type ConversationUpdate =
 
 export type OrganizationRow =
   Database["public"]["Tables"]["organizations"]["Row"];
+export type OrganizationInsert =
+  Database["public"]["Tables"]["organizations"]["Insert"];
 export type OrganizationUpdate =
   Database["public"]["Tables"]["organizations"]["Update"];
 
 export type ContactRow = Database["public"]["Tables"]["contacts"]["Row"];
 
 export type AgentRow = Database["public"]["Tables"]["agents"]["Row"];
+export type AgentInsert = Database["public"]["Tables"]["agents"]["Insert"];
+export type AgentUpdate = Database["public"]["Tables"]["agents"]["Update"];
 
 export const supabase = createClient<Database>(
   import.meta.env.VITE_SUPABASE_URL!,
   import.meta.env.VITE_SUPABASE_ANON_KEY!,
-  // Opt-out the stupid NextJS 14 default caching. It affects the Supabase client.
-  {
-    global: {
-      fetch: (url: any, options = {}) => {
-        return fetch(url, { ...options, cache: "no-store" });
-      },
-    },
-  },
 );
 
 supabase.realtime.reconnectAfterMs = (attempt: number) => {

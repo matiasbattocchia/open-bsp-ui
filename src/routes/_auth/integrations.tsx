@@ -30,7 +30,7 @@ function Integrations() {
                     {integration.service[0].toUpperCase()}
                   </div>
                 }
-                title={integration.address}
+                title={(integration.extra as { phone_number?: string })?.phone_number}
                 description={integration.status}
               />
             ))}

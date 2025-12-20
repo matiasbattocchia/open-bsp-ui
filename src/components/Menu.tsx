@@ -1,15 +1,18 @@
 import { supabase } from "@/supabase/client";
 import Avatar from "./Avatar";
 import useBoundStore from "@/stores/useBoundStore";
-import { SwitchLanguage, useTranslation } from "@/hooks/useTranslation";
+import { useTranslation } from "@/hooks/useTranslation";
 import {
   LogOut,
   Settings,
   MessageSquareText,
   Unplug,
   Users,
+  Languages,
+  Plus,
 } from "lucide-react";
-import { Link, useLocation } from "@tanstack/react-router";
+import { useLocation, useNavigate } from "@tanstack/react-router";
+import { LinkButton } from "./LinkButton";
 import { resetAuthorizedCache } from "@/utils/IdbUtils";
 import { useCurrentAgent } from "@/queries/useAgents";
 import { Dropdown } from "antd";
@@ -19,9 +22,8 @@ export default function Menu() {
   const user = useBoundStore((state) => state.ui.user);
 
   const { data: agent } = useCurrentAgent();
-  const isAdmin = agent?.extra?.roles?.includes("admin");
+  //const isAdmin = !agent?.ai && ["admin", "owner"].includes(agent?.extra?.role || "");
 
-  const activeConvId = useBoundStore((state) => state.ui.activeConvId);
   const setActiveOrg = useBoundStore((state) => state.ui.setActiveOrg);
   const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
 
@@ -33,6 +35,7 @@ export default function Menu() {
 
   // Simpler approach - call useLocation without select first
   const location = useLocation();
+  const navigate = useNavigate();
   const pathname = location.pathname;
 
   return (
@@ -45,111 +48,118 @@ export default function Menu() {
       <div className="flex flex-col items-center">
 
         {/* Conversations button */}
-        <Link
+        <LinkButton
           to="/conversations"
-          hash={activeConvId || undefined}
-          className={
-            "p-[8px] mt-[10px] rounded-full active:bg-black" +
-            (pathname === "/conversations"
-              ? " bg-primary"
-              : " bg-accent")
-          }
           title={t("Mensajes") as string}
+          isActive={pathname.startsWith("/conversations")}
+          className="mt-[10px]"
         >
           <MessageSquareText className="w-[24px] h-[24px] stroke-[2]" />
-        </Link>
-
-        {/* Settings button */}
-        <Link
-          to="/settings"
-          hash={activeConvId || undefined}
-          className={
-            "p-[8px] mt-[10px] rounded-full active:bg-gray-icon-bg" +
-            (pathname === "/settings" ? " bg-gray-icon-bg" : "") +
-            (isAdmin ? "" : " hidden")
-          }
-          title={t("Preferencias") as string}
-        >
-          <Settings className="w-[24px] h-[24px] stroke-[2]" />
-        </Link>
+        </LinkButton>
 
         {/* Agents button */}
-        <Link
+        <LinkButton
           to="/agents"
-          hash={activeConvId || undefined}
-          className={
-            "p-[8px] mt-[10px] rounded-full active:bg-gray-icon-bg" +
-            (pathname === "/agents" ? " bg-gray-icon-bg" : "")
-          }
           title={t("Agentes") as string}
+          isActive={pathname.startsWith("/agents")}
+          className="mt-[10px]"
         >
           <Users className="w-[24px] h-[24px] stroke-[2]" />
-        </Link>
+        </LinkButton>
 
         {/* Integrations button */}
-        <Link
+        <LinkButton
           to="/integrations"
-          hash={activeConvId || undefined}
-          className={
-            "p-[8px] mt-[10px] rounded-full active:bg-gray-icon-bg" +
-            (pathname === "/integrations" ? " bg-gray-icon-bg" : "")
-          }
           title={t("Integraciones") as string}
+          isActive={pathname.startsWith("/integrations")}
+          className="mt-[10px]"
         >
           <Unplug className="w-[24px] h-[24px] stroke-[2]" />
-        </Link>
+        </LinkButton>
       </div>
 
       {/* Lower section */}
       <div className="flex flex-col items-center">
-        <SwitchLanguage className="w-[40px] mt-[10px]" />
 
-        <div className="mt-[10px] p-[4px]">
-          <Dropdown
-            menu={{
-              items: [
-                {
-                  key: "orgs",
-                  type: "group",
-                  label: "Organizaciones",
-                  children:
-                    organizations?.map((org) => ({
-                      key: org.id,
-                      label: org.name,
-                      onClick: () => setActiveOrg(org.id),
-                    })) || [],
-                },
-                { type: "divider" },
-                {
-                  key: "logout",
-                  label: t("Cerrar sesión"),
-                  icon: <LogOut className="w-[16px] h-[16px]" />,
-                  onClick: () => {
-                    supabase.auth.signOut();
-                    resetAuthorizedCache();
+        {/* Settings button */}
+        <LinkButton
+          to="/settings"
+          title={t("Preferencias") as string}
+          isActive={pathname.startsWith("/settings")}
+          className="mt-[10px]"
+        >
+          <Settings className="w-[20px] h-[20px] stroke-[2]" />
+        </LinkButton>
+
+        <Dropdown
+          menu={{
+            items: [
+              {
+                key: "orgs",
+                type: "group",
+                label: "Organizaciones",
+                children: [
+                  ...(organizations?.map((org) => ({
+                    key: org.id,
+                    label: org.name,
+                    onClick: () => setActiveOrg(org.id),
+                  })) || []),
+                  {
+                    key: "new_org",
+                    label: t("Nueva organización"),
+                    icon: <Plus className="w-[16px] h-[16px]" />,
+                    onClick: () => navigate({ to: "/settings/organization/new", hash: (prevHash) => prevHash! }),
                   },
+                ],
+              },
+              { type: "divider" },
+              {
+                key: "lang",
+                label: t("Idioma"),
+                icon: <Languages className="w-[16px] h-[16px]" />,
+                children: [
+                  {
+                    key: "es",
+                    label: "Español",
+                    onClick: () => translation.setCurrentLanguage("es"),
+                  },
+                  {
+                    key: "en",
+                    label: "English",
+                    onClick: () => translation.setCurrentLanguage("en"),
+                  },
+                ],
+              },
+              { type: "divider" },
+              {
+                key: "logout",
+                label: t("Cerrar sesión"),
+                icon: <LogOut className="w-[16px] h-[16px]" />,
+                onClick: () => {
+                  supabase.auth.signOut();
+                  resetAuthorizedCache();
                 },
-              ],
-              selectable: true,
-              selectedKeys: activeOrgId ? [activeOrgId] : [],
-            }}
-            trigger={["click"]}
-          >
-            <div className="cursor-pointer">
-              <Avatar
-                src={agent?.picture || user?.user_metadata?.picture}
-                fallback={(
-                  agent?.name ||
-                  user?.user_metadata?.name ||
-                  user?.email ||
-                  "?"
-                ).charAt(0)}
-                size={32}
-                className="bg-primary text-primary-foreground text-[14px] border border-sidebar-border"
-              />
-            </div>
-          </Dropdown>
-        </div>
+              },
+            ],
+            selectable: true,
+            selectedKeys: activeOrgId ? [activeOrgId] : [],
+          }}
+          trigger={["click"]}
+        >
+          <div className="cursor-pointer mt-[10px] p-[2px] rounded-full hover:bg-muted">
+            <Avatar
+              src={agent?.picture || user?.user_metadata?.picture}
+              fallback={(
+                agent?.name ||
+                user?.user_metadata?.name ||
+                user?.email ||
+                "?"
+              ).charAt(0)}
+              size={32}
+              className="bg-primary text-primary-foreground text-[14px] border border-sidebar-border"
+            />
+          </div>
+        </Dropdown>
       </div>
     </div>
   );

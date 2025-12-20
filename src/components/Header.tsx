@@ -1,10 +1,9 @@
-import useBoundStore from "@/stores/useBoundStore";
 import { useTranslation } from "@/hooks/useTranslation";
-import { Link } from "@tanstack/react-router";
+import { LinkButton } from "@/components/LinkButton";
 import { useCurrentOrganization } from "@/queries/useOrgs";
+import { MessageSquarePlus } from "lucide-react";
 
 export default function Header() {
-  const activeConvId = useBoundStore((state) => state.ui.activeConvId);
   const { data: org } = useCurrentOrganization();
 
   const { translate: t } = useTranslation();
@@ -17,16 +16,13 @@ export default function Header() {
         </div>
       </div>
       <div className="flex justify-end">
-        <Link
+        <LinkButton
           to="/conversations/new"
-          hash={activeConvId || undefined}
-          className="p-[8px] ml-[10px] rounded-full active:bg-sidebar"
+          className="ml-[10px]"
           title={t("Nueva conversación") as string}
         >
-          <svg className="w-[24px] h-[24px]">
-            <use href="/icons.svg#new-chat" />
-          </svg>
-        </Link>
+          <MessageSquarePlus className="w-[24px] h-[24px] text-foreground" />
+        </LinkButton>
       </div>
     </div>
   );

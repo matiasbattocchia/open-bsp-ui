@@ -5,19 +5,16 @@ export default function SectionItem({
   description,
   aside,
   onClick,
-  active,
 }: {
   title: ReactNode;
   description?: ReactNode;
   aside?: ReactNode;
   onClick?: () => void;
-  active?: boolean;
 }) {
   return (
     <div
       className={
-        "h-[72px] flex cursor-pointer my-[2px] rounded-xl group" +
-        (active ? " bg-accent" : " hover:bg-accent")
+        "h-[72px] flex cursor-pointer my-[2px] rounded-xl group hover:bg-accent"
       }
       onClick={onClick}
     >

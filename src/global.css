@@ -51,6 +51,7 @@
   --border: oklch(0.36 0.01 106.89);
   --input: oklch(0.43 0.01 100.22);
   --ring: oklch(0.59 0.17 253.06);
+  --sidebar: oklch(0.24 0.00 67.71); 
   --sidebar-foreground: oklch(0.81 0.01 93.01);
   --sidebar-primary: oklch(0.33 0 0);
   --sidebar-primary-foreground: oklch(0.99 0 0);
@@ -98,13 +99,10 @@
 /*
 TODO:
 1a. El misterio de las letras que están más arriba que abajo
-1b. El color del texto debería ser un poco más gris
 2. Grises distintos para ChatListItem hover y active
-3. La altura del editor de prompt (pasar a contentEditable)
 4. Grosor barras scroll
 5. Revisar los w-full, h-full y calc; tal vez cambiar por flex grow
 6. El scroll empieza arriba
-7. Opacidad de la imagen de fondo
 8. Transiciones
 9. Placeholder overflow
 10. ChatHeader item names truncate
@@ -138,13 +136,29 @@ a {
   text-decoration: none;
 }
 
-* {
-  box-sizing: border-box;
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
 }
 
 @layer components {
+  .label {
+    @apply text-[14px] text-muted-foreground mb-[8px];
+  }
+
+  input.text {
+    @apply w-full h-[24px] border-input border-b-[2px] py-[8px] focus-visible:outline-none text-[16px] text-foreground placeholder:text-muted-foreground bg-transparent dark:bg-input/30 focus-visible:border-primary;
+  }
+
+  select {
+    @apply w-full h-[24px] border-input border-b-[2px] focus-visible:outline-none text-[16px] text-foreground placeholder:text-muted-foreground bg-transparent dark:bg-input/30 focus-visible:border-primary;
+  }
+
   .header {
-    @apply h-[60px] py-[10px] px-[20px] flex;
+    @apply h-[60px] py-[10px] px-[20px] flex shrink-0;
   }
 
   .spin {
@@ -319,20 +333,3 @@ pre {
     gap: 2px;
   }
 }
-
-/*
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-*/

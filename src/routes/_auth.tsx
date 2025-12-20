@@ -52,8 +52,8 @@ function AppLayout() {
       {/* Center Panel - Chat */}
       <div
         className={
-          "flex-col min-w-0 relative overflow-hidden bg-chat col-span-full md:col-span-1 " +
-          (activeConvId ? "flex" : "hidden md:flex")
+          "flex-col min-w-0 relative overflow-hidden col-span-full md:col-span-1" +
+          (activeConvId ? " flex bg-chat" : " hidden md:flex bg-muted")
         }
         onDragEnter={() => setIsHoveringFiles(true)}
         onDrop={() => setIsHoveringFiles(false)}

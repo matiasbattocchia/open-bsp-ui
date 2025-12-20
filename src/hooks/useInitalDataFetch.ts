@@ -1,6 +1,6 @@
 import { supabase } from "@/supabase/client";
 import useBoundStore from "@/stores/useBoundStore";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useOrganizations } from "@/queries/useOrgs";
 
 export const useInitialDataFetch = () => {
@@ -14,11 +14,17 @@ export const useInitialDataFetch = () => {
   );
   const pushMessages = useBoundStore((state) => state.chat.pushMessages);
 
-  const loadConvs = async () => {
-    const { data: conversations } = await supabase
+  const loadConvs = async (since?: Date) => {
+    let query = supabase
       .from("conversations")
       .select()
-      .in("organization_id", orgIds)
+      .in("organization_id", orgIds);
+
+    if (since) {
+      query = query.gt("updated_at", since.toISOString());
+    }
+
+    const { data: conversations } = await query
       .order("updated_at", { ascending: false })
       .limit(999)
       .throwOnError();
@@ -26,11 +32,17 @@ export const useInitialDataFetch = () => {
     pushConversations(conversations);
   };
 
-  const loadMsgs = async () => {
-    const { data: messages } = await supabase
+  const loadMsgs = async (since?: Date) => {
+    let query = supabase
       .from("messages")
       .select()
-      .in("organization_id", orgIds)
+      .in("organization_id", orgIds);
+
+    if (since) {
+      query = query.gt("updated_at", since.toISOString());
+    }
+
+    const { data: messages } = await query
       .order("updated_at", { ascending: false })
       .limit(999)
       .throwOnError();
@@ -47,5 +59,25 @@ export const useInitialDataFetch = () => {
 
     loadConvs();
     loadMsgs();
+  }, [orgIds]);
+
+  const lastVisibleAt = useRef<Date | null>(null);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        lastVisibleAt.current = new Date();
+      } else if (
+        document.visibilityState === "visible" && lastVisibleAt.current
+      ) {
+        loadConvs(lastVisibleAt.current);
+        loadMsgs(lastVisibleAt.current);
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () =>
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orgIds]);
 };

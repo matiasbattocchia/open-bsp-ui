@@ -1,6 +1,5 @@
 import {
   createContext,
-  useContext,
   useEffect,
   useCallback,
   type ReactNode,
@@ -12,7 +11,7 @@ const FB_API_VERSION = "v24.0";
 export type SignupPayload = {
   code: string;
   application_id?: string;
-  organization_id: string;
+  organization_id?: string;
   phone_number_id?: string;
   waba_id?: string;
   business_id?: string;
@@ -60,13 +59,12 @@ type EventListenerData =
 
 type WhatsAppIntegrationContextType = {
   launchWhatsAppSignup: (
-    orgId: string,
     onSuccess: () => void,
     setLoading: (loading: boolean) => void,
   ) => void;
 };
 
-const WhatsAppIntegrationContext = createContext<
+export const WhatsAppIntegrationContext = createContext<
   WhatsAppIntegrationContextType | undefined
 >(undefined);
 
@@ -175,7 +173,6 @@ export function WhatsAppIntegrationProvider({
 
   const launchWhatsAppSignup = useCallback(
     (
-      orgId: string,
       onSuccess: () => void,
       setLoading: (loading: boolean) => void,
     ) => {
@@ -199,7 +196,6 @@ export function WhatsAppIntegrationProvider({
             // Construct payload according to SignupPayload type
             const payload: SignupPayload = {
               code,
-              organization_id: orgId,
               application_id: import.meta.env.VITE_META_APP_ID,
               phone_number_id: sessionInfo.phone_number_id,
               waba_id: sessionInfo.waba_id,
@@ -243,14 +239,4 @@ export function WhatsAppIntegrationProvider({
       {children}
     </WhatsAppIntegrationContext.Provider>
   );
-}
-
-export function useWhatsAppIntegration() {
-  const context = useContext(WhatsAppIntegrationContext);
-  if (context === undefined) {
-    throw new Error(
-      "useWhatsAppIntegration must be used within a WhatsAppIntegrationProvider",
-    );
-  }
-  return context;
 }

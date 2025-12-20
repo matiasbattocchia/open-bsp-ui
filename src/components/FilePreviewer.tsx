@@ -209,9 +209,15 @@ const FilePreviewer = () => {
       <div className="flex flex-col bg-background text-foreground z-50 absolute top-[60px] h-[calc(100dvh-60px)] w-full">
         {/* Close button - Filename */}
         <div className="py-[8px] px-[16px] min-h-[60px] flex justify-between items-center">
-          <button onClick={quitPreviewer} className="cursor-pointer">
-            <X className="w-[24px] h-[24px] text-foreground" />
+
+          <button
+            className="p-[8px] rounded-full hover:bg-muted mr-[8px] ml-[-8px]"
+            title={t("Cerrar") as string}
+            onClick={quitPreviewer}
+          >
+            <X className="w-[24px] h-[24px]" />
           </button>
+
           <div className="grow flex justify-center items-center mx-[16px] pr-[24px]">
             <span className="text-[14px]">{previewDraft.file.name}</span>
           </div>

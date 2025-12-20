@@ -17,7 +17,7 @@ import { TickContext } from "@/contexts/useTick";
 import { Translate as T, useTranslation } from "@/hooks/useTranslation";
 import { AtSign, Pause, VolumeOff } from "lucide-react";
 import { SpecialMessageTypeMap } from "./Message/Message";
-import { useAgents, useCurrentAgent } from "@/queries/useAgents";
+import { useCurrentAgents, useCurrentAgent } from "@/queries/useAgents";
 import { nameInitials } from "@/utils/FormatUtils";
 import { useNavigate } from "@tanstack/react-router";
 
@@ -130,7 +130,7 @@ export default function ChatListItem({
   );
 
   const { data: agent } = useCurrentAgent();
-  const { data: agents } = useAgents();
+  const { data: agents } = useCurrentAgents();
   const isAdmin = agent?.extra?.roles?.includes("admin");
 
   const messages: MessageRow[] | undefined = Array.from(

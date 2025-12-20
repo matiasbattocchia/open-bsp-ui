@@ -12,12 +12,16 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AuthIndexRouteImport } from './routes/_auth/index'
-import { Route as AuthSettingsRouteImport } from './routes/_auth/settings'
-import { Route as AuthOrganizationsRouteImport } from './routes/_auth/organizations'
 import { Route as AuthIntegrationsRouteImport } from './routes/_auth/integrations'
 import { Route as AuthAgentsRouteImport } from './routes/_auth/agents'
+import { Route as AuthSettingsIndexRouteImport } from './routes/_auth/settings/index'
 import { Route as AuthConversationsIndexRouteImport } from './routes/_auth/conversations/index'
 import { Route as AuthConversationsNewRouteImport } from './routes/_auth/conversations/new'
+import { Route as AuthSettingsOrganizationIndexRouteImport } from './routes/_auth/settings/organization/index'
+import { Route as AuthSettingsMembersIndexRouteImport } from './routes/_auth/settings/members/index'
+import { Route as AuthSettingsOrganizationNewRouteImport } from './routes/_auth/settings/organization/new'
+import { Route as AuthSettingsMembersNewRouteImport } from './routes/_auth/settings/members/new'
+import { Route as AuthSettingsMembersMemberIdRouteImport } from './routes/_auth/settings/members/$memberId'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -33,16 +37,6 @@ const AuthIndexRoute = AuthIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthRoute,
 } as any)
-const AuthSettingsRoute = AuthSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => AuthRoute,
-} as any)
-const AuthOrganizationsRoute = AuthOrganizationsRouteImport.update({
-  id: '/organizations',
-  path: '/organizations',
-  getParentRoute: () => AuthRoute,
-} as any)
 const AuthIntegrationsRoute = AuthIntegrationsRouteImport.update({
   id: '/integrations',
   path: '/integrations',
@@ -51,6 +45,11 @@ const AuthIntegrationsRoute = AuthIntegrationsRouteImport.update({
 const AuthAgentsRoute = AuthAgentsRouteImport.update({
   id: '/agents',
   path: '/agents',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthSettingsIndexRoute = AuthSettingsIndexRouteImport.update({
+  id: '/settings/',
+  path: '/settings/',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthConversationsIndexRoute = AuthConversationsIndexRouteImport.update({
@@ -63,26 +62,63 @@ const AuthConversationsNewRoute = AuthConversationsNewRouteImport.update({
   path: '/conversations/new',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthSettingsOrganizationIndexRoute =
+  AuthSettingsOrganizationIndexRouteImport.update({
+    id: '/settings/organization/',
+    path: '/settings/organization/',
+    getParentRoute: () => AuthRoute,
+  } as any)
+const AuthSettingsMembersIndexRoute =
+  AuthSettingsMembersIndexRouteImport.update({
+    id: '/settings/members/',
+    path: '/settings/members/',
+    getParentRoute: () => AuthRoute,
+  } as any)
+const AuthSettingsOrganizationNewRoute =
+  AuthSettingsOrganizationNewRouteImport.update({
+    id: '/settings/organization/new',
+    path: '/settings/organization/new',
+    getParentRoute: () => AuthRoute,
+  } as any)
+const AuthSettingsMembersNewRoute = AuthSettingsMembersNewRouteImport.update({
+  id: '/settings/members/new',
+  path: '/settings/members/new',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthSettingsMembersMemberIdRoute =
+  AuthSettingsMembersMemberIdRouteImport.update({
+    id: '/settings/members/$memberId',
+    path: '/settings/members/$memberId',
+    getParentRoute: () => AuthRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/agents': typeof AuthAgentsRoute
   '/integrations': typeof AuthIntegrationsRoute
-  '/organizations': typeof AuthOrganizationsRoute
-  '/settings': typeof AuthSettingsRoute
   '/': typeof AuthIndexRoute
   '/conversations/new': typeof AuthConversationsNewRoute
   '/conversations': typeof AuthConversationsIndexRoute
+  '/settings': typeof AuthSettingsIndexRoute
+  '/settings/members/$memberId': typeof AuthSettingsMembersMemberIdRoute
+  '/settings/members/new': typeof AuthSettingsMembersNewRoute
+  '/settings/organization/new': typeof AuthSettingsOrganizationNewRoute
+  '/settings/members': typeof AuthSettingsMembersIndexRoute
+  '/settings/organization': typeof AuthSettingsOrganizationIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/agents': typeof AuthAgentsRoute
   '/integrations': typeof AuthIntegrationsRoute
-  '/organizations': typeof AuthOrganizationsRoute
-  '/settings': typeof AuthSettingsRoute
   '/': typeof AuthIndexRoute
   '/conversations/new': typeof AuthConversationsNewRoute
   '/conversations': typeof AuthConversationsIndexRoute
+  '/settings': typeof AuthSettingsIndexRoute
+  '/settings/members/$memberId': typeof AuthSettingsMembersMemberIdRoute
+  '/settings/members/new': typeof AuthSettingsMembersNewRoute
+  '/settings/organization/new': typeof AuthSettingsOrganizationNewRoute
+  '/settings/members': typeof AuthSettingsMembersIndexRoute
+  '/settings/organization': typeof AuthSettingsOrganizationIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -90,11 +126,15 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/_auth/agents': typeof AuthAgentsRoute
   '/_auth/integrations': typeof AuthIntegrationsRoute
-  '/_auth/organizations': typeof AuthOrganizationsRoute
-  '/_auth/settings': typeof AuthSettingsRoute
   '/_auth/': typeof AuthIndexRoute
   '/_auth/conversations/new': typeof AuthConversationsNewRoute
   '/_auth/conversations/': typeof AuthConversationsIndexRoute
+  '/_auth/settings/': typeof AuthSettingsIndexRoute
+  '/_auth/settings/members/$memberId': typeof AuthSettingsMembersMemberIdRoute
+  '/_auth/settings/members/new': typeof AuthSettingsMembersNewRoute
+  '/_auth/settings/organization/new': typeof AuthSettingsOrganizationNewRoute
+  '/_auth/settings/members/': typeof AuthSettingsMembersIndexRoute
+  '/_auth/settings/organization/': typeof AuthSettingsOrganizationIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -102,32 +142,44 @@ export interface FileRouteTypes {
     | '/login'
     | '/agents'
     | '/integrations'
-    | '/organizations'
-    | '/settings'
     | '/'
     | '/conversations/new'
     | '/conversations'
+    | '/settings'
+    | '/settings/members/$memberId'
+    | '/settings/members/new'
+    | '/settings/organization/new'
+    | '/settings/members'
+    | '/settings/organization'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
     | '/agents'
     | '/integrations'
-    | '/organizations'
-    | '/settings'
     | '/'
     | '/conversations/new'
     | '/conversations'
+    | '/settings'
+    | '/settings/members/$memberId'
+    | '/settings/members/new'
+    | '/settings/organization/new'
+    | '/settings/members'
+    | '/settings/organization'
   id:
     | '__root__'
     | '/_auth'
     | '/login'
     | '/_auth/agents'
     | '/_auth/integrations'
-    | '/_auth/organizations'
-    | '/_auth/settings'
     | '/_auth/'
     | '/_auth/conversations/new'
     | '/_auth/conversations/'
+    | '/_auth/settings/'
+    | '/_auth/settings/members/$memberId'
+    | '/_auth/settings/members/new'
+    | '/_auth/settings/organization/new'
+    | '/_auth/settings/members/'
+    | '/_auth/settings/organization/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -158,20 +210,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthIndexRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/_auth/settings': {
-      id: '/_auth/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof AuthSettingsRouteImport
-      parentRoute: typeof AuthRoute
-    }
-    '/_auth/organizations': {
-      id: '/_auth/organizations'
-      path: '/organizations'
-      fullPath: '/organizations'
-      preLoaderRoute: typeof AuthOrganizationsRouteImport
-      parentRoute: typeof AuthRoute
-    }
     '/_auth/integrations': {
       id: '/_auth/integrations'
       path: '/integrations'
@@ -184,6 +222,13 @@ declare module '@tanstack/react-router' {
       path: '/agents'
       fullPath: '/agents'
       preLoaderRoute: typeof AuthAgentsRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/settings/': {
+      id: '/_auth/settings/'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthSettingsIndexRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_auth/conversations/': {
@@ -200,27 +245,70 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthConversationsNewRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/settings/organization/': {
+      id: '/_auth/settings/organization/'
+      path: '/settings/organization'
+      fullPath: '/settings/organization'
+      preLoaderRoute: typeof AuthSettingsOrganizationIndexRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/settings/members/': {
+      id: '/_auth/settings/members/'
+      path: '/settings/members'
+      fullPath: '/settings/members'
+      preLoaderRoute: typeof AuthSettingsMembersIndexRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/settings/organization/new': {
+      id: '/_auth/settings/organization/new'
+      path: '/settings/organization/new'
+      fullPath: '/settings/organization/new'
+      preLoaderRoute: typeof AuthSettingsOrganizationNewRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/settings/members/new': {
+      id: '/_auth/settings/members/new'
+      path: '/settings/members/new'
+      fullPath: '/settings/members/new'
+      preLoaderRoute: typeof AuthSettingsMembersNewRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/settings/members/$memberId': {
+      id: '/_auth/settings/members/$memberId'
+      path: '/settings/members/$memberId'
+      fullPath: '/settings/members/$memberId'
+      preLoaderRoute: typeof AuthSettingsMembersMemberIdRouteImport
+      parentRoute: typeof AuthRoute
+    }
   }
 }
 
 interface AuthRouteChildren {
   AuthAgentsRoute: typeof AuthAgentsRoute
   AuthIntegrationsRoute: typeof AuthIntegrationsRoute
-  AuthOrganizationsRoute: typeof AuthOrganizationsRoute
-  AuthSettingsRoute: typeof AuthSettingsRoute
   AuthIndexRoute: typeof AuthIndexRoute
   AuthConversationsNewRoute: typeof AuthConversationsNewRoute
   AuthConversationsIndexRoute: typeof AuthConversationsIndexRoute
+  AuthSettingsIndexRoute: typeof AuthSettingsIndexRoute
+  AuthSettingsMembersMemberIdRoute: typeof AuthSettingsMembersMemberIdRoute
+  AuthSettingsMembersNewRoute: typeof AuthSettingsMembersNewRoute
+  AuthSettingsOrganizationNewRoute: typeof AuthSettingsOrganizationNewRoute
+  AuthSettingsMembersIndexRoute: typeof AuthSettingsMembersIndexRoute
+  AuthSettingsOrganizationIndexRoute: typeof AuthSettingsOrganizationIndexRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthAgentsRoute: AuthAgentsRoute,
   AuthIntegrationsRoute: AuthIntegrationsRoute,
-  AuthOrganizationsRoute: AuthOrganizationsRoute,
-  AuthSettingsRoute: AuthSettingsRoute,
   AuthIndexRoute: AuthIndexRoute,
   AuthConversationsNewRoute: AuthConversationsNewRoute,
   AuthConversationsIndexRoute: AuthConversationsIndexRoute,
+  AuthSettingsIndexRoute: AuthSettingsIndexRoute,
+  AuthSettingsMembersMemberIdRoute: AuthSettingsMembersMemberIdRoute,
+  AuthSettingsMembersNewRoute: AuthSettingsMembersNewRoute,
+  AuthSettingsOrganizationNewRoute: AuthSettingsOrganizationNewRoute,
+  AuthSettingsMembersIndexRoute: AuthSettingsMembersIndexRoute,
+  AuthSettingsOrganizationIndexRoute: AuthSettingsOrganizationIndexRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)

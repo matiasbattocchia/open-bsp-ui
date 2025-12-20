@@ -1,4 +1,5 @@
 import { useContext, useEffect, useRef, useState } from "react";
+import { Plus } from "lucide-react";
 import {
   newMessage,
   pushMessageToStore,
@@ -186,28 +187,19 @@ export default function ChatFooter() {
     setTimer(setTimeout(fn, ms));
   }
 
-  const attachButton = (
-    <>
-      {/* Attach files button */}
-      <button
-        disabled={!inCSWindow}
-        className={"p-[8px] " + (!inCSWindow ? "" : " cursor-pointer")}
-        onClick={() => fileInput.current?.click()}
-        title={t("Adjuntar") as string}
-      >
-        <svg className={"w-[24px] h-[24px] text-foreground"}>
-          <use href="/icons.svg#attach" />
-        </svg>
-      </button>
-    </>
-  );
-
   return (
     activeConvId &&
     conv && (
       <div className={"flex items-end text-foreground p-[5px] mx-[12px] mb-[12px] mt-[4px] lg:mt-[0px] rounded-[24px] shadow-[0_0_4px_0px_rgba(0,0,0,0.1)] z-10" + (!inCSWindow ? " bg-background" : " bg-incoming-chat-bubble")}>
         <div className="shrink-0">
-          {attachButton}
+          <button
+            disabled={!inCSWindow}
+            className={"p-[8px] rounded-full" + (!inCSWindow ? "" : " cursor-pointer hover:bg-accent")}
+            onClick={() => fileInput.current?.click()}
+            title={t("Adjuntar") as string}
+          >
+            <Plus className="w-[24px] h-[24px]" />
+          </button>
         </div>
 
         <input
