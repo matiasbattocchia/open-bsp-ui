@@ -611,8 +611,59 @@ export type AIAgentExtra = {
   tools?: ToolConfig[];
 };
 
+// Helper to remove agents from the generated DB
+type DatabaseGeneratedWithoutAgents = {
+  public: Omit<DatabaseGenerated["public"], "Tables"> & {
+    Tables: Omit<DatabaseGenerated["public"]["Tables"], "agents">;
+  };
+} & Omit<DatabaseGenerated, "public">;
+
+// Explicitly define the agents definitions that we want
+// Note: this is because MergeDeep is not doing a great job for this case
+type AgentRowGenerated = DatabaseGenerated["public"]["Tables"]["agents"]["Row"];
+type AgentInsertGenerated =
+  DatabaseGenerated["public"]["Tables"]["agents"]["Insert"];
+type AgentUpdateGenerated =
+  DatabaseGenerated["public"]["Tables"]["agents"]["Update"];
+
+export type HumanAgentRow = Omit<AgentRowGenerated, "ai" | "extra"> & {
+  ai: false;
+  extra: HumanAgentExtra | null;
+};
+
+export type AIAgentRow = Omit<AgentRowGenerated, "ai" | "extra"> & {
+  ai: true;
+  extra: AIAgentExtra | null;
+};
+
+type AgentRowStrict = HumanAgentRow | AIAgentRow;
+
+export type HumanAgentInsert = Omit<AgentInsertGenerated, "ai" | "extra"> & {
+  ai: false;
+  extra?: HumanAgentExtra | null;
+};
+
+export type AIAgentInsert = Omit<AgentInsertGenerated, "ai" | "extra"> & {
+  ai: true;
+  extra?: AIAgentExtra | null;
+};
+
+type AgentInsertStrict = HumanAgentInsert | AIAgentInsert;
+
+export type HumanAgentUpdate = Omit<AgentUpdateGenerated, "ai" | "extra"> & {
+  ai?: false;
+  extra?: HumanAgentExtra | null;
+};
+
+export type AIAgentUpdate = Omit<AgentUpdateGenerated, "ai" | "extra"> & {
+  ai?: true;
+  extra?: AIAgentExtra | null;
+};
+
+type AgentUpdateStrict = HumanAgentUpdate | AIAgentUpdate;
+
 export type Database = MergeDeep<
-  DatabaseGenerated,
+  DatabaseGeneratedWithoutAgents,
   {
     public: {
       Tables: {
@@ -675,27 +726,11 @@ export type Database = MergeDeep<
           };
         };
         agents: {
-          Row: {
-            ai: true;
-            extra?: AIAgentExtra;
-          } | {
-            ai: false;
-            extra?: HumanAgentExtra;
-          };
-          Insert: {
-            ai: true;
-            extra?: AIAgentExtra;
-          } | {
-            ai: false;
-            extra?: HumanAgentExtra;
-          };
-          Update: {
-            ai?: true;
-            extra?: AIAgentExtra;
-          } | {
-            ai?: false;
-            extra?: HumanAgentExtra;
-          };
+          Row: AgentRowStrict;
+          Insert: AgentInsertStrict;
+          Update: AgentUpdateStrict;
+          Relationships:
+            DatabaseGenerated["public"]["Tables"]["agents"]["Relationships"];
         };
       };
     };

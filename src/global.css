@@ -150,11 +150,19 @@ button:disabled {
   }
 
   input.text {
-    @apply w-full h-[24px] border-input border-b-[2px] py-[8px] focus-visible:outline-none text-[16px] text-foreground placeholder:text-muted-foreground bg-transparent dark:bg-input/30 focus-visible:border-primary;
+    @apply w-full h-[24px] border-input border-b-[2px] py-[8px] focus-visible:outline-none text-[16px] text-foreground placeholder:text-muted-foreground bg-transparent focus-visible:border-primary;
   }
 
   select {
-    @apply w-full h-[24px] border-input border-b-[2px] focus-visible:outline-none text-[16px] text-foreground placeholder:text-muted-foreground bg-transparent dark:bg-input/30 focus-visible:border-primary;
+    @apply w-full h-[24px] border-input border-b-[2px] focus-visible:outline-none text-[16px] text-foreground placeholder:text-muted-foreground bg-transparent focus-visible:border-primary;
+  }
+
+  button.primary {
+    @apply bg-primary hover:bg-primary/90 disabled:opacity-50 text-primary-foreground rounded-full text-[16px] py-[8px];
+  }
+
+  button.destructive {
+    @apply bg-transparent border border-destructive hover:bg-destructive/10 text-destructive rounded-full text-[16px] py-[8px];
   }
 
   .header {

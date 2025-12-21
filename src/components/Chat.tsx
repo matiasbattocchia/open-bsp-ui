@@ -6,7 +6,7 @@ import localizedFormat from "dayjs/plugin/localizedFormat";
 dayjs.extend(localizedFormat);
 import useBoundStore from "@/stores/useBoundStore";
 import Message from "./Message/Message";
-import { type MessageRow } from "@/supabase/client";
+import { type HumanAgentExtra, type MessageRow } from "@/supabase/client";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useCurrentOrganization } from "@/queries/useOrgs";
 import { useCurrentAgent } from "@/queries/useAgents";
@@ -59,7 +59,7 @@ export default function Chat() {
 
   const { data: agent } = useCurrentAgent();
   const activeAgentId = agent?.id;
-  const isAdmin = agent?.extra?.roles?.includes("admin");
+  const isAdmin = ["admin", "owner"].includes((agent?.extra as HumanAgentExtra)?.role || "");
 
   const scroller = useRef<HTMLDivElement>(null);
 

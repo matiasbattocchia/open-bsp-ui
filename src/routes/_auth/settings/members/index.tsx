@@ -8,13 +8,19 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 
 export const Route = createFileRoute("/_auth/settings/members/")({
-  component: SettingsMembers,
+  component: ListMembers,
 });
 
-function SettingsMembers() {
+function ListMembers() {
   const { translate: t } = useTranslation();
   const navigate = useNavigate();
   const { data: agents } = useCurrentAgents();
+
+  const roles = {
+    "owner": t("Propietario") as string,
+    "admin": t("Administrador") as string,
+    "user": t("Usuario") as string,
+  };
 
   return (
     <>
@@ -38,11 +44,14 @@ function SettingsMembers() {
           />
           {agents
             ?.filter((agent) => !agent.ai)
-            .map((agent) => (
-              <SectionItem
+            .map((agent) => {
+              const role = roles[agent.extra?.role || "user"];
+              const pending = agent.extra?.invitation?.status === "pending";
+
+              return (<SectionItem
                 key={agent.id}
                 title={agent.name}
-                description={(agent.extra as { email?: string })?.email}
+                description={role + (pending ? ` (${t("pendiente")})` : "")}
                 aside={
                   <Avatar
                     src={agent.picture}
@@ -57,8 +66,9 @@ function SettingsMembers() {
                     hash: (prevHash) => prevHash!,
                   })
                 }
-              />
-            ))}
+              />)
+            }
+            )}
         </div>
       </SectionBody>
     </>

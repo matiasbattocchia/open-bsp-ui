@@ -22,8 +22,8 @@ function SettingsIndex() {
           <SectionItem
             title={t("Organización")}
             aside={
-              <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center text-muted-foreground">
-                <Building2 className="w-5 h-5" />
+              <div className="p-[8px]">
+                <Building2 className="w-[24px] h-[24px] text-muted-foreground" />
               </div>
             }
             onClick={() =>
@@ -36,8 +36,8 @@ function SettingsIndex() {
           <SectionItem
             title={t("Miembros")}
             aside={
-              <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center text-muted-foreground">
-                <Users className="w-5 h-5" />
+              <div className="p-[8px]">
+                <Users className="w-[24px] h-[24px] text-muted-foreground" />
               </div>
             }
             onClick={() =>

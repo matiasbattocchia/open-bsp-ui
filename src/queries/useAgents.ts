@@ -1,12 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   type AgentInsert,
+  type AgentRow,
   type AgentUpdate,
   supabase,
 } from "@/supabase/client";
 import useBoundStore from "@/stores/useBoundStore";
 
-export function useAgent(id: string) {
+export function useAgent<T = AgentRow>(id: string) {
   const userId = useBoundStore((state) => state.ui.user?.id);
 
   return useQuery({
@@ -19,7 +20,8 @@ export function useAgent(id: string) {
         .throwOnError()
         .single(),
     enabled: !!userId,
-    select: (data) => data.data,
+    select: (data) => data.data as T,
+    experimental_prefetchInRender: true,
   });
 }
 
@@ -35,6 +37,7 @@ export function useCurrentAgent() {
         .select()
         .eq("organization_id", orgId!)
         .eq("user_id", userId!)
+        .is("ai", false)
         .throwOnError()
         .single(),
     enabled: !!userId && !!orgId,

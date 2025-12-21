@@ -71,7 +71,7 @@ function AppLayout() {
           </>
         ) : (
           <div className="flex items-center justify-center h-full">
-            Select a conversation to start chatting
+
           </div>
         )}
       </div>

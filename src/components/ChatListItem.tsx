@@ -4,6 +4,7 @@ import { getHighestStatus, getStatusIcon } from "@/utils/MessageStatusUtils";
 import useBoundStore from "@/stores/useBoundStore";
 import {
   type Draft,
+  type HumanAgentExtra,
   type MessageRow,
   type OutgoingStatus,
 } from "@/supabase/client";
@@ -131,7 +132,7 @@ export default function ChatListItem({
 
   const { data: agent } = useCurrentAgent();
   const { data: agents } = useCurrentAgents();
-  const isAdmin = agent?.extra?.roles?.includes("admin");
+  const isAdmin = ["admin", "owner"].includes((agent?.extra as HumanAgentExtra)?.role || "");
 
   const messages: MessageRow[] | undefined = Array.from(
     useBoundStore((state) => state.chat.messages.get(itemId || ""))?.values() ||

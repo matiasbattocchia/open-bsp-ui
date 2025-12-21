@@ -55,6 +55,8 @@ function SettingsOrganization() {
   return (
     <>
       <SectionHeader title={t("Organización") as string} />
+
+
       <OrganizationForm
         defaultValues={org || { name: "" }}
         onSubmit={(data) => updateOrg.mutate(data)}
