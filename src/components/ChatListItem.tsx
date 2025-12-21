@@ -4,7 +4,6 @@ import { getHighestStatus, getStatusIcon } from "@/utils/MessageStatusUtils";
 import useBoundStore from "@/stores/useBoundStore";
 import {
   type Draft,
-  type HumanAgentExtra,
   type MessageRow,
   type OutgoingStatus,
 } from "@/supabase/client";

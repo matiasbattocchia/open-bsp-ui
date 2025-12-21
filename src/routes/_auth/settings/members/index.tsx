@@ -1,7 +1,7 @@
 import SectionBody from "@/components/SectionBody";
 import SectionHeader from "@/components/SectionHeader";
 import { useTranslation } from "@/hooks/useTranslation";
-import { useCurrentAgents } from "@/queries/useAgents";
+import { useCurrentAgents, useCurrentAgent } from "@/queries/useAgents";
 import SectionItem from "@/components/SectionItem";
 import Avatar from "@/components/Avatar";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
@@ -15,8 +15,10 @@ function ListMembers() {
   const { translate: t } = useTranslation();
   const navigate = useNavigate();
   const { data: agents } = useCurrentAgents();
+  const { data: agent } = useCurrentAgent();
+  const isOwner = agent?.extra?.role === "owner";
 
-  const roles = {
+  const roles: Record<string, string> = {
     "owner": t("Propietario") as string,
     "admin": t("Administrador") as string,
     "user": t("Usuario") as string,
@@ -27,20 +29,22 @@ function ListMembers() {
       <SectionHeader title={t("Miembros") as string} />
 
       <SectionBody>
-        <SectionItem
-          title={t("Agregar miembro")}
-          aside={
-            <div className="p-[8px] bg-primary/10 rounded-full">
-              <Plus className="w-[24px] h-[24px] text-primary" />
-            </div>
-          }
-          onClick={() =>
-            navigate({
-              to: "/settings/members/new",
-              hash: (prevHash) => prevHash!,
-            })
-          }
-        />
+        {isOwner && (
+          <SectionItem
+            title={t("Agregar miembro")}
+            aside={
+              <div className="p-[8px] bg-primary/10 rounded-full">
+                <Plus className="w-[24px] h-[24px] text-primary" />
+              </div>
+            }
+            onClick={() =>
+              navigate({
+                to: "/settings/members/new",
+                hash: (prevHash) => prevHash!,
+              })
+            }
+          />
+        )}
         {agents
           ?.filter((agent) => !agent.ai)
           .map((agent) => {

@@ -5,6 +5,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import WhatsAppIntegration from "@/components/WhatsAppIntegration";
 import { WhatsAppOutlined } from "@ant-design/icons";
 import { useIntegrations } from "@/queries/useIntegrations";
+import { useCurrentAgent } from "@/queries/useAgents";
 
 export const Route = createFileRoute("/_auth/integrations")({
   component: Integrations,
@@ -12,15 +13,19 @@ export const Route = createFileRoute("/_auth/integrations")({
 
 function Integrations() {
   const { data: integrations } = useIntegrations();
+  const { data: agent } = useCurrentAgent();
+  const isAdmin = ["admin", "owner"].includes(agent?.extra?.role || "");
 
   return (
     <>
       <SectionHeader title="Integraciones" />
 
       <SectionBody>
-        <div className="py-[10px]">
-          <WhatsAppIntegration />
-        </div>
+        {isAdmin && (
+          <div className="py-[10px]">
+            <WhatsAppIntegration />
+          </div>
+        )}
 
         {integrations && integrations.length > 0 && (
           <>

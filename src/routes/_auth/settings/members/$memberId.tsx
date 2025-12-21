@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import SectionHeader from "@/components/SectionHeader";
 import SectionBody from "@/components/SectionBody";
 import { useTranslation } from "@/hooks/useTranslation";
-import { useAgent, useUpdateAgent, useDeleteAgent } from "@/queries/useAgents";
+import { useAgent, useUpdateAgent, useDeleteAgent, useCurrentAgent } from "@/queries/useAgents";
 import { useForm } from "react-hook-form";
 import type { HumanAgentRow, HumanAgentUpdate } from "@/supabase/client";
 import SectionItem from "@/components/SectionItem";
@@ -17,6 +17,9 @@ function EditMember() {
   const { translate: t } = useTranslation();
   const navigate = useNavigate();
   const { promise, data: agent } = useAgent<HumanAgentRow>(memberId);
+  const { data: currentAgent } = useCurrentAgent();
+  const isOwner = currentAgent?.extra?.role === "owner";
+
   const updateAgent = useUpdateAgent();
   const deleteAgent = useDeleteAgent();
 
@@ -59,6 +62,7 @@ function EditMember() {
             <div className="label">{t("Nombre")}</div>
             <input
               className="text"
+              disabled={!isOwner}
               {...register("name", { required: true })}
             />
           </label>
@@ -66,6 +70,7 @@ function EditMember() {
           <label>
             <div className="label">{t("Rol")}</div>
             <select
+              disabled={!isOwner}
               {...register("extra.role", { required: true })}
             >
               <option value="user">{t("Usuario")}</option>
@@ -86,29 +91,33 @@ function EditMember() {
 
           <div className="grow" />
 
-          <button
-            className="destructive"
-            onClick={() =>
-              deleteAgent.mutate(memberId, {
-                onSuccess: () =>
-                  navigate({
-                    to: "..",
-                    hash: (prevHash) => prevHash!,
-                  }),
-              })
-            }
-            disabled={deleteAgent.isPending}
-          >
-            {deleteAgent.isPending ? "..." : t("Eliminar")}
-          </button>
+          {isOwner && (
+            <>
+              <button
+                className="destructive"
+                onClick={() =>
+                  deleteAgent.mutate(memberId, {
+                    onSuccess: () =>
+                      navigate({
+                        to: "..",
+                        hash: (prevHash) => prevHash!,
+                      }),
+                  })
+                }
+                disabled={deleteAgent.isPending}
+              >
+                {deleteAgent.isPending ? "..." : t("Eliminar")}
+              </button>
 
-          <button
-            type="submit"
-            disabled={updateAgent.isPending || !isValid}
-            className="primary"
-          >
-            {updateAgent.isPending ? "..." : t("Actualizar")}
-          </button>
+              <button
+                type="submit"
+                disabled={updateAgent.isPending || !isValid}
+                className="primary"
+              >
+                {updateAgent.isPending ? "..." : t("Actualizar")}
+              </button>
+            </>
+          )}
         </form>
       </SectionBody>
     </>

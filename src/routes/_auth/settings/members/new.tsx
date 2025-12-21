@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import SectionHeader from "@/components/SectionHeader";
 import { useTranslation } from "@/hooks/useTranslation";
-import { useCreateAgent } from "@/queries/useAgents";
+import { useCreateAgent, useCurrentAgent } from "@/queries/useAgents";
 import { type HumanAgentInsert } from "@/supabase/client";
 import { useForm } from "react-hook-form";
 import SectionBody from "@/components/SectionBody";
@@ -14,6 +14,8 @@ function AddMember() {
   const { translate: t } = useTranslation();
   const navigate = useNavigate();
   const createAgent = useCreateAgent();
+  const { data: agent } = useCurrentAgent();
+  const isOwner = agent?.extra?.role === "owner";
 
   const {
     register,
@@ -59,6 +61,7 @@ function AddMember() {
             <div className="label">{t("Nombre")}</div>
             <input
               className="text"
+              disabled={!isOwner}
               {...register("name", { required: true })}
             />
           </label>
@@ -66,6 +69,7 @@ function AddMember() {
           <label>
             <div className="label">{t("Rol")}</div>
             <select
+              disabled={!isOwner}
               {...register("extra.role", { required: true })}
             >
               <option value="user">{t("Usuario")}</option>
@@ -79,6 +83,7 @@ function AddMember() {
             <input
               type="email"
               className="text"
+              disabled={!isOwner}
               {...register("extra.invitation.email", {
                 required: true, pattern: {
                   value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
@@ -90,13 +95,15 @@ function AddMember() {
 
           <div className="grow" />
 
-          <button
-            type="submit"
-            disabled={createAgent.isPending || !isValid}
-            className="primary"
-          >
-            {createAgent.isPending ? "..." : t("Invitar")}
-          </button>
+          {isOwner && (
+            <button
+              type="submit"
+              disabled={createAgent.isPending || !isValid}
+              className="primary"
+            >
+              {createAgent.isPending ? "..." : t("Invitar")}
+            </button>
+          )}
         </form>
       </SectionBody >
     </>

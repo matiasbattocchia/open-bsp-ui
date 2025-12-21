@@ -6,7 +6,7 @@ import localizedFormat from "dayjs/plugin/localizedFormat";
 dayjs.extend(localizedFormat);
 import useBoundStore from "@/stores/useBoundStore";
 import Message from "./Message/Message";
-import { type HumanAgentExtra, type MessageRow } from "@/supabase/client";
+import { type MessageRow } from "@/supabase/client";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useCurrentOrganization } from "@/queries/useOrgs";
 import { useCurrentAgent } from "@/queries/useAgents";
