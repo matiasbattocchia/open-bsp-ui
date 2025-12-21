@@ -59,7 +59,7 @@ export default function Chat() {
 
   const { data: agent } = useCurrentAgent();
   const activeAgentId = agent?.id;
-  const isAdmin = ["admin", "owner"].includes((agent?.extra as HumanAgentExtra)?.role || "");
+  const isAdmin = ["admin", "owner"].includes(agent?.extra?.role || "");
 
   const scroller = useRef<HTMLDivElement>(null);
 

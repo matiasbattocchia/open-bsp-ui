@@ -132,7 +132,7 @@ export default function ChatListItem({
 
   const { data: agent } = useCurrentAgent();
   const { data: agents } = useCurrentAgents();
-  const isAdmin = ["admin", "owner"].includes((agent?.extra as HumanAgentExtra)?.role || "");
+  const isAdmin = ["admin", "owner"].includes(agent?.extra?.role || "");
 
   const messages: MessageRow[] | undefined = Array.from(
     useBoundStore((state) => state.chat.messages.get(itemId || ""))?.values() ||

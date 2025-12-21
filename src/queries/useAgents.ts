@@ -3,6 +3,7 @@ import {
   type AgentInsert,
   type AgentRow,
   type AgentUpdate,
+  type HumanAgentRow,
   supabase,
 } from "@/supabase/client";
 import useBoundStore from "@/stores/useBoundStore";
@@ -41,7 +42,7 @@ export function useCurrentAgent() {
         .throwOnError()
         .single(),
     enabled: !!userId && !!orgId,
-    select: (data) => data.data,
+    select: (data) => data.data as HumanAgentRow,
   });
 }
 

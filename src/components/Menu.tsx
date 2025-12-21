@@ -22,7 +22,6 @@ export default function Menu() {
   const user = useBoundStore((state) => state.ui.user);
 
   const { data: agent } = useCurrentAgent();
-  //const isAdmin = !agent?.ai && ["admin", "owner"].includes(agent?.extra?.role || "");
 
   const setActiveOrg = useBoundStore((state) => state.ui.setActiveOrg);
   const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);

@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { supabase } from "@/supabase/client";
 
-import { Translate as T, useTranslation } from "@/hooks/useTranslation";
+import { useTranslation } from "@/hooks/useTranslation";
 import { GoogleOutlined } from "@ant-design/icons";
 
 export default function Login() {
@@ -46,7 +46,7 @@ export default function Login() {
       <div className="flex flex-col gap-3 w-[250px]">
         <button
           type="button"
-          className="py-[7px] px-[20px] hover:bg-blue-400/90 rounded-lg w-full flex items-center justify-center gap-2 bg-blue-500 text-white"
+          className="primary bg-blue-500 hover:bg-blue-400 text-white w-full border-none"
           onClick={handleLogInWithOauth}
         >
           <GoogleOutlined /> {t("Continuar con Google")}
@@ -55,31 +55,27 @@ export default function Login() {
         <div className="border-b border-border w-full" />
 
         <form onSubmit={handleLogInWithEmail} className="flex flex-col gap-3">
-          <div>
-            <T as="label" className="block text-md">
-              Correo electrónico
-            </T>
+          <label>
+            <div className="label">{t("Correo electrónico")}</div>
             <input
-              className="py-[10px] px-[20px] h-[40px] border border-border bg-incoming-chat-bubble rounded-lg w-full"
+              className="text"
               placeholder="gori@gmail.com"
               type="email"
               onChange={(e) => setEmail(e.target.value)}
               value={email}
             />
-          </div>
+          </label>
 
-          <div>
-            <T as="label" className="block text-md">
-              Contraseña
-            </T>
+          <label>
+            <div className="label">{t("Contraseña")}</div>
             <input
-              className="py-[10px] px-[20px] h-[40px] border border-border bg-incoming-chat-bubble rounded-lg w-full"
+              className="text"
               placeholder="******"
               type="password"
               onChange={(e) => setPassword(e.target.value)}
               value={password}
             />
-          </div>
+          </label>
 
           {message && (
             <div className="self-center text-destructive text-md">{message}</div>
@@ -87,7 +83,7 @@ export default function Login() {
 
           <button
             type="submit"
-            className="py-[7px] px-[20px] mt-[16px] text-primary-foreground bg-primary hover:bg-primary/90 rounded-lg w-full flex items-center justify-center"
+            className="primary w-full mt-[16px]"
           >
             {t("Entrar")}
           </button>
