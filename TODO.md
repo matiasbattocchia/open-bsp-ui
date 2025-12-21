@@ -2,8 +2,7 @@ TODO
 
 UI
 
-Back button goes up one level / Cancel button is one step back
-New org/member view should be poped from the navigation stack after success
+- [ ] Templates
 
 API
 
@@ -15,4 +14,5 @@ API
 - [ ] Invitations functions
   - [ ] Do not bring org data if agent status "pending"
   - [ ] If user exists, associate user_id
-  - [ ] Upon user creation, associate user_id 
+  - [ ] Upon user creation, associate user_id
+  - [ ] Member invitation email should be unique per org

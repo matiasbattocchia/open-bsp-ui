@@ -9,6 +9,8 @@ import { useLocation } from "@tanstack/react-router";
 import FilePicker from "@/components/FileUploader/FilePicker";
 import FilePreviewer from "@/components/FilePreviewer";
 import Templates from "@/components/Templates";
+import ActionCard from "@/components/ActionCard";
+import { Building2, MessageSquarePlus, Settings } from "lucide-react";
 
 export const Route = createFileRoute("/_auth")({
   component: AppLayout,
@@ -19,6 +21,7 @@ function AppLayout() {
   const activeConvId = useBoundStore((state) => state.ui.activeConvId);
   const setActiveConv = useBoundStore((state) => state.ui.setActiveConv);
   const location = useLocation();
+
 
   const [isHoveringFiles, setIsHoveringFiles] = useState(false);
 
@@ -70,8 +73,22 @@ function AppLayout() {
             <ChatFooter />
           </>
         ) : (
-          <div className="flex items-center justify-center h-full">
-
+          <div className="flex gap-[32px] items-center justify-center h-full">
+            <ActionCard
+              icon={<Building2 className="w-[24px] h-[24px]" />}
+              title="Crear organización"
+              to="/settings/organization/new"
+            />
+            <ActionCard
+              icon={<MessageSquarePlus className="w-[24px] h-[24px]" />}
+              title="Iniciar conversación"
+              to="/conversations/new"
+            />
+            <ActionCard
+              icon={<Settings className="w-[24px] h-[24px]" />}
+              title="Configurar WhatsApp"
+              to="/integrations"
+            />
           </div>
         )}
       </div>

@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import SectionHeader from "@/components/SectionHeader";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useCreateAgent } from "@/queries/useAgents";
-import { type AgentInsert } from "@/supabase/client";
+import { type HumanAgentInsert } from "@/supabase/client";
 import { useForm } from "react-hook-form";
 import SectionBody from "@/components/SectionBody";
 
@@ -19,7 +19,7 @@ function AddMember() {
     register,
     handleSubmit,
     formState: { isValid },
-  } = useForm<AgentInsert>({
+  } = useForm<HumanAgentInsert>({
     defaultValues: {
       extra: {
         role: "user",
@@ -32,15 +32,29 @@ function AddMember() {
       <SectionHeader title={t("Agregar miembro") as string} />
 
       <SectionBody>
-        <form onSubmit={handleSubmit(data => createAgent.mutate(data, {
-          onSuccess: (agent) =>
-            navigate({
-              to: `/settings/members/${agent!.id}`,
-              hash: (prevHash) => prevHash!,
+        <form
+          onSubmit={handleSubmit(data => createAgent.mutate(
+            {
+              ...data,
+              ai: false,
+              extra: {
+                role: data!.extra!.role!,
+                invitation: {
+                  email: data!.extra!.invitation!.email!,
+                  status: "pending"
+                }
+              }
+            },
+            {
+              onSuccess: (agent) =>
+                navigate({
+                  to: `/settings/members/${agent!.id}`,
+                  hash: (prevHash) => prevHash!,
+                }),
             }),
-        }),
-
-        )} className="flex flex-col gap-[16px] pb-[14px] grow">
+          )}
+          className="flex flex-col gap-[16px] pb-[14px] grow"
+        >
           <label>
             <div className="label">{t("Nombre")}</div>
             <input

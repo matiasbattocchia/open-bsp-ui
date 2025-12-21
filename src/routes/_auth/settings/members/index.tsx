@@ -26,50 +26,48 @@ function ListMembers() {
     <>
       <SectionHeader title={t("Miembros") as string} />
 
-      <SectionBody className="gap-4">
-        <div className="flex flex-col">
-          <SectionItem
-            title={t("Agregar miembro")}
-            aside={
-              <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary">
-                <Plus className="w-5 h-5" />
-              </div>
-            }
-            onClick={() =>
-              navigate({
-                to: "/settings/members/new",
-                hash: (prevHash) => prevHash!,
-              })
-            }
-          />
-          {agents
-            ?.filter((agent) => !agent.ai)
-            .map((agent) => {
-              const role = roles[agent.extra?.role || "user"];
-              const pending = agent.extra?.invitation?.status === "pending";
+      <SectionBody>
+        <SectionItem
+          title={t("Agregar miembro")}
+          aside={
+            <div className="p-[8px] bg-primary/10 rounded-full">
+              <Plus className="w-[24px] h-[24px] text-primary" />
+            </div>
+          }
+          onClick={() =>
+            navigate({
+              to: "/settings/members/new",
+              hash: (prevHash) => prevHash!,
+            })
+          }
+        />
+        {agents
+          ?.filter((agent) => !agent.ai)
+          .map((agent) => {
+            const role = roles[agent.extra?.role || "user"];
+            const pending = agent.extra?.invitation?.status === "pending";
 
-              return (<SectionItem
-                key={agent.id}
-                title={agent.name}
-                description={role + (pending ? ` (${t("pendiente")})` : "")}
-                aside={
-                  <Avatar
-                    src={agent.picture}
-                    fallback={agent.name?.substring(0, 2).toUpperCase()}
-                    size={40}
-                    className="bg-muted text-muted-foreground"
-                  />
-                }
-                onClick={() =>
-                  navigate({
-                    to: `/settings/members/${agent.id}`,
-                    hash: (prevHash) => prevHash!,
-                  })
-                }
-              />)
-            }
-            )}
-        </div>
+            return (<SectionItem
+              key={agent.id}
+              title={agent.name}
+              description={role + (pending ? ` (${t("pendiente")})` : "")}
+              aside={
+                <Avatar
+                  src={agent.picture}
+                  fallback={agent.name?.substring(0, 2).toUpperCase()}
+                  size={40}
+                  className="bg-muted text-muted-foreground"
+                />
+              }
+              onClick={() =>
+                navigate({
+                  to: `/settings/members/${agent.id}`,
+                  hash: (prevHash) => prevHash!,
+                })
+              }
+            />)
+          }
+          )}
       </SectionBody>
     </>
   );

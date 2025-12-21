@@ -72,7 +72,7 @@ export function useCreateAgent() {
 
       const { data: agent } = await supabase
         .from("agents")
-        .insert(data)
+        .insert({ ...data, organization_id: orgId })
         .select()
         .single()
         .throwOnError();

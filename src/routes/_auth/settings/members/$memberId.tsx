@@ -5,6 +5,8 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { useAgent, useUpdateAgent, useDeleteAgent } from "@/queries/useAgents";
 import { useForm } from "react-hook-form";
 import type { HumanAgentRow, HumanAgentUpdate } from "@/supabase/client";
+import SectionItem from "@/components/SectionItem";
+import { Bell } from "lucide-react";
 
 export const Route = createFileRoute("/_auth/settings/members/$memberId")({
   component: EditMember,
@@ -36,15 +38,23 @@ function EditMember() {
   return (
     <>
       <SectionHeader title={agent.name} />
-
       <SectionBody>
-        {invitation && invitation.status === "pending" && (
-          <div className="rounded-xl text-foreground bg-primary/10 border border-primary p-[16px]">
-            {t("Invitación pendiente")}
-          </div>
-        )}
+        <form
+          onSubmit={handleSubmit(data => updateAgent.mutate({ id: memberId, ...data }))}
+          className="flex flex-col gap-[16px] pb-[14px] grow"
+        >
+          {invitation && invitation.status === "pending" && (
+            <SectionItem
+              title={t("Invitación pendiente")}
+              aside={
+                <div className="p-[8px]">
+                  <Bell className="w-[24px] h-[24px] text-primary" />
+                </div>
+              }
+              className="bg-primary/10"
+            />
+          )}
 
-        <form onSubmit={handleSubmit(data => updateAgent.mutate({ id: memberId, ...data }))} className="flex flex-col gap-[14px] pb-[14px] grow">
           <label>
             <div className="label">{t("Nombre")}</div>
             <input

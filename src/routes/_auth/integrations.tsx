@@ -17,11 +17,12 @@ function Integrations() {
       <SectionHeader title="Integraciones" />
 
       <SectionBody>
-        <WhatsAppIntegration />
+        <div className="py-[10px]">
+          <WhatsAppIntegration />
+        </div>
 
         {integrations && integrations.length > 0 && (
           <>
-            <div className="h-px bg-border my-4" />
             {integrations.map((integration) => (
               <SectionItem
                 key={integration.address}

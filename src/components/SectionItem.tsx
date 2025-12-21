@@ -5,16 +5,19 @@ export default function SectionItem({
   description,
   aside,
   onClick,
+  className,
 }: {
   title: ReactNode;
   description?: ReactNode;
   aside?: ReactNode;
   onClick?: () => void;
+  className?: string;
 }) {
   return (
     <div
       className={
-        "h-[72px] flex cursor-pointer rounded-xl group hover:bg-accent"
+        `h-[72px] flex rounded-xl group ${className || ""}` +
+        (onClick ? " cursor-pointer hover:bg-accent" : "")
       }
       onClick={onClick}
     >
