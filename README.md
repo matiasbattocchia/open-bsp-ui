@@ -1,48 +1,52 @@
-This is a [Next.js](https://nextjs.org/) project that uses React and Tailwind.
+# Open BSP UI
 
-## Getting Started
+A beautiful WhatsApp Web clone designed to work seamlessly with [open-bsp-api](https://github.com/matiasbattocchia/open-bsp-api).
 
-Install the dependencies:
+## Demo
 
-```bash
-npm install
-```
+You can test the application live at:
+**[https://open-bsp-ui.pages.dev](https://open-bsp-ui.pages.dev)**
 
-Run the development server:
+> **Note:** You will need a Google account to log in.
 
-```bash
-npm run dev
-```
+## Tech Stack
 
-Open [http://localhost:3000](http://localhost:3000) with your browser.
+This project is a Single Page Application (SPA) built with modern web technologies.
 
-The development server reloads whenever it detects changes.
+-   **Build Tool**: [Vite](https://vitejs.dev/)
+-   **UI Framework**: [React](https://react.dev/)
+-   **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+-   **Routing**: [TanStack Router](https://tanstack.com/router)
+-   **State Management**: [Zustand](https://zustand-demo.pmnd.rs/)
+-   **Data Fetching**: [TanStack Query](https://tanstack.com/query)
 
 ## Deployment
 
-https://dash.cloudflare.com/7bb9714f43d84ddb520f3e1e3b739b21/workers-and-pages/create/pages
+As a Single Page Application, this project can be hosted on any static site hosting service. We recommend **Cloudflare Pages** for its speed and ease of use.
 
-cloudflare > Compute & AI > Workers & Pages > Create application > Pages > Import an existing Git repository
+### Deploying to Cloudflare Pages
 
-Project name: ...
-Production branch: main
+1. **Fork** this repository.
+2. Go to the [Cloudflare Dashboard](https://dash.cloudflare.com/).
+3. Navigate to **Workers & Pages** > **Create application** > **Pages** > **Connect to Git**.
+4. Connect GitHub and select your forked repository.
+5. Use the following build settings:
+  - Production branch: `main`
+  - Framework preset: `React (Vite)`
+  - Build command: `npm run build`
+  - Build output directory: `dist`
+6. Click **Save and deploy**. Ualá!
 
-### Build settings
+## Getting Started Locally
 
-Framework preset: Next.js (Static HTML Export)
-Build command: `npx next build`
-Build output directory: `out`
+1.  Install dependencies:
+    ```bash
+    npm install
+    ```
 
-Environment variables
+2.  Run the development server:
+    ```bash
+    npm run dev
+    ```
 
-- SUPABASE_URL
-- SUPABASE_ANON_KEY
-
-#### Optional
-
-- META_APP_ID
-- FB_LOGIN_CONFIG_ID
-
-Facebook Login for Business > Configurations > Configuration ID
-
-https://developers.facebook.com/apps/629323992623834/business-login/configurations
+3.  Open [http://localhost:5173](http://localhost:5173) in your browser.

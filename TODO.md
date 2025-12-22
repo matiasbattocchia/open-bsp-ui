@@ -2,7 +2,10 @@ TODO
 
 UI
 
+- [ ] Aceptar invitación
+- [ ] Redirect login no respeta hash identifier
 - [ ] Templates
+- [ ] Agents
 
 API
 
