@@ -31,22 +31,27 @@ As a Single Page Application, this project can be hosted on any static site host
 3. Navigate to **Workers & Pages** > **Create application** > **Pages** > **Connect to Git**.
 4. Connect GitHub and select your forked repository.
 5. Use the following build settings:
-  - Production branch: `main`
-  - Framework preset: `React (Vite)`
-  - Build command: `npm run build`
-  - Build output directory: `dist`
-6. Click **Save and deploy**. Ualá!
+    - Production branch: `main`
+    - Framework preset: `React (Vite)`
+    - Build command: `npm run build`
+    - Build output directory: `dist`
+6. Set environment variables:
+    - `VITE_SUPABASE_URL`
+    - `VITE_SUPABASE_ANON_KEY`
+    - `VITE_META_APP_ID` — Optional. Needed for WhatsApp.
+    - `VITE_FB_LOGIN_CONFIG_ID` — Optional. Needed for Tech Provider. Hint: Facebook Login for Business > Configurations > Configuration ID
+7. Click **Save and deploy**. Ualá!
 
-## Getting Started Locally
+## Getting started locally
 
-1.  Install dependencies:
+1. Install dependencies:
     ```bash
     npm install
     ```
 
-2.  Run the development server:
+2. Run the development server:
     ```bash
     npm run dev
     ```
 
-3.  Open [http://localhost:5173](http://localhost:5173) in your browser.
+3. Open [http://localhost:5173](http://localhost:5173) in your browser.
