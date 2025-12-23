@@ -2,15 +2,14 @@
 
 A beautiful WhatsApp Web clone designed to work seamlessly with [Open BSP API](https://github.com/matiasbattocchia/open-bsp-api).
 
-- Responsive desing, works on mobile
-- WhatsApp templates
-- Send and receive media
+<p align="center">
+  <img src="./screenshot.png" alt="Open BSP UI Screenshot" width="800">
+</p>
 
-## About Open BSP
-
-- 💬 **Official WhatsApp API**
-- 🚀 **Scalable backend**
-- 🏢 **Multi-tenant**
+- 📱 Responsive design
+- 📲 Works on mobile
+- 📝 WhatsApp templates
+- 🖼️ Send and receive media
 
 ## Demo
 
@@ -19,17 +18,6 @@ You can test the application live at:
 
 > [!IMPORTANT]
 > You will need a Google account to log in.
-
-## Tech stack
-
-This project is a Single Page Application (SPA) built with modern web technologies.
-
--   **Build tool**: [Vite](https://vitejs.dev/)
--   **UI framework**: [React](https://react.dev/)
--   **Styling**: [Tailwind CSS](https://tailwindcss.com/)
--   **Routing**: [TanStack Router](https://tanstack.com/router)
--   **State management**: [Zustand](https://zustand-demo.pmnd.rs/)
--   **Data fetching**: [TanStack Query](https://tanstack.com/query)
 
 ## Deployment
 
@@ -42,44 +30,42 @@ As a Single Page Application, this project can be hosted on any static site host
 3. Navigate to **Workers & Pages** > **Create application** > **Pages** > **Connect to Git**.
 4. Connect GitHub and select your forked repository.
 5. Use the following build settings:
-    - Production branch: `main`
-    - Framework preset: `React (Vite)`
-    - Build command: `npm run build`
-    - Build output directory: `dist`
+  - Production branch: `main`
+  - Framework preset: `React (Vite)`
+  - Build command: `npm run build`
+  - Build output directory: `dist`
 6. Set environment variables:
-    - `VITE_SUPABASE_URL`
-    - `VITE_SUPABASE_ANON_KEY`
-    - `VITE_META_APP_ID` — Optional. Needed for WhatsApp.
-    - `VITE_FB_LOGIN_CONFIG_ID` — Optional. Needed for Tech Provider. 
+  - `VITE_SUPABASE_URL`
+  - `VITE_SUPABASE_ANON_KEY`
+  - `VITE_META_APP_ID` — Optional. Needed for WhatsApp.
+  - `VITE_FB_LOGIN_CONFIG_ID` — Optional. Needed for Tech Provider. 
     
-    Hint: Facebook Login for Business > Configurations > Configuration ID
+  Hint: Facebook Login for Business > Configurations > Configuration ID
 7. Click **Save and deploy**. Ualá!
-8. <details>
 
-<summary>Tips for collapsed sections</summary>
+## Tech stack
 
-### You can add a header
+This project is a Single Page Application (SPA) built with modern web technologies.
 
-You can add text within a collapsed section.
-
-You can add an image or a code block, too.
-
-```ruby
-   puts "Hello World"
-```
-
-</details>
+-   **Build tool**: [Vite](https://vitejs.dev/)
+-   **UI framework**: [React](https://react.dev/)
+-   **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+-   **Routing**: [TanStack Router](https://tanstack.com/router)
+-   **State management**: [Zustand](https://zustand-demo.pmnd.rs/)
+-   **Data fetching**: [TanStack Query](https://tanstack.com/query)
 
 ## Getting started locally
 
-1. Install dependencies:
-    ```bash
-    npm install
-    ```
+Install dependencies:
 
-2. Run the development server:
-    ```bash
-    npm run dev
-    ```
+```bash
+npm install
+```
 
-3. Open [http://localhost:5173](http://localhost:5173) in your browser.
+Run the development server:
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:5173](http://localhost:5173) in your browser.
