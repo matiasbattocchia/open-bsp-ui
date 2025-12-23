@@ -30,17 +30,17 @@ As a Single Page Application, this project can be hosted on any static site host
 3. Navigate to **Workers & Pages** > **Create application** > **Pages** > **Connect to Git**.
 4. Connect GitHub and select your forked repository.
 5. Use the following build settings:
-  - Production branch: `main`
-  - Framework preset: `React (Vite)`
-  - Build command: `npm run build`
-  - Build output directory: `dist`
+   - Production branch: `main`
+   - Framework preset: `React (Vite)`
+   - Build command: `npm run build`
+   - Build output directory: `dist`
 6. Set environment variables:
-  - `VITE_SUPABASE_URL`
-  - `VITE_SUPABASE_ANON_KEY`
-  - `VITE_META_APP_ID` — Optional. Needed for WhatsApp.
-  - `VITE_FB_LOGIN_CONFIG_ID` — Optional. Needed for Tech Provider. 
+    - `VITE_SUPABASE_URL`
+    - `VITE_SUPABASE_ANON_KEY`
+    - `VITE_META_APP_ID` — Optional. Needed for WhatsApp.
+    - `VITE_FB_LOGIN_CONFIG_ID` — Optional. Needed for Tech Provider. 
     
-  Hint: Facebook Login for Business > Configurations > Configuration ID
+    Hint: Facebook Login for Business > Configurations > Configuration ID
 7. Click **Save and deploy**. Ualá!
 
 ## Tech stack
