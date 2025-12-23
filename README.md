@@ -2,19 +2,16 @@
 
 A beautiful WhatsApp Web clone designed to work seamlessly with [Open BSP API](https://github.com/matiasbattocchia/open-bsp-api).
 
-<p align="center">
-  <img src="./screenshot.png" alt="Open BSP UI Screenshot" width="800">
-</p>
-
 - 📱 Responsive design
 - 📲 Works on mobile
 - 📝 WhatsApp templates
 - 🖼️ Send and receive media
 
-## Demo
+<p align="center">
+  <img src="./screenshot.png" alt="Open BSP UI Screenshot" width="800">
+</p>
 
-You can test the application live at:
-**[https://open-bsp-ui.pages.dev](https://open-bsp-ui.pages.dev)**
+You can **test** the application live at **[https://open-bsp-ui.pages.dev](https://open-bsp-ui.pages.dev)**
 
 > [!IMPORTANT]
 > You will need a Google account to log in.
@@ -40,7 +37,7 @@ As a Single Page Application, this project can be hosted on any static site host
     - `VITE_META_APP_ID` — Optional. Needed for WhatsApp.
     - `VITE_FB_LOGIN_CONFIG_ID` — Optional. Needed for Tech Provider. 
     
-    Hint: Facebook Login for Business > Configurations > Configuration ID
+    Get the login config ID from Facebook Login for Business > Configurations > Configuration ID
 7. Click **Save and deploy**. Ualá!
 
 ## Tech stack
