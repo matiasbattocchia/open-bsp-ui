@@ -1,24 +1,35 @@
 # Open BSP UI
 
-A beautiful WhatsApp Web clone designed to work seamlessly with [open-bsp-api](https://github.com/matiasbattocchia/open-bsp-api).
+A beautiful WhatsApp Web clone designed to work seamlessly with [Open BSP API](https://github.com/matiasbattocchia/open-bsp-api).
+
+- Responsive desing, works on mobile
+- WhatsApp templates
+- Send and receive media
+
+## About Open BSP
+
+- 💬 **Official WhatsApp API**
+- 🚀 **Scalable backend**
+- 🏢 **Multi-tenant**
 
 ## Demo
 
 You can test the application live at:
 **[https://open-bsp-ui.pages.dev](https://open-bsp-ui.pages.dev)**
 
-> **Note:** You will need a Google account to log in.
+> [!IMPORTANT]
+> You will need a Google account to log in.
 
-## Tech Stack
+## Tech stack
 
 This project is a Single Page Application (SPA) built with modern web technologies.
 
--   **Build Tool**: [Vite](https://vitejs.dev/)
--   **UI Framework**: [React](https://react.dev/)
+-   **Build tool**: [Vite](https://vitejs.dev/)
+-   **UI framework**: [React](https://react.dev/)
 -   **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 -   **Routing**: [TanStack Router](https://tanstack.com/router)
--   **State Management**: [Zustand](https://zustand-demo.pmnd.rs/)
--   **Data Fetching**: [TanStack Query](https://tanstack.com/query)
+-   **State management**: [Zustand](https://zustand-demo.pmnd.rs/)
+-   **Data fetching**: [TanStack Query](https://tanstack.com/query)
 
 ## Deployment
 
@@ -39,8 +50,25 @@ As a Single Page Application, this project can be hosted on any static site host
     - `VITE_SUPABASE_URL`
     - `VITE_SUPABASE_ANON_KEY`
     - `VITE_META_APP_ID` — Optional. Needed for WhatsApp.
-    - `VITE_FB_LOGIN_CONFIG_ID` — Optional. Needed for Tech Provider. Hint: Facebook Login for Business > Configurations > Configuration ID
+    - `VITE_FB_LOGIN_CONFIG_ID` — Optional. Needed for Tech Provider. 
+    
+    Hint: Facebook Login for Business > Configurations > Configuration ID
 7. Click **Save and deploy**. Ualá!
+8. <details>
+
+<summary>Tips for collapsed sections</summary>
+
+### You can add a header
+
+You can add text within a collapsed section.
+
+You can add an image or a code block, too.
+
+```ruby
+   puts "Hello World"
+```
+
+</details>
 
 ## Getting started locally
 
