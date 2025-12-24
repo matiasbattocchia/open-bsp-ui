@@ -17,11 +17,17 @@ import { Route as AuthAgentsRouteImport } from './routes/_auth/agents'
 import { Route as AuthSettingsIndexRouteImport } from './routes/_auth/settings/index'
 import { Route as AuthConversationsIndexRouteImport } from './routes/_auth/conversations/index'
 import { Route as AuthConversationsNewRouteImport } from './routes/_auth/conversations/new'
+import { Route as AuthSettingsWebhooksIndexRouteImport } from './routes/_auth/settings/webhooks/index'
 import { Route as AuthSettingsOrganizationIndexRouteImport } from './routes/_auth/settings/organization/index'
 import { Route as AuthSettingsMembersIndexRouteImport } from './routes/_auth/settings/members/index'
+import { Route as AuthSettingsApiKeysIndexRouteImport } from './routes/_auth/settings/api-keys/index'
+import { Route as AuthSettingsWebhooksNewRouteImport } from './routes/_auth/settings/webhooks/new'
+import { Route as AuthSettingsWebhooksWebhookIdRouteImport } from './routes/_auth/settings/webhooks/$webhookId'
 import { Route as AuthSettingsOrganizationNewRouteImport } from './routes/_auth/settings/organization/new'
 import { Route as AuthSettingsMembersNewRouteImport } from './routes/_auth/settings/members/new'
 import { Route as AuthSettingsMembersMemberIdRouteImport } from './routes/_auth/settings/members/$memberId'
+import { Route as AuthSettingsApiKeysNewRouteImport } from './routes/_auth/settings/api-keys/new'
+import { Route as AuthSettingsApiKeysApiKeyIdRouteImport } from './routes/_auth/settings/api-keys/$apiKeyId'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -62,6 +68,12 @@ const AuthConversationsNewRoute = AuthConversationsNewRouteImport.update({
   path: '/conversations/new',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthSettingsWebhooksIndexRoute =
+  AuthSettingsWebhooksIndexRouteImport.update({
+    id: '/settings/webhooks/',
+    path: '/settings/webhooks/',
+    getParentRoute: () => AuthRoute,
+  } as any)
 const AuthSettingsOrganizationIndexRoute =
   AuthSettingsOrganizationIndexRouteImport.update({
     id: '/settings/organization/',
@@ -72,6 +84,23 @@ const AuthSettingsMembersIndexRoute =
   AuthSettingsMembersIndexRouteImport.update({
     id: '/settings/members/',
     path: '/settings/members/',
+    getParentRoute: () => AuthRoute,
+  } as any)
+const AuthSettingsApiKeysIndexRoute =
+  AuthSettingsApiKeysIndexRouteImport.update({
+    id: '/settings/api-keys/',
+    path: '/settings/api-keys/',
+    getParentRoute: () => AuthRoute,
+  } as any)
+const AuthSettingsWebhooksNewRoute = AuthSettingsWebhooksNewRouteImport.update({
+  id: '/settings/webhooks/new',
+  path: '/settings/webhooks/new',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthSettingsWebhooksWebhookIdRoute =
+  AuthSettingsWebhooksWebhookIdRouteImport.update({
+    id: '/settings/webhooks/$webhookId',
+    path: '/settings/webhooks/$webhookId',
     getParentRoute: () => AuthRoute,
   } as any)
 const AuthSettingsOrganizationNewRoute =
@@ -91,6 +120,17 @@ const AuthSettingsMembersMemberIdRoute =
     path: '/settings/members/$memberId',
     getParentRoute: () => AuthRoute,
   } as any)
+const AuthSettingsApiKeysNewRoute = AuthSettingsApiKeysNewRouteImport.update({
+  id: '/settings/api-keys/new',
+  path: '/settings/api-keys/new',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthSettingsApiKeysApiKeyIdRoute =
+  AuthSettingsApiKeysApiKeyIdRouteImport.update({
+    id: '/settings/api-keys/$apiKeyId',
+    path: '/settings/api-keys/$apiKeyId',
+    getParentRoute: () => AuthRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
@@ -100,11 +140,17 @@ export interface FileRoutesByFullPath {
   '/conversations/new': typeof AuthConversationsNewRoute
   '/conversations': typeof AuthConversationsIndexRoute
   '/settings': typeof AuthSettingsIndexRoute
+  '/settings/api-keys/$apiKeyId': typeof AuthSettingsApiKeysApiKeyIdRoute
+  '/settings/api-keys/new': typeof AuthSettingsApiKeysNewRoute
   '/settings/members/$memberId': typeof AuthSettingsMembersMemberIdRoute
   '/settings/members/new': typeof AuthSettingsMembersNewRoute
   '/settings/organization/new': typeof AuthSettingsOrganizationNewRoute
+  '/settings/webhooks/$webhookId': typeof AuthSettingsWebhooksWebhookIdRoute
+  '/settings/webhooks/new': typeof AuthSettingsWebhooksNewRoute
+  '/settings/api-keys': typeof AuthSettingsApiKeysIndexRoute
   '/settings/members': typeof AuthSettingsMembersIndexRoute
   '/settings/organization': typeof AuthSettingsOrganizationIndexRoute
+  '/settings/webhooks': typeof AuthSettingsWebhooksIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -114,11 +160,17 @@ export interface FileRoutesByTo {
   '/conversations/new': typeof AuthConversationsNewRoute
   '/conversations': typeof AuthConversationsIndexRoute
   '/settings': typeof AuthSettingsIndexRoute
+  '/settings/api-keys/$apiKeyId': typeof AuthSettingsApiKeysApiKeyIdRoute
+  '/settings/api-keys/new': typeof AuthSettingsApiKeysNewRoute
   '/settings/members/$memberId': typeof AuthSettingsMembersMemberIdRoute
   '/settings/members/new': typeof AuthSettingsMembersNewRoute
   '/settings/organization/new': typeof AuthSettingsOrganizationNewRoute
+  '/settings/webhooks/$webhookId': typeof AuthSettingsWebhooksWebhookIdRoute
+  '/settings/webhooks/new': typeof AuthSettingsWebhooksNewRoute
+  '/settings/api-keys': typeof AuthSettingsApiKeysIndexRoute
   '/settings/members': typeof AuthSettingsMembersIndexRoute
   '/settings/organization': typeof AuthSettingsOrganizationIndexRoute
+  '/settings/webhooks': typeof AuthSettingsWebhooksIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -130,11 +182,17 @@ export interface FileRoutesById {
   '/_auth/conversations/new': typeof AuthConversationsNewRoute
   '/_auth/conversations/': typeof AuthConversationsIndexRoute
   '/_auth/settings/': typeof AuthSettingsIndexRoute
+  '/_auth/settings/api-keys/$apiKeyId': typeof AuthSettingsApiKeysApiKeyIdRoute
+  '/_auth/settings/api-keys/new': typeof AuthSettingsApiKeysNewRoute
   '/_auth/settings/members/$memberId': typeof AuthSettingsMembersMemberIdRoute
   '/_auth/settings/members/new': typeof AuthSettingsMembersNewRoute
   '/_auth/settings/organization/new': typeof AuthSettingsOrganizationNewRoute
+  '/_auth/settings/webhooks/$webhookId': typeof AuthSettingsWebhooksWebhookIdRoute
+  '/_auth/settings/webhooks/new': typeof AuthSettingsWebhooksNewRoute
+  '/_auth/settings/api-keys/': typeof AuthSettingsApiKeysIndexRoute
   '/_auth/settings/members/': typeof AuthSettingsMembersIndexRoute
   '/_auth/settings/organization/': typeof AuthSettingsOrganizationIndexRoute
+  '/_auth/settings/webhooks/': typeof AuthSettingsWebhooksIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -146,11 +204,17 @@ export interface FileRouteTypes {
     | '/conversations/new'
     | '/conversations'
     | '/settings'
+    | '/settings/api-keys/$apiKeyId'
+    | '/settings/api-keys/new'
     | '/settings/members/$memberId'
     | '/settings/members/new'
     | '/settings/organization/new'
+    | '/settings/webhooks/$webhookId'
+    | '/settings/webhooks/new'
+    | '/settings/api-keys'
     | '/settings/members'
     | '/settings/organization'
+    | '/settings/webhooks'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -160,11 +224,17 @@ export interface FileRouteTypes {
     | '/conversations/new'
     | '/conversations'
     | '/settings'
+    | '/settings/api-keys/$apiKeyId'
+    | '/settings/api-keys/new'
     | '/settings/members/$memberId'
     | '/settings/members/new'
     | '/settings/organization/new'
+    | '/settings/webhooks/$webhookId'
+    | '/settings/webhooks/new'
+    | '/settings/api-keys'
     | '/settings/members'
     | '/settings/organization'
+    | '/settings/webhooks'
   id:
     | '__root__'
     | '/_auth'
@@ -175,11 +245,17 @@ export interface FileRouteTypes {
     | '/_auth/conversations/new'
     | '/_auth/conversations/'
     | '/_auth/settings/'
+    | '/_auth/settings/api-keys/$apiKeyId'
+    | '/_auth/settings/api-keys/new'
     | '/_auth/settings/members/$memberId'
     | '/_auth/settings/members/new'
     | '/_auth/settings/organization/new'
+    | '/_auth/settings/webhooks/$webhookId'
+    | '/_auth/settings/webhooks/new'
+    | '/_auth/settings/api-keys/'
     | '/_auth/settings/members/'
     | '/_auth/settings/organization/'
+    | '/_auth/settings/webhooks/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -245,6 +321,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthConversationsNewRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/settings/webhooks/': {
+      id: '/_auth/settings/webhooks/'
+      path: '/settings/webhooks'
+      fullPath: '/settings/webhooks'
+      preLoaderRoute: typeof AuthSettingsWebhooksIndexRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/settings/organization/': {
       id: '/_auth/settings/organization/'
       path: '/settings/organization'
@@ -257,6 +340,27 @@ declare module '@tanstack/react-router' {
       path: '/settings/members'
       fullPath: '/settings/members'
       preLoaderRoute: typeof AuthSettingsMembersIndexRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/settings/api-keys/': {
+      id: '/_auth/settings/api-keys/'
+      path: '/settings/api-keys'
+      fullPath: '/settings/api-keys'
+      preLoaderRoute: typeof AuthSettingsApiKeysIndexRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/settings/webhooks/new': {
+      id: '/_auth/settings/webhooks/new'
+      path: '/settings/webhooks/new'
+      fullPath: '/settings/webhooks/new'
+      preLoaderRoute: typeof AuthSettingsWebhooksNewRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/settings/webhooks/$webhookId': {
+      id: '/_auth/settings/webhooks/$webhookId'
+      path: '/settings/webhooks/$webhookId'
+      fullPath: '/settings/webhooks/$webhookId'
+      preLoaderRoute: typeof AuthSettingsWebhooksWebhookIdRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_auth/settings/organization/new': {
@@ -280,6 +384,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSettingsMembersMemberIdRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/settings/api-keys/new': {
+      id: '/_auth/settings/api-keys/new'
+      path: '/settings/api-keys/new'
+      fullPath: '/settings/api-keys/new'
+      preLoaderRoute: typeof AuthSettingsApiKeysNewRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/settings/api-keys/$apiKeyId': {
+      id: '/_auth/settings/api-keys/$apiKeyId'
+      path: '/settings/api-keys/$apiKeyId'
+      fullPath: '/settings/api-keys/$apiKeyId'
+      preLoaderRoute: typeof AuthSettingsApiKeysApiKeyIdRouteImport
+      parentRoute: typeof AuthRoute
+    }
   }
 }
 
@@ -290,11 +408,17 @@ interface AuthRouteChildren {
   AuthConversationsNewRoute: typeof AuthConversationsNewRoute
   AuthConversationsIndexRoute: typeof AuthConversationsIndexRoute
   AuthSettingsIndexRoute: typeof AuthSettingsIndexRoute
+  AuthSettingsApiKeysApiKeyIdRoute: typeof AuthSettingsApiKeysApiKeyIdRoute
+  AuthSettingsApiKeysNewRoute: typeof AuthSettingsApiKeysNewRoute
   AuthSettingsMembersMemberIdRoute: typeof AuthSettingsMembersMemberIdRoute
   AuthSettingsMembersNewRoute: typeof AuthSettingsMembersNewRoute
   AuthSettingsOrganizationNewRoute: typeof AuthSettingsOrganizationNewRoute
+  AuthSettingsWebhooksWebhookIdRoute: typeof AuthSettingsWebhooksWebhookIdRoute
+  AuthSettingsWebhooksNewRoute: typeof AuthSettingsWebhooksNewRoute
+  AuthSettingsApiKeysIndexRoute: typeof AuthSettingsApiKeysIndexRoute
   AuthSettingsMembersIndexRoute: typeof AuthSettingsMembersIndexRoute
   AuthSettingsOrganizationIndexRoute: typeof AuthSettingsOrganizationIndexRoute
+  AuthSettingsWebhooksIndexRoute: typeof AuthSettingsWebhooksIndexRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
@@ -304,11 +428,17 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthConversationsNewRoute: AuthConversationsNewRoute,
   AuthConversationsIndexRoute: AuthConversationsIndexRoute,
   AuthSettingsIndexRoute: AuthSettingsIndexRoute,
+  AuthSettingsApiKeysApiKeyIdRoute: AuthSettingsApiKeysApiKeyIdRoute,
+  AuthSettingsApiKeysNewRoute: AuthSettingsApiKeysNewRoute,
   AuthSettingsMembersMemberIdRoute: AuthSettingsMembersMemberIdRoute,
   AuthSettingsMembersNewRoute: AuthSettingsMembersNewRoute,
   AuthSettingsOrganizationNewRoute: AuthSettingsOrganizationNewRoute,
+  AuthSettingsWebhooksWebhookIdRoute: AuthSettingsWebhooksWebhookIdRoute,
+  AuthSettingsWebhooksNewRoute: AuthSettingsWebhooksNewRoute,
+  AuthSettingsApiKeysIndexRoute: AuthSettingsApiKeysIndexRoute,
   AuthSettingsMembersIndexRoute: AuthSettingsMembersIndexRoute,
   AuthSettingsOrganizationIndexRoute: AuthSettingsOrganizationIndexRoute,
+  AuthSettingsWebhooksIndexRoute: AuthSettingsWebhooksIndexRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
