@@ -11,6 +11,8 @@ import FilePreviewer from "@/components/FilePreviewer";
 import Templates from "@/components/Templates";
 import ActionCard from "@/components/ActionCard";
 import { Building2, MessageSquarePlus, Settings } from "lucide-react";
+import { useResizable } from "@/hooks/useResizable";
+import { ResizeHandle } from "@/components/ResizeHandle";
 
 export const Route = createFileRoute("/_auth")({
   component: AppLayout,
@@ -25,6 +27,12 @@ function AppLayout() {
 
   const [isHoveringFiles, setIsHoveringFiles] = useState(false);
 
+  const { width: sidebarWidth, handleMouseDown, isResizing } = useResizable({
+    initialWidth: 300,
+    minWidth: 200,
+    maxWidth: 600,
+  });
+
   // Sync fragment identifier with activeConvId
   // i.e. /conversations#1234
   useEffect(() => {
@@ -32,31 +40,37 @@ function AppLayout() {
     setActiveConv(convId);
   }, [location.hash]);
 
-  console.log("--------")
-  console.log("active org ", activeOrgId)
-  console.log("active conv", activeConvId)
-
   return (
-    <div className="app-grid">
+    <div
+      className="flex h-screen w-screen overflow-hidden"
+      style={{ cursor: isResizing ? "col-resize" : "default" }}
+    >
       {/* Menu - Fixed width */}
       <div className={activeConvId ? "hidden md:flex" : "flex"}>
         <Menu />
       </div>
-      {/* Left Panel - Router Outlet */}
+
+      {/* Left Panel - Router Outlet - Resizable */}
       <div
         className={
-          "flex-col overflow-hidden border-border md:border-r bg-background text-foreground col-span-2 md:col-span-1 " +
+          "flex flex-col overflow-hidden border-border md:border-r bg-background text-foreground " +
           (activeConvId ? "hidden md:flex" : "flex")
         }
+        style={{ width: `${sidebarWidth}px`, minWidth: `${sidebarWidth}px` }}
       >
         <Outlet />
       </div>
 
+      {/* Resize Handle */}
+      {!activeConvId && (
+        <ResizeHandle onMouseDown={handleMouseDown} isResizing={isResizing} />
+      )}
+
       {/* Center Panel - Chat */}
       <div
         className={
-          "flex-col min-w-0 relative overflow-hidden col-span-full md:col-span-1" +
-          (activeConvId ? " flex bg-chat" : " hidden md:flex bg-muted")
+          "flex flex-col min-w-0 relative overflow-hidden flex-1 " +
+          (activeConvId ? "flex bg-chat" : "hidden md:flex bg-muted")
         }
         onDragEnter={() => setIsHoveringFiles(true)}
         onDrop={() => setIsHoveringFiles(false)}
