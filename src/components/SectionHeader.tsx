@@ -1,9 +1,9 @@
-import { ArrowLeft, X } from "lucide-react";
+import { ArrowLeft, Trash2, X } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useLocation, useRouter } from "@tanstack/react-router";
 import { LinkButton } from "./LinkButton";
 
-export default function SectionHeader(props: { title: string; closeButton?: boolean }) {
+export default function SectionHeader(props: { title: string; closeButton?: boolean; onDelete?: () => void }) {
   const { translate: t } = useTranslation();
   const location = useLocation();
   const router = useRouter();
@@ -40,6 +40,16 @@ export default function SectionHeader(props: { title: string; closeButton?: bool
       <div className={showBackButton ? "text-[16px]" : "text-[22px]"}>
         {t(props.title)}
       </div>
+
+      {props.onDelete && (
+        <button
+          className="p-[8px] rounded-full hover:bg-muted ml-auto"
+          title={t("Eliminar") as string}
+          onClick={props.onDelete}
+        >
+          <Trash2 className="w-[24px] h-[24px]" />
+        </button>
+      )}
     </div>
   );
 }

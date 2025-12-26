@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import SectionHeader from "@/components/SectionHeader";
 import SectionBody from "@/components/SectionBody";
+import SectionFooter from "@/components/SectionFooter";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAgent, useUpdateAgent, useDeleteAgent, useCurrentAgent } from "@/queries/useAgents";
 import { useForm } from "react-hook-form";
@@ -37,11 +38,17 @@ function EditMember() {
 
   return (
     <>
-      <SectionHeader title={agent.name} />
+      <SectionHeader
+        title={agent.name}
+        onDelete={isOwner ? () => deleteAgent.mutate(memberId, {
+          onSuccess: () => navigate({ to: "..", hash: (prevHash) => prevHash! })
+        }) : undefined}
+      />
       <SectionBody>
         <form
+          id="member-form"
           onSubmit={handleSubmit(data => updateAgent.mutate(data))}
-          className="flex flex-col gap-[16px] pb-[14px] grow"
+          className="flex flex-col gap-[24px] grow"
         >
           {invitation && invitation.status === "pending" && (
             <SectionItem
@@ -85,38 +92,21 @@ function EditMember() {
               {...register("extra.invitation.email")}
             />
           </label>}
-
-          <div className="grow" />
-
-          {isOwner && (
-            <>
-              <button
-                className="destructive"
-                onClick={() =>
-                  deleteAgent.mutate(memberId, {
-                    onSuccess: () =>
-                      navigate({
-                        to: "..",
-                        hash: (prevHash) => prevHash!,
-                      }),
-                  })
-                }
-                disabled={deleteAgent.isPending}
-              >
-                {deleteAgent.isPending ? "..." : t("Eliminar")}
-              </button>
-
-              <button
-                type="submit"
-                disabled={updateAgent.isPending || !isValid || !isDirty}
-                className="primary"
-              >
-                {updateAgent.isPending ? "..." : t("Actualizar")}
-              </button>
-            </>
-          )}
         </form>
       </SectionBody>
+
+      {isOwner && (
+        <SectionFooter>
+          <button
+            form="member-form"
+            type="submit"
+            disabled={updateAgent.isPending || !isValid || !isDirty}
+            className="primary"
+          >
+            {updateAgent.isPending ? "..." : t("Actualizar")}
+          </button>
+        </SectionFooter>
+      )}
     </>
   );
 }

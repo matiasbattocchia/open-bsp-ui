@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import SectionHeader from "@/components/SectionHeader";
+import SectionFooter from "@/components/SectionFooter";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useCreateWebhook, type WebhookInsert } from "@/queries/useWebhooks";
 import { useForm } from "react-hook-form";
@@ -31,6 +32,7 @@ function AddWebhook() {
 
       <SectionBody>
         <form
+          id="create-webhook-form"
           onSubmit={handleSubmit((data) =>
             createWebhook.mutate(
               data,
@@ -43,7 +45,7 @@ function AddWebhook() {
               }
             )
           )}
-          className="flex flex-col gap-[16px] pb-[14px] grow"
+          className="flex flex-col gap-[24px] grow"
         >
           <label>
             <div className="label">{t("URL")}</div>
@@ -92,18 +94,19 @@ function AddWebhook() {
               {...register("token")}
             />
           </label>
-
-          <div className="grow" />
-
-          <button
-            type="submit"
-            disabled={createWebhook.isPending || !isValid}
-            className="primary"
-          >
-            {createWebhook.isPending ? "..." : t("Crear")}
-          </button>
         </form>
       </SectionBody>
+
+      <SectionFooter>
+        <button
+          form="create-webhook-form"
+          type="submit"
+          disabled={createWebhook.isPending || !isValid}
+          className="primary"
+        >
+          {createWebhook.isPending ? "..." : t("Crear")}
+        </button>
+      </SectionFooter>
     </>
   );
 }

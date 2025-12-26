@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import SectionHeader from "@/components/SectionHeader";
+import SectionFooter from "@/components/SectionFooter";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useCreateAgent } from "@/queries/useAgents";
 import { useForm } from "react-hook-form";
@@ -51,8 +52,9 @@ function AddAgent() {
 
       <SectionBody>
         <form
+          id="create-agent-form"
           onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col gap-[16px] pb-[14px] grow"
+          className="flex flex-col gap-[24px] grow"
         >
           <label>
             <div className="label">{t("Nombre")}</div>
@@ -131,23 +133,24 @@ function AddAgent() {
           <label>
             <div className="label">{t("Instrucciones")}</div>
             <textarea
-              className="text bg-incoming-chat-bubble rounded-lg w-full p-[8px] h-[120px] focus-visible:outline-none"
+              className="text h-auto h-min-[100px] font-mono text-[12.8px] bg-incoming-chat-bubble"
               placeholder={t("Eres un asistente útil...") as string}
               {...register("extra.instructions")}
             />
           </label>
-
-          <div className="grow" />
-
-          <button
-            type="submit"
-            disabled={createAgent.isPending || !isValid}
-            className="primary"
-          >
-            {createAgent.isPending ? "..." : t("Crear")}
-          </button>
         </form>
       </SectionBody>
+
+      <SectionFooter>
+        <button
+          form="create-agent-form"
+          type="submit"
+          disabled={createAgent.isPending || !isValid}
+          className="primary"
+        >
+          {createAgent.isPending ? "..." : t("Crear")}
+        </button>
+      </SectionFooter>
     </>
   );
 }

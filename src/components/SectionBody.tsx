@@ -9,7 +9,7 @@ export default function SectionBody({
 }) {
   return (
     <div className="[overflow-y:overlay] w-full h-full pt-[10px] px-[20px]">
-      <div className={`flex flex-col gap-[4px] min-h-full ${className || ""}`}>{children}</div>
+      <div className={`flex flex-col gap-[4px] min-h-full ${className}`}>{children}</div>
     </div>
   );
 }

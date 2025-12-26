@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SectionHeader from "@/components/SectionHeader";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAgent, useDeleteAgent, useUpdateAgent } from "@/queries/useAgents";
@@ -9,6 +9,7 @@ import useBoundStore from "@/stores/useBoundStore";
 import { type AIAgentRow, type AIAgentUpdate } from "@/supabase/client";
 import { startConversation } from "@/utils/ConversationUtils";
 import { useIntegrations } from "@/queries/useIntegrations";
+import SectionFooter from "@/components/SectionFooter";
 
 export const Route = createFileRoute("/_auth/agents/$agentId")({
   component: AgentDetail,
@@ -28,23 +29,19 @@ function AgentDetail() {
     (address) => address.service === "local",
   );
 
+  useEffect(() => {
+    if (!agent) return;
+    const apiUrl = agent.extra?.api_url || "";
+    const isKnown = ["openai", "anthropic", "groq", "google"].includes(apiUrl);
+    setProvider(isKnown ? apiUrl : "custom");
+  }, [agent]);
+
   const {
     register,
     handleSubmit,
     setValue,
     formState: { isDirty, isValid },
-  } = useForm<AIAgentUpdate>({
-    /*defaultValues: async () => {
-      const agent = await promise;
-      console.log("ues form promiso", agent);
-      const apiUrl = agent.extra?.api_url || "";
-      const isKnown = knownProviders.includes(apiUrl);
-      setProvider(isKnown ? apiUrl : "custom"); // Set local state based on agent data
-
-      return agent;
-    },*/
-    values: agent,
-  });
+  } = useForm<AIAgentUpdate>({ values: agent });
 
   const handleChat = () => {
     if (!activeOrgId || !localAddress) return;
@@ -63,12 +60,20 @@ function AgentDetail() {
 
   return agent && (
     <>
-      <SectionHeader title={agent.name} />
+      <SectionHeader
+        title={agent.name}
+        onDelete={() => {
+          deleteAgent.mutate(agentId, {
+            onSuccess: () => navigate({ to: "..", hash: (prevHash) => prevHash! })
+          });
+        }}
+      />
 
       <SectionBody>
         <form
+          id="agent-form"
           onSubmit={handleSubmit(data => updateAgent.mutate(data))}
-          className="flex flex-col gap-[16px] pb-[14px] grow"
+          className="flex flex-col gap-[24px] grow"
         >
           <label>
             <div className="label">{t("Nombre")}</div>
@@ -125,7 +130,7 @@ function AgentDetail() {
           )}
 
           <label>
-            <div className="label">{t("API Key")}</div>
+            <div className="label">{t("Clave API")}</div>
             <input
               type="text"
               className="text"
@@ -147,46 +152,34 @@ function AgentDetail() {
           <label>
             <div className="label">{t("Instrucciones")}</div>
             <textarea
-              rows={4}
-              className="text h-auto"
+              className="text h-auto h-min-[100px] font-mono text-[12.8px] bg-incoming-chat-bubble"
               {...register("extra.instructions")}
               placeholder={t("Eres un asistente útil...") as string}
             />
           </label>
+        </form>
+      </SectionBody >
 
-          <div className="grow" />
-
+      <SectionFooter>
+        {!isDirty ? (
           <button
             type="button"
-            className="destructive"
-            onClick={() => {
-              deleteAgent.mutate(agentId, {
-                onSuccess: () => navigate({ to: "..", hash: (prevHash) => prevHash! })
-              });
-            }}
+            className="primary"
+            onClick={handleChat}
           >
-            {t("Eliminar")}
+            {t("Chatea con este agente")}
           </button>
-
-          {!isDirty ? (
-            <button
-              type="button"
-              className="primary"
-              onClick={handleChat}
-            >
-              {t("Chatea con este agente")}
-            </button>
-          ) : (
-            <button
-              type="submit"
-              disabled={updateAgent.isPending || !isValid}
-              className="primary"
-            >
-              {updateAgent.isPending ? "..." : t("Actualizar")}
-            </button>
-          )}
-        </form>
-      </SectionBody>
+        ) : (
+          <button
+            form="agent-form"
+            type="submit"
+            disabled={updateAgent.isPending || !isValid}
+            className="primary"
+          >
+            {updateAgent.isPending ? "..." : t("Actualizar")}
+          </button>
+        )}
+      </SectionFooter>
     </>
   );
 }
