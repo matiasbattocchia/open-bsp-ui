@@ -5,12 +5,9 @@ import {
 } from "@/supabase/client";
 import useBoundStore from "@/stores/useBoundStore";
 import { useEffect } from "react";
-import { useOrganizations } from "@/queries/useOrgs";
 
 export const useRealtimeSubscription = () => {
-  const { data } = useOrganizations();
-
-  const orgIds = data?.map((o) => o.id) || [];
+  const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
 
   const pushConversations = useBoundStore(
     (state) => state.chat.pushConversations,
@@ -18,9 +15,9 @@ export const useRealtimeSubscription = () => {
   const pushMessages = useBoundStore((state) => state.chat.pushMessages);
 
   useEffect(() => {
-    if (!orgIds.length) return;
+    if (!activeOrgId) return;
 
-    const filter = `organization_id=in.(${orgIds.join(",")})`;
+    const filter = `organization_id=${activeOrgId}`;
 
     const channel = supabase
       .channel("rialtaim")
@@ -67,5 +64,5 @@ export const useRealtimeSubscription = () => {
     return () => {
       channel.unsubscribe();
     };
-  }, [orgIds]);
+  }, [activeOrgId]);
 };

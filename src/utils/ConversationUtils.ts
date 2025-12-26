@@ -18,44 +18,10 @@ export async function pushConversationToDb(record: ConversationInsert) {
   }
 }
 
-function assert(condition: boolean, message: string) {
-  if (!condition) {
-    throw new Error(message);
-  }
-}
-
-export function startConversation({
-  organization_id,
-  organization_address,
-  contact_address,
-  service,
-  type,
-  name,
-}: {
-  organization_id: string;
-  organization_address: string;
-  contact_address: string;
-  service: "local" | "whatsapp";
-  type: "group" | "personal" | "test";
-  name?: string;
-}) {
-  if (service === "whatsapp") {
-    assert(
-      type === "personal",
-      "Conversation type must be 'personal' for WhatsApp",
-    );
-  }
-
+export function startConversation(conv: ConversationInsert) {
   const record: ConversationInsert = {
+    ...conv,
     id: crypto.randomUUID(),
-    organization_address,
-    contact_address,
-    service,
-    organization_id, // The presence of this field makes the before insert trigger to skip, thus no contact is created.
-    name,
-    extra: {
-      type,
-    },
   };
 
   pushConversationToStore(record);

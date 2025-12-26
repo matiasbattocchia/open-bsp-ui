@@ -149,12 +149,12 @@ button:disabled {
     @apply text-[14px] text-muted-foreground mb-[8px];
   }
 
-  input.text {
-    @apply w-full h-[24px] border-input border-b-[2px] py-[8px] focus-visible:outline-none text-[16px] text-foreground placeholder:text-muted-foreground bg-transparent focus-visible:border-primary;
+  input.text, textarea.text {
+    @apply w-full h-[24px] border-b-[2px] border-transparent hover:border-input py-[8px] focus-visible:outline-none text-[16px] text-foreground placeholder:text-muted-foreground bg-transparent focus-visible:border-primary;
   }
 
   select {
-    @apply w-full h-[24px] border-input border-b-[2px] focus-visible:outline-none text-[16px] text-foreground placeholder:text-muted-foreground bg-transparent focus-visible:border-primary;
+    @apply w-full h-[24px] border-b-[2px] border-transparent hover:border-input focus-visible:outline-none text-[16px] text-foreground placeholder:text-muted-foreground bg-transparent focus-visible:border-primary;
   }
 
   button.primary {

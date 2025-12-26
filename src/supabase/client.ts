@@ -512,7 +512,7 @@ export type ConversationExtra = {
   paused?: string;
   archived?: string;
   pinned?: string;
-  notifications?: "off" | "muted" | "on";
+  agent_id?: string;
   draft?: {
     text: string;
     origin: string;

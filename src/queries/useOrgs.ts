@@ -34,14 +34,13 @@ export function useOrganization(id: string) {
         .eq("id", id)
         .single()
         .throwOnError(),
-    enabled: !!userId,
+    enabled: !!userId && !!id,
     select: (data) => data.data,
   });
 }
 
 export function useCurrentOrganization() {
   const orgId = useBoundStore((state) => state.ui.activeOrgId);
-  console.log(orgId);
 
   return useOrganization(orgId || "");
 }

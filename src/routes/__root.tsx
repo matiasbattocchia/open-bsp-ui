@@ -5,9 +5,11 @@ import { useInitialDataFetch } from "@/hooks/useInitalDataFetch";
 import useBoundStore from "@/stores/useBoundStore";
 import { redirect } from "@tanstack/react-router";
 import { supabase } from "@/supabase/client";
+import { useSetActiveOrg } from "@/hooks/useSetActiveOrg";
 
 function RootLayout() {
   useAuth();
+  useSetActiveOrg();
   useRealtimeSubscription();
   useInitialDataFetch();
 

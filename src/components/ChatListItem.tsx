@@ -15,7 +15,7 @@ import localizedFormat from "dayjs/plugin/localizedFormat";
 dayjs.extend(localizedFormat);
 import { TickContext } from "@/contexts/useTick";
 import { Translate as T, useTranslation } from "@/hooks/useTranslation";
-import { AtSign, Pause, VolumeOff } from "lucide-react";
+import { AtSign, Pause } from "lucide-react";
 import { SpecialMessageTypeMap } from "./Message/Message";
 import { useCurrentAgents, useCurrentAgent } from "@/queries/useAgents";
 import { nameInitials } from "@/utils/FormatUtils";
@@ -200,7 +200,6 @@ export default function ChatListItem({
   const tick = useContext(TickContext); // one-minute ticks
 
   const isPinned = conversation?.extra?.pinned;
-  const isMuted = conversation?.extra?.notifications === "off";
 
   const isPaused =
     +new Date(conversation?.extra?.paused || 0) > +new Date() - 12 * 60 * 60 * 1000; // Less than 12 hours ago.
@@ -254,7 +253,8 @@ export default function ChatListItem({
             />
           </div>
           <div className="info flex flex-col justify-center grow min-w-0 pr-[15px]">
-            <div className="upper-row flex justify-between items-baseline">
+            {/* Upper row */}
+            <div className="flex justify-between items-baseline">
               <div className="truncate text-foreground text-[16px]">{name || "?"}</div>
               <div
                 className={
@@ -265,12 +265,13 @@ export default function ChatListItem({
                 {preview && formatTime(preview.timestamp)}
               </div>
             </div>
-            <div className="lower-row flex justify-between mt-[2px] items-start">
+            {/* Lower row */}
+            <div className="flex justify-between mt-[2px] items-start">
               <div className="min-w-0 flex items-start text-muted-foreground">
                 {preview?.direction === "outgoing" &&
                   statusIcon(preview.status)}
                 {preview?.agent_id && preview.agent_id !== agent?.id && (
-                  <div className="text-[14px] mr-1 shrink-0">
+                  <div className="text-primary text-[14px] mr-1 shrink-0">
                     {agents?.find((a) => a.id === preview.agent_id)?.name || "?"}:
                   </div>
                 )}
@@ -301,10 +302,6 @@ export default function ChatListItem({
               </div>
 
               <div className="flex flex-row items-center">
-                {/* Muted - Notifications is turned off */}
-                {isMuted && (
-                  <VolumeOff className="h-[19px] w-[19px] ml-[6px] stroke-muted-foreground" />
-                )}
                 {/* Pause - AI assistant paused */}
                 {isPaused && (
                   <Pause className="h-[19px] w-[19px] ml-[6px] fill-muted-foreground stroke-0" />
@@ -325,7 +322,7 @@ export default function ChatListItem({
                 {unread.count > 0 && (
                   <div className="ml-[6px]">
                     <span
-                      className={`font-bold text-[12px] text-white rounded-full py-[3px] px-[6px] ${severity.bg}`}
+                      className={`font-bold text-[12px] text-white rounded-full py-[2px] px-[6px] ${severity.bg}`}
                     >
                       {unread.count}
                     </span>

@@ -14,7 +14,7 @@ function EditWebhook() {
   const { translate: t } = useTranslation();
   const navigate = useNavigate();
   const { webhookId } = Route.useParams();
-  const { promise, data: webhook } = useWebhook(webhookId);
+  const { data: webhook } = useWebhook(webhookId);
   const updateWebhook = useUpdateWebhook();
   const deleteWebhook = useDeleteWebhook();
 
@@ -23,15 +23,10 @@ function EditWebhook() {
     handleSubmit,
     formState: { isValid, isDirty },
   } = useForm<WebhookUpdate>({
-    defaultValues: async () => {
-      const webhook = await promise;
-      return webhook
-    },
+    values: webhook,
   });
 
-  if (!webhook) return null;
-
-  return (
+  return webhook && (
     <>
       <SectionHeader title={t("Editar webhook") as string} />
 
@@ -118,7 +113,7 @@ function EditWebhook() {
             disabled={updateWebhook.isPending || !isValid || !isDirty}
             className="primary"
           >
-            {updateWebhook.isPending ? "..." : t("Guardar")}
+            {updateWebhook.isPending ? "..." : t("Actualizar")}
           </button>
         </form>
       </SectionBody>

@@ -23,12 +23,10 @@ function EditOrganization() {
   const {
     register,
     handleSubmit,
-    formState: { isValid },
+    formState: { isValid, isDirty },
   } = useForm({ values: org });
 
-  if (!org) return null;
-
-  return (
+  return org && (
     <>
       <SectionHeader title={org.name} />
 
@@ -66,7 +64,7 @@ function EditOrganization() {
 
               <button
                 type="submit"
-                disabled={updateOrg.isPending || !isValid}
+                disabled={updateOrg.isPending || !isValid || !isDirty}
                 className="primary"
               >
                 {updateOrg.isPending ? "..." : t("Actualizar")}

@@ -13,18 +13,14 @@ function ApiKeyDetail() {
   const { translate: t } = useTranslation();
   const navigate = useNavigate();
   const { apiKeyId } = Route.useParams();
-  const { promise, data: apiKey } = useApiKey(apiKeyId);
+  const { data: apiKey } = useApiKey(apiKeyId);
   const deleteApiKey = useDeleteApiKey();
 
   const { register } = useForm<ApiKeyRow>({
-    defaultValues: async () => {
-      return await promise;
-    },
+    values: apiKey,
   });
 
-  if (!apiKey) return null;
-
-  return (
+  return apiKey && (
     <>
       <SectionHeader title={t("Clave API") as string} />
 

@@ -16,7 +16,7 @@ function EditMember() {
   const { memberId } = Route.useParams();
   const { translate: t } = useTranslation();
   const navigate = useNavigate();
-  const { promise, data: agent } = useAgent<HumanAgentRow>(memberId);
+  const { data: agent } = useAgent<HumanAgentRow>(memberId);
   const { data: currentAgent } = useCurrentAgent();
   const isOwner = currentAgent?.extra?.role === "owner";
 
@@ -26,12 +26,9 @@ function EditMember() {
   const {
     register,
     handleSubmit,
-    formState: { isValid },
+    formState: { isValid, isDirty },
   } = useForm<HumanAgentUpdate>({
-    defaultValues: async () => {
-      const agent = await promise;
-      return agent
-    },
+    values: agent,
   });
 
   if (!agent) return
@@ -43,7 +40,7 @@ function EditMember() {
       <SectionHeader title={agent.name} />
       <SectionBody>
         <form
-          onSubmit={handleSubmit(data => updateAgent.mutate({ id: memberId, ...data }))}
+          onSubmit={handleSubmit(data => updateAgent.mutate(data))}
           className="flex flex-col gap-[16px] pb-[14px] grow"
         >
           {invitation && invitation.status === "pending" && (
@@ -111,7 +108,7 @@ function EditMember() {
 
               <button
                 type="submit"
-                disabled={updateAgent.isPending || !isValid}
+                disabled={updateAgent.isPending || !isValid || !isDirty}
                 className="primary"
               >
                 {updateAgent.isPending ? "..." : t("Actualizar")}

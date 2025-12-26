@@ -16,6 +16,10 @@ function Integrations() {
   const { data: agent } = useCurrentAgent();
   const isAdmin = ["admin", "owner"].includes(agent?.extra?.role || "");
 
+  const externalIntegrations = integrations?.filter(
+    (integration) => integration.service !== "local",
+  );
+
   return (
     <>
       <SectionHeader title="Integraciones" />
@@ -27,9 +31,9 @@ function Integrations() {
           </div>
         )}
 
-        {integrations && integrations.length > 0 && (
+        {externalIntegrations && externalIntegrations.length > 0 && (
           <>
-            {integrations.map((integration) => (
+            {externalIntegrations.map((integration) => (
               <SectionItem
                 key={integration.address}
                 aside={

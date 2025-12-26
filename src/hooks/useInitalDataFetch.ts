@@ -1,13 +1,11 @@
 import { supabase } from "@/supabase/client";
 import useBoundStore from "@/stores/useBoundStore";
 import { useEffect, useRef } from "react";
-import { useOrganizations } from "@/queries/useOrgs";
 
 export const useInitialDataFetch = () => {
-  const setActiveOrg = useBoundStore((state) => state.ui.setActiveOrg);
-  const { data } = useOrganizations();
+  const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
 
-  const orgIds = data?.map((o) => o.id) || [];
+  const lastVisibleAt = useRef<Date | null>(null);
 
   const pushConversations = useBoundStore(
     (state) => state.chat.pushConversations,
@@ -15,10 +13,12 @@ export const useInitialDataFetch = () => {
   const pushMessages = useBoundStore((state) => state.chat.pushMessages);
 
   const loadConvs = async (since?: Date) => {
+    if (!activeOrgId) return;
+
     let query = supabase
       .from("conversations")
       .select()
-      .in("organization_id", orgIds);
+      .eq("organization_id", activeOrgId);
 
     if (since) {
       query = query.gt("updated_at", since.toISOString());
@@ -33,10 +33,12 @@ export const useInitialDataFetch = () => {
   };
 
   const loadMsgs = async (since?: Date) => {
+    if (!activeOrgId) return;
+
     let query = supabase
       .from("messages")
       .select()
-      .in("organization_id", orgIds);
+      .eq("organization_id", activeOrgId);
 
     if (since) {
       query = query.gt("updated_at", since.toISOString());
@@ -51,17 +53,11 @@ export const useInitialDataFetch = () => {
   };
 
   useEffect(() => {
-    if (!orgIds.length) {
-      return;
-    }
-
-    setActiveOrg(orgIds.at(-1)!);
-
     loadConvs();
     loadMsgs();
-  }, [orgIds]);
 
-  const lastVisibleAt = useRef<Date | null>(null);
+    lastVisibleAt.current = new Date();
+  }, [activeOrgId]);
 
   useEffect(() => {
     const handleVisibilityChange = () => {
@@ -79,5 +75,5 @@ export const useInitialDataFetch = () => {
     return () =>
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orgIds]);
+  }, []);
 };

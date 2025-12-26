@@ -2,38 +2,23 @@ import useBoundStore from "@/stores/useBoundStore";
 import { Search, X } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { startConversation } from "@/utils/ConversationUtils";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/supabase/client";
 import { useState } from "react";
 import { formatPhoneNumber } from "@/utils/FormatUtils";
 import { useNavigate } from "@tanstack/react-router";
 import SectionHeader from "./SectionHeader"
+import { useIntegrations } from "@/queries/useIntegrations";
 
 export default function NewChat() {
   const { translate: t } = useTranslation();
   const navigate = useNavigate();
-
+  const { data: addresses } = useIntegrations();
   const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
 
-  const addresses = useQuery({
-    queryKey: [activeOrgId, "addresses"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("organizations_addresses")
-        .select("*")
-        .eq("organization_id", activeOrgId!);
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!activeOrgId,
-    staleTime: 1000 * 60 * 60 * 24, // 24 hours
-  });
-
-  const internalAddress = addresses.data?.find(
+  const localAddress = addresses?.find(
     (address) => address.service === "local",
-  )?.address;
+  );
 
-  const whatsappAddresses = addresses.data?.filter(
+  const whatsappAddresses = addresses?.filter(
     (address) => address.service === "whatsapp",
   );
 
@@ -79,7 +64,7 @@ export default function NewChat() {
       </div>
 
       <div className="flex flex-col gap-2 mt-4 px-[12px]">
-        {internalAddress && (
+        {localAddress && (
           <button
             className="px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/80 rounded-full text-center"
             onClick={() => {
@@ -89,10 +74,9 @@ export default function NewChat() {
 
               const convId = startConversation({
                 organization_id: activeOrgId,
-                organization_address: internalAddress,
+                organization_address: localAddress.address, // It is a convention that the internal address id is the same as the organization id
                 contact_address: crypto.randomUUID(),
                 service: "local",
-                type: "personal",
               });
 
               //setActiveConv(convId!);
@@ -137,7 +121,6 @@ export default function NewChat() {
                   organization_address: whatsappAddresses[0].address,
                   contact_address: sanitizePhoneNumber(phoneNumber),
                   service: "whatsapp",
-                  type: "personal",
                   name: formatPhoneNumber(sanitizePhoneNumber(phoneNumber)),
                 });
 
