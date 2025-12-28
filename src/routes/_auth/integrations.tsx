@@ -4,7 +4,7 @@ import SectionItem from "@/components/SectionItem";
 import { createFileRoute } from "@tanstack/react-router";
 import WhatsAppIntegration from "@/components/WhatsAppIntegration";
 import { WhatsAppOutlined } from "@ant-design/icons";
-import { useIntegrations } from "@/queries/useIntegrations";
+import { useIntegrations } from "@/queries/useOrganizationsAddresses";
 import { useCurrentAgent } from "@/queries/useAgents";
 
 export const Route = createFileRoute("/_auth/integrations")({

@@ -2,7 +2,7 @@ import SectionBody from "@/components/SectionBody";
 import SectionHeader from "@/components/SectionHeader";
 import SectionFooter from "@/components/SectionFooter";
 import { useTranslation } from "@/hooks/useTranslation";
-import { useCurrentOrganization, useUpdateCurrentOrganization, useDeleteCurrentOrganization } from "@/queries/useOrgs";
+import { useCurrentOrganization, useUpdateCurrentOrganization, useDeleteCurrentOrganization } from "@/queries/useOrganizations";
 import { useCurrentAgent } from "@/queries/useAgents";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";

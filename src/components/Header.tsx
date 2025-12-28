@@ -1,6 +1,6 @@
 import { useTranslation } from "@/hooks/useTranslation";
 import { LinkButton } from "@/components/LinkButton";
-import { useCurrentOrganization } from "@/queries/useOrgs";
+import { useCurrentOrganization } from "@/queries/useOrganizations";
 import { MessageSquarePlus } from "lucide-react";
 
 export default function Header() {

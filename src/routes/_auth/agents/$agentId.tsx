@@ -8,7 +8,7 @@ import SectionBody from "@/components/SectionBody";
 import useBoundStore from "@/stores/useBoundStore";
 import { type AIAgentRow, type AIAgentUpdate } from "@/supabase/client";
 import { startConversation } from "@/utils/ConversationUtils";
-import { useIntegrations } from "@/queries/useIntegrations";
+import { useIntegrations } from "@/queries/useOrganizationsAddresses";
 import SectionFooter from "@/components/SectionFooter";
 import { protocols, protocolLabels } from "./new";
 

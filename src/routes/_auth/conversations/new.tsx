@@ -6,7 +6,7 @@ import { startConversation } from "@/utils/ConversationUtils";
 import { useState } from "react";
 import { formatPhoneNumber } from "@/utils/FormatUtils";
 import SectionHeader from "@/components/SectionHeader";
-import { useIntegrations } from "@/queries/useIntegrations";
+import { useIntegrations } from "@/queries/useOrganizationsAddresses";
 import SectionItem from "@/components/SectionItem";
 import SectionBody from "@/components/SectionBody";
 
