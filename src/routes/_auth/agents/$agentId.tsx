@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SectionHeader from "@/components/SectionHeader";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAgent, useDeleteAgent, useUpdateAgent } from "@/queries/useAgents";
@@ -8,7 +8,9 @@ import SectionBody from "@/components/SectionBody";
 import useBoundStore from "@/stores/useBoundStore";
 import { type AIAgentRow, type AIAgentUpdate } from "@/supabase/client";
 import { startConversation } from "@/utils/ConversationUtils";
-import { useIntegrations } from "@/queries/useIntegrations";
+import { useIntegrations } from "@/queries/useOrganizationsAddresses";
+import SectionFooter from "@/components/SectionFooter";
+import { protocols, protocolLabels } from "./new";
 
 export const Route = createFileRoute("/_auth/agents/$agentId")({
   component: AgentDetail,
@@ -22,29 +24,25 @@ function AgentDetail() {
   const deleteAgent = useDeleteAgent();
   const updateAgent = useUpdateAgent();
   const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
-  const [provider, setProvider] = useState("openai"); // Added local state for provider
+  const [provider, setProvider] = useState<keyof typeof protocols>("openai");
 
   const localAddress = useIntegrations().data?.find(
     (address) => address.service === "local",
   );
+
+  useEffect(() => {
+    if (!agent) return;
+    const apiUrl = agent.extra?.api_url || "";
+    const isKnown = ["openai", "anthropic", "groq", "google"].includes(apiUrl);
+    setProvider(isKnown ? apiUrl : "custom");
+  }, [agent]);
 
   const {
     register,
     handleSubmit,
     setValue,
     formState: { isDirty, isValid },
-  } = useForm<AIAgentUpdate>({
-    /*defaultValues: async () => {
-      const agent = await promise;
-      console.log("ues form promiso", agent);
-      const apiUrl = agent.extra?.api_url || "";
-      const isKnown = knownProviders.includes(apiUrl);
-      setProvider(isKnown ? apiUrl : "custom"); // Set local state based on agent data
-
-      return agent;
-    },*/
-    values: agent,
-  });
+  } = useForm<AIAgentUpdate>({ values: agent });
 
   const handleChat = () => {
     if (!activeOrgId || !localAddress) return;
@@ -63,12 +61,20 @@ function AgentDetail() {
 
   return agent && (
     <>
-      <SectionHeader title={agent.name} />
+      <SectionHeader
+        title={agent.name}
+        onDelete={() => {
+          deleteAgent.mutate(agentId, {
+            onSuccess: () => navigate({ to: "..", hash: (prevHash) => prevHash! })
+          });
+        }}
+      />
 
       <SectionBody>
         <form
+          id="agent-form"
           onSubmit={handleSubmit(data => updateAgent.mutate(data))}
-          className="flex flex-col gap-[16px] pb-[14px] grow"
+          className="flex flex-col gap-[24px] grow"
         >
           <label>
             <div className="label">{t("Nombre")}</div>
@@ -90,6 +96,15 @@ function AgentDetail() {
           </label>
 
           <label>
+            <div className="label">{t("Instrucciones")}</div>
+            <textarea
+              className="text h-min-[100px] font-mono text-[12.8px]"
+              {...register("extra.instructions")}
+              placeholder={t("Eres un asistente útil...") as string}
+            />
+          </label>
+
+          <label>
             <div className="label">{t("Proveedor")}</div>
             <select
               value={provider}
@@ -97,6 +112,10 @@ function AgentDetail() {
                 const val = e.target.value;
                 setProvider(val);
                 setValue("extra.model", "");
+
+                const availableProtocols = protocols[val as keyof typeof protocols];
+                setValue("extra.protocol", availableProtocols[0]);
+
                 if (val !== 'custom') {
                   setValue("extra.api_url", val, { shouldDirty: true });
                 } else {
@@ -112,6 +131,17 @@ function AgentDetail() {
             </select>
           </label>
 
+          <label>
+            <div className="label">{t("Protocolo")}</div>
+            <select
+              {...register("extra.protocol")}
+            >
+              {(protocols[provider as keyof typeof protocols] || []).map((p) => (
+                <option key={p} value={p}>{protocolLabels[p] || p}</option>
+              ))}
+            </select>
+          </label>
+
           {provider === "custom" && (
             <label>
               <div className="label">{t("API URL")}</div>
@@ -119,13 +149,13 @@ function AgentDetail() {
                 type="text"
                 className="text"
                 placeholder="https://api.example.com/v1"
-                {...register("extra.api_url", { required: true })}
+                {...register("extra.api_url")}
               />
             </label>
           )}
 
           <label>
-            <div className="label">{t("API Key")}</div>
+            <div className="label">{t("Clave API")}</div>
             <input
               type="text"
               className="text"
@@ -140,53 +170,32 @@ function AgentDetail() {
               type="text"
               className="text"
               placeholder="gpt-4.1-mini"
-              {...register("extra.model", { required: true })}
+              {...register("extra.model")}
             />
           </label>
+        </form>
+      </SectionBody >
 
-          <label>
-            <div className="label">{t("Instrucciones")}</div>
-            <textarea
-              rows={4}
-              className="text h-auto"
-              {...register("extra.instructions")}
-              placeholder={t("Eres un asistente útil...") as string}
-            />
-          </label>
-
-          <div className="grow" />
-
+      <SectionFooter>
+        {!isDirty ? (
           <button
             type="button"
-            className="destructive"
-            onClick={() => {
-              deleteAgent.mutate(agentId, {
-                onSuccess: () => navigate({ to: "..", hash: (prevHash) => prevHash! })
-              });
-            }}
+            className="primary"
+            onClick={handleChat}
           >
-            {t("Eliminar")}
+            {t("Chatea con este agente")}
           </button>
-
-          {!isDirty ? (
-            <button
-              type="button"
-              className="primary"
-              onClick={handleChat}
-            >
-              {t("Chatea con este agente")}
-            </button>
-          ) : (
-            <button
-              type="submit"
-              disabled={updateAgent.isPending || !isValid}
-              className="primary"
-            >
-              {updateAgent.isPending ? "..." : t("Actualizar")}
-            </button>
-          )}
-        </form>
-      </SectionBody>
+        ) : (
+          <button
+            form="agent-form"
+            type="submit"
+            disabled={updateAgent.isPending || !isValid}
+            className="primary"
+          >
+            {updateAgent.isPending ? "..." : t("Actualizar")}
+          </button>
+        )}
+      </SectionFooter>
     </>
   );
 }

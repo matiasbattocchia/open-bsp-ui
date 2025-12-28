@@ -146,15 +146,20 @@ button:disabled {
 
 @layer components {
   .label {
-    @apply text-[14px] text-muted-foreground mb-[8px];
+    @apply text-[12px] text-muted-foreground mb-[8px];
+  }
+
+  textarea {
+    field-sizing: content;
+    resize: none;
   }
 
   input.text, textarea.text {
-    @apply w-full h-[24px] border-b-[2px] border-transparent hover:border-input py-[8px] focus-visible:outline-none text-[16px] text-foreground placeholder:text-muted-foreground bg-transparent focus-visible:border-primary;
+    @apply w-full border-b-[2px] border-transparent hover:border-input pb-[2px] focus-visible:outline-none text-[16px] text-foreground placeholder:text-muted-foreground bg-transparent focus-visible:border-primary;
   }
 
   select {
-    @apply w-full h-[24px] border-b-[2px] border-transparent hover:border-input focus-visible:outline-none text-[16px] text-foreground placeholder:text-muted-foreground bg-transparent focus-visible:border-primary;
+    @apply w-full pb-[2px] border-b-[2px] border-transparent hover:border-input focus-visible:outline-none text-[16px] text-foreground placeholder:text-muted-foreground bg-transparent focus-visible:border-primary;
   }
 
   button.primary {

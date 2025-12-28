@@ -4,6 +4,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { useWebhook, useUpdateWebhook, useDeleteWebhook, type WebhookUpdate } from "@/queries/useWebhooks";
 import { useForm } from "react-hook-form";
 import SectionBody from "@/components/SectionBody";
+import SectionFooter from "@/components/SectionFooter";
 
 
 export const Route = createFileRoute("/_auth/settings/webhooks/$webhookId")({
@@ -28,10 +29,16 @@ function EditWebhook() {
 
   return webhook && (
     <>
-      <SectionHeader title={t("Editar webhook") as string} />
+      <SectionHeader
+        title={t("Editar webhook") as string}
+        onDelete={() => deleteWebhook.mutate(webhookId, {
+          onSuccess: () => navigate({ to: "..", hash: (prevHash) => prevHash! })
+        })}
+      />
 
       <SectionBody>
         <form
+          id="webhook-form"
           onSubmit={handleSubmit((data) =>
             updateWebhook.mutate(
               {
@@ -40,7 +47,7 @@ function EditWebhook() {
               }
             )
           )}
-          className="flex flex-col gap-[16px] grow pb-[14px]"
+          className="flex flex-col gap-[24px] grow"
         >
           <label>
             <div className="label">{t("URL")}</div>
@@ -89,34 +96,19 @@ function EditWebhook() {
               {...register("token")}
             />
           </label>
-
-          <div className="grow" />
-
-          <button
-            className="destructive"
-            onClick={() =>
-              deleteWebhook.mutate(webhookId, {
-                onSuccess: () =>
-                  navigate({
-                    to: "..",
-                    hash: (prevHash) => prevHash!,
-                  }),
-              })
-            }
-            disabled={deleteWebhook.isPending}
-          >
-            {deleteWebhook.isPending ? "..." : t("Eliminar")}
-          </button>
-
-          <button
-            type="submit"
-            disabled={updateWebhook.isPending || !isValid || !isDirty}
-            className="primary"
-          >
-            {updateWebhook.isPending ? "..." : t("Actualizar")}
-          </button>
         </form>
       </SectionBody>
+
+      <SectionFooter>
+        <button
+          form="webhook-form"
+          type="submit"
+          disabled={updateWebhook.isPending || !isValid || !isDirty}
+          className="primary"
+        >
+          {updateWebhook.isPending ? "..." : t("Actualizar")}
+        </button>
+      </SectionFooter>
     </>
   );
 }

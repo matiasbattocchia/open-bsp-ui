@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import SectionHeader from "@/components/SectionHeader";
+import SectionFooter from "@/components/SectionFooter";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useCreateApiKey } from "@/queries/useApiKeys";
 import { useForm } from "react-hook-form";
@@ -30,6 +31,7 @@ function AddApiKey() {
 
       <SectionBody>
         <form
+          id="create-apikey-form"
           onSubmit={handleSubmit((data) =>
             createApiKey.mutate(
               data,
@@ -42,7 +44,7 @@ function AddApiKey() {
               }
             )
           )}
-          className="flex flex-col gap-[16px] pb-[14px] grow"
+          className="flex flex-col gap-[24px] grow"
         >
           <div className="text-muted-foreground text-[14px]">
             {t("Esto generará una nueva clave API que podrás usar para autenticarte.")}
@@ -56,18 +58,19 @@ function AddApiKey() {
               {...register("name", { required: true })}
             />
           </label>
-
-          <div className="grow" />
-
-          <button
-            type="submit"
-            disabled={createApiKey.isPending || !isValid}
-            className="primary"
-          >
-            {createApiKey.isPending ? "..." : t("Generar")}
-          </button>
         </form>
       </SectionBody>
+
+      <SectionFooter>
+        <button
+          form="create-apikey-form"
+          type="submit"
+          disabled={createApiKey.isPending || !isValid}
+          className="primary"
+        >
+          {createApiKey.isPending ? "..." : t("Generar")}
+        </button>
+      </SectionFooter>
     </>
   );
 }

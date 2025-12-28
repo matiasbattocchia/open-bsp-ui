@@ -1,4 +1,4 @@
-import { useOrganizations } from "@/queries/useOrgs";
+import { useOrganizations } from "@/queries/useOrganizations";
 import useBoundStore from "@/stores/useBoundStore";
 import { useEffect } from "react";
 

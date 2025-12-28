@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import SectionHeader from "@/components/SectionHeader";
 import { useTranslation } from "@/hooks/useTranslation";
-import { useCreateOrganization } from "@/queries/useOrgs";
+import { useCreateOrganization } from "@/queries/useOrganizations";
 import useBoundStore from "@/stores/useBoundStore";
 import { useForm } from "react-hook-form";
 import SectionBody from "@/components/SectionBody";

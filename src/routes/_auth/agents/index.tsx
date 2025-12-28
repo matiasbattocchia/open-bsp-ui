@@ -6,6 +6,7 @@ import SectionItem from "@/components/SectionItem";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import Avatar from "@/components/Avatar";
+import type { JSX } from "react";
 
 export const Route = createFileRoute("/_auth/agents/")({
   component: ListAgents,
@@ -15,6 +16,12 @@ function ListAgents() {
   const { translate: t } = useTranslation();
   const navigate = useNavigate();
   const { data: agents } = useCurrentAgents();
+
+  const modeLabels: Record<string, string | JSX.Element> = {
+    active: <span className="text-primary">{t("Activo")}</span>,
+    draft: t("Borrador"),
+    inactive: t("Inactivo"),
+  };
 
   return (
     <>
@@ -39,7 +46,7 @@ function ListAgents() {
           <SectionItem
             key={agent.id}
             title={agent.name}
-            description={agent.extra?.description || t("Sin descripción")}
+            description={modeLabels[agent.extra?.mode || ""]}
             aside={
               <Avatar
                 src={agent.picture}

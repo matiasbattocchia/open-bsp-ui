@@ -1,7 +1,8 @@
 import SectionBody from "@/components/SectionBody";
 import SectionHeader from "@/components/SectionHeader";
+import SectionFooter from "@/components/SectionFooter";
 import { useTranslation } from "@/hooks/useTranslation";
-import { useCurrentOrganization, useUpdateCurrentOrganization, useDeleteCurrentOrganization } from "@/queries/useOrgs";
+import { useCurrentOrganization, useUpdateCurrentOrganization, useDeleteCurrentOrganization } from "@/queries/useOrganizations";
 import { useCurrentAgent } from "@/queries/useAgents";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
@@ -28,12 +29,18 @@ function EditOrganization() {
 
   return org && (
     <>
-      <SectionHeader title={org.name} />
+      <SectionHeader
+        title={t("Editar organización")}
+        onDelete={isOwner ? () => deleteOrg.mutate(undefined, {
+          onSuccess: () => navigate({ to: "..", hash: (prevHash) => prevHash! })
+        }) : undefined}
+      />
 
       <SectionBody>
         <form
+          id="org-form"
           onSubmit={handleSubmit((data) => updateOrg.mutate(data))}
-          className="flex flex-col gap-[16px] pb-[14px] grow"
+          className="flex flex-col gap-[24px]"
         >
           <label>
             <div className="label">{t("Nombre")}</div>
@@ -43,36 +50,21 @@ function EditOrganization() {
               {...register("name", { required: true })}
             />
           </label>
-
-          <div className="grow" />
-
-          {isOwner && (
-            <>
-              <button
-                className="destructive"
-                onClick={(e) => {
-                  e.preventDefault();
-                  deleteOrg.mutate(undefined, {
-                    onSuccess: () =>
-                      navigate({ to: "..", hash: (prevHash) => prevHash! }),
-                  });
-                }}
-                disabled={deleteOrg.isPending}
-              >
-                {deleteOrg.isPending ? "..." : t("Eliminar")}
-              </button>
-
-              <button
-                type="submit"
-                disabled={updateOrg.isPending || !isValid || !isDirty}
-                className="primary"
-              >
-                {updateOrg.isPending ? "..." : t("Actualizar")}
-              </button>
-            </>
-          )}
         </form>
       </SectionBody>
+
+      {isOwner && (
+        <SectionFooter>
+          <button
+            form="org-form"
+            type="submit"
+            disabled={updateOrg.isPending || !isValid || !isDirty}
+            className="primary"
+          >
+            {updateOrg.isPending ? "..." : t("Actualizar")}
+          </button>
+        </SectionFooter>
+      )}
     </>
   );
 }

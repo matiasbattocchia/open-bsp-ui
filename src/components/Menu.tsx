@@ -16,7 +16,7 @@ import { LinkButton } from "./LinkButton";
 import { resetAuthorizedCache } from "@/utils/IdbUtils";
 import { useCurrentAgent } from "@/queries/useAgents";
 import { Dropdown } from "antd";
-import { useOrganizations } from "@/queries/useOrgs";
+import { useOrganizations } from "@/queries/useOrganizations";
 
 export default function Menu() {
   const user = useBoundStore((state) => state.ui.user);

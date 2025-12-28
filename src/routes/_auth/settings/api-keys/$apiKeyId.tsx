@@ -22,10 +22,15 @@ function ApiKeyDetail() {
 
   return apiKey && (
     <>
-      <SectionHeader title={t("Clave API") as string} />
+      <SectionHeader
+        title={t("Clave API") as string}
+        onDelete={() => deleteApiKey.mutate(apiKeyId, {
+          onSuccess: () => navigate({ to: "..", hash: (prevHash) => prevHash! })
+        })}
+      />
 
       <SectionBody>
-        <div className="flex flex-col gap-[16px] grow pb-[14px]">
+        <div className="flex flex-col gap-[24px] grow">
           <label>
             <div className="label">{t("Nombre")}</div>
             <input
@@ -45,24 +50,6 @@ function ApiKeyDetail() {
               {...register("key")}
             />
           </label>
-
-          <div className="grow" />
-
-          <button
-            className="destructive"
-            onClick={() =>
-              deleteApiKey.mutate(apiKeyId, {
-                onSuccess: () =>
-                  navigate({
-                    to: "..",
-                    hash: (prevHash) => prevHash!,
-                  }),
-              })
-            }
-            disabled={deleteApiKey.isPending}
-          >
-            {deleteApiKey.isPending ? "..." : t("Eliminar")}
-          </button>
         </div>
       </SectionBody>
     </>

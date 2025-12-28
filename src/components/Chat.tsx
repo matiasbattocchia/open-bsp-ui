@@ -8,7 +8,7 @@ import useBoundStore from "@/stores/useBoundStore";
 import Message from "./Message/Message";
 import { type MessageRow } from "@/supabase/client";
 import { useTranslation } from "@/hooks/useTranslation";
-import { useCurrentOrganization } from "@/queries/useOrgs";
+import { useCurrentOrganization } from "@/queries/useOrganizations";
 import { useCurrentAgent } from "@/queries/useAgents";
 import { AVATAR_COLORS } from "@/utils/colors";
 
