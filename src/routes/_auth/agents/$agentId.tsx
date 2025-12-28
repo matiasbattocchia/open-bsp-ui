@@ -10,6 +10,7 @@ import { type AIAgentRow, type AIAgentUpdate } from "@/supabase/client";
 import { startConversation } from "@/utils/ConversationUtils";
 import { useIntegrations } from "@/queries/useIntegrations";
 import SectionFooter from "@/components/SectionFooter";
+import { protocols, protocolLabels } from "./new";
 
 export const Route = createFileRoute("/_auth/agents/$agentId")({
   component: AgentDetail,
@@ -23,7 +24,7 @@ function AgentDetail() {
   const deleteAgent = useDeleteAgent();
   const updateAgent = useUpdateAgent();
   const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
-  const [provider, setProvider] = useState("openai"); // Added local state for provider
+  const [provider, setProvider] = useState<keyof typeof protocols>("openai");
 
   const localAddress = useIntegrations().data?.find(
     (address) => address.service === "local",
@@ -95,6 +96,15 @@ function AgentDetail() {
           </label>
 
           <label>
+            <div className="label">{t("Instrucciones")}</div>
+            <textarea
+              className="text h-min-[100px] font-mono text-[12.8px]"
+              {...register("extra.instructions")}
+              placeholder={t("Eres un asistente útil...") as string}
+            />
+          </label>
+
+          <label>
             <div className="label">{t("Proveedor")}</div>
             <select
               value={provider}
@@ -102,6 +112,10 @@ function AgentDetail() {
                 const val = e.target.value;
                 setProvider(val);
                 setValue("extra.model", "");
+
+                const availableProtocols = protocols[val as keyof typeof protocols];
+                setValue("extra.protocol", availableProtocols[0]);
+
                 if (val !== 'custom') {
                   setValue("extra.api_url", val, { shouldDirty: true });
                 } else {
@@ -117,6 +131,17 @@ function AgentDetail() {
             </select>
           </label>
 
+          <label>
+            <div className="label">{t("Protocolo")}</div>
+            <select
+              {...register("extra.protocol")}
+            >
+              {(protocols[provider as keyof typeof protocols] || []).map((p) => (
+                <option key={p} value={p}>{protocolLabels[p] || p}</option>
+              ))}
+            </select>
+          </label>
+
           {provider === "custom" && (
             <label>
               <div className="label">{t("API URL")}</div>
@@ -124,7 +149,7 @@ function AgentDetail() {
                 type="text"
                 className="text"
                 placeholder="https://api.example.com/v1"
-                {...register("extra.api_url", { required: true })}
+                {...register("extra.api_url")}
               />
             </label>
           )}
@@ -145,16 +170,7 @@ function AgentDetail() {
               type="text"
               className="text"
               placeholder="gpt-4.1-mini"
-              {...register("extra.model", { required: true })}
-            />
-          </label>
-
-          <label>
-            <div className="label">{t("Instrucciones")}</div>
-            <textarea
-              className="text h-auto h-min-[100px] font-mono text-[12.8px] bg-incoming-chat-bubble"
-              {...register("extra.instructions")}
-              placeholder={t("Eres un asistente útil...") as string}
+              {...register("extra.model")}
             />
           </label>
         </form>

@@ -45,11 +45,11 @@ export type ButtonMessage = {
 export type InteractiveMessage = {
   type: "interactive";
   interactive:
-    | { type: "button_reply"; button_reply: { id: string; title: string } }
-    | {
-      type: "list_reply";
-      list_reply: { id: string; title: string; description?: string };
-    };
+  | { type: "button_reply"; button_reply: { id: string; title: string } }
+  | {
+    type: "list_reply";
+    list_reply: { id: string; title: string; description?: string };
+  };
 };
 
 // ORDER
@@ -110,15 +110,15 @@ export type TemplateData = {
   id: string;
   name: string;
   status:
-    | "APPROVED"
-    | "IN_APPEAL"
-    | "PENDING"
-    | "REJECTED"
-    | "PENDING_DELETION"
-    | "DELETED"
-    | "DISABLED"
-    | "PAUSED"
-    | "LIMIT_EXCEEDED";
+  | "APPROVED"
+  | "IN_APPEAL"
+  | "PENDING"
+  | "REJECTED"
+  | "PENDING_DELETION"
+  | "DELETED"
+  | "DISABLED"
+  | "PAUSED"
+  | "LIMIT_EXCEEDED";
   category: "MARKETING" | "UTILITY"; // TODO: service and auth categories - cabra 2024/09/12
   language: string;
   components: (
@@ -278,8 +278,8 @@ export type TaskInfo = {
 
 export type ToolInfo = {
   tool?:
-    & ToolEventInfo
-    & (LocalToolInfo | GoogleToolInfo | OpenAIToolInfo | AnthropicToolInfo);
+  & ToolEventInfo
+  & (LocalToolInfo | GoogleToolInfo | OpenAIToolInfo | AnthropicToolInfo);
 };
 
 export type ToolEventInfo =
@@ -309,23 +309,23 @@ type GoogleToolInfo = {
 type OpenAIToolInfo = {
   provider: "openai";
   type:
-    | "mcp"
-    | "web_search_preview"
-    | "file_search"
-    | "image_generation"
-    | "code_interpreter"
-    | "computer_use_preview";
+  | "mcp"
+  | "web_search_preview"
+  | "file_search"
+  | "image_generation"
+  | "code_interpreter"
+  | "computer_use_preview";
 };
 
 type AnthropicToolInfo = {
   provider: "anthropic";
   type:
-    | "mcp"
-    | "bash"
-    | "code_execution"
-    | "computer"
-    | "str_replace_based_edit_tool"
-    | "web_search";
+  | "mcp"
+  | "bash"
+  | "code_execution"
+  | "computer"
+  | "str_replace_based_edit_tool"
+  | "web_search";
 };
 
 // Text based
@@ -682,43 +682,43 @@ export type Database = MergeDeep<
         };
         messages: {
           Row:
-            | {
-              direction: "incoming";
-              content: IncomingMessage;
-              status: IncomingStatus;
-            }
-            | {
-              direction: "internal";
-              content: InternalMessage;
-              status: IncomingStatus;
-            }
-            | {
-              direction: "outgoing";
-              content: OutgoingMessage;
-              status: OutgoingStatus;
-            };
+          | {
+            direction: "incoming";
+            content: IncomingMessage;
+            status: IncomingStatus;
+          }
+          | {
+            direction: "internal";
+            content: InternalMessage;
+            status: IncomingStatus;
+          }
+          | {
+            direction: "outgoing";
+            content: OutgoingMessage;
+            status: OutgoingStatus;
+          };
           Insert:
-            | {
-              organization_id?: string;
-              conversation_id?: string;
-              direction: "incoming";
-              content: IncomingMessage;
-              status?: IncomingStatus;
-            }
-            | {
-              organization_id?: string;
-              conversation_id?: string;
-              direction: "internal";
-              content: InternalMessage;
-              status?: IncomingStatus;
-            }
-            | {
-              organization_id?: string;
-              conversation_id?: string;
-              direction: "outgoing";
-              content: OutgoingMessage;
-              status?: OutgoingStatus;
-            };
+          | {
+            organization_id?: string;
+            conversation_id?: string;
+            direction: "incoming";
+            content: IncomingMessage;
+            status?: IncomingStatus;
+          }
+          | {
+            organization_id?: string;
+            conversation_id?: string;
+            direction: "internal";
+            content: InternalMessage;
+            status?: IncomingStatus;
+          }
+          | {
+            organization_id?: string;
+            conversation_id?: string;
+            direction: "outgoing";
+            content: OutgoingMessage;
+            status?: OutgoingStatus;
+          };
         };
         contacts: {
           Row: {
@@ -730,7 +730,7 @@ export type Database = MergeDeep<
           Insert: AgentInsertStrict;
           Update: AgentUpdateStrict;
           Relationships:
-            DatabaseGenerated["public"]["Tables"]["agents"]["Relationships"];
+          DatabaseGenerated["public"]["Tables"]["agents"]["Relationships"];
         };
       };
     };

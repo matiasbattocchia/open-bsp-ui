@@ -48,7 +48,7 @@ export default function Header() {
       <button
         className="mr-4 md:hidden"
         title={t("Volver") as string}
-        onClick={() => navigate({ to: "/conversations" })}
+        onClick={() => navigate({ hash: undefined })}
       >
         <ArrowLeft className="w-[24px] h-[24px] text-foreground" />
       </button>
