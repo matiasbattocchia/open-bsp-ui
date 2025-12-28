@@ -19,11 +19,9 @@ export const Route = createFileRoute("/_auth")({
 });
 
 function AppLayout() {
-  const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
   const activeConvId = useBoundStore((state) => state.ui.activeConvId);
   const setActiveConv = useBoundStore((state) => state.ui.setActiveConv);
   const location = useLocation();
-
 
   const [isHoveringFiles, setIsHoveringFiles] = useState(false);
 
