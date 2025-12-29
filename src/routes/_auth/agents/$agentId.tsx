@@ -8,7 +8,7 @@ import SectionBody from "@/components/SectionBody";
 import useBoundStore from "@/stores/useBoundStore";
 import { type AIAgentRow, type AIAgentUpdate } from "@/supabase/client";
 import { startConversation } from "@/utils/ConversationUtils";
-import { useIntegrations } from "@/queries/useOrganizationsAddresses";
+import { useOrganizationsAddresses } from "@/queries/useOrganizationsAddresses";
 import SectionFooter from "@/components/SectionFooter";
 import { protocols, protocolLabels } from "./new";
 
@@ -26,7 +26,7 @@ function AgentDetail() {
   const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
   const [provider, setProvider] = useState<keyof typeof protocols>("openai");
 
-  const localAddress = useIntegrations().data?.find(
+  const localAddress = useOrganizationsAddresses().data?.find(
     (address) => address.service === "local",
   );
 

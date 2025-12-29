@@ -4,7 +4,7 @@ import SectionItem from "@/components/SectionItem";
 import { createFileRoute } from "@tanstack/react-router";
 import WhatsAppIntegration from "@/components/WhatsAppIntegration";
 import { WhatsAppOutlined } from "@ant-design/icons";
-import { useIntegrations } from "@/queries/useOrganizationsAddresses";
+import { useOrganizationsAddresses } from "@/queries/useOrganizationsAddresses";
 import { useCurrentAgent } from "@/queries/useAgents";
 
 export const Route = createFileRoute("/_auth/integrations")({
@@ -12,7 +12,7 @@ export const Route = createFileRoute("/_auth/integrations")({
 });
 
 function Integrations() {
-  const { data: integrations } = useIntegrations();
+  const { data: integrations } = useOrganizationsAddresses();
   const { data: agent } = useCurrentAgent();
   const isAdmin = ["admin", "owner"].includes(agent?.extra?.role || "");
 

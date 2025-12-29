@@ -8,7 +8,6 @@ import { useEffect, useState } from "react";
 import { useLocation } from "@tanstack/react-router";
 import FilePicker from "@/components/FileUploader/FilePicker";
 import FilePreviewer from "@/components/FilePreviewer";
-import Templates from "@/components/Templates";
 import ActionCard from "@/components/ActionCard";
 import { Building2, MessageSquarePlus, Settings } from "lucide-react";
 
@@ -67,7 +66,6 @@ function AppLayout() {
               <FilePicker setHovering={setIsHoveringFiles} />
             )}
             <FilePreviewer />
-            <Templates />
             <ChatHeader />
             <Chat />
             <ChatFooter />
