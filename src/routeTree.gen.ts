@@ -13,9 +13,12 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AuthIndexRouteImport } from './routes/_auth/index'
 import { Route as AuthIntegrationsRouteImport } from './routes/_auth/integrations'
+import { Route as AuthTemplatesIndexRouteImport } from './routes/_auth/templates/index'
 import { Route as AuthSettingsIndexRouteImport } from './routes/_auth/settings/index'
 import { Route as AuthConversationsIndexRouteImport } from './routes/_auth/conversations/index'
 import { Route as AuthAgentsIndexRouteImport } from './routes/_auth/agents/index'
+import { Route as AuthTemplatesNewRouteImport } from './routes/_auth/templates/new'
+import { Route as AuthTemplatesTemplateIdRouteImport } from './routes/_auth/templates/$templateId'
 import { Route as AuthConversationsNewRouteImport } from './routes/_auth/conversations/new'
 import { Route as AuthAgentsNewRouteImport } from './routes/_auth/agents/new'
 import { Route as AuthAgentsAgentIdRouteImport } from './routes/_auth/agents/$agentId'
@@ -50,6 +53,11 @@ const AuthIntegrationsRoute = AuthIntegrationsRouteImport.update({
   path: '/integrations',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthTemplatesIndexRoute = AuthTemplatesIndexRouteImport.update({
+  id: '/templates/',
+  path: '/templates/',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthSettingsIndexRoute = AuthSettingsIndexRouteImport.update({
   id: '/settings/',
   path: '/settings/',
@@ -63,6 +71,16 @@ const AuthConversationsIndexRoute = AuthConversationsIndexRouteImport.update({
 const AuthAgentsIndexRoute = AuthAgentsIndexRouteImport.update({
   id: '/agents/',
   path: '/agents/',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthTemplatesNewRoute = AuthTemplatesNewRouteImport.update({
+  id: '/templates/new',
+  path: '/templates/new',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthTemplatesTemplateIdRoute = AuthTemplatesTemplateIdRouteImport.update({
+  id: '/templates/$templateId',
+  path: '/templates/$templateId',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthConversationsNewRoute = AuthConversationsNewRouteImport.update({
@@ -151,9 +169,12 @@ export interface FileRoutesByFullPath {
   '/agents/$agentId': typeof AuthAgentsAgentIdRoute
   '/agents/new': typeof AuthAgentsNewRoute
   '/conversations/new': typeof AuthConversationsNewRoute
+  '/templates/$templateId': typeof AuthTemplatesTemplateIdRoute
+  '/templates/new': typeof AuthTemplatesNewRoute
   '/agents': typeof AuthAgentsIndexRoute
   '/conversations': typeof AuthConversationsIndexRoute
   '/settings': typeof AuthSettingsIndexRoute
+  '/templates': typeof AuthTemplatesIndexRoute
   '/settings/api-keys/$apiKeyId': typeof AuthSettingsApiKeysApiKeyIdRoute
   '/settings/api-keys/new': typeof AuthSettingsApiKeysNewRoute
   '/settings/members/$memberId': typeof AuthSettingsMembersMemberIdRoute
@@ -173,9 +194,12 @@ export interface FileRoutesByTo {
   '/agents/$agentId': typeof AuthAgentsAgentIdRoute
   '/agents/new': typeof AuthAgentsNewRoute
   '/conversations/new': typeof AuthConversationsNewRoute
+  '/templates/$templateId': typeof AuthTemplatesTemplateIdRoute
+  '/templates/new': typeof AuthTemplatesNewRoute
   '/agents': typeof AuthAgentsIndexRoute
   '/conversations': typeof AuthConversationsIndexRoute
   '/settings': typeof AuthSettingsIndexRoute
+  '/templates': typeof AuthTemplatesIndexRoute
   '/settings/api-keys/$apiKeyId': typeof AuthSettingsApiKeysApiKeyIdRoute
   '/settings/api-keys/new': typeof AuthSettingsApiKeysNewRoute
   '/settings/members/$memberId': typeof AuthSettingsMembersMemberIdRoute
@@ -197,9 +221,12 @@ export interface FileRoutesById {
   '/_auth/agents/$agentId': typeof AuthAgentsAgentIdRoute
   '/_auth/agents/new': typeof AuthAgentsNewRoute
   '/_auth/conversations/new': typeof AuthConversationsNewRoute
+  '/_auth/templates/$templateId': typeof AuthTemplatesTemplateIdRoute
+  '/_auth/templates/new': typeof AuthTemplatesNewRoute
   '/_auth/agents/': typeof AuthAgentsIndexRoute
   '/_auth/conversations/': typeof AuthConversationsIndexRoute
   '/_auth/settings/': typeof AuthSettingsIndexRoute
+  '/_auth/templates/': typeof AuthTemplatesIndexRoute
   '/_auth/settings/api-keys/$apiKeyId': typeof AuthSettingsApiKeysApiKeyIdRoute
   '/_auth/settings/api-keys/new': typeof AuthSettingsApiKeysNewRoute
   '/_auth/settings/members/$memberId': typeof AuthSettingsMembersMemberIdRoute
@@ -221,9 +248,12 @@ export interface FileRouteTypes {
     | '/agents/$agentId'
     | '/agents/new'
     | '/conversations/new'
+    | '/templates/$templateId'
+    | '/templates/new'
     | '/agents'
     | '/conversations'
     | '/settings'
+    | '/templates'
     | '/settings/api-keys/$apiKeyId'
     | '/settings/api-keys/new'
     | '/settings/members/$memberId'
@@ -243,9 +273,12 @@ export interface FileRouteTypes {
     | '/agents/$agentId'
     | '/agents/new'
     | '/conversations/new'
+    | '/templates/$templateId'
+    | '/templates/new'
     | '/agents'
     | '/conversations'
     | '/settings'
+    | '/templates'
     | '/settings/api-keys/$apiKeyId'
     | '/settings/api-keys/new'
     | '/settings/members/$memberId'
@@ -266,9 +299,12 @@ export interface FileRouteTypes {
     | '/_auth/agents/$agentId'
     | '/_auth/agents/new'
     | '/_auth/conversations/new'
+    | '/_auth/templates/$templateId'
+    | '/_auth/templates/new'
     | '/_auth/agents/'
     | '/_auth/conversations/'
     | '/_auth/settings/'
+    | '/_auth/templates/'
     | '/_auth/settings/api-keys/$apiKeyId'
     | '/_auth/settings/api-keys/new'
     | '/_auth/settings/members/$memberId'
@@ -317,6 +353,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthIntegrationsRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/templates/': {
+      id: '/_auth/templates/'
+      path: '/templates'
+      fullPath: '/templates'
+      preLoaderRoute: typeof AuthTemplatesIndexRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/settings/': {
       id: '/_auth/settings/'
       path: '/settings'
@@ -336,6 +379,20 @@ declare module '@tanstack/react-router' {
       path: '/agents'
       fullPath: '/agents'
       preLoaderRoute: typeof AuthAgentsIndexRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/templates/new': {
+      id: '/_auth/templates/new'
+      path: '/templates/new'
+      fullPath: '/templates/new'
+      preLoaderRoute: typeof AuthTemplatesNewRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/templates/$templateId': {
+      id: '/_auth/templates/$templateId'
+      path: '/templates/$templateId'
+      fullPath: '/templates/$templateId'
+      preLoaderRoute: typeof AuthTemplatesTemplateIdRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_auth/conversations/new': {
@@ -445,9 +502,12 @@ interface AuthRouteChildren {
   AuthAgentsAgentIdRoute: typeof AuthAgentsAgentIdRoute
   AuthAgentsNewRoute: typeof AuthAgentsNewRoute
   AuthConversationsNewRoute: typeof AuthConversationsNewRoute
+  AuthTemplatesTemplateIdRoute: typeof AuthTemplatesTemplateIdRoute
+  AuthTemplatesNewRoute: typeof AuthTemplatesNewRoute
   AuthAgentsIndexRoute: typeof AuthAgentsIndexRoute
   AuthConversationsIndexRoute: typeof AuthConversationsIndexRoute
   AuthSettingsIndexRoute: typeof AuthSettingsIndexRoute
+  AuthTemplatesIndexRoute: typeof AuthTemplatesIndexRoute
   AuthSettingsApiKeysApiKeyIdRoute: typeof AuthSettingsApiKeysApiKeyIdRoute
   AuthSettingsApiKeysNewRoute: typeof AuthSettingsApiKeysNewRoute
   AuthSettingsMembersMemberIdRoute: typeof AuthSettingsMembersMemberIdRoute
@@ -467,9 +527,12 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthAgentsAgentIdRoute: AuthAgentsAgentIdRoute,
   AuthAgentsNewRoute: AuthAgentsNewRoute,
   AuthConversationsNewRoute: AuthConversationsNewRoute,
+  AuthTemplatesTemplateIdRoute: AuthTemplatesTemplateIdRoute,
+  AuthTemplatesNewRoute: AuthTemplatesNewRoute,
   AuthAgentsIndexRoute: AuthAgentsIndexRoute,
   AuthConversationsIndexRoute: AuthConversationsIndexRoute,
   AuthSettingsIndexRoute: AuthSettingsIndexRoute,
+  AuthTemplatesIndexRoute: AuthTemplatesIndexRoute,
   AuthSettingsApiKeysApiKeyIdRoute: AuthSettingsApiKeysApiKeyIdRoute,
   AuthSettingsApiKeysNewRoute: AuthSettingsApiKeysNewRoute,
   AuthSettingsMembersMemberIdRoute: AuthSettingsMembersMemberIdRoute,

@@ -10,6 +10,7 @@ import {
   Users,
   Languages,
   Plus,
+  LayoutTemplate,
 } from "lucide-react";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import { LinkButton } from "./LinkButton";
@@ -64,6 +65,16 @@ export default function Menu() {
           className="mt-[10px]"
         >
           <Users className="w-[24px] h-[24px] stroke-[2]" />
+        </LinkButton>
+
+        {/* Templates button */}
+        <LinkButton
+          to="/templates"
+          title={t("Plantillas") as string}
+          isActive={pathname.startsWith("/templates")}
+          className="mt-[10px]"
+        >
+          <LayoutTemplate className="w-[24px] h-[24px] stroke-[2]" />
         </LinkButton>
 
         {/* Integrations button */}
