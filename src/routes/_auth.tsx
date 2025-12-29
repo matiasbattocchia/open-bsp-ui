@@ -26,7 +26,7 @@ function AppLayout() {
   const [isHoveringFiles, setIsHoveringFiles] = useState(false);
 
   const { width: sidebarWidth, handleMouseDown, isResizing } = useResizable({
-    initialWidth: 300,
+    initialWidth: 400,
     minWidth: 200,
     maxWidth: 600,
   });
@@ -38,12 +38,18 @@ function AppLayout() {
     setActiveConv(convId);
   }, [location.hash]);
 
+  const sidebarCol = activeConvId ? 0 : sidebarWidth;
+  const handleCol = activeConvId ? 0 : 8;
+
   return (
     <div
-      className="flex h-screen w-screen overflow-hidden"
-      style={{ cursor: isResizing ? "col-resize" : "default" }}
+      className="app-grid"
+      style={{
+        gridTemplateColumns: `64px ${sidebarCol}px ${handleCol}px 2fr`,
+        cursor: isResizing ? "col-resize" : "default",
+      }}
     >
-      {/* Menu - Fixed width */}
+      {/* Menu - Fixed width 64px */}
       <div className={activeConvId ? "hidden md:flex" : "flex"}>
         <Menu />
       </div>
@@ -51,10 +57,9 @@ function AppLayout() {
       {/* Left Panel - Router Outlet - Resizable */}
       <div
         className={
-          "flex flex-col overflow-hidden border-border md:border-r bg-background text-foreground " +
+          "flex-col overflow-hidden border-border md:border-r bg-background text-foreground " +
           (activeConvId ? "hidden md:flex" : "flex")
         }
-        style={{ width: `${sidebarWidth}px`, minWidth: `${sidebarWidth}px` }}
       >
         <Outlet />
       </div>
@@ -67,8 +72,8 @@ function AppLayout() {
       {/* Center Panel - Chat */}
       <div
         className={
-          "flex flex-col min-w-0 relative overflow-hidden flex-1 " +
-          (activeConvId ? "flex bg-chat" : "hidden md:flex bg-muted")
+          "flex-col min-w-0 relative overflow-hidden" +
+          (activeConvId ? " flex bg-chat" : " hidden md:flex bg-muted")
         }
         onDragEnter={() => setIsHoveringFiles(true)}
         onDrop={() => setIsHoveringFiles(false)}
@@ -107,3 +112,5 @@ function AppLayout() {
     </div>
   );
 }
+
+export default AppLayout;
