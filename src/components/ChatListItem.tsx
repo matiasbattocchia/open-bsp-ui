@@ -235,7 +235,7 @@ export default function ChatListItem({
       <ItemActions trigger={["contextMenu"]} itemId={itemId}>
         <div
           className={
-            "chat-list-item h-[72px] flex cursor-pointer mx-[10px] my-[2px] rounded-xl group" +
+            "chat-list-item h-[72px] flex cursor-pointer rounded-xl group" +
             (active ? " bg-accent" : " hover:bg-accent")
           }
           onClick={(e) => {

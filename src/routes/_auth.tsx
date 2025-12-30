@@ -10,10 +10,23 @@ import FilePicker from "@/components/FileUploader/FilePicker";
 import FilePreviewer from "@/components/FilePreviewer";
 import ActionCard from "@/components/ActionCard";
 import { Building2, MessageSquarePlus, Settings } from "lucide-react";
+import { useResizable } from "@/hooks/useResizable";
 
 export const Route = createFileRoute("/_auth")({
   component: AppLayout,
 });
+
+const MIN_PANEL_WIDTH = 300;
+
+function getMenuWidth() {
+  return window.innerWidth >= 1024 ? 64 : 48;
+}
+
+function getMaxPanelWidth() {
+  // Max is 1/2 of available space (equal to chat panel)
+  const availableSpace = window.innerWidth - getMenuWidth();
+  return Math.floor(availableSpace / 2);
+}
 
 function AppLayout() {
   const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
@@ -21,8 +34,12 @@ function AppLayout() {
   const setActiveConv = useBoundStore((state) => state.ui.setActiveConv);
   const location = useLocation();
 
-
   const [isHoveringFiles, setIsHoveringFiles] = useState(false);
+
+  const { width: panelWidth, panelRef, handleMouseDown } = useResizable({
+    minWidth: MIN_PANEL_WIDTH,
+    getMaxWidth: getMaxPanelWidth,
+  });
 
   // Sync fragment identifier with activeConvId
   // i.e. /conversations#1234
@@ -36,19 +53,28 @@ function AppLayout() {
   console.log("active conv", activeConvId)
 
   return (
-    <div className="app-grid">
+    <div
+      className="app-grid"
+      style={panelWidth !== null ? { gridTemplateColumns: `${getMenuWidth()}px ${panelWidth}px 1fr` } : undefined}
+    >
       {/* Menu - Fixed width */}
       <div className={activeConvId ? "hidden md:flex" : "flex"}>
         <Menu />
       </div>
       {/* Left Panel - Router Outlet */}
       <div
+        ref={panelRef}
         className={
-          "flex-col overflow-hidden border-border md:border-r bg-background text-foreground col-span-2 md:col-span-1 " +
+          "flex-col overflow-hidden md:border-r border-border bg-background text-foreground col-span-2 md:col-span-1 relative " +
           (activeConvId ? "hidden md:flex" : "flex")
         }
       >
         <Outlet />
+        {/* Resize Handle */}
+        <div
+          className="resize-handle"
+          onMouseDown={handleMouseDown}
+        />
       </div>
 
       {/* Center Panel - Chat */}

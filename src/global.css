@@ -219,6 +219,33 @@ button:disabled {
     }
   }
 
+  /* Resize Handle for panels */
+  .resize-handle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 4px;
+    height: 100%;
+    cursor: col-resize;
+    background: transparent;
+    transition: background-color 0.15s ease;
+    z-index: 10;
+  }
+
+  .resize-handle:hover,
+  .resize-handle:active {
+    background-color: var(--color-primary);
+  }
+
+  /* Hide scrollbar but keep scroll functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none !important;
+  }
+
   /* Responsive breakpoints */
   
   /* 
