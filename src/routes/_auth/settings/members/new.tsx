@@ -5,6 +5,7 @@ import { useCreateAgent, useCurrentAgent } from "@/queries/useAgents";
 import { type HumanAgentInsert } from "@/supabase/client";
 import { useForm } from "react-hook-form";
 import SectionBody from "@/components/SectionBody";
+import SectionFooter from "@/components/SectionFooter";
 
 export const Route = createFileRoute("/_auth/settings/members/new")({
   component: AddMember,
@@ -35,6 +36,7 @@ function AddMember() {
 
       <SectionBody>
         <form
+          id="create-member-form"
           onSubmit={handleSubmit(data => createAgent.mutate(
             {
               ...data,
@@ -91,20 +93,19 @@ function AddMember() {
               })}
             />
           </label>
-
-          <div className="grow" />
-
-          {isOwner && (
-            <button
-              type="submit"
-              disabled={createAgent.isPending || !isValid}
-              className="primary"
-            >
-              {createAgent.isPending ? "..." : t("Invitar")}
-            </button>
-          )}
         </form>
-      </SectionBody >
+      </SectionBody>
+
+      {isOwner && <SectionFooter>
+        <button
+          form="create-member-form"
+          type="submit"
+          disabled={createAgent.isPending || !isValid}
+          className="primary"
+        >
+          {createAgent.isPending ? "..." : t("Invitar")}
+        </button>
+      </SectionFooter>}
     </>
   );
 }

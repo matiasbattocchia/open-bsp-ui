@@ -6,6 +6,7 @@ import useBoundStore from "@/stores/useBoundStore";
 import { useForm } from "react-hook-form";
 import SectionBody from "@/components/SectionBody";
 import type { OrganizationInsert } from "@/supabase/client";
+import SectionFooter from "@/components/SectionFooter";
 
 export const Route = createFileRoute("/_auth/settings/organization/new")({
   component: NewOrganization,
@@ -29,6 +30,7 @@ function NewOrganization() {
 
       <SectionBody>
         <form
+          id="create-organization-form"
           onSubmit={handleSubmit((data) =>
             createOrg.mutate(data, {
               onSuccess: (org) => {
@@ -45,18 +47,19 @@ function NewOrganization() {
               {...register("name", { required: true })}
             />
           </label>
-
-          <div className="grow" />
-
-          <button
-            type="submit"
-            disabled={createOrg.isPending || !isValid}
-            className="primary"
-          >
-            {createOrg.isPending ? "..." : t("Crear")}
-          </button>
         </form>
       </SectionBody>
+
+      <SectionFooter>
+        <button
+          form="create-organization-form"
+          type="submit"
+          disabled={createOrg.isPending || !isValid}
+          className="primary"
+        >
+          {createOrg.isPending ? "..." : t("Crear")}
+        </button>
+      </SectionFooter>
     </>
   );
 }
