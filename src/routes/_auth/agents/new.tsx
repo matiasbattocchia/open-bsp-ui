@@ -69,7 +69,6 @@ function AddAgent() {
         <form
           id="create-agent-form"
           onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col gap-[24px] grow"
         >
           <label>
             <div className="label">{t("Nombre")}</div>

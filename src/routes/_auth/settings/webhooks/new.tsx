@@ -45,7 +45,6 @@ function AddWebhook() {
               }
             )
           )}
-          className="flex flex-col gap-[24px] grow"
         >
           <label>
             <div className="label">{t("URL")}</div>

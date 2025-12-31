@@ -55,7 +55,6 @@ function AddMember() {
                 }),
             }),
           )}
-          className="flex flex-col gap-[16px] pb-[14px] grow"
         >
           <label>
             <div className="label">{t("Nombre")}</div>

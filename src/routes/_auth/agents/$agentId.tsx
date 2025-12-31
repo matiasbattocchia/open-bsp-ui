@@ -74,7 +74,6 @@ function AgentDetail() {
         <form
           id="agent-form"
           onSubmit={handleSubmit(data => updateAgent.mutate(data))}
-          className="flex flex-col gap-[24px] grow"
         >
           <label>
             <div className="label">{t("Nombre")}</div>

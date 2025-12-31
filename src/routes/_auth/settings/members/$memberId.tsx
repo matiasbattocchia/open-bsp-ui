@@ -48,7 +48,6 @@ function EditMember() {
         <form
           id="member-form"
           onSubmit={handleSubmit(data => updateAgent.mutate(data))}
-          className="flex flex-col gap-[24px] grow"
         >
           {invitation && invitation.status === "pending" && (
             <SectionItem

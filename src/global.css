@@ -149,6 +149,15 @@ button:disabled {
     @apply text-[12px] text-muted-foreground mb-[8px];
   }
 
+  form {
+    @apply flex flex-col gap-[24px] grow pl-[10px];
+  }
+
+  /* Override form styles for login page */
+  .login-form {
+    @apply grow-0 gap-3 pl-0;
+  }
+
   textarea {
     field-sizing: content;
     resize: none;

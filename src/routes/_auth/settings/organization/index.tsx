@@ -40,7 +40,6 @@ function EditOrganization() {
         <form
           id="org-form"
           onSubmit={handleSubmit((data) => updateOrg.mutate(data))}
-          className="flex flex-col gap-[24px]"
         >
           <label>
             <div className="label">{t("Nombre")}</div>

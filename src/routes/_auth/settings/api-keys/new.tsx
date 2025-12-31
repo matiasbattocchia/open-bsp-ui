@@ -44,7 +44,6 @@ function AddApiKey() {
               }
             )
           )}
-          className="flex flex-col gap-[24px] grow"
         >
           <div className="text-muted-foreground text-[14px]">
             {t("Esto generará una nueva clave API que podrás usar para autenticarte.")}
