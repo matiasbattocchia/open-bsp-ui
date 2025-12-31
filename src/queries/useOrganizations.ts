@@ -47,13 +47,12 @@ export function useCurrentOrganization() {
 
 export function useCreateOrganization() {
   const queryClient = useQueryClient();
-  const userId = useBoundStore((state) => state.ui.user?.id);
 
   return useMutation({
     mutationFn: async (data: OrganizationInsert) => {
       const { data: org } = await supabase
         .from("organizations")
-        .insert({ ...data, user_id: userId })
+        .insert(data)
         .select()
         .single()
         .throwOnError();
