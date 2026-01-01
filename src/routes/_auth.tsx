@@ -98,21 +98,27 @@ function AppLayout() {
           </>
         ) : (
           <div className="flex gap-[32px] items-center justify-center h-full">
-            <ActionCard
-              icon={<Building2 className="w-[24px] h-[24px]" />}
-              title="Crear organización"
-              to="/settings/organization/new"
-            />
-            <ActionCard
-              icon={<MessageSquarePlus className="w-[24px] h-[24px]" />}
-              title="Iniciar conversación"
-              to="/conversations/new"
-            />
-            <ActionCard
-              icon={<Settings className="w-[24px] h-[24px]" />}
-              title="Configurar WhatsApp"
-              to="/integrations"
-            />
+            {!activeOrgId && (
+              <ActionCard
+                icon={<Building2 className="w-[24px] h-[24px]" />}
+                title="Crear organización"
+                to="/settings/organization/new"
+              />
+            )}
+            {activeOrgId && (
+              <>
+                <ActionCard
+                  icon={<MessageSquarePlus className="w-[24px] h-[24px]" />}
+                  title="Iniciar conversación"
+                  to="/conversations/new"
+                />
+                <ActionCard
+                  icon={<Settings className="w-[24px] h-[24px]" />}
+                  title="Configurar WhatsApp"
+                  to="/integrations"
+                />
+              </>
+            )}
           </div>
         )}
       </div>

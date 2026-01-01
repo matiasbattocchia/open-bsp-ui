@@ -50,10 +50,18 @@ export function useCreateOrganization() {
 
   return useMutation({
     mutationFn: async (data: OrganizationInsert) => {
-      const { data: org } = await supabase
+      // Note: because of RLS and the fact that the member(ship) that relates the user who created the organization
+      // and the organization is added by an after insert trigger, insert+select does not work.
+      await supabase
         .from("organizations")
         .insert(data)
+        .throwOnError();
+
+      const { data: org } = await supabase
+        .from("organizations")
         .select()
+        .order("created_at", { ascending: false })
+        .limit(1)
         .single()
         .throwOnError();
 

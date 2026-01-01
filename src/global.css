@@ -96,25 +96,6 @@
   --color-outgoing-chat-bubble: var(--chat-out);
 }
 
-/*
-TODO:
-1a. El misterio de las letras que están más arriba que abajo
-2. Grises distintos para ChatListItem hover y active
-4. Grosor barras scroll
-5. Revisar los w-full, h-full y calc; tal vez cambiar por flex grow
-6. El scroll empieza arriba
-8. Transiciones
-9. Placeholder overflow
-10. ChatHeader item names truncate
-11. ItemList minimum width debería ser el del panel izquierdo
-NICE:
-Colores para el editor de prompt
-Contador de tokenes
-Integraciones
-Variables
-Cambios no guardados
-*/
-
 html,
 body {
   padding: 0;
