@@ -74,6 +74,10 @@ function AddAgent() {
           onSubmit={handleSubmit(onSubmit)}
         >
           <fieldset disabled={!isAdmin} className="contents">
+            <p>
+              {t("Configura un agente de IA que responderá automáticamente a tus conversaciones.")}
+            </p>
+
             <label>
               <div className="label">{t("Nombre")}</div>
               <input

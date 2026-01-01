@@ -27,7 +27,7 @@ function EditOrganization() {
   const { data: org } = useCurrentOrganization();
   const { data: agent } = useCurrentAgent();
   const isOwner = agent?.extra?.role === "owner";
-
+  const setActiveOrg = useBoundStore((state) => state.ui.setActiveOrg);
   const updateOrg = useUpdateCurrentOrganization();
   const deleteOrg = useDeleteCurrentOrganization();
 
@@ -42,7 +42,10 @@ function EditOrganization() {
       <SectionHeader
         title={t("Editar organización")}
         onDelete={() => deleteOrg.mutate(undefined, {
-          onSuccess: () => navigate({ to: "..", hash: (prevHash) => prevHash! })
+          onSuccess: () => {
+            setActiveOrg(null);
+            navigate({ to: "..", hash: (prevHash) => prevHash! })
+          }
         })}
         deleteDisabled={!isOwner}
         deleteDisabledReason={t("Requiere permisos de propietario")}

@@ -51,6 +51,10 @@ function AddWebhook() {
           )}
         >
           <fieldset disabled={!isAdmin} className="contents">
+            <p>
+              {t("Los webhooks notifican a tu servidor cuando ocurren eventos. Selecciona la tabla y operaciones que quieres monitorear.")}
+            </p>
+
             <label>
               <div className="label">{t("URL")}</div>
               <input

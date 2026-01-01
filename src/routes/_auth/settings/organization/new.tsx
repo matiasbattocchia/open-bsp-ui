@@ -41,6 +41,10 @@ function NewOrganization() {
             })
           )}
         >
+          <p>
+            {t("Tu organización es el espacio de trabajo donde colaboras con tu equipo.")}
+          </p>
+
           <label>
             <div className="label">{t("Nombre")}</div>
             <input

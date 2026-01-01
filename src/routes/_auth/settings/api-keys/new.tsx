@@ -50,9 +50,9 @@ function AddApiKey() {
           )}
         >
           <fieldset disabled={!isAdmin} className="contents">
-            <div className="text-muted-foreground text-[14px]">
+            <p className="text-muted-foreground text-[14px]">
               {t("Esto generará una nueva clave API que podrás usar para autenticarte.")}
-            </div>
+            </p>
 
             <label>
               <div className="label">{t("Nombre")}</div>

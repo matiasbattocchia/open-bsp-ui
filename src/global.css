@@ -139,6 +139,10 @@ button:disabled {
     @apply grow-0 gap-3 pl-0;
   }
 
+  p {
+    @apply text-muted-foreground text-[14px] leading-relaxed;
+  }
+
   textarea {
     field-sizing: content;
     resize: none;

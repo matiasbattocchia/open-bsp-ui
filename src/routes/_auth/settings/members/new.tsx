@@ -60,6 +60,10 @@ function AddMember() {
           )}
         >
           <fieldset disabled={!isOwner} className="contents">
+            <p>
+              {t("Envía una invitación por correo. Los propietarios tienen control total, los administradores gestionan configuraciones y los miembros responden a las conversaciones.")}
+            </p>
+
             <label>
               <div className="label">{t("Nombre")}</div>
               <input
