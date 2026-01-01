@@ -32,7 +32,7 @@ function AddWebhook() {
 
   return (
     <>
-      <SectionHeader title={t("Agregar webhook") as string} />
+      <SectionHeader title={t("Agregar webhook")} />
 
       <SectionBody>
         <form
@@ -56,6 +56,7 @@ function AddWebhook() {
               <input
                 type="url"
                 className="text"
+                placeholder={t("https://ejemplo.com/webhook")}
                 {...register("url", { required: true })}
               />
             </label>
@@ -95,6 +96,7 @@ function AddWebhook() {
               <input
                 className="text"
                 type="text"
+                placeholder={t("Token de autenticación")}
                 {...register("token")}
               />
             </label>
@@ -109,7 +111,7 @@ function AddWebhook() {
           disabled={!isAdmin}
           invalid={!isValid || !isDirty}
           loading={createWebhook.isPending}
-          disabledReason={t("Requiere permisos de administrador") as string}
+          disabledReason={t("Requiere permisos de administrador")}
           className="primary"
         >
           {t("Crear")}

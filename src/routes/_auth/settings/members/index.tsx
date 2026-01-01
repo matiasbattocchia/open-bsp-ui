@@ -19,14 +19,14 @@ function ListMembers() {
   const isOwner = agent?.extra?.role === "owner";
 
   const roles: Record<string, string> = {
-    "owner": t("Propietario") as string,
-    "admin": t("Administrador") as string,
-    "user": t("Usuario") as string,
+    "owner": t("Propietario"),
+    "admin": t("Administrador"),
+    "user": t("Usuario"),
   };
 
   return (
     <>
-      <SectionHeader title={t("Miembros") as string} />
+      <SectionHeader title={t("Miembros")} />
 
       <SectionBody>
         <SectionItem
@@ -43,7 +43,7 @@ function ListMembers() {
             })
           }
           disabled={!isOwner}
-          disabledReason={t("Requiere permisos de propietario") as string}
+          disabledReason={t("Requiere permisos de propietario")}
         />
         {agents
           ?.filter((agent) => !agent.ai)

@@ -34,11 +34,12 @@ function EditWebhook() {
   return webhook && (
     <>
       <SectionHeader
-        title={t("Editar webhook") as string}
+        title={t("Editar webhook")}
         onDelete={() => deleteWebhook.mutate(webhookId, {
           onSuccess: () => navigate({ to: "..", hash: (prevHash) => prevHash! })
         })}
         deleteDisabled={!isAdmin}
+        deleteDisabledReason={t("Requiere permisos de administrador")}
       />
 
       <SectionBody>
@@ -58,6 +59,7 @@ function EditWebhook() {
             <input
               type="url"
               className="text"
+              placeholder={t("https://ejemplo.com/webhook")}
               {...register("url", { required: true })}
             />
           </label>
@@ -97,6 +99,7 @@ function EditWebhook() {
             <input
               className="text"
               type="text"
+              placeholder={t("Token de autenticación")}
               {...register("token")}
             />
           </label>
@@ -110,7 +113,7 @@ function EditWebhook() {
           disabled={!isAdmin}
           invalid={!isValid || !isDirty}
           loading={updateWebhook.isPending}
-          disabledReason={t("Requiere permisos de administrador") as string}
+          disabledReason={t("Requiere permisos de administrador")}
           className="primary"
         >
           {t("Actualizar")}

@@ -4,11 +4,20 @@ import SectionFooter from "@/components/SectionFooter";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useCurrentOrganization, useUpdateCurrentOrganization, useDeleteCurrentOrganization } from "@/queries/useOrganizations";
 import { useCurrentAgent } from "@/queries/useAgents";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
+import useBoundStore from "@/stores/useBoundStore";
 import Button from "@/components/Button";
 
 export const Route = createFileRoute("/_auth/settings/organization/")({
+  beforeLoad: () => {
+    const activeOrgId = useBoundStore.getState().ui.activeOrgId;
+    if (!activeOrgId) {
+      throw redirect({
+        to: "/settings/organization/new",
+      });
+    }
+  },
   component: EditOrganization,
 });
 
@@ -28,7 +37,7 @@ function EditOrganization() {
     formState: { isValid, isDirty },
   } = useForm({ values: org });
 
-  return org && (
+  return (
     <>
       <SectionHeader
         title={t("Editar organización")}
@@ -36,6 +45,7 @@ function EditOrganization() {
           onSuccess: () => navigate({ to: "..", hash: (prevHash) => prevHash! })
         })}
         deleteDisabled={!isOwner}
+        deleteDisabledReason={t("Requiere permisos de propietario")}
       />
 
       <SectionBody>
@@ -47,6 +57,7 @@ function EditOrganization() {
             <div className="label">{t("Nombre")}</div>
             <input
               className="text"
+              placeholder={t("Nombre de la organización")}
               disabled={!isOwner}
               {...register("name", { required: true })}
             />
@@ -61,7 +72,7 @@ function EditOrganization() {
           disabled={!isOwner}
           invalid={!isValid || !isDirty}
           loading={updateOrg.isPending}
-          disabledReason={t("Requiere permisos de propietario") as string}
+          disabledReason={t("Requiere permisos de propietario")}
           className="primary"
         >
           {t("Actualizar")}

@@ -27,7 +27,7 @@ function ListAgents() {
 
   return (
     <>
-      <SectionHeader title={t("Agentes") as string} />
+      <SectionHeader title={t("Agentes")} />
 
       <SectionBody>
         <SectionItem
@@ -44,7 +44,7 @@ function ListAgents() {
             })
           }
           disabled={!isAdmin}
-          disabledReason={t("Requiere permisos de administrador") as string}
+          disabledReason={t("Requiere permisos de administrador")}
         />
         {agents?.filter(a => a.ai).map((agent) => (
           <SectionItem

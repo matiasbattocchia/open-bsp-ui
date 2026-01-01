@@ -49,7 +49,7 @@ export default function Menu() {
         {/* Conversations button */}
         <LinkButton
           to="/conversations"
-          title={t("Mensajes") as string}
+          title={t("Mensajes")}
           isActive={pathname.startsWith("/conversations")}
           className="mt-[10px]"
         >
@@ -59,7 +59,7 @@ export default function Menu() {
         {/* Agents button */}
         <LinkButton
           to="/agents"
-          title={t("Agentes") as string}
+          title={t("Agentes")}
           isActive={pathname.startsWith("/agents")}
           className="mt-[10px]"
         >
@@ -69,7 +69,7 @@ export default function Menu() {
         {/* Integrations button */}
         <LinkButton
           to="/integrations"
-          title={t("Integraciones") as string}
+          title={t("Integraciones")}
           isActive={pathname.startsWith("/integrations")}
           className="mt-[10px]"
         >
@@ -83,7 +83,7 @@ export default function Menu() {
         {/* Settings button */}
         <LinkButton
           to="/settings"
-          title={t("Preferencias") as string}
+          title={t("Preferencias")}
           isActive={pathname.startsWith("/settings")}
           className="mt-[10px]"
         >

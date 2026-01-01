@@ -3,7 +3,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { useLocation, useRouter } from "@tanstack/react-router";
 import { LinkButton } from "./LinkButton";
 
-export default function SectionHeader({ title, closeButton, onDelete, deleteDisabled }: { title: string; closeButton?: boolean; onDelete?: () => void; deleteDisabled?: boolean }) {
+export default function SectionHeader({ title, closeButton, onDelete, deleteDisabled, deleteDisabledReason }: { title: string; closeButton?: boolean; onDelete?: () => void; deleteDisabled?: boolean; deleteDisabledReason?: string }) {
   const { translate: t } = useTranslation();
   const location = useLocation();
   const router = useRouter();
@@ -18,7 +18,7 @@ export default function SectionHeader({ title, closeButton, onDelete, deleteDisa
           (
             <button
               className="p-[8px] rounded-full hover:bg-muted mr-[8px] ml-[-8px]"
-              title={t("Cerrar") as string}
+              title={t("Cerrar")}
               onClick={() => router.history.back()}
             >
               <X className="w-[24px] h-[24px]" />
@@ -29,7 +29,7 @@ export default function SectionHeader({ title, closeButton, onDelete, deleteDisa
             <LinkButton
               to=".."
               className="mr-[8px] ml-[-8px]"
-              title={t("Volver") as string}
+              title={t("Volver")}
             >
               <ArrowLeft className="w-[24px] h-[24px]" />
             </LinkButton>
@@ -44,9 +44,9 @@ export default function SectionHeader({ title, closeButton, onDelete, deleteDisa
       {onDelete && (
         <button
           className="p-[8px] rounded-full hover:bg-muted ml-auto disabled:opacity-30 disabled:hover:bg-transparent"
-          title={(t("Eliminar") as string) + (deleteDisabled // Check if deleteDisabled is true to add the suffix
-            ? " - Requiere permisos de propietario"
-            : "")}
+          title={deleteDisabled && deleteDisabledReason
+            ? `${t("Eliminar")} - ${deleteDisabledReason}`
+            : t("Eliminar")}
           onClick={onDelete}
           disabled={deleteDisabled} // Ensure this prop is passed to disable the button
         >

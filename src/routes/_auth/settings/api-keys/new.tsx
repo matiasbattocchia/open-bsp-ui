@@ -31,7 +31,7 @@ function AddApiKey() {
 
   return (
     <>
-      <SectionHeader title={t("Generar clave API") as string} />
+      <SectionHeader title={t("Generar clave API")} />
 
       <SectionBody>
         <form
@@ -58,7 +58,7 @@ function AddApiKey() {
               <div className="label">{t("Nombre")}</div>
               <input
                 className="text"
-                placeholder={t("Desarrollo") as string}
+                placeholder={t("Nombre de la clave")}
                 {...register("name", { required: true })}
               />
             </label>
@@ -73,7 +73,7 @@ function AddApiKey() {
           disabled={!isAdmin}
           invalid={!isValid || !isDirty}
           loading={createApiKey.isPending}
-          disabledReason={t("Requiere permisos de administrador") as string}
+          disabledReason={t("Requiere permisos de administrador")}
           className="primary"
         >
           {t("Generar")}

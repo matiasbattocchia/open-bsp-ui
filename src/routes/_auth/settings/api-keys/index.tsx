@@ -20,7 +20,7 @@ function ListApiKeys() {
 
   return (
     <>
-      <SectionHeader title={t("Claves API") as string} />
+      <SectionHeader title={t("Claves API")} />
 
       <SectionBody>
         <SectionItem
@@ -37,7 +37,7 @@ function ListApiKeys() {
             })
           }
           disabled={!isAdmin}
-          disabledReason={t("Requiere permisos de administrador") as string}
+          disabledReason={t("Requiere permisos de administrador")}
         />
         {apiKeys?.map((apiKey) => (
           <SectionItem

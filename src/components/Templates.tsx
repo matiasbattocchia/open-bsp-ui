@@ -215,7 +215,7 @@ function TemplateEditor({
   setShowEditor: Dispatch<SetStateAction<boolean>>;
   existingTemplate?: TemplateData;
 }) {
-  const { currentLanguage } = useTranslation();
+  const { currentLanguage, translate: t } = useTranslation();
   const activeConvId = useBoundStore((store) => store.ui.activeConvId);
 
   const [name, setName] = useState(existingTemplate?.name || "");
@@ -436,6 +436,7 @@ function TemplateEditor({
             <T as="label">Pie</T>
             <input
               type="text"
+              placeholder={t("Texto del pie de página")}
               value={footer}
               onChange={(e) => setFooter(e.target.value)}
             />
@@ -646,7 +647,7 @@ export default function WhatsAppTemplates() {
                   )}
 
                   <button
-                    title={t("Editar") as string}
+                    title={t("Editar")}
                     className="absolute right-0 top-0 opacity-0 group-hover:opacity-100 z-50"
                     onClick={() => {
                       setTemplateToEdit(template);

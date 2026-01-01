@@ -72,6 +72,7 @@ function AgentDetail() {
           });
         }}
         deleteDisabled={!isAdmin}
+        deleteDisabledReason={t("Requiere permisos de administrador")}
       />
 
       <SectionBody>
@@ -84,7 +85,7 @@ function AgentDetail() {
             <input
               type="text"
               className="text"
-              placeholder="Nombre del agente"
+              placeholder={t("Nombre del agente")}
               {...register("name", { required: true })}
             />
           </label>
@@ -103,7 +104,7 @@ function AgentDetail() {
             <textarea
               className="text h-min-[100px] font-mono text-[12.8px]"
               {...register("extra.instructions")}
-              placeholder={t("Eres un asistente útil...") as string}
+              placeholder={t("Eres un asistente útil...")}
             />
           </label>
 
@@ -162,8 +163,8 @@ function AgentDetail() {
             <input
               type="text"
               className="text"
+              placeholder={t("Clave API del proveedor")}
               {...register("extra.api_key")}
-              placeholder="sk_012345..."
             />
           </label>
 
@@ -172,7 +173,7 @@ function AgentDetail() {
             <input
               type="text"
               className="text"
-              placeholder="gpt-4.1-mini"
+              placeholder={t("Nombre del modelo")}
               {...register("extra.model")}
             />
           </label>

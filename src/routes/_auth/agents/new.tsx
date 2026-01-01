@@ -66,7 +66,7 @@ function AddAgent() {
 
   return (
     <>
-      <SectionHeader title={t("Agregar agente") as string} />
+      <SectionHeader title={t("Agregar agente")} />
 
       <SectionBody>
         <form
@@ -79,7 +79,7 @@ function AddAgent() {
               <input
                 type="text"
                 className="text"
-                placeholder="Nombre del agente"
+                placeholder={t("Nombre del agente")}
                 {...register("name", { required: true })}
               />
             </label>
@@ -97,7 +97,7 @@ function AddAgent() {
               <div className="label">{t("Instrucciones")}</div>
               <textarea
                 className="text h-min-[100px] font-mono text-[12.8px]"
-                placeholder={t("Eres un asistente útil...") as string}
+                placeholder={t("Eres un asistente útil...")}
                 {...register("extra.instructions")}
               />
             </label>
@@ -157,7 +157,7 @@ function AddAgent() {
               <input
                 type="text"
                 className="text"
-                placeholder="sk_..."
+                placeholder={t("Clave API del proveedor")}
                 {...register("extra.api_key")}
               />
             </label>
@@ -167,7 +167,7 @@ function AddAgent() {
               <input
                 type="text"
                 className="text"
-                placeholder="gpt-4.1-mini"
+                placeholder={t("Nombre del modelo")}
                 {...register("extra.model")}
               />
             </label>
@@ -182,7 +182,7 @@ function AddAgent() {
           disabled={!isAdmin}
           invalid={!isValid || !isDirty}
           loading={createAgent.isPending}
-          disabledReason={t("Requiere permisos de administrador") as string}
+          disabledReason={t("Requiere permisos de administrador")}
           className="primary"
         >
           {t("Crear")}

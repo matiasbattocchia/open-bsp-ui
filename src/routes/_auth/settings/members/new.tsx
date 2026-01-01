@@ -33,7 +33,7 @@ function AddMember() {
 
   return (
     <>
-      <SectionHeader title={t("Agregar miembro") as string} />
+      <SectionHeader title={t("Agregar miembro")} />
 
       <SectionBody>
         <form
@@ -64,6 +64,7 @@ function AddMember() {
               <div className="label">{t("Nombre")}</div>
               <input
                 className="text"
+                placeholder={t("Nombre del miembro")}
                 {...register("name", { required: true })}
               />
             </label>
@@ -74,7 +75,7 @@ function AddMember() {
               <select
                 {...register("extra.role", { required: true })}
               >
-                <option value="user">{t("Usuario")}</option>
+                <option value="member">{t("Miembro")}</option>
                 <option value="admin">{t("Administrador")}</option>
                 <option value="owner">{t("Propietario")}</option>
               </select>
@@ -85,6 +86,7 @@ function AddMember() {
               <input
                 type="email"
                 className="text"
+                placeholder={t("usuario@ejemplo.com")}
                 {...register("extra.invitation.email", {
                   required: true, pattern: {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
@@ -104,7 +106,7 @@ function AddMember() {
           disabled={!isOwner}
           invalid={!isValid || !isDirty}
           loading={createAgent.isPending}
-          disabledReason={t("Requiere permisos de propietario") as string}
+          disabledReason={t("Requiere permisos de propietario")}
           className="primary"
         >
           {t("Invitar")}

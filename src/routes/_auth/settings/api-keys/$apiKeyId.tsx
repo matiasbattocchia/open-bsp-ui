@@ -26,11 +26,12 @@ function ApiKeyDetail() {
   return apiKey && (
     <>
       <SectionHeader
-        title={t("Clave API") as string}
+        title={t("Clave API")}
         onDelete={() => deleteApiKey.mutate(apiKeyId, {
           onSuccess: () => navigate({ to: "..", hash: (prevHash) => prevHash! })
         })}
         deleteDisabled={!isAdmin}
+        deleteDisabledReason={t("Requiere permisos de administrador")}
       />
 
       <SectionBody>

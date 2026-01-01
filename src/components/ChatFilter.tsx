@@ -9,10 +9,10 @@ export default function ChatFilter() {
   const { translate: t } = useTranslation();
 
   const filterNames: { [key in Filters]: string } = {
-    todas: t("todas") as string,
-    pendientes: t("pendientes") as string,
-    "24h": t("24h") as string,
-    archivadas: t("archivadas") as string,
+    todas: t("todas"),
+    pendientes: t("pendientes"),
+    "24h": t("24h"),
+    archivadas: t("archivadas"),
   };
 
   return (

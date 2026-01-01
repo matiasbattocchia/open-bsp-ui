@@ -45,6 +45,7 @@ function EditMember() {
           onSuccess: () => navigate({ to: "..", hash: (prevHash) => prevHash! })
         })}
         deleteDisabled={!isOwner}
+        deleteDisabledReason={t("Requiere permisos de propietario")}
       />
       <SectionBody>
         <form
@@ -68,6 +69,7 @@ function EditMember() {
             <input
               className="text"
               disabled={!isOwner}
+              placeholder={t("Nombre del miembro")}
               {...register("name", { required: true })}
             />
           </label>
@@ -90,6 +92,7 @@ function EditMember() {
               type="email"
               className="text"
               disabled
+              placeholder={t("usuario@ejemplo.com")}
               {...register("extra.invitation.email")}
             />
           </label>}
@@ -103,7 +106,7 @@ function EditMember() {
           disabled={!isOwner}
           invalid={!isValid || !isDirty}
           loading={updateAgent.isPending}
-          disabledReason={t("Requiere permisos de propietario") as string}
+          disabledReason={t("Requiere permisos de propietario")}
           className="primary"
         >
           {t("Actualizar")}

@@ -28,7 +28,7 @@ function Integrations() {
 
       <SectionBody>
         {/* WhatsApp Integration - Always show but disabled if not admin */}
-        <div className={`py-[10px] ${!isAdmin ? "opacity-50 pointer-events-none" : ""}`} title={!isAdmin ? t("Requiere permisos de administrador") as string : undefined}>
+        <div className={`py-[10px] ${!isAdmin ? "opacity-50 pointer-events-none" : ""}`} title={!isAdmin ? t("Requiere permisos de administrador") : undefined}>
           <fieldset disabled={!isAdmin} className="group">
             <WhatsAppIntegration />
           </fieldset>

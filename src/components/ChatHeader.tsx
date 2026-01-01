@@ -47,7 +47,7 @@ export default function Header() {
       {/* Back button */}
       <button
         className="mr-4 md:hidden"
-        title={t("Volver") as string}
+        title={t("Volver")}
         onClick={() => navigate({ hash: undefined })}
       >
         <ArrowLeft className="w-[24px] h-[24px] text-foreground" />

@@ -34,7 +34,7 @@ function Login() {
     });
 
     if (error) {
-      setMessage(t("¡Credenciales inválidas!") as string);
+      setMessage(t("¡Credenciales inválidas!"));
     } else {
       setEmail("");
       setPassword("");

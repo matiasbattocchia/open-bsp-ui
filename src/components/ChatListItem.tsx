@@ -215,7 +215,7 @@ export default function ChatListItem({
 
     if (days < 1) return dayjsTs.format("HH:mm");
 
-    if (days < 2) return t("ayer") as string;
+    if (days < 2) return t("ayer");
 
     if (days < 7) return dayjsTs.format("dddd"); // Jueves
 

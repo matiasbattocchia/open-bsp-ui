@@ -15,7 +15,7 @@ function SettingsIndex() {
 
   return (
     <>
-      <SectionHeader title={t("Preferencias") as string} />
+      <SectionHeader title={t("Preferencias")} />
 
       <SectionBody className="gap-4">
         <div className="flex flex-col">

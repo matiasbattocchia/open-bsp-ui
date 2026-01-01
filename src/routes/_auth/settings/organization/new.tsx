@@ -27,7 +27,7 @@ function NewOrganization() {
 
   return (
     <>
-      <SectionHeader title={t("Nueva organización") as string} closeButton={true} />
+      <SectionHeader title={t("Nueva organización")} closeButton={true} />
 
       <SectionBody>
         <form
@@ -45,6 +45,7 @@ function NewOrganization() {
             <div className="label">{t("Nombre")}</div>
             <input
               className="text"
+              placeholder={t("Nombre de la organización")}
               {...register("name", { required: true })}
             />
           </label>
