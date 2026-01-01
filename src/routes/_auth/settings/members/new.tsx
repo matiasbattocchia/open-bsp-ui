@@ -6,6 +6,7 @@ import { type HumanAgentInsert } from "@/supabase/client";
 import { useForm } from "react-hook-form";
 import SectionBody from "@/components/SectionBody";
 import SectionFooter from "@/components/SectionFooter";
+import Button from "@/components/Button";
 
 export const Route = createFileRoute("/_auth/settings/members/new")({
   component: AddMember,
@@ -21,11 +22,11 @@ function AddMember() {
   const {
     register,
     handleSubmit,
-    formState: { isValid },
+    formState: { isValid, isDirty },
   } = useForm<HumanAgentInsert>({
     defaultValues: {
       extra: {
-        role: "user",
+        role: "member",
       },
     },
   });
@@ -58,54 +59,57 @@ function AddMember() {
             }),
           )}
         >
-          <label>
-            <div className="label">{t("Nombre")}</div>
-            <input
-              className="text"
-              disabled={!isOwner}
-              {...register("name", { required: true })}
-            />
-          </label>
+          <fieldset disabled={!isOwner} className="contents">
+            <label>
+              <div className="label">{t("Nombre")}</div>
+              <input
+                className="text"
+                {...register("name", { required: true })}
+              />
+            </label>
 
-          <label>
-            <div className="label">{t("Rol")}</div>
-            <select
-              disabled={!isOwner}
-              {...register("extra.role", { required: true })}
-            >
-              <option value="user">{t("Usuario")}</option>
-              <option value="admin">{t("Administrador")}</option>
-              <option value="owner">{t("Propietario")}</option>
-            </select>
-          </label>
 
-          <label>
-            <div className="label">{t("Correo electrónico")}</div>
-            <input
-              type="email"
-              className="text"
-              disabled={!isOwner}
-              {...register("extra.invitation.email", {
-                required: true, pattern: {
-                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: "Invalid email address"
-                }
-              })}
-            />
-          </label>
+            <label>
+              <div className="label">{t("Rol")}</div>
+              <select
+                {...register("extra.role", { required: true })}
+              >
+                <option value="user">{t("Usuario")}</option>
+                <option value="admin">{t("Administrador")}</option>
+                <option value="owner">{t("Propietario")}</option>
+              </select>
+            </label>
+
+            <label>
+              <div className="label">{t("Correo electrónico")}</div>
+              <input
+                type="email"
+                className="text"
+                {...register("extra.invitation.email", {
+                  required: true, pattern: {
+                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    message: "Invalid email address"
+                  }
+                })}
+              />
+            </label>
+          </fieldset>
         </form>
       </SectionBody>
 
-      {isOwner && <SectionFooter>
-        <button
+      <SectionFooter>
+        <Button
           form="create-member-form"
           type="submit"
-          disabled={createAgent.isPending || !isValid}
+          disabled={!isOwner}
+          invalid={!isValid || !isDirty}
+          loading={createAgent.isPending}
+          disabledReason={t("Requiere permisos de propietario") as string}
           className="primary"
         >
-          {createAgent.isPending ? "..." : t("Invitar")}
-        </button>
-      </SectionFooter>}
+          {t("Invitar")}
+        </Button>
+      </SectionFooter>
     </>
   );
 }

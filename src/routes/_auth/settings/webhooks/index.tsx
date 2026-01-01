@@ -2,6 +2,7 @@ import SectionBody from "@/components/SectionBody";
 import SectionHeader from "@/components/SectionHeader";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useWebhooks } from "@/queries/useWebhooks";
+import { useCurrentAgent } from "@/queries/useAgents";
 import SectionItem from "@/components/SectionItem";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Plus, Webhook } from "lucide-react";
@@ -14,6 +15,8 @@ function ListWebhooks() {
   const { translate: t } = useTranslation();
   const navigate = useNavigate();
   const { data: webhooks } = useWebhooks();
+  const { data: currentAgent } = useCurrentAgent();
+  const isAdmin = ["admin", "owner"].includes(currentAgent?.extra?.role || "");
 
   return (
     <>
@@ -33,6 +36,8 @@ function ListWebhooks() {
               hash: (prevHash) => prevHash!,
             })
           }
+          disabled={!isAdmin}
+          disabledReason={t("Requiere permisos de administrador") as string}
         />
         {webhooks?.map((webhook) => (
           <SectionItem

@@ -5,6 +5,8 @@ import { useWebhook, useUpdateWebhook, useDeleteWebhook, type WebhookUpdate } fr
 import { useForm } from "react-hook-form";
 import SectionBody from "@/components/SectionBody";
 import SectionFooter from "@/components/SectionFooter";
+import { useCurrentAgent } from "@/queries/useAgents";
+import Button from "@/components/Button";
 
 
 export const Route = createFileRoute("/_auth/settings/webhooks/$webhookId")({
@@ -16,6 +18,8 @@ function EditWebhook() {
   const navigate = useNavigate();
   const { webhookId } = Route.useParams();
   const { data: webhook } = useWebhook(webhookId);
+  const { data: currentAgent } = useCurrentAgent();
+  const isAdmin = ["admin", "owner"].includes(currentAgent?.extra?.role || "");
   const updateWebhook = useUpdateWebhook();
   const deleteWebhook = useDeleteWebhook();
 
@@ -34,6 +38,7 @@ function EditWebhook() {
         onDelete={() => deleteWebhook.mutate(webhookId, {
           onSuccess: () => navigate({ to: "..", hash: (prevHash) => prevHash! })
         })}
+        deleteDisabled={!isAdmin}
       />
 
       <SectionBody>
@@ -99,14 +104,17 @@ function EditWebhook() {
       </SectionBody>
 
       <SectionFooter>
-        <button
+        <Button
           form="webhook-form"
           type="submit"
-          disabled={updateWebhook.isPending || !isValid || !isDirty}
+          disabled={!isAdmin}
+          invalid={!isValid || !isDirty}
+          loading={updateWebhook.isPending}
+          disabledReason={t("Requiere permisos de administrador") as string}
           className="primary"
         >
-          {updateWebhook.isPending ? "..." : t("Actualizar")}
-        </button>
+          {t("Actualizar")}
+        </Button>
       </SectionFooter>
     </>
   );

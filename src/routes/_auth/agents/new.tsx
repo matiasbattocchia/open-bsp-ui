@@ -2,11 +2,12 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import SectionHeader from "@/components/SectionHeader";
 import SectionFooter from "@/components/SectionFooter";
 import { useTranslation } from "@/hooks/useTranslation";
-import { useCreateAgent } from "@/queries/useAgents";
+import { useCreateAgent, useCurrentAgent } from "@/queries/useAgents";
 import { useForm } from "react-hook-form";
 import SectionBody from "@/components/SectionBody";
 import { type AIAgentInsert, type AIAgentExtra } from "@/supabase/client";
 import { useState } from "react";
+import Button from "@/components/Button";
 
 export const Route = createFileRoute("/_auth/agents/new")({
   component: AddAgent,
@@ -30,13 +31,15 @@ function AddAgent() {
   const { translate: t } = useTranslation();
   const navigate = useNavigate();
   const createAgent = useCreateAgent();
+  const { data: currentAgent } = useCurrentAgent();
+  const isAdmin = ["admin", "owner"].includes(currentAgent?.extra?.role || "");
   const [provider, setProvider] = useState<keyof typeof protocols>("openai");
 
   const {
     register,
     handleSubmit,
     setValue,
-    formState: { isValid },
+    formState: { isValid, isDirty },
   } = useForm<AIAgentInsert>({
     defaultValues: {
       extra: {
@@ -70,115 +73,120 @@ function AddAgent() {
           id="create-agent-form"
           onSubmit={handleSubmit(onSubmit)}
         >
-          <label>
-            <div className="label">{t("Nombre")}</div>
-            <input
-              type="text"
-              className="text"
-              placeholder="Nombre del agente"
-              {...register("name", { required: true })}
-            />
-          </label>
-
-          <label>
-            <div className="label">{t("Estado")}</div>
-            <select {...register("extra.mode")}>
-              <option value="active">{t("Activo")}</option>
-              <option value="draft">{t("Borrador")}</option>
-              <option value="inactive">{t("Inactivo")}</option>
-            </select>
-          </label>
-
-          <label>
-            <div className="label">{t("Instrucciones")}</div>
-            <textarea
-              className="text h-min-[100px] font-mono text-[12.8px]"
-              placeholder={t("Eres un asistente útil...") as string}
-              {...register("extra.instructions")}
-            />
-          </label>
-
-          <label>
-            <div className="label">{t("Proveedor")}</div>
-            <select
-              value={provider}
-              onChange={(e) => {
-                const val = e.target.value;
-                setProvider(val);
-                setValue("extra.model", "");
-
-                const availableProtocols = protocols[val as keyof typeof protocols];
-                setValue("extra.protocol", availableProtocols[0]);
-
-                if (val === 'custom') {
-                  setValue("extra.api_url", "", { shouldDirty: true });
-                } else {
-                  setValue("extra.api_url", val, { shouldDirty: true });
-                }
-              }}
-            >
-              <option value="openai">OpenAI</option>
-              <option value="anthropic">Anthropic</option>
-              <option value="groq">Groq</option>
-              <option value="gemini">Gemini</option>
-              <option value="custom">{t("Personalizado")}</option>
-            </select>
-          </label>
-
-          <label>
-            <div className="label">{t("Protocolo")}</div>
-            <select
-              {...register("extra.protocol")}
-            >
-              {(protocols[provider as keyof typeof protocols]).map((p) => (
-                <option key={p} value={p}>{protocolLabels[p] || p}</option>
-              ))}
-            </select>
-          </label>
-
-          {provider === 'custom' && (
+          <fieldset disabled={!isAdmin} className="contents">
             <label>
-              <div className="label">{t("API URL")}</div>
+              <div className="label">{t("Nombre")}</div>
               <input
-                type="url"
+                type="text"
                 className="text"
-                placeholder="https://api.example.com/v1"
-                {...register("extra.api_url")}
+                placeholder="Nombre del agente"
+                {...register("name", { required: true })}
               />
             </label>
-          )}
 
-          <label>
-            <div className="label">{t("API Key")}</div>
-            <input
-              type="text"
-              className="text"
-              placeholder="sk_..."
-              {...register("extra.api_key")}
-            />
-          </label>
+            <label>
+              <div className="label">{t("Estado")}</div>
+              <select {...register("extra.mode")}>
+                <option value="active">{t("Activo")}</option>
+                <option value="draft">{t("Borrador")}</option>
+                <option value="inactive">{t("Inactivo")}</option>
+              </select>
+            </label>
 
-          <label>
-            <div className="label">{t("Modelo")}</div>
-            <input
-              type="text"
-              className="text"
-              placeholder="gpt-4.1-mini"
-              {...register("extra.model")}
-            />
-          </label>
+            <label>
+              <div className="label">{t("Instrucciones")}</div>
+              <textarea
+                className="text h-min-[100px] font-mono text-[12.8px]"
+                placeholder={t("Eres un asistente útil...") as string}
+                {...register("extra.instructions")}
+              />
+            </label>
+
+            <label>
+              <div className="label">{t("Proveedor")}</div>
+              <select
+                value={provider}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setProvider(val);
+                  setValue("extra.model", "");
+
+                  const availableProtocols = protocols[val as keyof typeof protocols];
+                  setValue("extra.protocol", availableProtocols[0]);
+
+                  if (val === 'custom') {
+                    setValue("extra.api_url", "", { shouldDirty: true });
+                  } else {
+                    setValue("extra.api_url", val, { shouldDirty: true });
+                  }
+                }}
+              >
+                <option value="openai">OpenAI</option>
+                <option value="anthropic">Anthropic</option>
+                <option value="groq">Groq</option>
+                <option value="gemini">Gemini</option>
+                <option value="custom">{t("Personalizado")}</option>
+              </select>
+            </label>
+
+            <label>
+              <div className="label">{t("Protocolo")}</div>
+              <select
+                {...register("extra.protocol")}
+              >
+                {(protocols[provider as keyof typeof protocols]).map((p) => (
+                  <option key={p} value={p}>{protocolLabels[p] || p}</option>
+                ))}
+              </select>
+            </label>
+
+            {provider === 'custom' && (
+              <label>
+                <div className="label">{t("API URL")}</div>
+                <input
+                  type="url"
+                  className="text"
+                  placeholder="https://api.example.com/v1"
+                  {...register("extra.api_url")}
+                />
+              </label>
+            )}
+
+            <label>
+              <div className="label">{t("API Key")}</div>
+              <input
+                type="text"
+                className="text"
+                placeholder="sk_..."
+                {...register("extra.api_key")}
+              />
+            </label>
+
+            <label>
+              <div className="label">{t("Modelo")}</div>
+              <input
+                type="text"
+                className="text"
+                placeholder="gpt-4.1-mini"
+                {...register("extra.model")}
+              />
+            </label>
+          </fieldset>
         </form>
       </SectionBody>
 
       <SectionFooter>
-        <button
+        <Button
           form="create-agent-form"
           type="submit"
-          disabled={createAgent.isPending || !isValid}
+          disabled={!isAdmin}
+          invalid={!isValid || !isDirty}
+          loading={createAgent.isPending}
+          disabledReason={t("Requiere permisos de administrador") as string}
           className="primary"
         >
-          {createAgent.isPending ? "..." : t("Crear")}
-        </button>
+          {t("Crear")}
+        </Button>
       </SectionFooter>
     </>
   );

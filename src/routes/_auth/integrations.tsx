@@ -6,12 +6,14 @@ import WhatsAppIntegration from "@/components/WhatsAppIntegration";
 import { WhatsAppOutlined } from "@ant-design/icons";
 import { useOrganizationsAddresses } from "@/queries/useOrganizationsAddresses";
 import { useCurrentAgent } from "@/queries/useAgents";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export const Route = createFileRoute("/_auth/integrations")({
   component: Integrations,
 });
 
 function Integrations() {
+  const { translate: t } = useTranslation();
   const { data: integrations } = useOrganizationsAddresses();
   const { data: agent } = useCurrentAgent();
   const isAdmin = ["admin", "owner"].includes(agent?.extra?.role || "");
@@ -25,11 +27,12 @@ function Integrations() {
       <SectionHeader title="Integraciones" />
 
       <SectionBody>
-        {isAdmin && (
-          <div className="py-[10px]">
+        {/* WhatsApp Integration - Always show but disabled if not admin */}
+        <div className={`py-[10px] ${!isAdmin ? "opacity-50 pointer-events-none" : ""}`} title={!isAdmin ? t("Requiere permisos de administrador") as string : undefined}>
+          <fieldset disabled={!isAdmin} className="group">
             <WhatsAppIntegration />
-          </div>
-        )}
+          </fieldset>
+        </div>
 
         {externalIntegrations && externalIntegrations.length > 0 && (
           <>

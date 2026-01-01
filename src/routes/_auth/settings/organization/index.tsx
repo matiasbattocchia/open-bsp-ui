@@ -6,6 +6,7 @@ import { useCurrentOrganization, useUpdateCurrentOrganization, useDeleteCurrentO
 import { useCurrentAgent } from "@/queries/useAgents";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
+import Button from "@/components/Button";
 
 export const Route = createFileRoute("/_auth/settings/organization/")({
   component: EditOrganization,
@@ -31,9 +32,10 @@ function EditOrganization() {
     <>
       <SectionHeader
         title={t("Editar organización")}
-        onDelete={isOwner ? () => deleteOrg.mutate(undefined, {
+        onDelete={() => deleteOrg.mutate(undefined, {
           onSuccess: () => navigate({ to: "..", hash: (prevHash) => prevHash! })
-        }) : undefined}
+        })}
+        deleteDisabled={!isOwner}
       />
 
       <SectionBody>
@@ -52,18 +54,19 @@ function EditOrganization() {
         </form>
       </SectionBody>
 
-      {isOwner && (
-        <SectionFooter>
-          <button
-            form="org-form"
-            type="submit"
-            disabled={updateOrg.isPending || !isValid || !isDirty}
-            className="primary"
-          >
-            {updateOrg.isPending ? "..." : t("Actualizar")}
-          </button>
-        </SectionFooter>
-      )}
+      <SectionFooter>
+        <Button
+          form="org-form"
+          type="submit"
+          disabled={!isOwner}
+          invalid={!isValid || !isDirty}
+          loading={updateOrg.isPending}
+          disabledReason={t("Requiere permisos de propietario") as string}
+          className="primary"
+        >
+          {t("Actualizar")}
+        </Button>
+      </SectionFooter>
     </>
   );
 }

@@ -2,6 +2,7 @@ import SectionBody from "@/components/SectionBody";
 import SectionHeader from "@/components/SectionHeader";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useApiKeys } from "@/queries/useApiKeys";
+import { useCurrentAgent } from "@/queries/useAgents";
 import SectionItem from "@/components/SectionItem";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Key, Plus } from "lucide-react";
@@ -14,6 +15,8 @@ function ListApiKeys() {
   const { translate: t } = useTranslation();
   const navigate = useNavigate();
   const { data: apiKeys } = useApiKeys();
+  const { data: currentAgent } = useCurrentAgent();
+  const isAdmin = ["admin", "owner"].includes(currentAgent?.extra?.role || "");
 
   return (
     <>
@@ -33,6 +36,8 @@ function ListApiKeys() {
               hash: (prevHash) => prevHash!,
             })
           }
+          disabled={!isAdmin}
+          disabledReason={t("Requiere permisos de administrador") as string}
         />
         {apiKeys?.map((apiKey) => (
           <SectionItem

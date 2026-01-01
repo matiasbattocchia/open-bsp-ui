@@ -3,8 +3,10 @@ import SectionHeader from "@/components/SectionHeader";
 import SectionFooter from "@/components/SectionFooter";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useCreateWebhook, type WebhookInsert } from "@/queries/useWebhooks";
+import { useCurrentAgent } from "@/queries/useAgents";
 import { useForm } from "react-hook-form";
 import SectionBody from "@/components/SectionBody";
+import Button from "@/components/Button";
 
 export const Route = createFileRoute("/_auth/settings/webhooks/new")({
   component: AddWebhook,
@@ -14,11 +16,13 @@ function AddWebhook() {
   const { translate: t } = useTranslation();
   const navigate = useNavigate();
   const createWebhook = useCreateWebhook();
+  const { data: currentAgent } = useCurrentAgent();
+  const isAdmin = ["admin", "owner"].includes(currentAgent?.extra?.role || "");
 
   const {
     register,
     handleSubmit,
-    formState: { isValid },
+    formState: { isValid, isDirty },
   } = useForm<WebhookInsert>({
     defaultValues: {
       operations: ["insert", "update"],
@@ -46,65 +50,70 @@ function AddWebhook() {
             )
           )}
         >
-          <label>
-            <div className="label">{t("URL")}</div>
-            <input
-              type="url"
-              className="text"
-              {...register("url", { required: true })}
-            />
-          </label>
+          <fieldset disabled={!isAdmin} className="contents">
+            <label>
+              <div className="label">{t("URL")}</div>
+              <input
+                type="url"
+                className="text"
+                {...register("url", { required: true })}
+              />
+            </label>
 
-          <label>
-            <div className="label">{t("Tabla")}</div>
-            <select {...register("table_name", { required: true })}>
-              <option value="messages">{t("Mensajes")}</option>
-              <option value="conversations">{t("Conversaciones")}</option>
-            </select>
-          </label>
+            <label>
+              <div className="label">{t("Tabla")}</div>
+              <select {...register("table_name", { required: true })}>
+                <option value="messages">{t("Mensajes")}</option>
+                <option value="conversations">{t("Conversaciones")}</option>
+              </select>
+            </label>
 
-          <label>
-            <div className="label">{t("Operaciones")}</div>
-            <div className="flex gap-4">
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  value="insert"
-                  {...register("operations")}
-                />
-                {t("Insertar")}
-              </label>
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  value="update"
-                  {...register("operations")}
-                />
-                {t("Actualizar")}
-              </label>
-            </div>
-          </label>
+            <label>
+              <div className="label">{t("Operaciones")}</div>
+              <div className="flex gap-4">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    value="insert"
+                    {...register("operations")}
+                  />
+                  {t("Insertar")}
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    value="update"
+                    {...register("operations")}
+                  />
+                  {t("Actualizar")}
+                </label>
+              </div>
+            </label>
 
-          <label>
-            <div className="label">{t("Token (Opcional)")}</div>
-            <input
-              className="text"
-              type="text"
-              {...register("token")}
-            />
-          </label>
+            <label>
+              <div className="label">{t("Token (Opcional)")}</div>
+              <input
+                className="text"
+                type="text"
+                {...register("token")}
+              />
+            </label>
+          </fieldset>
         </form>
       </SectionBody>
 
       <SectionFooter>
-        <button
+        <Button
           form="create-webhook-form"
           type="submit"
-          disabled={createWebhook.isPending || !isValid}
+          disabled={!isAdmin}
+          invalid={!isValid || !isDirty}
+          loading={createWebhook.isPending}
+          disabledReason={t("Requiere permisos de administrador") as string}
           className="primary"
         >
-          {createWebhook.isPending ? "..." : t("Crear")}
-        </button>
+          {t("Crear")}
+        </Button>
       </SectionFooter>
     </>
   );

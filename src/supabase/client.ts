@@ -586,7 +586,7 @@ export type ToolConfig =
   | LocalMCPToolConfig;
 
 export type HumanAgentExtra = {
-  role: "user" | "admin" | "owner";
+  role: "member" | "admin" | "owner";
   invitation?: {
     email: string;
     status: "pending" | "accepted" | "rejected";

@@ -6,20 +6,29 @@ export default function SectionItem({
   aside,
   onClick,
   className,
+  disabled,
+  disabledReason,
 }: {
   title: ReactNode;
   description?: ReactNode;
   aside?: ReactNode;
   onClick?: () => void;
   className?: string;
+  disabled?: boolean;
+  disabledReason?: string;
 }) {
+  const isDisabled = disabled;
+  const tooltip = title + (isDisabled ? " - " + disabledReason : "");
+
   return (
     <div
+      title={tooltip}
       className={
-        `h-[72px] flex rounded-xl group ${className || ""}` +
-        (onClick ? " cursor-pointer hover:bg-accent" : "")
+        `h-[72px] flex rounded-xl group ${className || ""} ` +
+        (onClick && !isDisabled ? " cursor-pointer hover:bg-accent" : "") +
+        (isDisabled ? " opacity-50 grayscale" : "")
       }
-      onClick={onClick}
+      onClick={isDisabled ? undefined : onClick}
     >
       {/* Left Pane: Avatar/Icon */}
       <div className="pl-[10px] pr-[15px] flex items-center">

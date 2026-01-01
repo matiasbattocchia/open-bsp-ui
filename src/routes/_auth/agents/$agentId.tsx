@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import SectionHeader from "@/components/SectionHeader";
 import { useTranslation } from "@/hooks/useTranslation";
-import { useAgent, useDeleteAgent, useUpdateAgent } from "@/queries/useAgents";
+import { useAgent, useDeleteAgent, useUpdateAgent, useCurrentAgent } from "@/queries/useAgents";
 import { useForm } from "react-hook-form";
 import SectionBody from "@/components/SectionBody";
 import useBoundStore from "@/stores/useBoundStore";
@@ -11,6 +11,7 @@ import { startConversation } from "@/utils/ConversationUtils";
 import { useOrganizationsAddresses } from "@/queries/useOrganizationsAddresses";
 import SectionFooter from "@/components/SectionFooter";
 import { protocols, protocolLabels } from "./new";
+import Button from "@/components/Button";
 
 export const Route = createFileRoute("/_auth/agents/$agentId")({
   component: AgentDetail,
@@ -21,6 +22,8 @@ function AgentDetail() {
   const navigate = useNavigate();
   const { agentId } = Route.useParams();
   const { data: agent } = useAgent<AIAgentRow>(agentId);
+  const { data: currentAgent } = useCurrentAgent();
+  const isAdmin = ["admin", "owner"].includes(currentAgent?.extra?.role || "");
   const deleteAgent = useDeleteAgent();
   const updateAgent = useUpdateAgent();
   const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
@@ -68,6 +71,7 @@ function AgentDetail() {
             onSuccess: () => navigate({ to: "..", hash: (prevHash) => prevHash! })
           });
         }}
+        deleteDisabled={!isAdmin}
       />
 
       <SectionBody>
@@ -185,14 +189,17 @@ function AgentDetail() {
             {t("Chatea con este agente")}
           </button>
         ) : (
-          <button
+          <Button
             form="agent-form"
             type="submit"
-            disabled={updateAgent.isPending || !isValid}
+            disabled={!isAdmin}
+            invalid={!isValid}
+            loading={updateAgent.isPending}
+            disabledReason={t("Requiere permisos de administrador") as string}
             className="primary"
           >
-            {updateAgent.isPending ? "..." : t("Actualizar")}
-          </button>
+            {t("Actualizar")}
+          </Button>
         )}
       </SectionFooter>
     </>

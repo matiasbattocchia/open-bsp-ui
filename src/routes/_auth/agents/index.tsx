@@ -1,7 +1,7 @@
 import SectionBody from "@/components/SectionBody";
 import SectionHeader from "@/components/SectionHeader";
 import { useTranslation } from "@/hooks/useTranslation";
-import { useCurrentAgents } from "@/queries/useAgents";
+import { useCurrentAgents, useCurrentAgent } from "@/queries/useAgents";
 import SectionItem from "@/components/SectionItem";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
@@ -16,6 +16,8 @@ function ListAgents() {
   const { translate: t } = useTranslation();
   const navigate = useNavigate();
   const { data: agents } = useCurrentAgents();
+  const { data: currentAgent } = useCurrentAgent();
+  const isAdmin = ["admin", "owner"].includes(currentAgent?.extra?.role || "");
 
   const modeLabels: Record<string, string | JSX.Element> = {
     active: <span className="text-primary">{t("Activo")}</span>,
@@ -41,6 +43,8 @@ function ListAgents() {
               hash: (prevHash) => prevHash!,
             })
           }
+          disabled={!isAdmin}
+          disabledReason={t("Requiere permisos de administrador") as string}
         />
         {agents?.filter(a => a.ai).map((agent) => (
           <SectionItem

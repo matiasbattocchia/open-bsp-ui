@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import SectionBody from "@/components/SectionBody";
 import type { OrganizationInsert } from "@/supabase/client";
 import SectionFooter from "@/components/SectionFooter";
+import Button from "@/components/Button";
 
 export const Route = createFileRoute("/_auth/settings/organization/new")({
   component: NewOrganization,
@@ -51,14 +52,15 @@ function NewOrganization() {
       </SectionBody>
 
       <SectionFooter>
-        <button
+        <Button
           form="create-organization-form"
           type="submit"
-          disabled={createOrg.isPending || !isValid}
+          invalid={!isValid}
+          loading={createOrg.isPending}
           className="primary"
         >
           {createOrg.isPending ? "..." : t("Crear")}
-        </button>
+        </Button>
       </SectionFooter>
     </>
   );

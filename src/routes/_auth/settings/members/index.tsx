@@ -29,22 +29,22 @@ function ListMembers() {
       <SectionHeader title={t("Miembros") as string} />
 
       <SectionBody>
-        {isOwner && (
-          <SectionItem
-            title={t("Agregar miembro")}
-            aside={
-              <div className="p-[8px] bg-primary/10 rounded-full">
-                <Plus className="w-[24px] h-[24px] text-primary" />
-              </div>
-            }
-            onClick={() =>
-              navigate({
-                to: "/settings/members/new",
-                hash: (prevHash) => prevHash!,
-              })
-            }
-          />
-        )}
+        <SectionItem
+          title={t("Agregar miembro")}
+          aside={
+            <div className="p-[8px] bg-primary/10 rounded-full">
+              <Plus className="w-[24px] h-[24px] text-primary" />
+            </div>
+          }
+          onClick={() =>
+            navigate({
+              to: "/settings/members/new",
+              hash: (prevHash) => prevHash!,
+            })
+          }
+          disabled={!isOwner}
+          disabledReason={t("Requiere permisos de propietario") as string}
+        />
         {agents
           ?.filter((agent) => !agent.ai)
           .map((agent) => {

@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import type { HumanAgentRow, HumanAgentUpdate } from "@/supabase/client";
 import SectionItem from "@/components/SectionItem";
 import { Bell } from "lucide-react";
+import Button from "@/components/Button";
 
 export const Route = createFileRoute("/_auth/settings/members/$memberId")({
   component: EditMember,
@@ -40,9 +41,10 @@ function EditMember() {
     <>
       <SectionHeader
         title={agent.name}
-        onDelete={isOwner ? () => deleteAgent.mutate(memberId, {
+        onDelete={() => deleteAgent.mutate(memberId, {
           onSuccess: () => navigate({ to: "..", hash: (prevHash) => prevHash! })
-        }) : undefined}
+        })}
+        deleteDisabled={!isOwner}
       />
       <SectionBody>
         <form
@@ -94,18 +96,19 @@ function EditMember() {
         </form>
       </SectionBody>
 
-      {isOwner && (
-        <SectionFooter>
-          <button
-            form="member-form"
-            type="submit"
-            disabled={updateAgent.isPending || !isValid || !isDirty}
-            className="primary"
-          >
-            {updateAgent.isPending ? "..." : t("Actualizar")}
-          </button>
-        </SectionFooter>
-      )}
+      <SectionFooter>
+        <Button
+          form="member-form"
+          type="submit"
+          disabled={!isOwner}
+          invalid={!isValid || !isDirty}
+          loading={updateAgent.isPending}
+          disabledReason={t("Requiere permisos de propietario") as string}
+          className="primary"
+        >
+          {t("Actualizar")}
+        </Button>
+      </SectionFooter>
     </>
   );
 }
