@@ -11,10 +11,8 @@ A beautiful WhatsApp Web clone designed to work seamlessly with [Open BSP API](h
   <img src="./screenshot.png" alt="Open BSP UI Screenshot" width="800">
 </p>
 
-You can **test** the application live at **[https://open-bsp-ui.pages.dev](https://open-bsp-ui.pages.dev)**
-
 > [!IMPORTANT]
-> You will need a Google account to log in.
+> **Sign up for a free account and try it out at [open-bsp-ui.pages.dev](https://open-bsp-ui.pages.dev)**! Requires a Google account.
 
 ## Deployment
 
@@ -32,14 +30,15 @@ As a Single Page Application, this project can be hosted on any static site host
    - Build command: `npm run build`
    - Build output directory: `dist`
 6. Set environment variables:
-    - `VITE_SUPABASE_URL`
-    - `VITE_SUPABASE_ANON_KEY`
-    - `VITE_META_APP_ID` — Optional. Needed for WhatsApp.
-    - `VITE_FB_LOGIN_CONFIG_ID` — Optional. Needed for Tech Provider. 
+    - **VITE_SUPABASE_URL**
+    - **VITE_SUPABASE_ANON_KEY**
+    - **VITE_META_APP_ID** — Optional. Needed for WhatsApp.
+    - **VITE_FB_LOGIN_CONFIG_ID** — Optional. Needed for Tech Provider. 
     
     Get the login config ID from Facebook Login for Business > Configurations > Configuration ID
 7. Click **Save and deploy**. Ualá!
 
+<!--
 ## Tech stack
 
 This project is a Single Page Application (SPA) built with modern web technologies.
@@ -50,6 +49,7 @@ This project is a Single Page Application (SPA) built with modern web technologi
 -   **Routing**: [TanStack Router](https://tanstack.com/router)
 -   **State management**: [Zustand](https://zustand-demo.pmnd.rs/)
 -   **Data fetching**: [TanStack Query](https://tanstack.com/query)
+-->
 
 ## Getting started locally
 

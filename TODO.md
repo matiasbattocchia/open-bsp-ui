@@ -13,5 +13,7 @@ https://develop.open-bsp-ui.pages.dev/settings/organization/new#access_token=eyJ
 - [ ] Preview mensajes internos
 - [ ] Bug mensajes internos (tipo error) se muestran como incoming en conversaciones de prueba
 - [ ] Mostrar nuevas conversaciones vacías en la lista de chats?
-- [ ] placeholders form, new org
-- [ ] no debería ser posible crear agentes o una nueva conversación cuando no hay organización
+- [x] placeholders form
+- [x] no debería ser posible crear agentes o una nueva conversación cuando no hay organización
+- [ ] spinner botón primario a la derecha
+- [ ] indexedDB cache
