@@ -17,7 +17,7 @@ export const useRealtimeSubscription = () => {
   useEffect(() => {
     if (!activeOrgId) return;
 
-    const filter = `organization_id=${activeOrgId}`;
+    const filter = `organization_id=eq.${activeOrgId}`;
 
     const channel = supabase
       .channel("rialtaim")
