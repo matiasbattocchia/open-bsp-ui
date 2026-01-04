@@ -84,6 +84,7 @@ function NewChat() {
               }
 
               const convId = startConversation({
+                name: t("Conversación de prueba"),
                 organization_id: activeOrgId,
                 organization_address: localAddress.address,
                 contact_address: crypto.randomUUID(),

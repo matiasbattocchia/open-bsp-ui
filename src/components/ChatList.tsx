@@ -53,7 +53,8 @@ const ChatList = () => {
     .filter(
       (a) =>
         a.conv.organization_id === activeOrgId &&
-        filters[filterName](a.conv, a.mostRecentMsg),
+        filters[filterName](a.conv, a.mostRecentMsg) &&
+        !!a.mostRecentMsg
     );
 
   if (searchPattern) {

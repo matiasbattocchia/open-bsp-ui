@@ -3,9 +3,9 @@
 A beautiful WhatsApp Web clone designed to work seamlessly with [Open BSP API](https://github.com/matiasbattocchia/open-bsp-api).
 
 - 📱 Responsive design
-- 📲 Works on mobile
+- 🌙 Dark mode
 - 📝 WhatsApp templates
-- 🖼️ Send and receive media
+- 📸 Media messages
 
 <p align="center">
   <img src="./screenshot.png" alt="Open BSP UI Screenshot" width="800">

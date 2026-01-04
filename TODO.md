@@ -1,19 +1,27 @@
 # TODO
 
-- [ ] Aceptar invitación
-- [ ] Redirect login google no respeta hash identifier. Parece que supabase lo tira o lo reemplaza por un access token
+- [x] (enhacement) Test conversation names
+
+- [ ] (feat) Respond to invitation
+
+- [ ] (enhacement) Eliminated agent messages display name
+
+- [ ] (enhacement) Media messages colors
+
+- [ ] (enhacement) Internal messages preview
+
+- [ ] (bug) Error internal messages are shown as incoming in test conversations
+
+- [ ] (feat) Templates
+
+- [ ] (feat) Client-side cache using IndexedDB
+
+- [x] (enhacement) Hide empty conversations from the chat list
+
+- [ ] (enhancement) Primary button spinner placement to the left of the text
+
+- [ ] (bug) Google login redirect does not respect hash identifier. It seems Supabase drops it or replaces it with an access token
 
 https://develop.open-bsp-ui.pages.dev/settings/organization/new#access_token=eyJhbGciOiJFU...tQugBjxzngiNVg&expires_at=1767219571&expires_in=3600&provider_token=ya...nw0293&refresh_token=ktzzl77plo42&token_type=bearer
 
-- [ ] Templates
-- [x] Agents
-- [x] Initial data fetch -> by org
-- [ ] Cómo mostrar mensajes de agentes eliminados?
-- [ ] Nombres de conversaciones de prueba?
-- [ ] Preview mensajes internos
-- [ ] Bug mensajes internos (tipo error) se muestran como incoming en conversaciones de prueba
-- [ ] Mostrar nuevas conversaciones vacías en la lista de chats?
-- [x] placeholders form
-- [x] no debería ser posible crear agentes o una nueva conversación cuando no hay organización
-- [ ] spinner botón primario a la derecha
-- [ ] indexedDB cache
+If redirected to organizations/new from this URL, the cancel button returns to SSO

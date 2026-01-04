@@ -318,7 +318,7 @@ export default function Chat() {
 
   return (
     activeConvId && (
-      <div ref={scroller} className="grow pb-[8px] [overflow-y:scroll]">
+      <div ref={scroller} className="grow pb-[8px] overflow-y-auto [scrollbar-gutter:stable]">
         <div className="min-h-[12px]" />
         <div className="flex flex-col">
           {envelopesAndSeparators.map((envOrSep, index) =>
