@@ -3,6 +3,7 @@ import useBoundStore from "@/stores/useBoundStore";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { Route } from "@/routes/__root";
+import { useQueryClient } from "@tanstack/react-query";
 
 /**
  * Hook to manage authentication state
@@ -13,6 +14,7 @@ export function useAuth() {
   const setUser = useBoundStore((state) => state.ui.setUser);
   const navigate = useNavigate();
   const { redirect } = Route.useSearch();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     // Listen for auth changes
@@ -39,6 +41,9 @@ export function useAuth() {
       if (
         loggedUser && !user && !window.location.pathname.startsWith("/login")
       ) {
+        // Clear all queries
+        queryClient.clear();
+
         navigate({
           to: "/login",
           search: { redirect: window.location.pathname + window.location.hash },

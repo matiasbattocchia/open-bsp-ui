@@ -26,6 +26,24 @@ export function useAgent<T = AgentRow>(id: string) {
   });
 }
 
+export function useInvitations() {
+  const userId = useBoundStore((state) => state.ui.user?.id);
+
+  return useQuery({
+    queryKey: ["invitations"],
+    queryFn: async () =>
+      await supabase
+        .from("agents")
+        .select()
+        .eq("user_id", userId!)
+        .eq("extra->invitation->>status", "pending")
+        .throwOnError(),
+    enabled: !!userId,
+    select: (data) => data.data as HumanAgentRow[],
+    experimental_prefetchInRender: true,
+  });
+}
+
 export function useCurrentAgent() {
   const userId = useBoundStore((state) => state.ui.user?.id);
   const orgId = useBoundStore((state) => state.ui.activeOrgId);
@@ -95,11 +113,15 @@ export function useUpdateAgent() {
       if (!orgId) throw new Error("No active organization");
       if (!data.id) throw new Error("No agent id");
 
-      await supabase
+      const { data: agent } = await supabase
         .from("agents")
         .update(data)
         .eq("id", data.id)
+        .select()
+        .single()
         .throwOnError();
+
+      return agent;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: [orgId, "agents"] });

@@ -467,10 +467,10 @@ export function SpecialMessageTypeMap(type: string) {
   const { translate: t } = useTranslation();
 
   return {
-    notification: t("🔔 Notificación") as string,
-    draft: t("📝 Borrador") as string,
-    function_call: t("⚙️ Uso de herramienta") as string,
-    function_response: t("📊 Resultado de herramienta") as string,
+    notification: t("🔔 Notificación"),
+    draft: t("📝 Borrador"),
+    function_call: t("⚙️ Uso de herramienta"),
+    function_response: t("📊 Resultado de herramienta"),
   }[type];
 }
 
@@ -497,14 +497,14 @@ function SpecialMessage(message: MessageRow) {
         return (
           <FunctionCallMessage
             message={message}
-            header={SpecialMessageTypeMap("function_call") as string}
+            header={SpecialMessageTypeMap("function_call")}
           />
         );
       } else if (toolInfo.event === "result") {
         return (
           <FunctionResponseMessage
             message={message}
-            header={SpecialMessageTypeMap("function_response") as string}
+            header={SpecialMessageTypeMap("function_response")}
           />
         );
       }

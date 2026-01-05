@@ -196,7 +196,7 @@ export default function ChatFooter() {
             disabled={!inCSWindow}
             className={"p-[8px] rounded-full" + (!inCSWindow ? "" : " cursor-pointer hover:bg-accent")}
             onClick={() => fileInput.current?.click()}
-            title={t("Adjuntar") as string}
+            title={t("Adjuntar")}
           >
             <Plus className="w-[24px] h-[24px]" />
           </button>
@@ -272,7 +272,7 @@ export default function ChatFooter() {
                 ? undefined
                 : (t(
                   "WhatsApp cierra la conversación a las 24 horas del último mensaje recibido. Para abrir la conversación debes utilizar una plantilla.",
-                ) as string)
+                ))
             }
           />
           {!message && (
@@ -338,7 +338,7 @@ export default function ChatFooter() {
           title={
             (sendAsContact
               ? t("Recibir mensaje")
-              : t("Enviar mensaje")) as string
+              : t("Enviar mensaje"))
           }
         >
           <svg

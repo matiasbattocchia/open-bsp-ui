@@ -20,7 +20,7 @@ function ListWebhooks() {
 
   return (
     <>
-      <SectionHeader title={t("Webhooks") as string} />
+      <SectionHeader title={t("Webhooks")} />
 
       <SectionBody>
         <SectionItem
@@ -37,7 +37,7 @@ function ListWebhooks() {
             })
           }
           disabled={!isAdmin}
-          disabledReason={t("Requiere permisos de administrador") as string}
+          disabledReason={t("Requiere permisos de administrador")}
         />
         {webhooks?.map((webhook) => (
           <SectionItem

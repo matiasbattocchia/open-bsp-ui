@@ -196,7 +196,7 @@ function AgentDetail() {
             disabled={!isAdmin}
             invalid={!isValid}
             loading={updateAgent.isPending}
-            disabledReason={t("Requiere permisos de administrador") as string}
+            disabledReason={t("Requiere permisos de administrador")}
             className="primary"
           >
             {t("Actualizar")}

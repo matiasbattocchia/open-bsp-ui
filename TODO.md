@@ -2,7 +2,7 @@
 
 - [x] (enhacement) Test conversation names
 
-- [ ] (feat) Respond to invitation
+- [x] (feat) Respond to invitation
 
 - [ ] (enhacement) Eliminated agent messages display name
 
@@ -11,6 +11,8 @@
 - [ ] (enhacement) Internal messages preview
 
 - [ ] (bug) Error internal messages are shown as incoming in test conversations
+
+- [ ] (enhacement) Translations
 
 - [ ] (feat) Templates
 

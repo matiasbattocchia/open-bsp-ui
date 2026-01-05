@@ -588,8 +588,18 @@ export type ToolConfig =
 export type HumanAgentExtra = {
   role: "member" | "admin" | "owner";
   invitation?: {
+    organization_name: string;
     email: string;
     status: "pending" | "accepted" | "rejected";
+  };
+};
+
+export type HumanAgentExtraUpdate = {
+  role?: "member" | "admin" | "owner";
+  invitation?: {
+    organization_name?: string;
+    email?: string;
+    status?: "pending" | "accepted" | "rejected";
   };
 };
 
@@ -652,7 +662,7 @@ type AgentInsertStrict = HumanAgentInsert | AIAgentInsert;
 
 export type HumanAgentUpdate = Omit<AgentUpdateGenerated, "ai" | "extra"> & {
   ai?: false;
-  extra?: HumanAgentExtra | null;
+  extra?: HumanAgentExtraUpdate | null;
 };
 
 export type AIAgentUpdate = Omit<AgentUpdateGenerated, "ai" | "extra"> & {

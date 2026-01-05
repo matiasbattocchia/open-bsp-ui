@@ -45,7 +45,7 @@ export default function SectionItem({
         {/* Lower Row: Description */}
         {description && (
           <div className="flex justify-between mt-[2px] items-start">
-            <div className="min-w-0 flex items-start text-muted-foreground text-[14px] truncate">
+            <div className="min-w-0 flex items-start text-muted-foreground text-[14px] truncate w-full">
               {description}
             </div>
           </div>

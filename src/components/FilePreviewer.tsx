@@ -212,7 +212,7 @@ const FilePreviewer = () => {
 
           <button
             className="p-[8px] rounded-full hover:bg-muted mr-[8px] ml-[-8px]"
-            title={t("Cerrar") as string}
+            title={t("Cerrar")}
             onClick={quitPreviewer}
           >
             <X className="w-[24px] h-[24px]" />

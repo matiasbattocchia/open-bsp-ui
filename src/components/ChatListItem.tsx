@@ -47,25 +47,25 @@ function mediaPreview(t: (content: string) => ReactNode, message?: MessageRow) {
         }
 
         // TODO: Should be the audio length - cabra 24/05/2024
-        mediaPreviewContent = t("Audio") as string;
+        mediaPreviewContent = t("Audio");
         break;
       case "document":
         mediaIconClass += " h-[20px] w-[13px]";
         mediaPreviewContent =
-          message.content.file?.name || (t("Documento") as string);
+          message.content.file?.name || (t("Documento"));
         break;
       case "image":
         mediaIconClass += " h-[20px] w-[16px]";
-        mediaPreviewContent = t("Foto") as string;
+        mediaPreviewContent = t("Foto");
         break;
       case "sticker":
         mediaIconClass += " h-[16px] w-[16px] mt-[4px]";
-        mediaPreviewContent = t("Pegatina") as string;
+        mediaPreviewContent = t("Pegatina");
         break;
       case "video":
         mediaIconClass += " h-[20px] w-[16px]";
         mediaPreviewContent =
-          message.content.file?.name || (t("Video") as string);
+          message.content.file?.name || (t("Video"));
         break;
       // @ts-expect-error gif is not declared yet
       case "gif":
