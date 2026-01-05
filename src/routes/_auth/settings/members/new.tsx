@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import SectionBody from "@/components/SectionBody";
 import SectionFooter from "@/components/SectionFooter";
 import Button from "@/components/Button";
+import { useCurrentOrganization } from "@/queries/useOrganizations";
 
 export const Route = createFileRoute("/_auth/settings/members/new")({
   component: AddMember,
@@ -17,6 +18,7 @@ function AddMember() {
   const navigate = useNavigate();
   const createAgent = useCreateAgent();
   const { data: agent } = useCurrentAgent();
+  const { data: organization } = useCurrentOrganization();
   const isOwner = agent?.extra?.role === "owner";
 
   const {
@@ -43,9 +45,10 @@ function AddMember() {
               ...data,
               ai: false,
               extra: {
-                role: data!.extra!.role!,
+                role: data.extra!.role!,
                 invitation: {
-                  email: data!.extra!.invitation!.email!,
+                  organization_name: organization?.name || "",
+                  email: data.extra!.invitation!.email!,
                   status: "pending"
                 }
               }

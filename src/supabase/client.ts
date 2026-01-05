@@ -597,6 +597,7 @@ export type HumanAgentExtra = {
 export type HumanAgentExtraInsert = {
   role: "member" | "admin" | "owner";
   invitation?: {
+    organization_name: string;
     email: string;
     status: "pending";
   };
