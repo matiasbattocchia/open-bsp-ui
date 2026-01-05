@@ -24,7 +24,7 @@ import { useNavigate } from "@tanstack/react-router";
 function mediaPreview(t: (content: string) => ReactNode, message?: MessageRow) {
   let mediaIcon = null;
   let mediaIconClass = "mr-[3px]";
-  let mediaPreviewContent = "";
+  let mediaPreviewContent: ReactNode = "";
 
   if (
     !message ||

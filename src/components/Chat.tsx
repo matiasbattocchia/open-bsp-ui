@@ -253,12 +253,10 @@ export default function Chat() {
       return;
     }
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages.length, activeConvId]);
 
   useEffect(() => {
     scrollToBottom(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeConvId]);
 
   // Keep the scroll at the bottom when new messages are added
@@ -269,7 +267,6 @@ export default function Chat() {
       return;
     }
     scrollToBottom();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages.length]);
 
   // Adjust scroll when visual viewport resizes (e.g. mobile keyboard opens)

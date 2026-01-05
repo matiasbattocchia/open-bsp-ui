@@ -12,6 +12,8 @@
 
 - [ ] (bug) Error internal messages are shown as incoming in test conversations
 
+- [ ] (feat) Modals (delete confirmation)
+
 - [ ] (enhacement) Translations
 
 - [ ] (feat) Templates

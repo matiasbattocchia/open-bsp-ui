@@ -497,14 +497,14 @@ function SpecialMessage(message: MessageRow) {
         return (
           <FunctionCallMessage
             message={message}
-            header={SpecialMessageTypeMap("function_call")}
+            header={SpecialMessageTypeMap("function_call")!}
           />
         );
       } else if (toolInfo.event === "result") {
         return (
           <FunctionResponseMessage
             message={message}
-            header={SpecialMessageTypeMap("function_response")}
+            header={SpecialMessageTypeMap("function_response")!}
           />
         );
       }

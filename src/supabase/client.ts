@@ -594,6 +594,14 @@ export type HumanAgentExtra = {
   };
 };
 
+export type HumanAgentExtraInsert = {
+  role: "member" | "admin" | "owner";
+  invitation?: {
+    email: string;
+    status: "pending";
+  };
+};
+
 export type HumanAgentExtraUpdate = {
   role?: "member" | "admin" | "owner";
   invitation?: {
@@ -650,7 +658,7 @@ type AgentRowStrict = HumanAgentRow | AIAgentRow;
 
 export type HumanAgentInsert = Omit<AgentInsertGenerated, "ai" | "extra"> & {
   ai: false;
-  extra?: HumanAgentExtra | null;
+  extra?: HumanAgentExtraInsert | null;
 };
 
 export type AIAgentInsert = Omit<AgentInsertGenerated, "ai" | "extra"> & {
