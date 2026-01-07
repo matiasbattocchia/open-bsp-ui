@@ -506,18 +506,26 @@ export type OrganizationExtra = {
   error_messages_direction?: "internal" | "outgoing";
 };
 
+export type OrganizationAddressExtra = {
+  waba_id?: string;
+  phone_number?: string;
+  verified_name?: string;
+  access_token?: string;
+  flow_type?: "only_waba" | "new_phone_number" | "existing_phone_number";
+};
+
 export type ConversationExtra = {
-  type?: "personal" | "group" | "test" | "test_run";
   memory?: Memory;
-  paused?: string;
-  archived?: string;
-  pinned?: string;
-  agent_id?: string;
+  paused?: string | null;
+  archived?: string | null;
+  pinned?: string | null;
+  default_agent_id?: string;
   draft?: {
     text: string;
     origin: string;
     timestamp: string;
-  };
+  } | null;
+  /*
   test_run?: {
     reference_conversation: {
       organization_address: string;
@@ -526,11 +534,12 @@ export type ConversationExtra = {
     status?: "fail" | "success";
     reference_message_id?: string;
   };
+  */
 };
 
 export type ContactExtra = {
-  allowed?: boolean;
-  group?: string;
+  whatsapp_synced?: boolean;
+  addresses?: string[];
 };
 
 // Function tools have a JSON input (data part).
@@ -690,13 +699,33 @@ export type Database = MergeDeep<
           Row: {
             extra: OrganizationExtra | null;
           };
+          Insert: {
+            extra?: OrganizationExtra | null;
+          };
+          Update: {
+            extra?: OrganizationExtra | null;
+          };
+        };
+        organizations_addresses: {
+          Row: {
+            extra: OrganizationAddressExtra | null;
+          };
+          Insert: {
+            extra?: OrganizationAddressExtra | null;
+          };
+          Update: {
+            extra?: OrganizationAddressExtra | null;
+          };
         };
         conversations: {
           Row: {
             extra: ConversationExtra | null;
           };
           Insert: {
-            organization_id?: string;
+            extra?: ConversationExtra | null;
+          };
+          Update: {
+            extra?: ConversationExtra | null;
           };
         };
         messages: {
@@ -742,6 +771,12 @@ export type Database = MergeDeep<
         contacts: {
           Row: {
             extra: ContactExtra | null;
+          };
+          Insert: {
+            extra?: ContactExtra | null;
+          };
+          Update: {
+            extra?: ContactExtra | null;
           };
         };
         agents: {

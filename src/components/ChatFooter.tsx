@@ -28,7 +28,7 @@ export default function ChatFooter() {
   const conv = useBoundStore((store) =>
     store.chat.conversations.get(store.ui.activeConvId || ""),
   );
-  const draft: Draft | undefined = conv?.extra?.draft;
+  const draft: Draft | null | undefined = conv?.extra?.draft;
   const sendAsContact = useBoundStore((store) => store.ui.sendAsContact);
   const setSendAsContact = useBoundStore((store) => store.ui.setSendAsContact);
   const toggle = useBoundStore((store) => store.ui.toggle);
@@ -52,8 +52,6 @@ export default function ChatFooter() {
 
   const { data: agent } = useCurrentAgent();
   const agentId = agent?.id;
-
-  const convType = conv?.extra?.type;
 
   const [timer, setTimer] = useState<ReturnType<typeof setTimeout>>();
 
@@ -120,7 +118,7 @@ export default function ChatFooter() {
     if (draft?.origin === "bot" || draft?.origin === "human-as-organization") {
       // Draft defaults to send as organization
       shouldLoadDraft && setSendAsContact(false);
-    } else if (conv.service === "local" && convType !== "group") {
+    } else if (conv.service === "local") {
       // Internal testing service defaults to send as contact
       setSendAsContact(true);
     } else {
@@ -156,11 +154,9 @@ export default function ChatFooter() {
 
     const record = newMessage(
       conv,
-      convType === "group"
-        ? "internal"
-        : sendAsContact
-          ? "incoming"
-          : "outgoing",
+      sendAsContact
+        ? "incoming"
+        : "outgoing",
       {
         version: "1",
         type: "text",
@@ -330,7 +326,7 @@ export default function ChatFooter() {
           onClick={() => {
             if (message) {
               sendTextMessage();
-            } else if (conv.service === "local" && convType !== "group") {
+            } else if (conv.service === "local") {
               // Only the internal service can simulate incoming messages
               toggle("sendAsContact");
             }

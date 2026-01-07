@@ -15,14 +15,6 @@ export default function Header() {
       state.chat.conversations.get(state.ui.activeConvId || "")?.name || "?",
   );
 
-  const convType = useBoundStore((state) => {
-    const extra = state.chat.conversations.get(
-      state.ui.activeConvId || "",
-    )?.extra;
-
-    return extra?.type;
-  });
-
   const service = useBoundStore(
     (state) =>
       state.chat.conversations.get(state.ui.activeConvId || "")?.service,
@@ -64,10 +56,7 @@ export default function Header() {
       <div className="info flex flex-col justify-center mr-[12px] truncate">
         <div className="text-[16px] text-foreground truncate">{convName}</div>
         <div className="text-[13px] text-muted-foreground truncate">
-          {service === "local" &&
-            convType !== "group" &&
-            t("Contacto de prueba")}
-          {service === "local" && convType === "group" && t("Grupo")}
+          {service === "local" && t("Contacto de prueba")}
           {service === "whatsapp" && address && formatPhoneNumber(address)}
         </div>
       </div>

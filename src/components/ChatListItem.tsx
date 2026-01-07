@@ -143,7 +143,7 @@ export default function ChatListItem({
     (m) => isAdmin || m.direction !== "internal",
   );
 
-  const draft: Draft | undefined = conversation?.extra?.draft;
+  const draft: Draft | null | undefined = conversation?.extra?.draft;
 
   const preview =
     +new Date(mostRecent?.timestamp || 0) >= +new Date(draft?.timestamp || 0)

@@ -55,7 +55,7 @@ function AgentDetail() {
       organization_address: localAddress.address,
       contact_address: crypto.randomUUID(),
       service: "local",
-      extra: { agent_id: agentId },
+      extra: { default_agent_id: agentId },
       name: agent?.name,
     });
 

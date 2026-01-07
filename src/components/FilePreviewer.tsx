@@ -41,7 +41,6 @@ const FilePreviewer = () => {
   );
   const sendAsContact = useBoundStore((store) => store.ui.sendAsContact);
   const setMediaLoad = useBoundStore((store) => store.chat.setMediaLoad);
-  const convType = conv?.extra?.type;
 
   const [previewIndex, setPreviewIndex] = useState(0);
 
@@ -156,11 +155,9 @@ const FilePreviewer = () => {
 
       const record = newMessage(
         conv,
-        convType === "group"
-          ? "internal"
-          : sendAsContact
-            ? "incoming"
-            : "outgoing",
+        sendAsContact
+          ? "incoming"
+          : "outgoing",
         {
           version: "1",
           type: "file",
