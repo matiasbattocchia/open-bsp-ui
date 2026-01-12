@@ -17,7 +17,7 @@ function AddApiKey() {
   const navigate = useNavigate();
   const createApiKey = useCreateApiKey();
   const { data: currentAgent } = useCurrentAgent();
-  const isAdmin = ["admin", "owner"].includes(currentAgent?.extra?.role || "");
+  const isOwner = currentAgent?.extra?.role === "owner";
 
   const {
     register,
@@ -49,7 +49,7 @@ function AddApiKey() {
             )
           )}
         >
-          <fieldset disabled={!isAdmin} className="contents">
+          <fieldset disabled={!isOwner} className="contents">
             <p className="text-muted-foreground text-[14px]">
               {t("Esto generará una nueva clave API que podrás usar para autenticarte.")}
             </p>
@@ -70,10 +70,10 @@ function AddApiKey() {
         <Button
           form="create-apikey-form"
           type="submit"
-          disabled={!isAdmin}
+          disabled={!isOwner}
           invalid={!isValid || !isDirty}
           loading={createApiKey.isPending}
-          disabledReason={t("Requiere permisos de administrador")}
+          disabledReason={t("Requiere permisos de propietario")}
           className="primary"
         >
           {t("Generar")}

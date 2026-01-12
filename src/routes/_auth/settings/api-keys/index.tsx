@@ -16,7 +16,7 @@ function ListApiKeys() {
   const navigate = useNavigate();
   const { data: apiKeys } = useApiKeys();
   const { data: currentAgent } = useCurrentAgent();
-  const isAdmin = ["admin", "owner"].includes(currentAgent?.extra?.role || "");
+  const isOwner = currentAgent?.extra?.role === "owner";
 
   return (
     <>
@@ -36,8 +36,8 @@ function ListApiKeys() {
               hash: (prevHash) => prevHash!,
             })
           }
-          disabled={!isAdmin}
-          disabledReason={t("Requiere permisos de administrador")}
+          disabled={!isOwner}
+          disabledReason={t("Requiere permisos de propietario")}
         />
         {apiKeys?.map((apiKey) => (
           <SectionItem

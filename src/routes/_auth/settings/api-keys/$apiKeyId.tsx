@@ -16,7 +16,7 @@ function ApiKeyDetail() {
   const { apiKeyId } = Route.useParams();
   const { data: apiKey } = useApiKey(apiKeyId);
   const { data: currentAgent } = useCurrentAgent();
-  const isAdmin = ["admin", "owner"].includes(currentAgent?.extra?.role || "");
+  const isOwner = currentAgent?.extra?.role === "owner";
   const deleteApiKey = useDeleteApiKey();
 
   const { register } = useForm<ApiKeyRow>({
@@ -30,17 +30,25 @@ function ApiKeyDetail() {
         onDelete={() => deleteApiKey.mutate(apiKeyId, {
           onSuccess: () => navigate({ to: "..", hash: (prevHash) => prevHash! })
         })}
-        deleteDisabled={!isAdmin}
-        deleteDisabledReason={t("Requiere permisos de administrador")}
+        deleteDisabled={!isOwner}
+        deleteDisabledReason={t("Requiere permisos de propietario")}
       />
 
       <SectionBody>
         <div className="flex flex-col gap-[24px] grow">
+          <p className="text-muted-foreground text-[14px]">
+            {t("Configura los siguientes encabezados HTTP para autenticarte:")}
+          </p>
+          <ul className="text-muted-foreground text-[14px] list-disc ml-[20px]">
+            <li><code className="font-mono">authorization:</code> <code className="font-mono break-all">{import.meta.env.VITE_SUPABASE_ANON_KEY}</code></li>
+            <li><code className="font-mono">api-key:</code> {t("el valor de la clave generada abajo")}</li>
+          </ul>
+
           <label>
             <div className="label">{t("Nombre")}</div>
             <input
               type="text"
-              className="text"
+              className="text hover:border-transparent"
               disabled
               {...register("name")}
             />
@@ -50,7 +58,7 @@ function ApiKeyDetail() {
             <div className="label">{t("Clave")}</div>
             <input
               type="text"
-              className="text"
+              className="text hover:border-transparent"
               disabled
               {...register("key")}
             />
