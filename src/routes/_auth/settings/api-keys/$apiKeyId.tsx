@@ -1,10 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import SectionHeader from "@/components/SectionHeader";
 import { useTranslation } from "@/hooks/useTranslation";
-import { useApiKey, useDeleteApiKey, type ApiKeyRow } from "@/queries/useApiKeys";
+import { useApiKey, useDeleteApiKey } from "@/queries/useApiKeys";
 import { useCurrentAgent } from "@/queries/useAgents";
 import { useForm } from "react-hook-form";
 import SectionBody from "@/components/SectionBody";
+import type { ApiKeyUpdate } from "@/supabase/client";
 
 export const Route = createFileRoute("/_auth/settings/api-keys/$apiKeyId")({
   component: ApiKeyDetail,
@@ -19,7 +20,7 @@ function ApiKeyDetail() {
   const isOwner = currentAgent?.extra?.role === "owner";
   const deleteApiKey = useDeleteApiKey();
 
-  const { register } = useForm<ApiKeyRow>({
+  const { register } = useForm<ApiKeyUpdate>({
     values: apiKey,
   });
 
@@ -52,6 +53,15 @@ function ApiKeyDetail() {
               disabled
               {...register("name")}
             />
+          </label>
+
+          <label>
+            <div className="label">{t("Rol")}</div>
+            <div className="text-[16px] text-foreground">
+              {apiKey.role === "owner" && t("Propietario")}
+              {apiKey.role === "admin" && t("Administrador")}
+              {apiKey.role === "member" && t("Miembro")}
+            </div>
           </label>
 
           <label>

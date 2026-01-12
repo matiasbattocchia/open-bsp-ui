@@ -58,21 +58,27 @@ export type Database = {
           created_at: string
           id: string
           key: string
+          name: string
           organization_id: string
+          role: Database["public"]["Enums"]["role"]
           updated_at: string
         }
         Insert: {
           created_at?: string
           id?: string
           key: string
+          name: string
           organization_id: string
+          role?: Database["public"]["Enums"]["role"]
           updated_at?: string
         }
         Update: {
           created_at?: string
           id?: string
           key?: string
+          name?: string
           organization_id?: string
+          role?: Database["public"]["Enums"]["role"]
           updated_at?: string
         }
         Relationships: [
@@ -90,24 +96,27 @@ export type Database = {
           created_at: string
           extra: Json | null
           id: string
-          name: string
+          name: string | null
           organization_id: string
+          status: string
           updated_at: string
         }
         Insert: {
           created_at?: string
           extra?: Json | null
           id?: string
-          name: string
+          name?: string | null
           organization_id: string
+          status?: string
           updated_at?: string
         }
         Update: {
           created_at?: string
           extra?: Json | null
           id?: string
-          name?: string
+          name?: string | null
           organization_id?: string
+          status?: string
           updated_at?: string
         }
         Relationships: [
@@ -122,10 +131,10 @@ export type Database = {
       }
       conversations: {
         Row: {
-          contact_address: string
-          contact_id: string | null
+          contact_address: string | null
           created_at: string
           extra: Json | null
+          group_address: string | null
           id: string
           name: string | null
           organization_address: string
@@ -135,10 +144,10 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          contact_address: string
-          contact_id?: string | null
+          contact_address?: string | null
           created_at?: string
           extra?: Json | null
+          group_address?: string | null
           id?: string
           name?: string | null
           organization_address: string
@@ -148,10 +157,10 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          contact_address?: string
-          contact_id?: string | null
+          contact_address?: string | null
           created_at?: string
           extra?: Json | null
+          group_address?: string | null
           id?: string
           name?: string | null
           organization_address?: string
@@ -162,18 +171,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "conversations_contact_id_fkey"
-            columns: ["contact_id"]
-            isOneToOne: false
-            referencedRelation: "contacts"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "conversations_organization_address_fkey"
-            columns: ["organization_address"]
+            columns: ["organization_id", "organization_address"]
             isOneToOne: false
             referencedRelation: "organizations_addresses"
-            referencedColumns: ["address"]
+            referencedColumns: ["organization_id", "address"]
           },
           {
             foreignKeyName: "conversations_organization_id_fkey"
@@ -184,15 +186,64 @@ export type Database = {
           },
         ]
       }
+      logs: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          level: Database["public"]["Enums"]["log_level"]
+          message: string
+          metadata: Json | null
+          organization_address: string | null
+          organization_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          level: Database["public"]["Enums"]["log_level"]
+          message: string
+          metadata?: Json | null
+          organization_address?: string | null
+          organization_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          level?: Database["public"]["Enums"]["log_level"]
+          message?: string
+          metadata?: Json | null
+          organization_address?: string | null
+          organization_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "logs_organization_address_fkey"
+            columns: ["organization_id", "organization_address"]
+            isOneToOne: false
+            referencedRelation: "organizations_addresses"
+            referencedColumns: ["organization_id", "address"]
+          },
+          {
+            foreignKeyName: "logs_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           agent_id: string | null
-          contact_address: string
+          contact_address: string | null
           content: Json
           conversation_id: string
           created_at: string
           direction: Database["public"]["Enums"]["direction"]
           external_id: string | null
+          group_address: string | null
           id: string
           organization_address: string
           organization_id: string
@@ -203,12 +254,13 @@ export type Database = {
         }
         Insert: {
           agent_id?: string | null
-          contact_address: string
+          contact_address?: string | null
           content: Json
           conversation_id: string
           created_at?: string
           direction: Database["public"]["Enums"]["direction"]
           external_id?: string | null
+          group_address?: string | null
           id?: string
           organization_address: string
           organization_id: string
@@ -219,12 +271,13 @@ export type Database = {
         }
         Update: {
           agent_id?: string | null
-          contact_address?: string
+          contact_address?: string | null
           content?: Json
           conversation_id?: string
           created_at?: string
           direction?: Database["public"]["Enums"]["direction"]
           external_id?: string | null
+          group_address?: string | null
           id?: string
           organization_address?: string
           organization_id?: string
@@ -234,6 +287,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "messages_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "messages_conversation_id_fkey"
             columns: ["conversation_id"]
@@ -393,10 +453,34 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_authorized_org_by_api_key: { Args: never; Returns: string }
-      get_authorized_orgs:
-        | { Args: never; Returns: string[] }
-        | { Args: { role: string }; Returns: string[] }
+      agent_update_by_owner_rules: {
+        Args: {
+          p_ai: boolean
+          p_extra: Json
+          p_id: string
+          p_organization_id: string
+          p_user_id: string
+        }
+        Returns: boolean
+      }
+      change_contact_address: {
+        Args: { new_address: string; old_address: string }
+        Returns: undefined
+      }
+      get_authorized_orgs: {
+        Args: { role?: Database["public"]["Enums"]["role"] }
+        Returns: string[]
+      }
+      member_self_update_rules: {
+        Args: {
+          p_ai: boolean
+          p_extra: Json
+          p_id: string
+          p_organization_id: string
+          p_user_id: string
+        }
+        Returns: boolean
+      }
       merge_update_jsonb: {
         Args: { object: Json; path: string[]; target: Json }
         Returns: Json
@@ -404,6 +488,8 @@ export type Database = {
     }
     Enums: {
       direction: "incoming" | "outgoing" | "internal"
+      log_level: "info" | "warning" | "error"
+      role: "owner" | "admin" | "member"
       service: "whatsapp" | "instagram" | "local"
       webhook_operation: "insert" | "update"
       webhook_table: "messages" | "conversations"
@@ -459,21 +545,48 @@ export type Database = {
       buckets_analytics: {
         Row: {
           created_at: string
+          deleted_at: string | null
           format: string
+          id: string
+          name: string
+          type: Database["storage"]["Enums"]["buckettype"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deleted_at?: string | null
+          format?: string
+          id?: string
+          name: string
+          type?: Database["storage"]["Enums"]["buckettype"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deleted_at?: string | null
+          format?: string
+          id?: string
+          name?: string
+          type?: Database["storage"]["Enums"]["buckettype"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      buckets_vectors: {
+        Row: {
+          created_at: string
           id: string
           type: Database["storage"]["Enums"]["buckettype"]
           updated_at: string
         }
         Insert: {
           created_at?: string
-          format?: string
           id: string
           type?: Database["storage"]["Enums"]["buckettype"]
           updated_at?: string
         }
         Update: {
           created_at?: string
-          format?: string
           id?: string
           type?: Database["storage"]["Enums"]["buckettype"]
           updated_at?: string
@@ -482,30 +595,36 @@ export type Database = {
       }
       iceberg_namespaces: {
         Row: {
-          bucket_id: string
+          bucket_name: string
+          catalog_id: string
           created_at: string
           id: string
+          metadata: Json
           name: string
           updated_at: string
         }
         Insert: {
-          bucket_id: string
+          bucket_name: string
+          catalog_id: string
           created_at?: string
           id?: string
+          metadata?: Json
           name: string
           updated_at?: string
         }
         Update: {
-          bucket_id?: string
+          bucket_name?: string
+          catalog_id?: string
           created_at?: string
           id?: string
+          metadata?: Json
           name?: string
           updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "iceberg_namespaces_bucket_id_fkey"
-            columns: ["bucket_id"]
+            foreignKeyName: "iceberg_namespaces_catalog_id_fkey"
+            columns: ["catalog_id"]
             isOneToOne: false
             referencedRelation: "buckets_analytics"
             referencedColumns: ["id"]
@@ -514,36 +633,48 @@ export type Database = {
       }
       iceberg_tables: {
         Row: {
-          bucket_id: string
+          bucket_name: string
+          catalog_id: string
           created_at: string
           id: string
           location: string
           name: string
           namespace_id: string
+          remote_table_id: string | null
+          shard_id: string | null
+          shard_key: string | null
           updated_at: string
         }
         Insert: {
-          bucket_id: string
+          bucket_name: string
+          catalog_id: string
           created_at?: string
           id?: string
           location: string
           name: string
           namespace_id: string
+          remote_table_id?: string | null
+          shard_id?: string | null
+          shard_key?: string | null
           updated_at?: string
         }
         Update: {
-          bucket_id?: string
+          bucket_name?: string
+          catalog_id?: string
           created_at?: string
           id?: string
           location?: string
           name?: string
           namespace_id?: string
+          remote_table_id?: string | null
+          shard_id?: string | null
+          shard_key?: string | null
           updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "iceberg_tables_bucket_id_fkey"
-            columns: ["bucket_id"]
+            foreignKeyName: "iceberg_tables_catalog_id_fkey"
+            columns: ["catalog_id"]
             isOneToOne: false
             referencedRelation: "buckets_analytics"
             referencedColumns: ["id"]
@@ -764,6 +895,50 @@ export type Database = {
           },
         ]
       }
+      vector_indexes: {
+        Row: {
+          bucket_id: string
+          created_at: string
+          data_type: string
+          dimension: number
+          distance_metric: string
+          id: string
+          metadata_configuration: Json | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          bucket_id: string
+          created_at?: string
+          data_type: string
+          dimension: number
+          distance_metric: string
+          id?: string
+          metadata_configuration?: Json | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          bucket_id?: string
+          created_at?: string
+          data_type?: string
+          dimension?: number
+          distance_metric?: string
+          id?: string
+          metadata_configuration?: Json | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vector_indexes_bucket_id_fkey"
+            columns: ["bucket_id"]
+            isOneToOne: false
+            referencedRelation: "buckets_vectors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -775,6 +950,10 @@ export type Database = {
       }
       can_insert_object: {
         Args: { bucketid: string; metadata: Json; name: string; owner: string }
+        Returns: undefined
+      }
+      delete_leaf_prefixes: {
+        Args: { bucket_ids: string[]; names: string[] }
         Returns: undefined
       }
       delete_prefix: {
@@ -825,27 +1004,49 @@ export type Database = {
           updated_at: string
         }[]
       }
-      operation: { Args: never; Returns: string }
-      search: {
-        Args: {
-          bucketname: string
-          levels?: number
-          limits?: number
-          offsets?: number
-          prefix: string
-          search?: string
-          sortcolumn?: string
-          sortorder?: string
-        }
-        Returns: {
-          created_at: string
-          id: string
-          last_accessed_at: string
-          metadata: Json
-          name: string
-          updated_at: string
-        }[]
+      lock_top_prefixes: {
+        Args: { bucket_ids: string[]; names: string[] }
+        Returns: undefined
       }
+      operation: { Args: never; Returns: string }
+      search:
+        | {
+            Args: {
+              bucketname: string
+              levels?: number
+              limits?: number
+              offsets?: number
+              prefix: string
+            }
+            Returns: {
+              created_at: string
+              id: string
+              last_accessed_at: string
+              metadata: Json
+              name: string
+              updated_at: string
+            }[]
+          }
+        | {
+            Args: {
+              bucketname: string
+              levels?: number
+              limits?: number
+              offsets?: number
+              prefix: string
+              search?: string
+              sortcolumn?: string
+              sortorder?: string
+            }
+            Returns: {
+              created_at: string
+              id: string
+              last_accessed_at: string
+              metadata: Json
+              name: string
+              updated_at: string
+            }[]
+          }
       search_legacy_v1: {
         Args: {
           bucketname: string
@@ -886,26 +1087,48 @@ export type Database = {
           updated_at: string
         }[]
       }
-      search_v2: {
-        Args: {
-          bucket_name: string
-          levels?: number
-          limits?: number
-          prefix: string
-          start_after?: string
-        }
-        Returns: {
-          created_at: string
-          id: string
-          key: string
-          metadata: Json
-          name: string
-          updated_at: string
-        }[]
-      }
+      search_v2:
+        | {
+            Args: {
+              bucket_name: string
+              levels?: number
+              limits?: number
+              prefix: string
+              start_after?: string
+            }
+            Returns: {
+              created_at: string
+              id: string
+              key: string
+              metadata: Json
+              name: string
+              updated_at: string
+            }[]
+          }
+        | {
+            Args: {
+              bucket_name: string
+              levels?: number
+              limits?: number
+              prefix: string
+              sort_column?: string
+              sort_column_after?: string
+              sort_order?: string
+              start_after?: string
+            }
+            Returns: {
+              created_at: string
+              id: string
+              key: string
+              last_accessed_at: string
+              metadata: Json
+              name: string
+              updated_at: string
+            }[]
+          }
     }
     Enums: {
-      buckettype: "STANDARD" | "ANALYTICS"
+      buckettype: "STANDARD" | "ANALYTICS" | "VECTOR"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1034,6 +1257,8 @@ export const Constants = {
   public: {
     Enums: {
       direction: ["incoming", "outgoing", "internal"],
+      log_level: ["info", "warning", "error"],
+      role: ["owner", "admin", "member"],
       service: ["whatsapp", "instagram", "local"],
       webhook_operation: ["insert", "update"],
       webhook_table: ["messages", "conversations"],
@@ -1041,7 +1266,8 @@ export const Constants = {
   },
   storage: {
     Enums: {
-      buckettype: ["STANDARD", "ANALYTICS"],
+      buckettype: ["STANDARD", "ANALYTICS", "VECTOR"],
     },
   },
 } as const
+

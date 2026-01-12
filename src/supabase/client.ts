@@ -815,6 +815,12 @@ export type AgentRow = Database["public"]["Tables"]["agents"]["Row"];
 export type AgentInsert = Database["public"]["Tables"]["agents"]["Insert"];
 export type AgentUpdate = Database["public"]["Tables"]["agents"]["Update"];
 
+export type ApiKeyRow = Database["public"]["Tables"]["api_keys"]["Row"];
+export type ApiKeyInsert = Database["public"]["Tables"]["api_keys"]["Insert"];
+export type ApiKeyUpdate = Database["public"]["Tables"]["api_keys"]["Update"];
+
+export type Role = Database["public"]["Enums"]["role"];
+
 export const supabase = createClient<Database>(
   import.meta.env.VITE_SUPABASE_URL!,
   import.meta.env.VITE_SUPABASE_ANON_KEY!,

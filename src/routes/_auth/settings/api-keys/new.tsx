@@ -7,6 +7,7 @@ import { useCurrentAgent } from "@/queries/useAgents";
 import { useForm } from "react-hook-form";
 import SectionBody from "@/components/SectionBody";
 import Button from "@/components/Button";
+import type { ApiKeyInsert } from "@/supabase/client";
 
 export const Route = createFileRoute("/_auth/settings/api-keys/new")({
   component: AddApiKey,
@@ -23,11 +24,17 @@ function AddApiKey() {
     register,
     handleSubmit,
     formState: { isValid, isDirty },
-  } = useForm<{ name: string }>({
+  } = useForm<ApiKeyInsert>({
     defaultValues: {
-      name: "",
+      role: "member",
     },
   });
+
+  const roles = {
+    owner: t("Propietario"),
+    admin: t("Administrador"),
+    member: t("Miembro"),
+  };
 
   return (
     <>
@@ -61,6 +68,15 @@ function AddApiKey() {
                 placeholder={t("Nombre de la clave")}
                 {...register("name", { required: true })}
               />
+            </label>
+
+            <label>
+              <div className="label">{t("Rol")}</div>
+              <select {...register("role", { required: true })}>
+                <option value="member">{roles.member}</option>
+                <option value="admin">{roles.admin}</option>
+                <option value="owner">{roles.owner}</option>
+              </select>
             </label>
           </fieldset>
         </form>

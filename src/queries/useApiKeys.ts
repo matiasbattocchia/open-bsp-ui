@@ -1,13 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { type Database, supabase } from "@/supabase/client";
+import { type ApiKeyInsert, type ApiKeyRow, supabase } from "@/supabase/client";
 import useBoundStore from "@/stores/useBoundStore";
-
-export type ApiKeyRow = Database["public"]["Tables"]["api_keys"]["Row"] & {
-  name: string;
-};
-export type ApiKeyInsert =
-  & Database["public"]["Tables"]["api_keys"]["Insert"]
-  & { name: string };
 
 export function useApiKeys() {
   const userId = useBoundStore((state) => state.ui.user?.id);
@@ -52,7 +45,7 @@ export function useCreateApiKey() {
   const orgId = useBoundStore((state) => state.ui.activeOrgId);
 
   return useMutation({
-    mutationFn: async ({ name }: { name: string }) => {
+    mutationFn: async (data: ApiKeyInsert) => {
       if (!orgId) throw new Error("No active organization");
 
       // Simple key generation logic
@@ -60,11 +53,7 @@ export function useCreateApiKey() {
 
       const { data: apiKey } = await supabase
         .from("api_keys")
-        .insert({
-          organization_id: orgId,
-          key: key,
-          name: name,
-        } as any) // Type cast because DB types aren't updated yet.
+        .insert({ ...data, organization_id: orgId, key })
         .select()
         .single()
         .throwOnError();

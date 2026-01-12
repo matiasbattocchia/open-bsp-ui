@@ -21,7 +21,7 @@ function ListMembers() {
   const roles: Record<string, string> = {
     "owner": t("Propietario"),
     "admin": t("Administrador"),
-    "user": t("Usuario"),
+    "member": t("Miembro"),
   };
 
   return (
@@ -48,7 +48,7 @@ function ListMembers() {
         {agents
           ?.filter((agent) => !agent.ai)
           .map((agent) => {
-            const role = roles[agent.extra?.role || "user"];
+            const role = roles[agent.extra?.role || "member"];
             const pending = agent.extra?.invitation?.status === "pending";
 
             return (<SectionItem

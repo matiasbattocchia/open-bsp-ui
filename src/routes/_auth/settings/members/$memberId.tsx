@@ -80,7 +80,7 @@ function EditMember() {
               disabled={!isOwner}
               {...register("extra.role", { required: true })}
             >
-              <option value="user">{t("Usuario")}</option>
+              <option value="member">{t("Miembro")}</option>
               <option value="admin">{t("Administrador")}</option>
               <option value="owner">{t("Propietario")}</option>
             </select>

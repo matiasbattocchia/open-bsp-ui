@@ -18,6 +18,12 @@ function ListApiKeys() {
   const { data: currentAgent } = useCurrentAgent();
   const isOwner = currentAgent?.extra?.role === "owner";
 
+  const roles: Record<string, string> = {
+    owner: t("Propietario"),
+    admin: t("Administrador"),
+    member: t("Miembro"),
+  };
+
   return (
     <>
       <SectionHeader title={t("Claves API")} />
@@ -43,7 +49,7 @@ function ListApiKeys() {
           <SectionItem
             key={apiKey.id}
             title={apiKey.name}
-            description={apiKey.key.slice(0, 8) + "..."}
+            description={roles[apiKey.role || "member"]}
             aside={
               <div className="p-[8px]">
                 <Key className="w-[24px] h-[24px] text-muted-foreground" />

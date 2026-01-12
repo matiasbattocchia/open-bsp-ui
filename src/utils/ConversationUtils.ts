@@ -41,7 +41,7 @@ export const updateConvExtra = async (
     .from("conversations")
     .update({ extra })
     .eq("organization_address", conversation.organization_address)
-    .eq("contact_address", conversation.contact_address);
+    .eq("contact_address", conversation.contact_address || "");
 
   if (error) {
     throw error;
@@ -75,7 +75,7 @@ export async function saveDraft(
     .from("conversations")
     .update(payload)
     .eq("organization_address", conv.organization_address)
-    .eq("contact_address", conv.contact_address);
+    .eq("contact_address", conv.contact_address || "");
 
   if (error) {
     throw error;
