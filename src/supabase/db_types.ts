@@ -129,6 +129,44 @@ export type Database = {
           },
         ]
       }
+      contacts_addresses: {
+        Row: {
+          address: string
+          created_at: string
+          extra: Json | null
+          organization_id: string
+          service: Database["public"]["Enums"]["service"]
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          created_at?: string
+          extra?: Json | null
+          organization_id: string
+          service: Database["public"]["Enums"]["service"]
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          created_at?: string
+          extra?: Json | null
+          organization_id?: string
+          service?: Database["public"]["Enums"]["service"]
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contacts_addresses_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       conversations: {
         Row: {
           contact_address: string | null
@@ -170,6 +208,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "conversations_contact_address_fkey"
+            columns: ["organization_id", "contact_address"]
+            isOneToOne: false
+            referencedRelation: "contacts_addresses"
+            referencedColumns: ["organization_id", "address"]
+          },
           {
             foreignKeyName: "conversations_organization_address_fkey"
             columns: ["organization_id", "organization_address"]
@@ -464,7 +509,11 @@ export type Database = {
         Returns: boolean
       }
       change_contact_address: {
-        Args: { new_address: string; old_address: string }
+        Args: {
+          new_address: string
+          old_address: string
+          p_organization_id: string
+        }
         Returns: undefined
       }
       get_authorized_orgs: {
@@ -1009,44 +1058,26 @@ export type Database = {
         Returns: undefined
       }
       operation: { Args: never; Returns: string }
-      search:
-        | {
-            Args: {
-              bucketname: string
-              levels?: number
-              limits?: number
-              offsets?: number
-              prefix: string
-            }
-            Returns: {
-              created_at: string
-              id: string
-              last_accessed_at: string
-              metadata: Json
-              name: string
-              updated_at: string
-            }[]
-          }
-        | {
-            Args: {
-              bucketname: string
-              levels?: number
-              limits?: number
-              offsets?: number
-              prefix: string
-              search?: string
-              sortcolumn?: string
-              sortorder?: string
-            }
-            Returns: {
-              created_at: string
-              id: string
-              last_accessed_at: string
-              metadata: Json
-              name: string
-              updated_at: string
-            }[]
-          }
+      search: {
+        Args: {
+          bucketname: string
+          levels?: number
+          limits?: number
+          offsets?: number
+          prefix: string
+          search?: string
+          sortcolumn?: string
+          sortorder?: string
+        }
+        Returns: {
+          created_at: string
+          id: string
+          last_accessed_at: string
+          metadata: Json
+          name: string
+          updated_at: string
+        }[]
+      }
       search_legacy_v1: {
         Args: {
           bucketname: string
@@ -1087,45 +1118,27 @@ export type Database = {
           updated_at: string
         }[]
       }
-      search_v2:
-        | {
-            Args: {
-              bucket_name: string
-              levels?: number
-              limits?: number
-              prefix: string
-              start_after?: string
-            }
-            Returns: {
-              created_at: string
-              id: string
-              key: string
-              metadata: Json
-              name: string
-              updated_at: string
-            }[]
-          }
-        | {
-            Args: {
-              bucket_name: string
-              levels?: number
-              limits?: number
-              prefix: string
-              sort_column?: string
-              sort_column_after?: string
-              sort_order?: string
-              start_after?: string
-            }
-            Returns: {
-              created_at: string
-              id: string
-              key: string
-              last_accessed_at: string
-              metadata: Json
-              name: string
-              updated_at: string
-            }[]
-          }
+      search_v2: {
+        Args: {
+          bucket_name: string
+          levels?: number
+          limits?: number
+          prefix: string
+          sort_column?: string
+          sort_column_after?: string
+          sort_order?: string
+          start_after?: string
+        }
+        Returns: {
+          created_at: string
+          id: string
+          key: string
+          last_accessed_at: string
+          metadata: Json
+          name: string
+          updated_at: string
+        }[]
+      }
     }
     Enums: {
       buckettype: "STANDARD" | "ANALYTICS" | "VECTOR"

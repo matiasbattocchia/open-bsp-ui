@@ -538,9 +538,13 @@ export type ConversationExtra = {
 };
 
 export type ContactExtra = {
-  whatsapp_synced?: boolean;
-  addresses?: string[];
+  addresses: string[];
 };
+
+export type ContactAddressExtra = {
+  name?: string;
+  synced?: boolean; // True if the contact was synced from WhatsApp
+}
 
 // Function tools have a JSON input (data part).
 export type LocalFunctionToolConfig = {
@@ -779,6 +783,17 @@ export type Database = MergeDeep<
             extra?: ContactExtra | null;
           };
         };
+        contacts_addresses: {
+          Row: {
+            extra: ContactAddressExtra | null;
+          };
+          Insert: {
+            extra?: ContactAddressExtra;
+          };
+          Update: {
+            extra?: ContactAddressExtra;
+          };
+        };
         agents: {
           Row: AgentRowStrict;
           Insert: AgentInsertStrict;
@@ -810,6 +825,8 @@ export type OrganizationUpdate =
   Database["public"]["Tables"]["organizations"]["Update"];
 
 export type ContactRow = Database["public"]["Tables"]["contacts"]["Row"];
+
+export type ContactAddressRow = Database["public"]["Tables"]["contacts_addresses"]["Row"];
 
 export type AgentRow = Database["public"]["Tables"]["agents"]["Row"];
 export type AgentInsert = Database["public"]["Tables"]["agents"]["Insert"];

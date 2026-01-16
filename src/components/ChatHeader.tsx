@@ -4,27 +4,26 @@ import useBoundStore from "@/stores/useBoundStore";
 import { useTranslation } from "@/hooks/useTranslation";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
+import { useContactByAddress } from "@/queries/useContacts";
+import { useContactAddress } from "@/queries/useContactsAddresses";
 
 export default function Header() {
   const navigate = useNavigate();
 
   const activeConvId = useBoundStore((state) => state.ui.activeConvId);
 
-  const convName = useBoundStore(
-    (state) =>
-      state.chat.conversations.get(state.ui.activeConvId || "")?.name || "?",
+  const conversation = useBoundStore((state) =>
+    state.chat.conversations.get(state.ui.activeConvId || "")
   );
 
-  const service = useBoundStore(
-    (state) =>
-      state.chat.conversations.get(state.ui.activeConvId || "")?.service,
-  );
+  const { data: contact } = useContactByAddress(conversation?.contact_address);
+  const { data: contactAddress } = useContactAddress(conversation?.contact_address);
 
-  const address = useBoundStore(
-    (state) =>
-      state.chat.conversations.get(state.ui.activeConvId || "")
-        ?.contact_address,
-  );
+  // Name fallback order: conversation.name → contact.name → contactAddress.extra?.name → "?"
+  const convName = conversation?.name || contact?.name || contactAddress?.extra?.name || "?";
+
+  const service = conversation?.service;
+  const address = conversation?.contact_address;
 
   const convInitials = nameInitials(convName);
 

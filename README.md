@@ -12,7 +12,7 @@ A beautiful WhatsApp Web clone designed to work seamlessly with [Open BSP API](h
 </p>
 
 > [!IMPORTANT]
-> **Sign up for a free account and try it out at [open-bsp-ui.pages.dev](https://open-bsp-ui.pages.dev)**! Requires a Google account.
+> **Sign up for a free account and try it out at [web.openbsp.dev](https://web.openbsp.dev)**! Requires a Google account.
 
 ## Deployment
 
