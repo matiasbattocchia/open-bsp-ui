@@ -18,6 +18,8 @@ import { Translate as T, useTranslation } from "@/hooks/useTranslation";
 import { AtSign, Pause } from "lucide-react";
 import { SpecialMessageTypeMap } from "./Message/Message";
 import { useCurrentAgents, useCurrentAgent } from "@/queries/useAgents";
+import { useContactByAddress } from "@/queries/useContacts";
+import { useContactAddress } from "@/queries/useContactsAddresses";
 import { nameInitials } from "@/utils/FormatUtils";
 import { useNavigate } from "@tanstack/react-router";
 
@@ -129,6 +131,9 @@ export default function ChatListItem({
     state.chat.conversations.get(itemId),
   );
 
+  const { data: contact } = useContactByAddress(conversation?.contact_address);
+  const { data: contactAddress } = useContactAddress(conversation?.contact_address);
+
   const { data: agent } = useCurrentAgent();
   const { data: agents } = useCurrentAgents();
   const isAdmin = ["admin", "owner"].includes(agent?.extra?.role || "");
@@ -204,7 +209,8 @@ export default function ChatListItem({
   const isPaused =
     +new Date(conversation?.extra?.paused || 0) > +new Date() - 12 * 60 * 60 * 1000; // Less than 12 hours ago.
 
-  const name = conversation?.name;
+  // Name fallback order: conversation.name → contact.name → contactAddress.extra?.name
+  const name = conversation?.name || contact?.name || contactAddress?.extra?.name;
 
   const { translate: t, currentLanguage } = useTranslation();
 

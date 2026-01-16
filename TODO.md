@@ -24,8 +24,14 @@
 
 - [ ] (enhancement) Primary button spinner placement to the left of the text
 
+- [ ] (enhancement) Active conversation from another organization
+  - The conversation is not in the store
+  - Also contacts / contacts_addresses depend on the organization to which the conversation belongs
+
 - [ ] (bug) Google login redirect does not respect hash identifier. It seems Supabase drops it or replaces it with an access token
 
 https://develop.open-bsp-ui.pages.dev/settings/organization/new#access_token=eyJhbGciOiJFU...tQugBjxzngiNVg&expires_at=1767219571&expires_in=3600&provider_token=ya...nw0293&refresh_token=ktzzl77plo42&token_type=bearer
 
 If redirected to organizations/new from this URL, the cancel button returns to SSO
+
+- [ ] (bug) Re-login does not initializes data, needs to refresh
