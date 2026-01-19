@@ -8,6 +8,7 @@ import SectionBody from "@/components/SectionBody";
 import SectionFooter from "@/components/SectionFooter";
 import Button from "@/components/Button";
 import { useCurrentOrganization } from "@/queries/useOrganizations";
+import SelectField from "@/components/SelectField";
 
 export const Route = createFileRoute("/_auth/settings/members/new")({
   component: AddMember,
@@ -24,6 +25,7 @@ function AddMember() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { isValid, isDirty },
   } = useForm<HumanAgentInsert>({
     defaultValues: {
@@ -77,16 +79,17 @@ function AddMember() {
             </label>
 
 
-            <label>
-              <div className="label">{t("Rol")}</div>
-              <select
-                {...register("extra.role", { required: true })}
-              >
-                <option value="member">{t("Miembro")}</option>
-                <option value="admin">{t("Administrador")}</option>
-                <option value="owner">{t("Propietario")}</option>
-              </select>
-            </label>
+            <SelectField
+              name="extra.role"
+              control={control}
+              label={t("Rol")}
+              options={[
+                { value: "member", label: t("Miembro") },
+                { value: "admin", label: t("Administrador") },
+                { value: "owner", label: t("Propietario") },
+              ]}
+              required
+            />
 
             <label>
               <div className="label">{t("Correo electrónico")}</div>

@@ -7,6 +7,7 @@ import { useCurrentAgent } from "@/queries/useAgents";
 import { useForm } from "react-hook-form";
 import SectionBody from "@/components/SectionBody";
 import Button from "@/components/Button";
+import SelectField from "@/components/SelectField";
 
 export const Route = createFileRoute("/_auth/settings/webhooks/new")({
   component: AddWebhook,
@@ -22,6 +23,7 @@ function AddWebhook() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { isValid, isDirty },
   } = useForm<WebhookInsert>({
     defaultValues: {
@@ -65,13 +67,16 @@ function AddWebhook() {
               />
             </label>
 
-            <label>
-              <div className="label">{t("Tabla")}</div>
-              <select {...register("table_name", { required: true })}>
-                <option value="messages">{t("Mensajes")}</option>
-                <option value="conversations">{t("Conversaciones")}</option>
-              </select>
-            </label>
+            <SelectField
+              name="table_name"
+              control={control}
+              label={t("Tabla")}
+              options={[
+                { value: "messages", label: t("Mensajes") },
+                { value: "conversations", label: t("Conversaciones") },
+              ]}
+              required
+            />
 
             <label>
               <div className="label">{t("Operaciones")}</div>

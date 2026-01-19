@@ -72,7 +72,7 @@ function AppLayout() {
         <Outlet />
         {/* Resize Handle */}
         <div
-          className="resize-handle"
+          className="resize-handle z-[60]"
           onMouseDown={handleMouseDown}
         />
       </div>

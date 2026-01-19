@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import SectionBody from "@/components/SectionBody";
 import Button from "@/components/Button";
 import type { ApiKeyInsert } from "@/supabase/client";
+import SelectField from "@/components/SelectField";
 
 export const Route = createFileRoute("/_auth/settings/api-keys/new")({
   component: AddApiKey,
@@ -23,6 +24,7 @@ function AddApiKey() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { isValid, isDirty },
   } = useForm<ApiKeyInsert>({
     defaultValues: {
@@ -70,14 +72,17 @@ function AddApiKey() {
               />
             </label>
 
-            <label>
-              <div className="label">{t("Rol")}</div>
-              <select {...register("role", { required: true })}>
-                <option value="member">{roles.member}</option>
-                <option value="admin">{roles.admin}</option>
-                <option value="owner">{roles.owner}</option>
-              </select>
-            </label>
+            <SelectField
+              name="role"
+              control={control}
+              label={t("Rol")}
+              options={[
+                { value: "member", label: roles.member },
+                { value: "admin", label: roles.admin },
+                { value: "owner", label: roles.owner },
+              ]}
+              required
+            />
           </fieldset>
         </form>
       </SectionBody>

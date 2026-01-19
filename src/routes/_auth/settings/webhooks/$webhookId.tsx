@@ -7,6 +7,7 @@ import SectionBody from "@/components/SectionBody";
 import SectionFooter from "@/components/SectionFooter";
 import { useCurrentAgent } from "@/queries/useAgents";
 import Button from "@/components/Button";
+import SelectField from "@/components/SelectField";
 
 
 export const Route = createFileRoute("/_auth/settings/webhooks/$webhookId")({
@@ -26,6 +27,7 @@ function EditWebhook() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { isValid, isDirty },
   } = useForm<WebhookUpdate>({
     values: webhook,
@@ -64,13 +66,16 @@ function EditWebhook() {
             />
           </label>
 
-          <label>
-            <div className="label">{t("Tabla")}</div>
-            <select {...register("table_name", { required: true })}>
-              <option value="messages">{t("Mensajes")}</option>
-              <option value="conversations">{t("Conversaciones")}</option>
-            </select>
-          </label>
+          <SelectField
+            name="table_name"
+            control={control}
+            label={t("Tabla")}
+            options={[
+              { value: "messages", label: t("Mensajes") },
+              { value: "conversations", label: t("Conversaciones") },
+            ]}
+            required
+          />
 
           <label>
             <div className="label">{t("Operaciones")}</div>

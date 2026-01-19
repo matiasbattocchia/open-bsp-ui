@@ -8,6 +8,7 @@ import SectionBody from "@/components/SectionBody";
 import { type AIAgentInsert, type AIAgentExtra } from "@/supabase/client";
 import { useState } from "react";
 import Button from "@/components/Button";
+import SelectField from "@/components/SelectField";
 
 export const Route = createFileRoute("/_auth/agents/new")({
   component: AddAgent,
@@ -39,6 +40,7 @@ function AddAgent() {
     register,
     handleSubmit,
     setValue,
+    control,
     formState: { isValid, isDirty },
   } = useForm<AIAgentInsert>({
     defaultValues: {
@@ -88,14 +90,16 @@ function AddAgent() {
               />
             </label>
 
-            <label>
-              <div className="label">{t("Estado")}</div>
-              <select {...register("extra.mode")}>
-                <option value="active">{t("Activo")}</option>
-                <option value="draft">{t("Borrador")}</option>
-                <option value="inactive">{t("Inactivo")}</option>
-              </select>
-            </label>
+            <SelectField
+              name="extra.mode"
+              control={control}
+              label={t("Estado")}
+              options={[
+                { value: "active", label: t("Activo") },
+                { value: "draft", label: t("Borrador") },
+                { value: "inactive", label: t("Inactivo") },
+              ]}
+            />
 
             <label>
               <div className="label">{t("Instrucciones")}</div>
@@ -106,43 +110,40 @@ function AddAgent() {
               />
             </label>
 
-            <label>
-              <div className="label">{t("Proveedor")}</div>
-              <select
-                value={provider}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setProvider(val);
-                  setValue("extra.model", "");
+            <SelectField
+              value={provider}
+              onChange={(val) => {
+                setProvider(val);
+                setValue("extra.model", "");
 
-                  const availableProtocols = protocols[val as keyof typeof protocols];
-                  setValue("extra.protocol", availableProtocols[0]);
+                const availableProtocols = protocols[val as keyof typeof protocols];
+                setValue("extra.protocol", availableProtocols[0]);
 
-                  if (val === 'custom') {
-                    setValue("extra.api_url", "", { shouldDirty: true });
-                  } else {
-                    setValue("extra.api_url", val, { shouldDirty: true });
-                  }
-                }}
-              >
-                <option value="openai">OpenAI</option>
-                <option value="anthropic">Anthropic</option>
-                <option value="groq">Groq</option>
-                <option value="gemini">Gemini</option>
-                <option value="custom">{t("Personalizado")}</option>
-              </select>
-            </label>
+                if (val !== "custom") {
+                  setValue("extra.api_url", val, { shouldDirty: true });
+                } else {
+                  setValue("extra.api_url", "", { shouldDirty: true });
+                }
+              }}
+              label={t("Proveedor")}
+              options={[
+                { value: "openai", label: "OpenAI" },
+                { value: "anthropic", label: "Anthropic" },
+                { value: "groq", label: "Groq" },
+                { value: "google", label: "Google" },
+                { value: "custom", label: t("Personalizado") },
+              ]}
+            />
 
-            <label>
-              <div className="label">{t("Protocolo")}</div>
-              <select
-                {...register("extra.protocol")}
-              >
-                {(protocols[provider as keyof typeof protocols]).map((p) => (
-                  <option key={p} value={p}>{protocolLabels[p] || p}</option>
-                ))}
-              </select>
-            </label>
+            <SelectField
+              name="extra.protocol"
+              control={control}
+              label={t("Protocolo")}
+              options={protocols[provider as keyof typeof protocols].map((p) => ({
+                value: p,
+                label: protocolLabels[p] || p,
+              }))}
+            />
 
             {provider === 'custom' && (
               <label>

@@ -9,6 +9,7 @@ import type { HumanAgentRow, HumanAgentUpdate } from "@/supabase/client";
 import SectionItem from "@/components/SectionItem";
 import { Bell } from "lucide-react";
 import Button from "@/components/Button";
+import SelectField from "@/components/SelectField";
 
 export const Route = createFileRoute("/_auth/settings/members/$memberId")({
   component: EditMember,
@@ -28,6 +29,7 @@ function EditMember() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { isValid, isDirty },
   } = useForm<HumanAgentUpdate>({
     values: agent,
@@ -74,17 +76,18 @@ function EditMember() {
             />
           </label>
 
-          <label>
-            <div className="label">{t("Rol")}</div>
-            <select
-              disabled={!isOwner}
-              {...register("extra.role", { required: true })}
-            >
-              <option value="member">{t("Miembro")}</option>
-              <option value="admin">{t("Administrador")}</option>
-              <option value="owner">{t("Propietario")}</option>
-            </select>
-          </label>
+          <SelectField
+            name="extra.role"
+            control={control}
+            label={t("Rol")}
+            options={[
+              { value: "member", label: t("Miembro") },
+              { value: "admin", label: t("Administrador") },
+              { value: "owner", label: t("Propietario") },
+            ]}
+            disabled={!isOwner}
+            required
+          />
 
           {invitation && invitation.status === "pending" && <label>
             <div className="label">{t("Correo electrónico")}</div>
