@@ -10,6 +10,7 @@ import { useState } from "react";
 import Button from "@/components/Button";
 import SelectField from "@/components/SelectField";
 import TextAreaField from "@/components/TextAreaField";
+import SectionField from "@/components/SectionField";
 
 export const Route = createFileRoute("/_auth/agents/new")({
   component: AddAgent,
@@ -109,72 +110,75 @@ function AddAgent() {
               placeholder={t("Eres un asistente útil...")}
             />
 
-            <SelectField
-              value={provider}
-              onChange={(val) => {
-                setProvider(val);
-                setValue("extra.model", "");
+            {/* AI Section */}
+            <SectionField label={t("Modelo de IA")}>
+              <SelectField
+                value={provider}
+                onChange={(val) => {
+                  setProvider(val);
+                  setValue("extra.model", "");
 
-                const availableProtocols = protocols[val as keyof typeof protocols];
-                setValue("extra.protocol", availableProtocols[0]);
+                  const availableProtocols = protocols[val as keyof typeof protocols];
+                  setValue("extra.protocol", availableProtocols[0]);
 
-                if (val !== "custom") {
-                  setValue("extra.api_url", val, { shouldDirty: true });
-                } else {
-                  setValue("extra.api_url", "", { shouldDirty: true });
-                }
-              }}
-              label={t("Proveedor")}
-              options={[
-                { value: "openai", label: "OpenAI" },
-                { value: "anthropic", label: "Anthropic" },
-                { value: "groq", label: "Groq" },
-                { value: "google", label: "Google" },
-                { value: "custom", label: t("Personalizado") },
-              ]}
-            />
+                  if (val !== "custom") {
+                    setValue("extra.api_url", val, { shouldDirty: true });
+                  } else {
+                    setValue("extra.api_url", "", { shouldDirty: true });
+                  }
+                }}
+                label={t("Proveedor")}
+                options={[
+                  { value: "openai", label: "OpenAI" },
+                  { value: "anthropic", label: "Anthropic" },
+                  { value: "groq", label: "Groq" },
+                  { value: "google", label: "Google" },
+                  { value: "custom", label: t("Personalizado") },
+                ]}
+              />
 
-            <SelectField
-              name="extra.protocol"
-              control={control}
-              label={t("Protocolo")}
-              options={protocols[provider as keyof typeof protocols].map((p) => ({
-                value: p,
-                label: protocolLabels[p] || p,
-              }))}
-            />
+              <SelectField
+                name="extra.protocol"
+                control={control}
+                label={t("Protocolo")}
+                options={protocols[provider as keyof typeof protocols].map((p) => ({
+                  value: p,
+                  label: protocolLabels[p] || p,
+                }))}
+              />
 
-            {provider === 'custom' && (
+              {provider === 'custom' && (
+                <label>
+                  <div className="label">{t("API URL")}</div>
+                  <input
+                    type="url"
+                    className="text"
+                    placeholder="https://api.example.com/v1"
+                    {...register("extra.api_url")}
+                  />
+                </label>
+              )}
+
               <label>
-                <div className="label">{t("API URL")}</div>
+                <div className="label">{t("API Key")}</div>
                 <input
-                  type="url"
+                  type="text"
                   className="text"
-                  placeholder="https://api.example.com/v1"
-                  {...register("extra.api_url")}
+                  placeholder={t("Clave API del proveedor")}
+                  {...register("extra.api_key")}
                 />
               </label>
-            )}
 
-            <label>
-              <div className="label">{t("API Key")}</div>
-              <input
-                type="text"
-                className="text"
-                placeholder={t("Clave API del proveedor")}
-                {...register("extra.api_key")}
-              />
-            </label>
-
-            <label>
-              <div className="label">{t("Modelo")}</div>
-              <input
-                type="text"
-                className="text"
-                placeholder={t("Nombre del modelo")}
-                {...register("extra.model")}
-              />
-            </label>
+              <label>
+                <div className="label">{t("Modelo")}</div>
+                <input
+                  type="text"
+                  className="text"
+                  placeholder={t("Nombre del modelo")}
+                  {...register("extra.model")}
+                />
+              </label>
+            </SectionField>
           </fieldset>
         </form>
       </SectionBody>
