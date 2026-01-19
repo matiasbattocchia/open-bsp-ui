@@ -11,6 +11,7 @@ import Button from "@/components/Button";
 import SelectField from "@/components/SelectField";
 import TextAreaField from "@/components/TextAreaField";
 import SectionField from "@/components/SectionField";
+import ToolsSection from "@/components/ToolsSection";
 
 export const Route = createFileRoute("/_auth/agents/new")({
   component: AddAgent,
@@ -109,6 +110,9 @@ function AddAgent() {
               label={t("Instrucciones")}
               placeholder={t("Eres un asistente útil...")}
             />
+
+            {/* Tools Section */}
+            <ToolsSection control={control} register={register} />
 
             {/* AI Section */}
             <SectionField label={t("Modelo de IA")}>
