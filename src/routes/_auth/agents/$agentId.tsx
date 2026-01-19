@@ -13,6 +13,7 @@ import SectionFooter from "@/components/SectionFooter";
 import { protocols, protocolLabels } from "./new";
 import Button from "@/components/Button";
 import SelectField from "@/components/SelectField";
+import TextAreaField from "@/components/TextAreaField";
 
 export const Route = createFileRoute("/_auth/agents/$agentId")({
   component: AgentDetail,
@@ -103,14 +104,12 @@ function AgentDetail() {
             ]}
           />
 
-          <label>
-            <div className="label">{t("Instrucciones")}</div>
-            <textarea
-              className="text h-min-[100px] font-mono text-[12.8px]"
-              {...register("extra.instructions")}
-              placeholder={t("Eres un asistente útil...")}
-            />
-          </label>
+          <TextAreaField
+            name="extra.instructions"
+            control={control}
+            label={t("Instrucciones")}
+            placeholder={t("Eres un asistente útil...")}
+          />
 
           <SelectField
             value={provider}

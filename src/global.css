@@ -148,8 +148,12 @@ button:disabled {
     resize: none;
   }
 
-  input.text, textarea.text {
+  input.text {
     @apply w-full border-b-[2px] border-transparent hover:border-input pb-[2px] focus-visible:outline-none text-[16px] text-foreground placeholder:text-muted-foreground bg-transparent focus-visible:border-primary;
+  }
+  
+  textarea.text {
+    @apply w-full focus-visible:outline-none text-[16px] text-foreground placeholder:text-muted-foreground bg-transparent focus-visible:border-primary;
   }
 
   select {
