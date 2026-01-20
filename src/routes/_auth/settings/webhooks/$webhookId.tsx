@@ -100,7 +100,7 @@ function EditWebhook() {
           </label>
 
           <label>
-            <div className="label">{t("Token (Opcional)")}</div>
+            <div className="label">{t("Token (opcional)")}</div>
             <input
               className="text"
               type="text"

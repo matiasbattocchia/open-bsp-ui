@@ -1,20 +1,28 @@
 import { useState } from "react";
-import { ArrowLeft, ChevronRight, Plus, Server, Trash2 } from "lucide-react";
+import { ArrowLeft, ChevronRight, Database, Globe, Plus, Server, Trash2 } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
-import { type Control, useFieldArray, type FieldValues, type UseFormRegister, useWatch } from "react-hook-form";
+import { type Control, useFieldArray, type FieldValues, type UseFormRegister, useWatch, type UseFormSetValue } from "react-hook-form";
 import SectionBody from "@/components/SectionBody";
 import SectionItem from "@/components/SectionItem";
-import type { LocalMCPToolConfig, ToolConfig } from "@/supabase/client";
+import SelectField from "@/components/SelectField";
+import type { LocalMCPToolConfig, LocalHTTPToolConfig, LocalSQLToolConfig, LocalFunctionToolConfig, ToolConfig } from "@/supabase/client";
 
 type ToolsSectionProps<T extends FieldValues> = {
   control: Control<T>;
   register: UseFormRegister<T>;
+  setValue: UseFormSetValue<T>;
 };
 
-export default function ToolsSection<T extends FieldValues>({ control, register }: ToolsSectionProps<T>) {
+type EditorState =
+  | { type: "closed" }
+  | { type: "mcp"; index: number }
+  | { type: "http"; index: number }
+  | { type: "sql"; index: number };
+
+export default function ToolsSection<T extends FieldValues>({ control, register, setValue }: ToolsSectionProps<T>) {
   const { translate: t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editor, setEditor] = useState<EditorState>({ type: "closed" });
 
   // useFieldArray for structure (IDs) and operations (append/remove)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -28,21 +36,55 @@ export default function ToolsSection<T extends FieldValues>({ control, register 
   const toolsValues = (useWatch({ control, name: "extra.tools" as any }) as ToolConfig[]) || [];
 
   // Combine fields (for IDs) with watched values (for current data)
-  const mcpTools = fields
-    .map((field, index) => ({
-      ...field,
-      ...(toolsValues[index] || {}),
-    }))
-    .filter((tool): tool is LocalMCPToolConfig & { id: string } => (tool as any).type === "mcp");
+  const allTools = fields.map((field, index) => ({
+    ...field,
+    ...(toolsValues[index] || {}),
+    _index: index,
+  }));
 
-  const handleEditMCP = (mcpIndex: number) => {
-    const tool = mcpTools[mcpIndex];
-    const actualIndex = fields.findIndex((f) => (f as any).id === (tool as any).id);
-    setEditingIndex(actualIndex);
+  const mcpTools = allTools.filter((tool): tool is LocalMCPToolConfig & { id: string; _index: number } =>
+    (tool as any).type === "mcp"
+  );
+
+  const httpTools = allTools.filter((tool): tool is LocalHTTPToolConfig & { id: string; _index: number } =>
+    (tool as any).type === "http"
+  );
+
+  const sqlTools = allTools.filter((tool): tool is LocalSQLToolConfig & { id: string; _index: number } =>
+    (tool as any).type === "sql"
+  );
+
+  // Simple tools (function type) - only one instance of each allowed
+  const simpleToolNames = ["calculator", "transfer_to_human_agent"] as const;
+  type SimpleToolName = typeof simpleToolNames[number];
+
+  const hasSimpleTool = (name: SimpleToolName): boolean => {
+    return toolsValues.some(
+      (tool) => tool.type === "function" && (tool as LocalFunctionToolConfig).name === name
+    );
+  };
+
+  const toggleSimpleTool = (name: SimpleToolName) => {
+    if (hasSimpleTool(name)) {
+      // Remove the tool
+      const index = toolsValues.findIndex(
+        (tool) => tool.type === "function" && (tool as LocalFunctionToolConfig).name === name
+      );
+      if (index !== -1) {
+        remove(index);
+      }
+    } else {
+      // Add the tool
+      const newTool: LocalFunctionToolConfig = {
+        provider: "local",
+        type: "function",
+        name,
+      };
+      append(newTool as any);
+    }
   };
 
   const handleAddMCP = () => {
-    // Append a new empty MCP tool and immediately edit it
     const newTool: LocalMCPToolConfig = {
       provider: "local",
       type: "mcp",
@@ -50,8 +92,29 @@ export default function ToolsSection<T extends FieldValues>({ control, register 
       config: { url: "" },
     };
     append(newTool as any);
-    // Set editing index to the new tool (last index after append)
-    setEditingIndex(fields.length);
+    setEditor({ type: "mcp", index: fields.length });
+  };
+
+  const handleAddHTTP = () => {
+    const newTool: LocalHTTPToolConfig = {
+      provider: "local",
+      type: "http",
+      label: "",
+      config: {},
+    };
+    append(newTool as any);
+    setEditor({ type: "http", index: fields.length });
+  };
+
+  const handleAddSQL = () => {
+    const newTool: LocalSQLToolConfig = {
+      provider: "local",
+      type: "sql",
+      label: "",
+      config: { driver: "libsql", url: "" },
+    };
+    append(newTool as any);
+    setEditor({ type: "sql", index: fields.length });
   };
 
   const handleDeleteTool = (index: number) => {
@@ -60,8 +123,10 @@ export default function ToolsSection<T extends FieldValues>({ control, register 
 
   const handleBack = () => {
     setIsOpen(false);
-    setEditingIndex(null);
+    setEditor({ type: "closed" });
   };
+
+  const isEditing = editor.type !== "closed";
 
   return (
     <>
@@ -76,7 +141,7 @@ export default function ToolsSection<T extends FieldValues>({ control, register 
       </button>
 
       {/* Tools List Modal */}
-      {isOpen && editingIndex === null && (
+      {isOpen && !isEditing && (
         <div className="absolute inset-0 bottom-[80px] z-50 bg-background flex flex-col">
           <div className="header items-center truncate shrink-0">
             <button
@@ -91,8 +156,9 @@ export default function ToolsSection<T extends FieldValues>({ control, register 
           </div>
 
           <SectionBody>
+            {/* Add buttons */}
             <SectionItem
-              title={t("Agregar servidor MCP")}
+              title={t("Agregar cliente MCP")}
               aside={
                 <div className="p-[8px] bg-primary/10 rounded-full">
                   <Plus className="w-[24px] h-[24px] text-primary" />
@@ -100,10 +166,29 @@ export default function ToolsSection<T extends FieldValues>({ control, register 
               }
               onClick={handleAddMCP}
             />
+            <SectionItem
+              title={t("Agregar cliente HTTP")}
+              aside={
+                <div className="p-[8px] bg-primary/10 rounded-full">
+                  <Plus className="w-[24px] h-[24px] text-primary" />
+                </div>
+              }
+              onClick={handleAddHTTP}
+            />
+            <SectionItem
+              title={t("Agregar cliente SQL")}
+              aside={
+                <div className="p-[8px] bg-primary/10 rounded-full">
+                  <Plus className="w-[24px] h-[24px] text-primary" />
+                </div>
+              }
+              onClick={handleAddSQL}
+            />
 
-            {mcpTools.map((tool, index) => (
+            {/* Existing MCP Clients */}
+            {mcpTools.map((tool) => (
               <SectionItem
-                key={(tool as any).id || index}
+                key={tool.id}
                 title={tool.label || t("Sin nombre")}
                 description={tool.config.url || t("Sin URL")}
                 aside={
@@ -111,32 +196,129 @@ export default function ToolsSection<T extends FieldValues>({ control, register 
                     <Server className="w-[24px] h-[24px] text-muted-foreground" />
                   </div>
                 }
-                onClick={() => handleEditMCP(index)}
+                onClick={() => setEditor({ type: "mcp", index: tool._index })}
               />
             ))}
+
+            {/* Existing HTTP Clients */}
+            {httpTools.map((tool) => (
+              <SectionItem
+                key={tool.id}
+                title={tool.label || t("Sin nombre")}
+                description={(tool.config as any)?.url || t("Sin URL base")}
+                aside={
+                  <div className="p-[8px] bg-muted rounded-full">
+                    <Globe className="w-[24px] h-[24px] text-muted-foreground" />
+                  </div>
+                }
+                onClick={() => setEditor({ type: "http", index: tool._index })}
+              />
+            ))}
+
+            {/* Existing SQL Clients */}
+            {sqlTools.map((tool) => (
+              <SectionItem
+                key={tool.id}
+                title={tool.label || t("Sin nombre")}
+                description={(tool.config as any)?.driver || t("Sin driver")}
+                aside={
+                  <div className="p-[8px] bg-muted rounded-full">
+                    <Database className="w-[24px] h-[24px] text-muted-foreground" />
+                  </div>
+                }
+                onClick={() => setEditor({ type: "sql", index: tool._index })}
+              />
+            ))}
+
+            {/* Simple Tools (Toggles) */}
+
+            <div className="flex flex-col gap-[24px] pl-[10px] mt-[6px]">
+              <div className="border-t border-border" />
+
+              {/* Calculator */}
+              <label className="flex items-start gap-[12px] cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="mt-[4px] w-[18px] h-[18px] accent-primary"
+                  checked={hasSimpleTool("calculator")}
+                  onChange={() => toggleSimpleTool("calculator")}
+                />
+                <div className="flex-1">
+                  <div className="text-foreground">{t("Calculadora")}</div>
+                  <p className="text-muted-foreground text-[14px]">
+                    {t("Evita errores de cálculo en LLMs")}
+                  </p>
+                </div>
+              </label>
+
+              {/* Transfer to Human */}
+              <label className="flex items-start gap-[12px] cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="mt-[4px] w-[18px] h-[18px] accent-primary"
+                  checked={hasSimpleTool("transfer_to_human_agent")}
+                  onChange={() => toggleSimpleTool("transfer_to_human_agent")}
+                />
+                <div className="flex-1">
+                  <div className="text-foreground">{t("Transferir a humano")}</div>
+                  <p className="text-muted-foreground text-[14px]">
+                    {t("Pausa la conversación cuando el agente no conoce la respuesta")}
+                  </p>
+                </div>
+              </label>
+            </div>
           </SectionBody>
         </div>
       )}
 
-      {/* MCP Server Editor - for both new and existing tools */}
-      {isOpen && editingIndex !== null && (
-        <MCPServerEditor
-          index={editingIndex}
+      {/* MCP Client Editor */}
+      {isOpen && editor.type === "mcp" && (
+        <MCPClientEditor
+          index={editor.index}
           register={register}
           control={control}
           onDelete={() => {
-            handleDeleteTool(editingIndex);
-            setEditingIndex(null);
+            handleDeleteTool(editor.index);
+            setEditor({ type: "closed" });
           }}
-          onBack={() => setEditingIndex(null)}
+          onBack={() => setEditor({ type: "closed" })}
+        />
+      )}
+
+      {/* HTTP Client Editor */}
+      {isOpen && editor.type === "http" && (
+        <HTTPClientEditor
+          index={editor.index}
+          register={register}
+          control={control}
+          onDelete={() => {
+            handleDeleteTool(editor.index);
+            setEditor({ type: "closed" });
+          }}
+          onBack={() => setEditor({ type: "closed" })}
+        />
+      )}
+
+      {/* SQL Client Editor */}
+      {isOpen && editor.type === "sql" && (
+        <SQLClientEditor
+          index={editor.index}
+          register={register}
+          control={control}
+          setValue={setValue}
+          onDelete={() => {
+            handleDeleteTool(editor.index);
+            setEditor({ type: "closed" });
+          }}
+          onBack={() => setEditor({ type: "closed" })}
         />
       )}
     </>
   );
 }
 
-// MCP Server Editor - uses parent form's register directly
-function MCPServerEditor<T extends FieldValues>({
+// MCP Client Editor
+function MCPClientEditor<T extends FieldValues>({
   index,
   register,
   control,
@@ -151,13 +333,24 @@ function MCPServerEditor<T extends FieldValues>({
 }) {
   const { translate: t } = useTranslation();
 
-  // Watch current values to check validity
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const label = (useWatch({ control, name: `extra.tools.${index}.label` as any }) as string) || "";
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const url = (useWatch({ control, name: `extra.tools.${index}.config.url` as any }) as string) || "";
 
   const isValid = label.trim() !== "" && url.trim() !== "";
+  const isEmpty = label.trim() === "" && url.trim() === "";
+
+  // Allow back if valid OR if unchanged (empty) - empty tools get deleted
+  const canGoBack = isValid || isEmpty;
+
+  const handleBack = () => {
+    if (isEmpty) {
+      onDelete(); // Delete empty tool
+    } else {
+      onBack();
+    }
+  };
 
   return (
     <div className="absolute inset-0 bottom-[80px] z-50 bg-background flex flex-col">
@@ -165,15 +358,14 @@ function MCPServerEditor<T extends FieldValues>({
         <button
           type="button"
           className="p-[8px] rounded-full hover:bg-muted mr-[8px] ml-[-8px] disabled:opacity-30 disabled:hover:bg-transparent"
-          title={isValid ? t("Volver") : t("Volver") + " - " + t("Completa los campos requeridos")}
-          onClick={onBack}
-          disabled={!isValid}
+          title={canGoBack ? t("Volver") : t("Volver") + " - " + t("Completa los campos requeridos")}
+          onClick={handleBack}
+          disabled={!canGoBack}
         >
           <ArrowLeft className="w-[24px] h-[24px]" />
         </button>
-        <div className="text-[16px]">{label ? t("Editar servidor MCP") : t("Agregar servidor MCP")}</div>
+        <div className="text-[16px]">{label ? t("Editar cliente MCP") : t("Agregar cliente MCP")}</div>
 
-        {/* Delete button - matches SectionHeader style */}
         <button
           type="button"
           className="p-[8px] rounded-full hover:bg-muted ml-auto"
@@ -190,7 +382,7 @@ function MCPServerEditor<T extends FieldValues>({
           <input
             type="text"
             className="text"
-            placeholder={t("Mi servidor MCP")}
+            placeholder={t("Mi cliente MCP")}
             {...register(`extra.tools.${index}.label` as any, { required: true })}
           />
         </label>
@@ -206,7 +398,7 @@ function MCPServerEditor<T extends FieldValues>({
         </label>
 
         <label>
-          <div className="label">{t("Clave API")}</div>
+          <div className="label">{t("Token")} ({t("opcional")})</div>
           <input
             type="text"
             className="text"
@@ -214,6 +406,276 @@ function MCPServerEditor<T extends FieldValues>({
             {...register(`extra.tools.${index}.config.headers.authentication` as any)}
           />
         </label>
+      </SectionBody>
+    </div>
+  );
+}
+
+// HTTP Client Editor
+function HTTPClientEditor<T extends FieldValues>({
+  index,
+  register,
+  control,
+  onDelete,
+  onBack,
+}: {
+  index: number;
+  register: UseFormRegister<T>;
+  control: Control<T>;
+  onDelete: () => void;
+  onBack: () => void;
+}) {
+  const { translate: t } = useTranslation();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const label = (useWatch({ control, name: `extra.tools.${index}.label` as any }) as string) || "";
+
+  const isValid = label.trim() !== "";
+  const isEmpty = label.trim() === "";
+
+  // Allow back if valid OR if unchanged (empty) - empty tools get deleted
+  const canGoBack = isValid || isEmpty;
+
+  const handleBack = () => {
+    if (isEmpty) {
+      onDelete(); // Delete empty tool
+    } else {
+      onBack();
+    }
+  };
+
+  return (
+    <div className="absolute inset-0 bottom-[80px] z-50 bg-background flex flex-col">
+      <div className="header items-center truncate shrink-0">
+        <button
+          type="button"
+          className="p-[8px] rounded-full hover:bg-muted mr-[8px] ml-[-8px] disabled:opacity-30 disabled:hover:bg-transparent"
+          title={canGoBack ? t("Volver") : t("Volver") + " - " + t("Completa los campos requeridos")}
+          onClick={handleBack}
+          disabled={!canGoBack}
+        >
+          <ArrowLeft className="w-[24px] h-[24px]" />
+        </button>
+        <div className="text-[16px]">{label ? t("Editar cliente HTTP") : t("Agregar cliente HTTP")}</div>
+
+        <button
+          type="button"
+          className="p-[8px] rounded-full hover:bg-muted ml-auto"
+          title={t("Eliminar")}
+          onClick={onDelete}
+        >
+          <Trash2 className="w-[24px] h-[24px]" />
+        </button>
+      </div>
+
+      <SectionBody className="gap-[24px] pl-[10px]">
+        <label>
+          <div className="label">{t("Nombre")}</div>
+          <input
+            type="text"
+            className="text"
+            placeholder={t("Mi cliente HTTP")}
+            {...register(`extra.tools.${index}.label` as any, { required: true })}
+          />
+        </label>
+
+        <label>
+          <div className="label">{t("URL base")} ({t("opcional")})</div>
+          <input
+            type="url"
+            className="text"
+            placeholder="https://api.example.com"
+            {...register(`extra.tools.${index}.config.url` as any)}
+          />
+        </label>
+
+        <label>
+          <div className="label">{t("Token")} ({t("opcional")})</div>
+          <input
+            type="text"
+            className="text"
+            placeholder="Bearer sk-..."
+            {...register(`extra.tools.${index}.config.headers.authentication` as any)}
+          />
+        </label>
+      </SectionBody>
+    </div>
+  );
+}
+
+// SQL Client Editor with driver-specific fields
+function SQLClientEditor<T extends FieldValues>({
+  index,
+  register,
+  control,
+  setValue,
+  onDelete,
+  onBack,
+}: {
+  index: number;
+  register: UseFormRegister<T>;
+  control: Control<T>;
+  setValue: UseFormSetValue<T>;
+  onDelete: () => void;
+  onBack: () => void;
+}) {
+  const { translate: t } = useTranslation();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const label = (useWatch({ control, name: `extra.tools.${index}.label` as any }) as string) || "";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const driver = (useWatch({ control, name: `extra.tools.${index}.config.driver` as any }) as string) || "libsql";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const url = (useWatch({ control, name: `extra.tools.${index}.config.url` as any }) as string) || "";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const host = (useWatch({ control, name: `extra.tools.${index}.config.host` as any }) as string) || "";
+
+  // Validation depends on driver
+  const isLibSQL = driver === "libsql";
+  const isValid = label.trim() !== "" && (isLibSQL ? url.trim() !== "" : host.trim() !== "");
+  const isEmpty = label.trim() === "" && (isLibSQL ? url.trim() === "" : host.trim() === "");
+
+  // Allow back if valid OR if unchanged (empty) - empty tools get deleted
+  const canGoBack = isValid || isEmpty;
+
+  const handleDriverChange = (newDriver: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setValue(`extra.tools.${index}.config.driver` as any, newDriver as any, { shouldDirty: true });
+  };
+
+  const handleBack = () => {
+    if (isEmpty) {
+      onDelete(); // Delete empty tool
+    } else {
+      onBack();
+    }
+  };
+
+  return (
+    <div className="absolute inset-0 bottom-[80px] z-50 bg-background flex flex-col">
+      <div className="header items-center truncate shrink-0">
+        <button
+          type="button"
+          className="p-[8px] rounded-full hover:bg-muted mr-[8px] ml-[-8px] disabled:opacity-30 disabled:hover:bg-transparent"
+          title={canGoBack ? t("Volver") : t("Volver") + " - " + t("Completa los campos requeridos")}
+          onClick={handleBack}
+          disabled={!canGoBack}
+        >
+          <ArrowLeft className="w-[24px] h-[24px]" />
+        </button>
+        <div className="text-[16px]">{label ? t("Editar cliente SQL") : t("Agregar cliente SQL")}</div>
+
+        <button
+          type="button"
+          className="p-[8px] rounded-full hover:bg-muted ml-auto"
+          title={t("Eliminar")}
+          onClick={onDelete}
+        >
+          <Trash2 className="w-[24px] h-[24px]" />
+        </button>
+      </div>
+
+      <SectionBody className="gap-[24px] pl-[10px]">
+        <label>
+          <div className="label">{t("Nombre")}</div>
+          <input
+            type="text"
+            className="text"
+            placeholder={t("Mi base de datos")}
+            {...register(`extra.tools.${index}.label` as any, { required: true })}
+          />
+        </label>
+
+        <SelectField
+          label={t("Driver")}
+          value={driver}
+          onChange={handleDriverChange}
+          options={[
+            { value: "libsql", label: "LibSQL / Turso" },
+            { value: "postgres", label: "PostgreSQL" },
+            { value: "mysql", label: "MySQL" },
+          ]}
+        />
+
+        {/* LibSQL-specific fields */}
+        {isLibSQL && (
+          <>
+            <label>
+              <div className="label">{t("URL")}</div>
+              <input
+                type="url"
+                className="text"
+                placeholder="libsql://your-database.turso.io"
+                {...register(`extra.tools.${index}.config.url` as any, { required: true })}
+              />
+            </label>
+
+            <label>
+              <div className="label">{t("Token")} ({t("opcional")})</div>
+              <input
+                type="text"
+                className="text"
+                placeholder="eyJhbGciOiJFZ..."
+                {...register(`extra.tools.${index}.config.token` as any)}
+              />
+            </label>
+          </>
+        )}
+
+        {/* Postgres/MySQL-specific fields */}
+        {!isLibSQL && (
+          <>
+            <label>
+              <div className="label">{t("Host")}</div>
+              <input
+                type="text"
+                className="text"
+                placeholder="localhost"
+                {...register(`extra.tools.${index}.config.host` as any, { required: true })}
+              />
+            </label>
+
+            <label>
+              <div className="label">{t("Puerto")} ({t("opcional")})</div>
+              <input
+                type="number"
+                className="text"
+                placeholder={driver === "postgres" ? "5432" : "3306"}
+                {...register(`extra.tools.${index}.config.port` as any, { valueAsNumber: true })}
+              />
+            </label>
+
+            <label>
+              <div className="label">{t("Usuario")} ({t("opcional")})</div>
+              <input
+                type="text"
+                className="text"
+                placeholder={driver === "postgres" ? "postgres" : "root"}
+                {...register(`extra.tools.${index}.config.user` as any)}
+              />
+            </label>
+
+            <label>
+              <div className="label">{t("Contraseña")} ({t("opcional")})</div>
+              <input
+                type="text"
+                className="text"
+                placeholder={t("Contraseña")}
+                {...register(`extra.tools.${index}.config.password` as any)}
+              />
+            </label>
+
+            <label>
+              <div className="label">{t("Base de datos")} ({t("opcional")})</div>
+              <input
+                type="text"
+                className="text"
+                placeholder="mydb"
+                {...register(`extra.tools.${index}.config.database` as any)}
+              />
+            </label>
+          </>
+        )}
       </SectionBody>
     </div>
   );

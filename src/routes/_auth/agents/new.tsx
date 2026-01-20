@@ -52,6 +52,7 @@ function AddAgent() {
         api_url: "openai",
         protocol: "chat_completions",
         model: "gpt-4.1-mini",
+        tools: [],
       }
     },
   });
@@ -104,6 +105,8 @@ function AddAgent() {
               ]}
             />
 
+            <div className="border-t border-border" />
+
             <TextAreaField
               name="extra.instructions"
               control={control}
@@ -112,7 +115,7 @@ function AddAgent() {
             />
 
             {/* Tools Section */}
-            <ToolsSection control={control} register={register} />
+            <ToolsSection control={control} register={register} setValue={setValue} />
 
             {/* AI Section */}
             <SectionField label={t("Modelo de IA")}>

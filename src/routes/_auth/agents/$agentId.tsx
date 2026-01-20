@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import SectionHeader from "@/components/SectionHeader";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAgent, useDeleteAgent, useUpdateAgent, useCurrentAgent } from "@/queries/useAgents";
@@ -44,13 +44,25 @@ function AgentDetail() {
     setProvider(isKnown ? apiUrl : "custom");
   }, [agent]);
 
+  // Normalize agent data to ensure tools is always an array
+  const normalizedAgent = useMemo(() => {
+    if (!agent) return undefined;
+    return {
+      ...agent,
+      extra: {
+        ...agent.extra,
+        tools: agent.extra?.tools ?? [],
+      },
+    };
+  }, [agent]);
+
   const {
     register,
     handleSubmit,
     setValue,
     control,
     formState: { isDirty, isValid },
-  } = useForm<AIAgentUpdate>({ values: agent });
+  } = useForm<AIAgentUpdate>({ values: normalizedAgent });
 
   const handleChat = () => {
     if (!activeOrgId || !localAddress) return;
@@ -58,7 +70,6 @@ function AgentDetail() {
     const convId = startConversation({
       organization_id: activeOrgId,
       organization_address: localAddress.address,
-      contact_address: crypto.randomUUID(),
       service: "local",
       extra: { default_agent_id: agentId },
       name: agent?.name,
@@ -107,6 +118,8 @@ function AgentDetail() {
             ]}
           />
 
+          <div className="border-t border-border" />
+
           <TextAreaField
             name="extra.instructions"
             control={control}
@@ -115,7 +128,7 @@ function AgentDetail() {
           />
 
           {/* Tools Section */}
-          <ToolsSection control={control} register={register} />
+          <ToolsSection control={control} register={register} setValue={setValue} />
 
           {/* AI Section */}
           <SectionField label={t("Modelo de IA")}>

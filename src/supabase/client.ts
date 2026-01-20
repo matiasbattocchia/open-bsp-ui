@@ -579,8 +579,29 @@ export type LocalSQLToolConfig = {
   provider: "local";
   type: "sql";
   label: string; // database label
-  config: Json;
+  config: Json; // SQLToolConfig
 };
+
+/*
+export const LibSQLConfigSchema = z.object({
+  driver: z.literal("libsql"),
+  url: z.string(),
+  token: z.string().optional(),
+});
+type LibSQLConfig = z.infer<typeof LibSQLConfigSchema>;
+
+export const SQLConfigSchema = z.object({
+  driver: z.union([z.literal("postgres"), z.literal("mysql")]),
+  host: z.string(),
+  port: z.number().optional(),
+  user: z.string().optional(),
+  password: z.string().optional(),
+  database: z.string().optional(),
+});
+type SQLConfig = z.infer<typeof SQLConfigSchema>;
+
+export type SQLToolConfig = LibSQLConfig | SQLConfig;
+*/
 
 export type LocalHTTPToolConfig = {
   provider: "local";
