@@ -35,3 +35,11 @@ https://develop.open-bsp-ui.pages.dev/settings/organization/new#access_token=eyJ
 If redirected to organizations/new from this URL, the cancel button returns to SSO
 
 - [ ] (bug) Re-login does not initializes data, needs to refresh
+
+---
+
+- mostrar email cuenta usuario logueado
+
+- algo de feedback / spinner, sobre todo al borrar, al aceptar una invitación
+
+- Conversation with null is paused. Skipping response. -> welcome message de coexistence pausa la conversación

@@ -403,7 +403,7 @@ function MCPClientEditor<T extends FieldValues>({
             type="text"
             className="text"
             placeholder="Bearer sk-..."
-            {...register(`extra.tools.${index}.config.headers.authentication` as any)}
+            {...register(`extra.tools.${index}.config.headers.authorization` as any)}
           />
         </label>
       </SectionBody>
@@ -495,7 +495,7 @@ function HTTPClientEditor<T extends FieldValues>({
             type="text"
             className="text"
             placeholder="Bearer sk-..."
-            {...register(`extra.tools.${index}.config.headers.authentication` as any)}
+            {...register(`extra.tools.${index}.config.headers.authorization` as any)}
           />
         </label>
       </SectionBody>
