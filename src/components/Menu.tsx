@@ -94,6 +94,12 @@ export default function Menu() {
           menu={{
             items: [
               {
+                key: "user_email",
+                type: "group", // using group name as title style
+                label: user?.email || "",
+              },
+              { type: "divider" },
+              {
                 key: "orgs",
                 type: "group",
                 label: "Organizaciones",
