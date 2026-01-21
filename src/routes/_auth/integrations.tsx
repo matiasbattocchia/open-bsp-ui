@@ -27,15 +27,17 @@ function Integrations() {
       <SectionHeader title="Integraciones" />
 
       <SectionBody>
-        <p>
-          {t("Conecta tu número de WhatsApp Business para recibir y enviar mensajes directamente desde la plataforma.")}
-        </p>
+        <div className="pl-[10px]">
+          <p>
+            {t("Conecta tu número de WhatsApp Business para recibir y enviar mensajes directamente desde la plataforma.")}
+          </p>
 
-        {/* WhatsApp Integration - Always show but disabled if not admin */}
-        <div className={`py-[10px] ${!isAdmin ? "opacity-50 pointer-events-none" : ""}`} title={!isAdmin ? t("Requiere permisos de administrador") : undefined}>
-          <fieldset disabled={!isAdmin} className="group">
-            <WhatsAppIntegration />
-          </fieldset>
+          {/* WhatsApp Integration - Always show but disabled if not admin */}
+          <div className={`py-[10px] ${!isAdmin ? "opacity-50 pointer-events-none" : ""}`} title={!isAdmin ? t("Requiere permisos de administrador") : undefined}>
+            <fieldset disabled={!isAdmin} className="group">
+              <WhatsAppIntegration />
+            </fieldset>
+          </div>
         </div>
 
         {externalIntegrations && externalIntegrations.length > 0 && (
@@ -54,7 +56,7 @@ function Integrations() {
             ))}
           </>
         )}
-      </SectionBody>
+      </SectionBody >
     </>
   );
 }
