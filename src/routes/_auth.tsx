@@ -9,8 +9,9 @@ import { useLocation } from "@tanstack/react-router";
 import FilePicker from "@/components/FileUploader/FilePicker";
 import FilePreviewer from "@/components/FilePreviewer";
 import ActionCard from "@/components/ActionCard";
-import { Building2, MessageSquarePlus, Settings } from "lucide-react";
+import { Bot, Building2, MessageSquarePlus, Settings } from "lucide-react";
 import { useResizable } from "@/hooks/useResizable";
+import { useCurrentAgents } from "@/queries/useAgents";
 
 export const Route = createFileRoute("/_auth")({
   component: AppLayout,
@@ -30,6 +31,8 @@ function getMaxPanelWidth() {
 
 function AppLayout() {
   const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
+  const { data: agents } = useCurrentAgents();
+  const hasAiAgents = agents?.some((a) => a.ai);
   const activeConvId = useBoundStore((state) => state.ui.activeConvId);
   const setActiveConv = useBoundStore((state) => state.ui.setActiveConv);
   const location = useLocation();
@@ -107,11 +110,20 @@ function AppLayout() {
             )}
             {activeOrgId && (
               <>
-                <ActionCard
-                  icon={<MessageSquarePlus className="w-[24px] h-[24px]" />}
-                  title="Iniciar conversación"
-                  to="/conversations/new"
-                />
+                {!hasAiAgents && (
+                  <ActionCard
+                    icon={<Bot className="w-[24px] h-[24px]" />}
+                    title="Crear agente"
+                    to="/agents/new"
+                  />
+                )}
+                {hasAiAgents && (
+                  <ActionCard
+                    icon={<MessageSquarePlus className="w-[24px] h-[24px]" />}
+                    title="Iniciar conversación"
+                    to="/conversations/new"
+                  />
+                )}
                 <ActionCard
                   icon={<Settings className="w-[24px] h-[24px]" />}
                   title="Configurar WhatsApp"

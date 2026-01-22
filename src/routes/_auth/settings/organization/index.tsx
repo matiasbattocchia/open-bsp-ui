@@ -6,8 +6,12 @@ import { useCurrentOrganization, useUpdateCurrentOrganization, useDeleteCurrentO
 import { useCurrentAgent } from "@/queries/useAgents";
 import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
+import { useMemo } from "react";
 import useBoundStore from "@/stores/useBoundStore";
 import Button from "@/components/Button";
+import SelectField from "@/components/SelectField";
+import TextAreaField from "@/components/TextAreaField";
+import { type OrganizationUpdate } from "@/supabase/client";
 
 export const Route = createFileRoute("/_auth/settings/organization/")({
   beforeLoad: () => {
@@ -31,11 +35,23 @@ function EditOrganization() {
   const updateOrg = useUpdateCurrentOrganization();
   const deleteOrg = useDeleteCurrentOrganization();
 
+  const normalizedOrg = useMemo(() => {
+    if (!org) return undefined;
+    return {
+      ...org,
+      extra: {
+        ...org.extra,
+        error_messages_direction: org.extra?.error_messages_direction || "internal",
+      },
+    };
+  }, [org]);
+
   const {
     register,
     handleSubmit,
+    control,
     formState: { isValid, isDirty },
-  } = useForm({ values: org });
+  } = useForm<OrganizationUpdate>({ values: normalizedOrg });
 
   return (
     <>
@@ -65,6 +81,36 @@ function EditOrganization() {
               {...register("name", { required: true })}
             />
           </label>
+
+          <label>
+            <div className="label">{t("Demora de respuesta (segundos)")}</div>
+            <input
+              type="number"
+              className="text"
+              placeholder="3"
+              disabled={!isOwner}
+              {...register("extra.response_delay_seconds", { valueAsNumber: true })}
+            />
+          </label>
+
+          <TextAreaField
+            control={control}
+            name="extra.welcome_message"
+            label={t("Mensaje de bienvenida")}
+            placeholder={t("Hola! Soy un agente virtual. ¿En qué puedo ayudarte?")}
+            disabled={!isOwner}
+          />
+
+          <SelectField
+            control={control}
+            name="extra.error_messages_direction"
+            label={t("Mensajes de error")}
+            options={[
+              { value: "internal", label: t("Solo en la UI") },
+              { value: "outgoing", label: t("Visible desde WhatsApp") },
+            ]}
+            disabled={!isOwner}
+          />
         </form>
       </SectionBody>
 

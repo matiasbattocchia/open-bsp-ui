@@ -20,7 +20,7 @@ As a Single Page Application, this project can be hosted on any static site host
 
 ### Deploying to Cloudflare Pages
 
-1. **Fork** this repository.
+1. **Fork** this repository (`main` branch).
 2. Go to the [Cloudflare Dashboard](https://dash.cloudflare.com/).
 3. Navigate to **Workers & Pages** > **Create application** > **Pages** > **Connect to Git**.
 4. Connect GitHub and select your forked repository.

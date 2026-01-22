@@ -14,6 +14,8 @@
 
 - [ ] (feat) Modals (delete confirmation)
 
+- [ ] (feat) Annotator configuration
+
 - [ ] (enhacement) Translations
 
 - [ ] (feat) Templates

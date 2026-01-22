@@ -7,7 +7,7 @@ import {
   Settings,
   MessageSquareText,
   Unplug,
-  Users,
+  Bot,
   Languages,
   Plus,
 } from "lucide-react";
@@ -63,7 +63,7 @@ export default function Menu() {
           isActive={pathname.startsWith("/agents")}
           className="mt-[10px]"
         >
-          <Users className="w-[24px] h-[24px] stroke-[2]" />
+          <Bot className="w-[24px] h-[24px] stroke-[2]" />
         </LinkButton>
 
         {/* Integrations button */}
