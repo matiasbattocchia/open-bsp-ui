@@ -48,7 +48,7 @@ export function Markdown({
 
   return (
     <div
-      className="markdown overflow-x-auto scrollbar-hide"
+      className="markdown"
       dangerouslySetInnerHTML={{ __html: renderedHTML }}
       onInput={onInput}
     />
@@ -121,16 +121,14 @@ export function TextMessage({
               </span>}
             </>
           ) : (
-            <Markdown
-              content={
-                isTooLong && !expanded
-                  ? (body as string).slice(0, MAX_LENGTH) + "..."
-                  : body as string
-              }
-              direction={direction}
-              onInput={onInput}
-              withoutEndingSpace={!!footer}
-            />
+            <div className={"scrollbar-hide overflow-x-auto " + (isTooLong && !expanded ? "max-h-[150px] overflow-y-hidden" : "")}>
+              <Markdown
+                content={body as string}
+                direction={direction}
+                onInput={onInput}
+                withoutEndingSpace={!!footer}
+              />
+            </div>
           )}
 
           {isTooLong && (

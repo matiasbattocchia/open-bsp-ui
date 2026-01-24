@@ -134,21 +134,6 @@ export default function Chat() {
   ): (EnvelopeType | SeparatorType)[] {
     const _chat = [];
 
-    function typeMap(row: MessageRow) {
-      // For internal messages with tool info, use tool use_id to group related calls
-      if (row.direction === "internal" && row.content.tool?.event === "use") {
-        return `tool-use-${row.content.tool.use_id}`;
-      }
-      if (
-        row.direction === "internal" &&
-        row.content.tool?.event === "result"
-      ) {
-        return `tool-result-${row.content.tool.use_id}`;
-      }
-      // For other messages, combine direction and content kind
-      return `${row.direction}-${row.content.kind}`;
-    }
-
     let prevMsg: EnvelopeType | null = null;
 
     for (const [_index, env] of chat
@@ -161,13 +146,13 @@ export default function Chat() {
         env.last = true;
       } else if (
         prevMsg.message.agent_id === env.message.agent_id &&
-        typeMap(prevMsg.message) === typeMap(env.message)
+        prevMsg.message.direction === env.message.direction
       ) {
         prevMsg.last = false;
         env.last = true;
       } else if (
         prevMsg.message.agent_id !== env.message.agent_id ||
-        typeMap(prevMsg.message) !== typeMap(env.message)
+        prevMsg.message.direction !== env.message.direction
       ) {
         prevMsg.last = true;
         env.first = true;
