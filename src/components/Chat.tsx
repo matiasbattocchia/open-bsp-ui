@@ -127,28 +127,7 @@ export default function Chat() {
     return { agentId, color: colorMap.get(agentId)! };
   }
 
-  // If the message is internal (teams communication), we need to determine if it's an incoming or outgoing message for display purposes.
-  function rewriteInternalMessageDirection(
-    originalMessage: MessageRow,
-  ): MessageRow {
-    let message = { ...originalMessage };
 
-    if (
-      message.direction === "internal" &&
-      message.agent_id !== activeAgentId
-    ) {
-      // @ts-ignore
-      message = { ...message, direction: "incoming" };
-    } else if (
-      message.direction === "internal" &&
-      message.agent_id === activeAgentId
-    ) {
-      // @ts-ignore
-      message = { ...message, direction: "outgoing" };
-    }
-
-    return message;
-  }
 
   function insertDateSeparators(
     chat: MessageRow[],
@@ -300,8 +279,7 @@ export default function Chat() {
 
         return true;
       })
-      .reverse()
-      .map((message) => rewriteInternalMessageDirection(message)),
+      .reverse(),
   );
 
   const scrollToBottom = (isSmooth: boolean = true) => {

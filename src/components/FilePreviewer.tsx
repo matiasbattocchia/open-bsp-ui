@@ -15,6 +15,7 @@ import { saveDraft } from "@/utils/ConversationUtils";
 import { pushConversationToDb } from "@/utils/ConversationUtils";
 import { useCurrentAgent } from "@/queries/useAgents";
 import { moveCursorToEnd } from "@/utils/UtilityFunctions";
+import { htmlToMarkdown } from "@/utils/htmlToMarkdown";
 
 const FilePreviewer = () => {
   const { translate: t } = useTranslation();
@@ -253,10 +254,11 @@ const FilePreviewer = () => {
                 if (!(event.target instanceof Element)) {
                   return;
                 }
+
                 setConversationFileDraftCaption(
                   activeConvId,
                   previewIndex,
-                  event.target.textContent || "",
+                  htmlToMarkdown(event.currentTarget.innerHTML),
                 );
               }}
               onKeyDown={(event) => {

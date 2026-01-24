@@ -22,6 +22,7 @@ import "dayjs/locale/pt";
 import { Translate as T, useTranslation } from "@/hooks/useTranslation";
 import { useCurrentAgent } from "@/queries/useAgents";
 import { moveCursorToEnd } from "@/utils/UtilityFunctions";
+import { htmlToMarkdown } from "@/utils/htmlToMarkdown";
 
 export default function ChatFooter() {
   const activeConvId = useBoundStore((store) => store.ui.activeConvId);
@@ -232,15 +233,9 @@ export default function ChatFooter() {
               if (!(event.target instanceof Element)) {
                 return;
               }
-              // TODO: HTML to markdown
-              // TODO: DOM sanitizer to prevent injection attacks
-              //const message = event.target.textContent || "";
-              const message =
-                event.target.innerHTML
-                  .replace(/<br>/, "")
-                  .replace(/<br>/g, "\n")
-                  .replace(/<\/div><div>/g, "\n")
-                  .replace(/<\/?div>/g, "") || "";
+
+              // Use secure utility to sanitize and convert HTML to Markdown
+              const message = htmlToMarkdown(event.currentTarget.innerHTML);
 
               setMessage(message);
 

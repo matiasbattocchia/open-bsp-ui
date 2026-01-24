@@ -48,7 +48,7 @@ export function Markdown({
 
   return (
     <div
-      className="markdown"
+      className="markdown overflow-x-auto scrollbar-hide"
       dangerouslySetInnerHTML={{ __html: renderedHTML }}
       onInput={onInput}
     />
@@ -102,7 +102,7 @@ export function TextMessage({
           {/* Body */}
           {type === "json" ? (
             <>
-              <div className={"overflow-hidden " + (isTooLong && !expanded ? "max-h-[150px]" : "")}>
+              <div className={"scrollbar-hide overflow-x-auto " + (isTooLong && !expanded ? "max-h-[150px] overflow-y-hidden" : "")}>
                 <pre
                   dangerouslySetInnerHTML={{
                     __html: prettyPrintJson.toHtml(body as Json, {
