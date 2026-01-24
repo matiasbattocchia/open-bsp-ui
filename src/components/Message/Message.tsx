@@ -1,8 +1,7 @@
 import {
   type MessageRow,
-  type MessageInsert,
   type OutgoingStatus,
-  type InternalMessage,
+  type ToolInfo,
 } from "@/supabase/client";
 import AudioMessage from "./AudioMessage";
 import DocumentMessage from "./DocumentMessage";
@@ -14,40 +13,38 @@ import { type FormEventHandler, type PropsWithChildren, useState } from "react";
 import { prettyPrintJson } from "pretty-print-json";
 import { useTranslation } from "@/hooks/useTranslation";
 import AvatarComponent from "@/components/Avatar";
-import { pushMessageToDb } from "@/utils/MessageUtils";
-import { pushMessageToStore } from "@/utils/MessageUtils";
 import { useAgent } from "@/queries/useAgents";
 import { AVATAR_BG_COLORS, AVATAR_TEXT_COLORS } from "@/utils/colors";
+import type { Json } from "@/supabase/db_types";
 
-const md = new Remarkable({ breaks: true, html: true });
+const md = new Remarkable({
+  breaks: true,
+  html: false, // Security: Disabled to prevent XSS from untrusted WhatsApp messages
+  linkify: true,
+  typographer: true,
+});
 
 export function Markdown({
   content,
-  type,
+  direction,
   onInput,
   withoutEndingSpace,
 }: {
   content: string;
-  type: string;
+  direction: MessageRow["direction"];
   onInput?: FormEventHandler<HTMLDivElement>;
   withoutEndingSpace?: boolean;
 }) {
-  let toRender = content;
-  toRender = toRender.replace(
-    /(?<=[^*]|^)\*(?=[^*\s])(.+?)(?<=[^*\s])\*(?=[^*]|$)/g,
-    "**$1**",
-  ); // TODO: use a markdown parser that supports the WhatsApp style - cabra 06/10/2024
-
   // Hack to induce some space to not to overwrite the timestamp.
   if (!withoutEndingSpace) {
-    toRender += "&emsp;&emsp;&emsp;";
+    content += "&emsp;&emsp;&emsp;";
 
-    if (type === "outgoing") {
-      toRender += "&emsp;";
+    if (direction === "outgoing") {
+      content += "&emsp;";
     }
   }
 
-  const renderedHTML = md.render(toRender);
+  const renderedHTML = md.render(content);
 
   return (
     <div
@@ -58,34 +55,41 @@ export function Markdown({
   );
 }
 
-export function BaseMessage({
+export function TextMessage({
   header,
   body,
   footer,
   buttons,
-  type,
   timestamp,
   status,
   onInput,
-  draft,
+  direction,
+  type,
+  fixedWidth,
 }: {
   header?: string;
-  body: string;
+  body: string | Json;
   footer?: string;
   buttons?: string[];
-  type: "incoming" | "outgoing" | "system";
   timestamp?: string;
   status?: OutgoingStatus;
   onInput?: FormEventHandler<HTMLDivElement>;
-  draft?: MessageRow;
+  direction: MessageRow["direction"];
+  type?: "markdown" | "json";
+  fixedWidth?: boolean;
 }) {
+  const [expanded, setExpanded] = useState(false);
   const { translate: t } = useTranslation();
+  const MAX_LENGTH = 500;
+
+  // Calculate if content is "too long"
+  const isTooLong = type === "json" ? JSON.stringify(body).length > MAX_LENGTH : (body as string).length > MAX_LENGTH;
 
   return (
     <>
       <div className="relative">
         {/* Content */}
-        <div className="pl-[6px] pt-[6px] pb-[5px] pr-[4px]">
+        <div className={"pl-[6px] pt-[6px] pb-[5px] pr-[4px]" + (fixedWidth ? " w-[320px]" : "")}>
           {/* Header */}
           {header && (
             <div
@@ -96,21 +100,47 @@ export function BaseMessage({
           )}
 
           {/* Body */}
-          <Markdown
-            content={body}
-            type={type}
-            onInput={onInput}
-            withoutEndingSpace={!!footer}
-          />
+          {type === "json" ? (
+            <>
+              <div className={"overflow-hidden " + (isTooLong && !expanded ? "max-h-[150px]" : "")}>
+                <pre
+                  dangerouslySetInnerHTML={{
+                    __html: prettyPrintJson.toHtml(body as Json, {
+                      indent: 2,
+                    }),
+                  }}
+                />
+              </div>
 
-          {/* This invisible inline element does not play well with Markdown block elements.
-          <span className="text-[11px] mx-[4px] invisible">
-            {dayjs(message.timestamp).format("HH:mm")}
-            {message.type === "outgoing" && (
-              <span className="px-[8px] ml-[3px]"></span>
-            )}
-          </span>
-          */}
+              {/* This invisible inline element does not play well with Markdown block elements. */}
+              {!!footer && <span className="text-[11px] mx-[4px] invisible">
+                {dayjs(timestamp).format("HH:mm")}
+                {direction === "outgoing" && (
+                  <span className="px-[8px] ml-[3px]"></span>
+                )}
+              </span>}
+            </>
+          ) : (
+            <Markdown
+              content={
+                isTooLong && !expanded
+                  ? (body as string).slice(0, MAX_LENGTH) + "..."
+                  : body as string
+              }
+              direction={direction}
+              onInput={onInput}
+              withoutEndingSpace={!!footer}
+            />
+          )}
+
+          {isTooLong && (
+            <div
+              className="text-primary cursor-pointer mt-1"
+              onClick={() => setExpanded(!expanded)}
+            >
+              {expanded ? t("ver menos...") : t("ver más...")}
+            </div>
+          )}
 
           {/* Footer */}
           {footer && (
@@ -118,7 +148,7 @@ export function BaseMessage({
               {footer}
               <span className="text-[11px] mx-[4px] invisible">
                 {dayjs(timestamp).format("HH:mm")}
-                {type === "outgoing" && !!status && (
+                {direction === "outgoing" && !!status && (
                   <span className="px-[8px] ml-[3px]"></span>
                 )}
               </span>
@@ -129,7 +159,7 @@ export function BaseMessage({
         {/* Timestamp */}
         <div className="text-[11px] text-muted-foreground absolute bottom-[0px] right-[7px] flex items-center">
           {dayjs(timestamp).format("HH:mm")}
-          {type === "outgoing" && !!status && <StatusIcon {...status} />}
+          {direction === "outgoing" && !!status && <StatusIcon {...status} />}
         </div>
       </div>
 
@@ -137,59 +167,12 @@ export function BaseMessage({
       {buttons?.map((text, idx) => (
         <div
           key={idx}
-          className="py-3 border-t border-t-gray-dark text-center text-primary"
+          className="py-3 border-t border-border text-center text-primary"
         >
           {text}
         </div>
       ))}
-
-      {draft && (
-        <div
-          className="py-3 border-t border-border text-center text-primary cursor-pointer"
-          onClick={() => {
-            // Cast the content as OutgoingMessage since we're sending it as outgoing
-            const outgoingMessage = {
-              organization_id: draft.organization_id,
-              conversation_id: draft.conversation_id,
-              contact_address: draft.contact_address,
-              organization_address: draft.organization_address,
-              agent_id: draft.agent_id,
-              direction: "outgoing" as const,
-              content: draft.content,
-            };
-            pushMessageToStore(outgoingMessage as MessageInsert);
-            pushMessageToDb(outgoingMessage as MessageInsert, false);
-          }}
-        >
-          {t("Enviar")}
-        </div>
-      )}
     </>
-  );
-}
-
-function TextMessage(message: MessageRow) {
-  if (!(message.direction === "incoming" || message.direction === "outgoing")) {
-    throw new Error(`Message with id ${message.id} is not a BaseMessage.`);
-  }
-
-  const content = message.content;
-  let body = "";
-
-  // Handle v1 content structure - TextPart
-  if (content.type === "text") {
-    body = content.text || "";
-  }
-
-  return (
-    <BaseMessage
-      header={undefined}
-      body={body}
-      footer={undefined}
-      type={message.direction}
-      timestamp={message.timestamp}
-      status={message.direction === "outgoing" ? message.status : undefined}
-    />
   );
 }
 
@@ -285,6 +268,7 @@ export function OutMessage({
   last,
   children,
   avatar,
+  internal
 }: PropsWithChildren<UIMessage>) {
   return (
     <div
@@ -298,250 +282,26 @@ export function OutMessage({
         className={
           // max-w-65% applies to text only but could not find a way to abstract it
           msgBubbleClasses +
-          " bg-outgoing-chat-bubble text-foreground" +
+          " text-foreground" +
           (first ? " rounded-tr-none" : "") +
-          (text ? textMsgMaxWidth : "")
+          (text ? textMsgMaxWidth : "") +
+          (internal ? " bg-incoming-chat-bubble" : " bg-outgoing-chat-bubble")
         }
       >
         {first && (
           <>
             {!!avatar && <Avatar {...avatar} display="picture-right" />}
-            <svg className={msgTailClasses + " text-outgoing-chat-bubble -right-[8px]"}>
+            <svg className={
+              msgTailClasses +
+              " -right-[8px]" +
+              (internal ? " text-incoming-chat-bubble" : " text-outgoing-chat-bubble")
+            }
+            >
               <use href="/icons.svg#tail-out" />
             </svg>
           </>
         )}
         {!!avatar && first && <Avatar {...avatar} display="name" />}
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function FunctionCallMessage({
-  message,
-  header,
-}: {
-  message: MessageRow;
-  header: string;
-}) {
-  const [showArguments, setShowArguments] = useState(false);
-
-  const { translate: t } = useTranslation();
-
-  // Extract tool info from InternalMessage with ToolInfo
-  const content = message.content as InternalMessage;
-  let toolName: string = "unknown";
-  let toolArgs: any = {};
-
-  if ("tool" in content && content.tool) {
-    const toolInfo = content.tool;
-
-    // Extract tool name from provider-specific info
-    if ("name" in toolInfo) {
-      toolName = toolInfo.name as string;
-    } else if ("label" in toolInfo) {
-      toolName = toolInfo.label as string;
-    }
-  }
-
-  // Tool arguments are in the data part for function tools
-  if (content.type === "data" && content.data) {
-    toolArgs = content.data;
-  }
-
-  return (
-    <div className="relative">
-      {/* Content */}
-      <div className="pl-[6px] pt-[6px] pb-[5px] pr-[4px] w-[320px]">
-        {/* Header */}
-        <div className="text-[15px] mb-3 font-semibold">{header}</div>
-
-        <pre className="pb-[6px]">{toolName}</pre>
-
-        {showArguments && (
-          <pre
-            dangerouslySetInnerHTML={{
-              __html: prettyPrintJson.toHtml(toolArgs, {
-                indent: 2,
-              }),
-            }}
-          />
-        )}
-        <div
-          className="text-primary cursor-pointer"
-          onClick={() => setShowArguments(!showArguments)}
-        >
-          {showArguments ? t("ocultar argumentos...") : t("ver argumentos...")}
-        </div>
-      </div>
-
-      {/* Timestamp */}
-      <div className="text-[11px] text-muted-foreground absolute bottom-[0px] right-[7px] flex items-center">
-        {dayjs(message.timestamp).format("HH:mm")}
-      </div>
-    </div>
-  );
-}
-
-function FunctionResponseMessage({
-  message,
-  header,
-}: {
-  message: MessageRow;
-  header: string;
-}) {
-  const [showResponse, setShowResponse] = useState(false);
-
-  const { translate: t } = useTranslation();
-
-  // Extract content from InternalMessage with ToolInfo
-  const content = message.content as InternalMessage;
-  let isJson = false;
-  let textBody = "";
-  let responseData: any = null;
-
-  // Tool results are typically in text or data parts
-  if (content.type === "text") {
-    textBody = content.text || "";
-  } else if (content.type === "data") {
-    responseData = content.data;
-    try {
-      textBody = JSON.stringify(content.data, null, 2);
-      isJson = true;
-    } catch {
-      textBody = String(content.data || "");
-    }
-  }
-
-  return (
-    <div className="relative">
-      {/* Content */}
-      <div className="pl-[6px] pt-[6px] pb-[5px] pr-[4px] w-[320px]">
-        {/* Header */}
-        <div className="text-[15px] mb-3 font-semibold">{header}</div>
-
-        {/* Body */}
-        {textBody.length > 100 ? (
-          <>
-            {showResponse ? (
-              isJson ? (
-                <pre
-                  dangerouslySetInnerHTML={{
-                    __html: prettyPrintJson.toHtml(responseData || {}, {
-                      indent: 2,
-                    }),
-                  }}
-                />
-              ) : (
-                <pre>{textBody}</pre>
-              )
-            ) : (
-              <pre className="pb-[6px]">
-                {textBody.slice(0, 100)}
-                ...
-              </pre>
-            )}
-
-            <div
-              className="text-primary cursor-pointer"
-              onClick={() => setShowResponse(!showResponse)}
-            >
-              {showResponse ? t("ver menos...") : t("ver más...")}
-            </div>
-          </>
-        ) : (
-          <pre>{textBody}</pre>
-        )}
-      </div>
-
-      {/* Timestamp */}
-      <div className="text-[11px] text-muted-foreground absolute bottom-[0px] right-[7px] flex items-center">
-        {dayjs(message.timestamp).format("HH:mm")}
-      </div>
-    </div>
-  );
-}
-
-export function SpecialMessageTypeMap(type: string) {
-  const { translate: t } = useTranslation();
-
-  return {
-    notification: t("🔔 Notificación"),
-    draft: t("📝 Borrador"),
-    function_call: t("⚙️ Uso de herramienta"),
-    function_response: t("📊 Resultado de herramienta"),
-  }[type];
-}
-
-function SpecialMessage(message: MessageRow) {
-  const content = message.content;
-  let bodyText = "";
-
-  // Extract text for display
-  if (content.type === "text") {
-    bodyText = content.text || "";
-  } else if (content.type === "data") {
-    bodyText = JSON.stringify(content.data, null, 2);
-  }
-
-  // Check if this is an internal message with tool information
-  // InternalMessage has ToolInfo with event "use" or "result"
-  if (message.direction === "internal") {
-    const internalContent = content as InternalMessage;
-
-    if ("tool" in internalContent && internalContent.tool) {
-      const toolInfo = internalContent.tool;
-
-      if (toolInfo.event === "use") {
-        return (
-          <FunctionCallMessage
-            message={message}
-            header={SpecialMessageTypeMap("function_call")!}
-          />
-        );
-      } else if (toolInfo.event === "result") {
-        return (
-          <FunctionResponseMessage
-            message={message}
-            header={SpecialMessageTypeMap("function_response")!}
-          />
-        );
-      }
-    }
-  }
-
-  // Default: render internal messages as system messages
-  return (
-    <BaseMessage
-      header={undefined}
-      body={bodyText}
-      type="system"
-      timestamp={message.timestamp}
-    />
-  );
-}
-
-function SystemMessage({
-  first,
-  last,
-  children,
-  avatar,
-}: PropsWithChildren<UIMessage>) {
-  return (
-    <div
-      className={
-        msgRowClasses + " justify-center" + (last ? " mb-[12px]" : " mb-[2px]")
-      }
-    >
-      <div
-        className={
-          // max-w-65% applies to text only but could not find a way to abstract it
-          msgBubbleClasses + " bg-white" + textMsgMaxWidth
-        }
-      >
-        {first && !!avatar && <Avatar {...avatar} display="picture-right" />}
-        {first && !!avatar && <Avatar {...avatar} display="name" />}
         {children}
       </div>
     </div>
@@ -555,77 +315,96 @@ type UIMessage = {
   orgName?: string;
   convName?: string;
   avatar?: { agentId: string; color: string };
+  internal?: boolean;
 };
 
 export default function Message(props: UIMessage & { message: MessageRow }) {
+  const { translate: t } = useTranslation();
   let content;
   let text = false;
+  let fixedWidth = false;
 
-  const messageContent = props.message.content;
-  const messageKind = messageContent.kind;
+  let headerText: string | undefined = undefined;
 
-  // Determine message type based on v1 content structure
-  switch (messageKind) {
-    case "text":
-    case "reaction":
-    case "caption":
-    case "transcription":
-    case "description": {
-      content = <TextMessage {...props.message} />;
-      text = true;
-      break;
+  if ("tool" in props.message.content && props.message.content.tool) {
+    const toolInfo = (props.message.content.tool as ToolInfo["tool"])!;
+
+    const toolName = [
+      "label" in toolInfo && toolInfo.label,
+      "name" in toolInfo && toolInfo.name
+    ].filter(Boolean).join("__");
+
+    if (toolInfo.event === "use") {
+      headerText = `${t("Uso")}: ${toolName}`;
+    } else if (toolInfo.event === "result") {
+      headerText = `${t("Resultado")}: ${toolName}`;
     }
-    case "document": {
-      content = <DocumentMessage {...props.message} />;
-      break;
-    }
-    case "audio": {
-      content = (
-        <AudioMessage
-          {...{
-            message: props.message,
-            orgName: props.orgName || "",
-            convName: props.convName || "",
-          }}
-        />
-      );
-      break;
-    }
-    case "image":
-    case "sticker": {
-      content = <ImageMessage {...props.message} />;
-      break;
-    }
-    case "video": {
-      content = <ImageMessage {...props.message} />; // Reusing ImageMessage for now
-      break;
-    }
-    case "template":
-    case "button":
-    case "interactive":
-    case "contacts":
-    case "location":
-    case "order": {
-      content = <TextMessage {...props.message} />;
-      text = true;
-      break;
+
+    fixedWidth = true;
+  }
+
+  if (props.message.content.type === "text") {
+    content = (
+      <TextMessage
+        header={headerText}
+        body={props.message.content.text}
+        type="markdown"
+        direction={props.message.direction}
+        timestamp={props.message.timestamp}
+        status={props.message.direction === "outgoing" ? props.message.status : undefined}
+        fixedWidth={fixedWidth}
+      />
+    );
+    text = true;
+  } else if (props.message.content.type === "data") {
+    content = (
+      <TextMessage
+        header={headerText}
+        body={props.message.content.data}
+        type="json"
+        direction={props.message.direction}
+        timestamp={props.message.timestamp}
+        status={props.message.direction === "outgoing" ? props.message.status : undefined}
+        fixedWidth={fixedWidth}
+      />
+    );
+    text = true;
+  } else if (props.message.content.type === "file") {
+    switch (props.message.content.kind) {
+      case "audio": {
+        content = (
+          <AudioMessage
+            {...{
+              message: props.message,
+              orgName: props.orgName || "",
+              convName: props.convName || "",
+            }}
+          />
+        );
+        break;
+      }
+      case "image":
+      case "sticker":
+      case "video": {
+        content = <ImageMessage {...props.message} />;
+        break;
+      }
+      case "document":
+      default: {
+        content = <DocumentMessage {...props.message} />;
+        break;
+      }
     }
   }
 
   return (
     <>
       {props.message.direction === "incoming" && (
-        <InMessage {...{ ...props, text }}>{content}</InMessage>
+        <InMessage {...{ ...props, text, fixedWidth }}>{content}</InMessage>
       )}
-      {props.message.direction === "outgoing" && (
-        <OutMessage {...{ ...props, text }}>{content}</OutMessage>
+      {(props.message.direction === "outgoing" || props.message.direction === "internal") && (
+        <OutMessage {...{ ...props, text, internal: props.message.direction === "internal", fixedWidth }}>{content}</OutMessage>
       )}
-      {props.message.direction !== "outgoing" &&
-        props.message.direction !== "incoming" && (
-          <SystemMessage {...props}>
-            <SpecialMessage {...props.message} />
-          </SystemMessage>
-        )}
     </>
   );
 }

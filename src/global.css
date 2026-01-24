@@ -382,3 +382,21 @@ pre {
     gap: 2px;
   }
 }
+/* pretty-print-json theme mapping */
+.json-key {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.json-string {
+  color: var(--ring);
+}
+
+.json-number, 
+.json-boolean {
+  color: var(--primary);
+}
+
+.json-null {
+  color: var(--muted-foreground);
+}

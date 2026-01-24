@@ -16,7 +16,7 @@ dayjs.extend(localizedFormat);
 import { TickContext } from "@/contexts/useTick";
 import { Translate as T, useTranslation } from "@/hooks/useTranslation";
 import { AtSign, Pause } from "lucide-react";
-import { SpecialMessageTypeMap } from "./Message/Message";
+
 import { useCurrentAgents, useCurrentAgent } from "@/queries/useAgents";
 import { useContactByAddress } from "@/queries/useContacts";
 import { useContactAddress } from "@/queries/useContactsAddresses";
@@ -293,18 +293,11 @@ export default function ChatListItem({
                       Plantilla:
                     </T>
                   )}
-                {preview?.direction === "internal" && (
-                  <div className="text-[14px] text-muted-foreground">
-                    {SpecialMessageTypeMap(preview?.content.kind || "")}
-                  </div>
-                )}
-                {preview?.direction !== "internal" && (
-                  <div className="truncate text-[14px]">
-                    {preview?.content.type === "text" || preview?.content.type === "file"
-                      ? preview.content.text
-                      : mediaPreviewContent}
-                  </div>
-                )}
+                <div className="truncate text-[14px]">
+                  {preview?.content.type === "text" && preview.content.text}
+                  {preview?.content.type === "data" && JSON.stringify(preview.content.data)}
+                  {preview?.content.type === "file" && mediaPreviewContent}
+                </div>
               </div>
 
               <div className="flex flex-row items-center">

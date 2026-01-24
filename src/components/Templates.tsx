@@ -8,7 +8,7 @@ import {
 } from "react";
 import useBoundStore from "@/stores/useBoundStore";
 import { supabase, type TemplateMessage, type TemplateData } from "@/supabase/client";
-import { OutMessage, InMessage, BaseMessage } from "./Message/Message";
+import { OutMessage, InMessage, TextMessage } from "./Message/Message";
 import {
   newMessage,
   pushMessageToDb,
@@ -185,12 +185,12 @@ function Template({
   return (
     <div className="relative mx-[16px]">
       <Message first text>
-        <BaseMessage
+        <TextMessage
           header={headPlaceholders}
           body={bodyPlaceholders}
           footer={foot?.text}
           buttons={buttons?.map((b) => b.text)}
-          type="outgoing"
+          direction="outgoing"
           onInput={onInputHandler}
         />
       </Message>
