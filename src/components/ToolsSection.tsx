@@ -5,6 +5,7 @@ import { type Control, useFieldArray, type FieldValues, type UseFormRegister, us
 import SectionBody from "@/components/SectionBody";
 import SectionItem from "@/components/SectionItem";
 import SelectField from "@/components/SelectField";
+import Switch from "@/components/Switch";
 import type { LocalMCPToolConfig, LocalHTTPToolConfig, LocalSQLToolConfig, LocalFunctionToolConfig, ToolConfig } from "@/supabase/client";
 
 type ToolsSectionProps<T extends FieldValues> = {
@@ -236,35 +237,34 @@ export default function ToolsSection<T extends FieldValues>({ control, register,
               <div className="border-t border-border" />
 
               {/* Calculator */}
-              <label className="flex items-start gap-[12px] cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="mt-[4px] w-[18px] h-[18px] accent-primary"
-                  checked={hasSimpleTool("calculator")}
-                  onChange={() => toggleSimpleTool("calculator")}
-                />
+              {/* Calculator */}
+              <label className="flex items-center gap-[12px] cursor-pointer justify-between">
                 <div className="flex-1">
                   <div className="text-foreground">{t("Calculadora")}</div>
                   <p className="text-muted-foreground text-[14px]">
                     {t("Evita errores de cálculo en LLMs")}
                   </p>
                 </div>
+                <Switch
+                  checked={hasSimpleTool("calculator")}
+                  onCheckedChange={() => toggleSimpleTool("calculator")}
+                  className="mt-[4px]"
+                />
               </label>
 
               {/* Transfer to Human */}
-              <label className="flex items-start gap-[12px] cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="mt-[4px] w-[18px] h-[18px] accent-primary"
-                  checked={hasSimpleTool("transfer_to_human_agent")}
-                  onChange={() => toggleSimpleTool("transfer_to_human_agent")}
-                />
+              <label className="flex items-center gap-[12px] cursor-pointer justify-between">
                 <div className="flex-1">
                   <div className="text-foreground">{t("Transferir a humano")}</div>
                   <p className="text-muted-foreground text-[14px]">
-                    {t("Pausa la conversación cuando el agente no conoce la respuesta")}
+                    {t("Dejar que un humano responda cuando no se tiene la respuesta exacta")}
                   </p>
                 </div>
+                <Switch
+                  checked={hasSimpleTool("transfer_to_human_agent")}
+                  onCheckedChange={() => toggleSimpleTool("transfer_to_human_agent")}
+                  className="mt-[4px]"
+                />
               </label>
             </div>
           </SectionBody>
