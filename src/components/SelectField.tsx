@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, ChevronRight, Check } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { Controller, type Control, type FieldValues, type Path } from "react-hook-form";
 
@@ -8,35 +8,55 @@ export interface SelectOption {
   label: string;
 }
 
-// Controlled mode (with react-hook-form)
-interface ControlledSelectFieldProps<T extends FieldValues> {
-  name: Path<T>;
-  control: Control<T>;
+// --- Types ---
+
+interface BaseSelectProps {
   label: string;
   placeholder?: string;
   options: SelectOption[];
   disabled?: boolean;
+}
+
+// Single Select
+interface SingleSelectControlledProps<T extends FieldValues> extends BaseSelectProps {
+  multiple?: false;
+  name: Path<T>;
+  control: Control<T>;
   required?: boolean;
   onValueChange?: (value: string) => void;
 }
 
-// Uncontrolled mode (with value/onChange)
-interface UncontrolledSelectFieldProps {
+interface SingleSelectUncontrolledProps extends BaseSelectProps {
+  multiple?: false;
   value: string;
   onChange: (value: string) => void;
-  label: string;
-  placeholder?: string;
-  options: SelectOption[];
-  disabled?: boolean;
 }
 
+// Multi Select
+interface MultiSelectControlledProps<T extends FieldValues> extends BaseSelectProps {
+  multiple: true;
+  name: Path<T>;
+  control: Control<T>;
+  required?: boolean;
+  onValueChange?: (value: string[]) => void;
+}
+
+interface MultiSelectUncontrolledProps extends BaseSelectProps {
+  multiple: true;
+  value: string[];
+  onChange: (value: string[]) => void;
+}
+
+// Union
 type SelectFieldProps<T extends FieldValues> =
-  | ControlledSelectFieldProps<T>
-  | UncontrolledSelectFieldProps;
+  | SingleSelectControlledProps<T>
+  | SingleSelectUncontrolledProps
+  | MultiSelectControlledProps<T>
+  | MultiSelectUncontrolledProps;
 
 function isControlled<T extends FieldValues>(
   props: SelectFieldProps<T>
-): props is ControlledSelectFieldProps<T> {
+): props is SingleSelectControlledProps<T> | MultiSelectControlledProps<T> {
   return "control" in props;
 }
 
@@ -46,11 +66,29 @@ export default function SelectField<T extends FieldValues>(
   const { translate: t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
-  const { label, placeholder, options, disabled } = props;
+  const { label, placeholder, options, disabled, multiple } = props;
 
   // Render the actual select UI
-  const renderSelect = (value: string | undefined, handleChange: (val: string) => void) => {
-    const selectedOption = options.find((o) => o.value === value);
+  // internally we treat value as string | string[] to share logic
+  const renderSelect = (
+    value: string | string[] | undefined,
+    handleChange: (val: string | string[]) => void
+  ) => {
+    const getDisplayLabel = () => {
+      if (multiple && Array.isArray(value)) {
+        if (value.length === 0) return placeholder || t("Seleccionar...");
+        return options
+          .filter((o) => value.includes(o.value))
+          .map((o) => o.label)
+          .join(", ");
+      }
+      const selectedOption = options.find((o) => o.value === value);
+      return selectedOption?.label || placeholder || t("Seleccionar...");
+    };
+
+    const hasSelection = multiple
+      ? Array.isArray(value) && value.length > 0
+      : !!value;
 
     return (
       <>
@@ -63,14 +101,16 @@ export default function SelectField<T extends FieldValues>(
             onClick={() => !disabled && setIsOpen(true)}
             disabled={disabled}
           >
-            <span className={selectedOption ? "text-foreground" : "text-muted-foreground"}>
-              {selectedOption?.label || placeholder || t("Seleccionar...")}
+            <span
+              className={hasSelection ? "text-foreground" : "text-muted-foreground"}
+            >
+              {getDisplayLabel()}
             </span>
             <ChevronRight className="w-[20px] h-[20px] text-muted-foreground shrink-0" />
           </button>
         </label>
 
-        {/* Options Modal - absolute within left panel (which has relative) */}
+        {/* Options Modal */}
         {isOpen && (
           <div className="absolute inset-0 bottom-[80px] z-50 bg-background flex flex-col">
             {/* Header */}
@@ -88,26 +128,42 @@ export default function SelectField<T extends FieldValues>(
             {/* Options */}
             <div className="flex flex-col overflow-y-auto grow px-[10px]">
               {options.map((option) => {
-                const isSelected = value === option.value;
+                const isSelected = multiple
+                  ? Array.isArray(value) && value.includes(option.value)
+                  : value === option.value;
+
                 return (
                   <button
                     key={option.value}
                     type="button"
                     className="flex items-center gap-[12px] w-full py-[16px] text-left rounded-xl px-[10px]"
                     onClick={() => {
-                      handleChange(option.value);
-                      setIsOpen(false);
+                      if (multiple) {
+                        const currentRef = Array.isArray(value) ? value : [];
+                        const newValue = currentRef.includes(option.value)
+                          ? currentRef.filter((v) => v !== option.value)
+                          : [...currentRef, option.value];
+                        // we know handleChange expects string | string[]
+                        handleChange(newValue);
+                      } else {
+                        handleChange(option.value);
+                        setIsOpen(false);
+                      }
                     }}
                   >
-                    {/* Radio indicator */}
+                    {/* Indicator */}
                     <span
-                      className={`w-[20px] h-[20px] rounded-full border-[2px] flex items-center justify-center shrink-0 ${isSelected
-                          ? "border-primary bg-primary"
-                          : "border-muted-foreground"
-                        }`}
+                      className={`w-[20px] h-[20px] border-[2px] flex items-center justify-center shrink-0 ${isSelected
+                        ? "border-primary bg-primary"
+                        : "border-muted-foreground"
+                        } ${multiple ? "rounded-[4px]" : "rounded-full"}`}
                     >
                       {isSelected && (
-                        <span className="w-[8px] h-[8px] rounded-full bg-primary-foreground" />
+                        multiple ? (
+                          <Check className="w-[14px] h-[14px] text-primary-foreground" />
+                        ) : (
+                          <span className="w-[8px] h-[8px] rounded-full bg-primary-foreground" />
+                        )
                       )}
                     </span>
                     <span className="text-[16px] text-foreground">
@@ -125,7 +181,11 @@ export default function SelectField<T extends FieldValues>(
 
   // Controlled mode: wrap with Controller
   if (isControlled(props)) {
+    // We cast to access properties safely, knowing strict types guide external usage
     const { name, control, required, onValueChange } = props;
+    // We need to cast props to any or specific controlled type because TS can't narrow generic union easily here
+    const isMultiple = props.multiple === true;
+
     return (
       <Controller
         name={name}
@@ -134,13 +194,28 @@ export default function SelectField<T extends FieldValues>(
         render={({ field }) =>
           renderSelect(field.value, (val) => {
             field.onChange(val);
-            onValueChange?.(val);
+            // safe cast because we know usage matches prop
+            if (onValueChange) {
+              if (isMultiple) {
+                (onValueChange as (v: string[]) => void)(val as string[]);
+              } else {
+                (onValueChange as (v: string) => void)(val as string);
+              }
+            }
           })
         }
       />
     );
   }
 
-  // Uncontrolled mode: use value/onChange directly
-  return renderSelect(props.value, props.onChange);
+  // Uncontrolled mode
+  const p = props as unknown as (SingleSelectUncontrolledProps | MultiSelectUncontrolledProps);
+
+  return renderSelect(p.value, (val) => {
+    if (p.multiple) {
+      (p.onChange as (v: string[]) => void)(val as string[]);
+    } else {
+      (p.onChange as (v: string) => void)(val as string);
+    }
+  });
 }

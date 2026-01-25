@@ -78,27 +78,16 @@ function AddWebhook() {
               required
             />
 
-            <label>
-              <div className="label">{t("Operaciones")}</div>
-              <div className="flex gap-4">
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    value="insert"
-                    {...register("operations")}
-                  />
-                  {t("Insertar")}
-                </label>
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    value="update"
-                    {...register("operations")}
-                  />
-                  {t("Actualizar")}
-                </label>
-              </div>
-            </label>
+            <SelectField
+              name="operations"
+              control={control}
+              label={t("Operaciones")}
+              multiple
+              options={[
+                { value: "insert", label: t("Insertar") },
+                { value: "update", label: t("Actualizar") },
+              ]}
+            />
 
             <label>
               <div className="label">{t("Token (opcional)")}</div>
