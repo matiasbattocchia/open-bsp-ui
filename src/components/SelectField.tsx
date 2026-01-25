@@ -106,7 +106,7 @@ export default function SelectField<T extends FieldValues>(
             >
               {getDisplayLabel()}
             </span>
-            <ChevronRight className="w-[20px] h-[20px] text-muted-foreground shrink-0" />
+            <ChevronRight className="w-[20px] h-[20px] ml-[12px] text-muted-foreground shrink-0" />
           </button>
         </label>
 

@@ -117,6 +117,11 @@ a {
   text-decoration: none;
 }
 
+p a,
+.markdown a {
+  color: var(--primary) !important;
+}
+
 button {
   cursor: pointer;
 }

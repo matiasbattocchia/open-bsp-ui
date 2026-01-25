@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AuthIndexRouteImport } from './routes/_auth/index'
+import { Route as OauthCallbackRouteImport } from './routes/oauth/callback'
 import { Route as AuthIntegrationsRouteImport } from './routes/_auth/integrations'
 import { Route as AuthSettingsIndexRouteImport } from './routes/_auth/settings/index'
 import { Route as AuthConversationsIndexRouteImport } from './routes/_auth/conversations/index'
@@ -44,6 +45,11 @@ const AuthIndexRoute = AuthIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthRoute,
+} as any)
+const OauthCallbackRoute = OauthCallbackRouteImport.update({
+  id: '/oauth/callback',
+  path: '/oauth/callback',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthIntegrationsRoute = AuthIntegrationsRouteImport.update({
   id: '/integrations',
@@ -147,6 +153,7 @@ const AuthSettingsApiKeysApiKeyIdRoute =
 export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/integrations': typeof AuthIntegrationsRoute
+  '/oauth/callback': typeof OauthCallbackRoute
   '/': typeof AuthIndexRoute
   '/agents/$agentId': typeof AuthAgentsAgentIdRoute
   '/agents/new': typeof AuthAgentsNewRoute
@@ -169,6 +176,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/integrations': typeof AuthIntegrationsRoute
+  '/oauth/callback': typeof OauthCallbackRoute
   '/': typeof AuthIndexRoute
   '/agents/$agentId': typeof AuthAgentsAgentIdRoute
   '/agents/new': typeof AuthAgentsNewRoute
@@ -193,6 +201,7 @@ export interface FileRoutesById {
   '/_auth': typeof AuthRouteWithChildren
   '/login': typeof LoginRoute
   '/_auth/integrations': typeof AuthIntegrationsRoute
+  '/oauth/callback': typeof OauthCallbackRoute
   '/_auth/': typeof AuthIndexRoute
   '/_auth/agents/$agentId': typeof AuthAgentsAgentIdRoute
   '/_auth/agents/new': typeof AuthAgentsNewRoute
@@ -217,6 +226,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/login'
     | '/integrations'
+    | '/oauth/callback'
     | '/'
     | '/agents/$agentId'
     | '/agents/new'
@@ -239,6 +249,7 @@ export interface FileRouteTypes {
   to:
     | '/login'
     | '/integrations'
+    | '/oauth/callback'
     | '/'
     | '/agents/$agentId'
     | '/agents/new'
@@ -262,6 +273,7 @@ export interface FileRouteTypes {
     | '/_auth'
     | '/login'
     | '/_auth/integrations'
+    | '/oauth/callback'
     | '/_auth/'
     | '/_auth/agents/$agentId'
     | '/_auth/agents/new'
@@ -285,6 +297,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AuthRoute: typeof AuthRouteWithChildren
   LoginRoute: typeof LoginRoute
+  OauthCallbackRoute: typeof OauthCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -309,6 +322,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof AuthIndexRouteImport
       parentRoute: typeof AuthRoute
+    }
+    '/oauth/callback': {
+      id: '/oauth/callback'
+      path: '/oauth/callback'
+      fullPath: '/oauth/callback'
+      preLoaderRoute: typeof OauthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_auth/integrations': {
       id: '/_auth/integrations'
@@ -488,6 +508,7 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRouteWithChildren,
   LoginRoute: LoginRoute,
+  OauthCallbackRoute: OauthCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
