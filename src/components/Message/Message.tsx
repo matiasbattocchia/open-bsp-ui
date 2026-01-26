@@ -24,6 +24,11 @@ const md = new Remarkable({
   typographer: true,
 });
 
+md.renderer.rules.link_open = function (tokens, idx) {
+  const title = tokens[idx].title ? ` title="${tokens[idx].title}"` : "";
+  return `<a href="${tokens[idx].href}"${title} target="_blank" rel="noopener noreferrer">`;
+};
+
 export function Markdown({
   content,
   direction,

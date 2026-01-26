@@ -361,11 +361,6 @@ input[type="range"]::-moz-range-track {
   list-style-type: disc;
 }
 
-.markdown code,
-pre {
-  text-wrap: wrap;
-}
-
 .templateField {
   text-decoration: underline;
   text-decoration-color: #53bdeb;

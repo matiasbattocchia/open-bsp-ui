@@ -8,9 +8,9 @@
 
 - [ ] (enhacement) Media messages colors
 
-- [ ] (enhacement) Internal messages preview
+- [x] (enhacement) Internal messages preview
 
-- [ ] (bug) Error internal messages are shown as incoming in test conversations
+- [x] (bug) Error internal messages are shown as incoming in test conversations
 
 - [ ] (feat) Modals (delete confirmation)
 
@@ -28,7 +28,7 @@
 
 - [ ] (enhancement) Primary button spinner placement to the left of the text
 
-- [ ] (enhancement) Active conversation from another organization
+- [ ] (enhancement) Active conversation or resource in path from another organization
   - The conversation is not in the store
   - Also contacts / contacts_addresses depend on the organization to which the conversation belongs
 
