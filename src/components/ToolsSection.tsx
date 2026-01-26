@@ -198,7 +198,7 @@ export default function ToolsSection<T extends FieldValues>({ control, register,
               <SectionItem
                 key={tool.id}
                 title={tool.label || t("Sin nombre")}
-                description={t("Cliente MCP preconfigurado")}
+                description={tool.config.url || t("Sin URL")}
                 aside={
                   <div className="p-[8px] bg-muted rounded-full">
                     {tool.config.product === "calendar" ? (
@@ -243,19 +243,28 @@ export default function ToolsSection<T extends FieldValues>({ control, register,
             ))}
 
             {/* Existing SQL Clients */}
-            {sqlTools.map((tool) => (
-              <SectionItem
-                key={tool.id}
-                title={tool.label || t("Sin nombre")}
-                description={(tool.config as any)?.driver || t("Sin driver")}
-                aside={
-                  <div className="p-[8px] bg-muted rounded-full">
-                    <Database className="w-[24px] h-[24px] text-muted-foreground" />
-                  </div>
-                }
-                onClick={() => setEditor({ type: "sql", index: tool._index })}
-              />
-            ))}
+            {sqlTools.map((tool) => {
+              const config = tool.config as any;
+              const driver = config.driver || "libsql";
+              // Format: driver://host/db
+              const desc = driver === "libsql"
+                ? `${driver}://${config.url?.replace(/^.*:\/\//, "") || ""}`
+                : `${driver}://${config.host || "localhost"}/${config.database || ""}`;
+
+              return (
+                <SectionItem
+                  key={tool.id}
+                  title={tool.label || t("Sin nombre")}
+                  description={desc}
+                  aside={
+                    <div className="p-[8px] bg-muted rounded-full">
+                      <Database className="w-[24px] h-[24px] text-muted-foreground" />
+                    </div>
+                  }
+                  onClick={() => setEditor({ type: "sql", index: tool._index })}
+                />
+              );
+            })}
 
             {/* Simple Tools (Toggles) */}
 
@@ -864,10 +873,6 @@ function GoogleMCPClientEditor<T extends FieldValues>({
           />
         </label>
 
-        <p>
-          {t("Esta herramienta es un cliente MCP preconfigurado que se conecta a los servicios de Google a través del")} <a href="https://g.mcp.openbsp.dev" target="_blank" rel="noreferrer">servidor MCP de OpenBSP</a>.
-        </p>
-
         {
           product === "calendar" ?
             <p>
@@ -880,7 +885,7 @@ function GoogleMCPClientEditor<T extends FieldValues>({
         }
 
         <p>
-          {t("Para obtener el token, inicia sesión en Google usando el siguiente botón:")}
+          {t("Para obtener el token, inicia sesión en Google desde el")} <a href="https://g.mcp.openbsp.dev" target="_blank" rel="noreferrer">servidor MCP de OpenBSP</a> {t("usando el siguiente botón:")}
         </p>
 
         <button
@@ -890,16 +895,6 @@ function GoogleMCPClientEditor<T extends FieldValues>({
         >
           {t("Obtener token")}
         </button>
-
-        <label>
-          <div className="label">{t("URL")}</div>
-          <input
-            type="url"
-            className="text opacity-50 cursor-not-allowed"
-            readOnly
-            {...register(`extra.tools.${index}.config.url` as any)}
-          />
-        </label>
 
         <label>
           <div className="label">{t("Token")}</div>
