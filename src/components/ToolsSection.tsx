@@ -16,6 +16,7 @@ type ToolsSectionProps<T extends FieldValues> = {
 
 type EditorState =
   | { type: "closed" }
+  | { type: "new-selection" }
   | { type: "mcp"; index: number }
   | { type: "google-mcp"; index: number }
   | { type: "http"; index: number }
@@ -125,8 +126,8 @@ export default function ToolsSection<T extends FieldValues>({ control, register,
 
   const handleAddGoogle = (product: "calendar" | "sheets") => {
     const defaultTools = product === "calendar"
-      ? ["list_calendars", "list_events", "create_event", "update_event", "delete_event"]
-      : ["get_spreadsheet", "read_sheet", "write_sheet", "append_rows", "create_spreadsheet"];
+      ? ["list_calendars", "list_events", "check_availability", "create_event", "update_event", "delete_event"]
+      : ["get_spreadsheet", "get_sheet_schema", "describe_sheet", "search_rows", "read_sheet", "write_sheet", "append_rows", "create_spreadsheet"];
 
     const newTool: LocalMCPToolConfig = {
       provider: "local",
@@ -181,52 +182,15 @@ export default function ToolsSection<T extends FieldValues>({ control, register,
           </div>
 
           <SectionBody>
-            {/* Add buttons */}
+            {/* Add button */}
             <SectionItem
-              title={t("Agregar cliente MCP")}
+              title={t("Agregar herramienta")}
               aside={
                 <div className="p-[8px] bg-primary/10 rounded-full">
                   <Plus className="w-[24px] h-[24px] text-primary" />
                 </div>
               }
-              onClick={handleAddMCP}
-            />
-            <SectionItem
-              title={t("Agregar cliente HTTP")}
-              aside={
-                <div className="p-[8px] bg-primary/10 rounded-full">
-                  <Plus className="w-[24px] h-[24px] text-primary" />
-                </div>
-              }
-              onClick={handleAddHTTP}
-            />
-            <SectionItem
-              title={t("Agregar cliente SQL")}
-              aside={
-                <div className="p-[8px] bg-primary/10 rounded-full">
-                  <Plus className="w-[24px] h-[24px] text-primary" />
-                </div>
-              }
-              onClick={handleAddSQL}
-            />
-
-            <SectionItem
-              title={t("Agregar Google Calendar")}
-              aside={
-                <div className="p-[8px] bg-primary/10 rounded-full">
-                  <Plus className="w-[24px] h-[24px] text-primary" />
-                </div>
-              }
-              onClick={() => handleAddGoogle("calendar")}
-            />
-            <SectionItem
-              title={t("Agregar Google Sheets")}
-              aside={
-                <div className="p-[8px] bg-primary/10 rounded-full">
-                  <Plus className="w-[24px] h-[24px] text-primary" />
-                </div>
-              }
-              onClick={() => handleAddGoogle("sheets")}
+              onClick={() => setEditor({ type: "new-selection" })}
             />
 
             {/* Google Tools */}
@@ -331,6 +295,17 @@ export default function ToolsSection<T extends FieldValues>({ control, register,
             </div>
           </SectionBody>
         </div>
+      )}
+
+      {/* New Tool Selection */}
+      {isOpen && editor.type === "new-selection" && (
+        <NewToolSelection
+          onBack={() => setEditor({ type: "closed" })}
+          onAddMCP={handleAddMCP}
+          onAddHTTP={handleAddHTTP}
+          onAddSQL={handleAddSQL}
+          onAddGoogle={handleAddGoogle}
+        />
       )}
 
       {/* Google MCP Client Editor */}
@@ -672,6 +647,7 @@ function SQLClientEditor<T extends FieldValues>({
             { value: "postgres", label: "PostgreSQL" },
             { value: "mysql", label: "MySQL" },
           ]}
+          modalClassName="bottom-0"
         />
 
         {/* LibSQL-specific fields */}
@@ -835,12 +811,16 @@ function GoogleMCPClientEditor<T extends FieldValues>({
     ? [
       { value: "list_calendars", label: t("Listar calendarios") },
       { value: "list_events", label: t("Listar eventos") },
+      { value: "check_availability", label: t("Verificar disponibilidad") },
       { value: "create_event", label: t("Crear evento") },
       { value: "update_event", label: t("Actualizar evento") },
       { value: "delete_event", label: t("Eliminar evento") },
     ]
     : [
       { value: "get_spreadsheet", label: t("Obtener hoja de cálculo") },
+      { value: "get_sheet_schema", label: t("Obtener esquema de la hoja") },
+      { value: "describe_sheet", label: t("Describir hoja") },
+      { value: "search_rows", label: t("Buscar filas") },
       { value: "read_sheet", label: t("Leer hoja") },
       { value: "write_sheet", label: t("Escribir hoja") },
       { value: "append_rows", label: t("Agregar filas") },
@@ -939,9 +919,98 @@ function GoogleMCPClientEditor<T extends FieldValues>({
           multiple
           options={allowedToolsOptions}
           placeholder={t("Ninguna")}
+          modalClassName="bottom-0"
         />
 
       </SectionBody>
     </div>
   );
 }
+
+// New Tool Selection View
+function NewToolSelection({
+  onBack,
+  onAddMCP,
+  onAddHTTP,
+  onAddSQL,
+  onAddGoogle,
+}: {
+  onBack: () => void;
+  onAddMCP: () => void;
+  onAddHTTP: () => void;
+  onAddSQL: () => void;
+  onAddGoogle: (product: "calendar" | "sheets") => void;
+}) {
+  const { translate: t } = useTranslation();
+
+  return (
+    <div className="absolute inset-0 bottom-[80px] z-50 bg-background flex flex-col">
+      <div className="header items-center truncate shrink-0">
+        <button
+          type="button"
+          className="p-[8px] rounded-full hover:bg-muted mr-[8px] ml-[-8px]"
+          title={t("Volver")}
+          onClick={onBack}
+        >
+          <ArrowLeft className="w-[24px] h-[24px]" />
+        </button>
+        <div className="text-[16px]">{t("Agregar herramienta")}</div>
+      </div>
+
+      <SectionBody>
+        <SectionItem
+          title={t("Cliente MCP")}
+          description={t("Conectar servidor MCP externo")}
+          aside={
+            <div className="p-[8px] bg-muted rounded-full">
+              <Server className="w-[24px] h-[24px] text-muted-foreground" />
+            </div>
+          }
+          onClick={onAddMCP}
+        />
+        <SectionItem
+          title={t("Cliente HTTP")}
+          description={t("Realizar peticiones HTTP")}
+          aside={
+            <div className="p-[8px] bg-muted rounded-full">
+              <Globe className="w-[24px] h-[24px] text-muted-foreground" />
+            </div>
+          }
+          onClick={onAddHTTP}
+        />
+        <SectionItem
+          title={t("Cliente SQL")}
+          description={t("Consultar base de datos")}
+          aside={
+            <div className="p-[8px] bg-muted rounded-full">
+              <Database className="w-[24px] h-[24px] text-muted-foreground" />
+            </div>
+          }
+          onClick={onAddSQL}
+        />
+        <SectionItem
+          title={t("Google Calendar")}
+          description={t("Gestionar eventos y calendarios")}
+          aside={
+            <div className="p-[8px] bg-muted rounded-full">
+              <Calendar className="w-[24px] h-[24px] text-muted-foreground" />
+            </div>
+          }
+          onClick={() => onAddGoogle("calendar")}
+        />
+        <SectionItem
+          title={t("Google Sheets")}
+          description={t("Leer y escribir hojas de cálculo")}
+          aside={
+            <div className="p-[8px] bg-muted rounded-full">
+              <FileSpreadsheet className="w-[24px] h-[24px] text-muted-foreground" />
+            </div>
+          }
+          onClick={() => onAddGoogle("sheets")}
+        />
+      </SectionBody>
+    </div>
+  );
+}
+
+

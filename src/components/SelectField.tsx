@@ -15,6 +15,7 @@ interface BaseSelectProps {
   placeholder?: string;
   options: SelectOption[];
   disabled?: boolean;
+  modalClassName?: string;
 }
 
 // Single Select
@@ -112,7 +113,7 @@ export default function SelectField<T extends FieldValues>(
 
         {/* Options Modal */}
         {isOpen && (
-          <div className="absolute inset-0 bottom-[80px] z-50 bg-background flex flex-col">
+          <div className={`absolute inset-0 z-50 bg-background flex flex-col ${props.modalClassName ?? "bottom-[80px]"}`}>
             {/* Header */}
             <div className="header items-center truncate">
               <button
