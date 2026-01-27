@@ -13,10 +13,11 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AuthIndexRouteImport } from './routes/_auth/index'
 import { Route as OauthCallbackRouteImport } from './routes/oauth/callback'
-import { Route as AuthIntegrationsRouteImport } from './routes/_auth/integrations'
 import { Route as AuthSettingsIndexRouteImport } from './routes/_auth/settings/index'
+import { Route as AuthIntegrationsIndexRouteImport } from './routes/_auth/integrations/index'
 import { Route as AuthConversationsIndexRouteImport } from './routes/_auth/conversations/index'
 import { Route as AuthAgentsIndexRouteImport } from './routes/_auth/agents/index'
+import { Route as AuthIntegrationsAnnotatorRouteImport } from './routes/_auth/integrations/annotator'
 import { Route as AuthConversationsNewRouteImport } from './routes/_auth/conversations/new'
 import { Route as AuthAgentsNewRouteImport } from './routes/_auth/agents/new'
 import { Route as AuthAgentsAgentIdRouteImport } from './routes/_auth/agents/$agentId'
@@ -24,6 +25,7 @@ import { Route as AuthSettingsWebhooksIndexRouteImport } from './routes/_auth/se
 import { Route as AuthSettingsOrganizationIndexRouteImport } from './routes/_auth/settings/organization/index'
 import { Route as AuthSettingsMembersIndexRouteImport } from './routes/_auth/settings/members/index'
 import { Route as AuthSettingsApiKeysIndexRouteImport } from './routes/_auth/settings/api-keys/index'
+import { Route as AuthIntegrationsWhatsappIndexRouteImport } from './routes/_auth/integrations/whatsapp/index'
 import { Route as AuthSettingsWebhooksNewRouteImport } from './routes/_auth/settings/webhooks/new'
 import { Route as AuthSettingsWebhooksWebhookIdRouteImport } from './routes/_auth/settings/webhooks/$webhookId'
 import { Route as AuthSettingsOrganizationNewRouteImport } from './routes/_auth/settings/organization/new'
@@ -31,6 +33,8 @@ import { Route as AuthSettingsMembersNewRouteImport } from './routes/_auth/setti
 import { Route as AuthSettingsMembersMemberIdRouteImport } from './routes/_auth/settings/members/$memberId'
 import { Route as AuthSettingsApiKeysNewRouteImport } from './routes/_auth/settings/api-keys/new'
 import { Route as AuthSettingsApiKeysApiKeyIdRouteImport } from './routes/_auth/settings/api-keys/$apiKeyId'
+import { Route as AuthIntegrationsWhatsappNewRouteImport } from './routes/_auth/integrations/whatsapp/new'
+import { Route as AuthIntegrationsWhatsappOrgAddressIdRouteImport } from './routes/_auth/integrations/whatsapp/$orgAddressId'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -51,14 +55,14 @@ const OauthCallbackRoute = OauthCallbackRouteImport.update({
   path: '/oauth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthIntegrationsRoute = AuthIntegrationsRouteImport.update({
-  id: '/integrations',
-  path: '/integrations',
-  getParentRoute: () => AuthRoute,
-} as any)
 const AuthSettingsIndexRoute = AuthSettingsIndexRouteImport.update({
   id: '/settings/',
   path: '/settings/',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthIntegrationsIndexRoute = AuthIntegrationsIndexRouteImport.update({
+  id: '/integrations/',
+  path: '/integrations/',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthConversationsIndexRoute = AuthConversationsIndexRouteImport.update({
@@ -71,6 +75,12 @@ const AuthAgentsIndexRoute = AuthAgentsIndexRouteImport.update({
   path: '/agents/',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthIntegrationsAnnotatorRoute =
+  AuthIntegrationsAnnotatorRouteImport.update({
+    id: '/integrations/annotator',
+    path: '/integrations/annotator',
+    getParentRoute: () => AuthRoute,
+  } as any)
 const AuthConversationsNewRoute = AuthConversationsNewRouteImport.update({
   id: '/conversations/new',
   path: '/conversations/new',
@@ -108,6 +118,12 @@ const AuthSettingsApiKeysIndexRoute =
   AuthSettingsApiKeysIndexRouteImport.update({
     id: '/settings/api-keys/',
     path: '/settings/api-keys/',
+    getParentRoute: () => AuthRoute,
+  } as any)
+const AuthIntegrationsWhatsappIndexRoute =
+  AuthIntegrationsWhatsappIndexRouteImport.update({
+    id: '/integrations/whatsapp/',
+    path: '/integrations/whatsapp/',
     getParentRoute: () => AuthRoute,
   } as any)
 const AuthSettingsWebhooksNewRoute = AuthSettingsWebhooksNewRouteImport.update({
@@ -149,18 +165,33 @@ const AuthSettingsApiKeysApiKeyIdRoute =
     path: '/settings/api-keys/$apiKeyId',
     getParentRoute: () => AuthRoute,
   } as any)
+const AuthIntegrationsWhatsappNewRoute =
+  AuthIntegrationsWhatsappNewRouteImport.update({
+    id: '/integrations/whatsapp/new',
+    path: '/integrations/whatsapp/new',
+    getParentRoute: () => AuthRoute,
+  } as any)
+const AuthIntegrationsWhatsappOrgAddressIdRoute =
+  AuthIntegrationsWhatsappOrgAddressIdRouteImport.update({
+    id: '/integrations/whatsapp/$orgAddressId',
+    path: '/integrations/whatsapp/$orgAddressId',
+    getParentRoute: () => AuthRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
-  '/integrations': typeof AuthIntegrationsRoute
   '/oauth/callback': typeof OauthCallbackRoute
   '/': typeof AuthIndexRoute
   '/agents/$agentId': typeof AuthAgentsAgentIdRoute
   '/agents/new': typeof AuthAgentsNewRoute
   '/conversations/new': typeof AuthConversationsNewRoute
+  '/integrations/annotator': typeof AuthIntegrationsAnnotatorRoute
   '/agents': typeof AuthAgentsIndexRoute
   '/conversations': typeof AuthConversationsIndexRoute
+  '/integrations': typeof AuthIntegrationsIndexRoute
   '/settings': typeof AuthSettingsIndexRoute
+  '/integrations/whatsapp/$orgAddressId': typeof AuthIntegrationsWhatsappOrgAddressIdRoute
+  '/integrations/whatsapp/new': typeof AuthIntegrationsWhatsappNewRoute
   '/settings/api-keys/$apiKeyId': typeof AuthSettingsApiKeysApiKeyIdRoute
   '/settings/api-keys/new': typeof AuthSettingsApiKeysNewRoute
   '/settings/members/$memberId': typeof AuthSettingsMembersMemberIdRoute
@@ -168,6 +199,7 @@ export interface FileRoutesByFullPath {
   '/settings/organization/new': typeof AuthSettingsOrganizationNewRoute
   '/settings/webhooks/$webhookId': typeof AuthSettingsWebhooksWebhookIdRoute
   '/settings/webhooks/new': typeof AuthSettingsWebhooksNewRoute
+  '/integrations/whatsapp': typeof AuthIntegrationsWhatsappIndexRoute
   '/settings/api-keys': typeof AuthSettingsApiKeysIndexRoute
   '/settings/members': typeof AuthSettingsMembersIndexRoute
   '/settings/organization': typeof AuthSettingsOrganizationIndexRoute
@@ -175,15 +207,18 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
-  '/integrations': typeof AuthIntegrationsRoute
   '/oauth/callback': typeof OauthCallbackRoute
   '/': typeof AuthIndexRoute
   '/agents/$agentId': typeof AuthAgentsAgentIdRoute
   '/agents/new': typeof AuthAgentsNewRoute
   '/conversations/new': typeof AuthConversationsNewRoute
+  '/integrations/annotator': typeof AuthIntegrationsAnnotatorRoute
   '/agents': typeof AuthAgentsIndexRoute
   '/conversations': typeof AuthConversationsIndexRoute
+  '/integrations': typeof AuthIntegrationsIndexRoute
   '/settings': typeof AuthSettingsIndexRoute
+  '/integrations/whatsapp/$orgAddressId': typeof AuthIntegrationsWhatsappOrgAddressIdRoute
+  '/integrations/whatsapp/new': typeof AuthIntegrationsWhatsappNewRoute
   '/settings/api-keys/$apiKeyId': typeof AuthSettingsApiKeysApiKeyIdRoute
   '/settings/api-keys/new': typeof AuthSettingsApiKeysNewRoute
   '/settings/members/$memberId': typeof AuthSettingsMembersMemberIdRoute
@@ -191,6 +226,7 @@ export interface FileRoutesByTo {
   '/settings/organization/new': typeof AuthSettingsOrganizationNewRoute
   '/settings/webhooks/$webhookId': typeof AuthSettingsWebhooksWebhookIdRoute
   '/settings/webhooks/new': typeof AuthSettingsWebhooksNewRoute
+  '/integrations/whatsapp': typeof AuthIntegrationsWhatsappIndexRoute
   '/settings/api-keys': typeof AuthSettingsApiKeysIndexRoute
   '/settings/members': typeof AuthSettingsMembersIndexRoute
   '/settings/organization': typeof AuthSettingsOrganizationIndexRoute
@@ -200,15 +236,18 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_auth': typeof AuthRouteWithChildren
   '/login': typeof LoginRoute
-  '/_auth/integrations': typeof AuthIntegrationsRoute
   '/oauth/callback': typeof OauthCallbackRoute
   '/_auth/': typeof AuthIndexRoute
   '/_auth/agents/$agentId': typeof AuthAgentsAgentIdRoute
   '/_auth/agents/new': typeof AuthAgentsNewRoute
   '/_auth/conversations/new': typeof AuthConversationsNewRoute
+  '/_auth/integrations/annotator': typeof AuthIntegrationsAnnotatorRoute
   '/_auth/agents/': typeof AuthAgentsIndexRoute
   '/_auth/conversations/': typeof AuthConversationsIndexRoute
+  '/_auth/integrations/': typeof AuthIntegrationsIndexRoute
   '/_auth/settings/': typeof AuthSettingsIndexRoute
+  '/_auth/integrations/whatsapp/$orgAddressId': typeof AuthIntegrationsWhatsappOrgAddressIdRoute
+  '/_auth/integrations/whatsapp/new': typeof AuthIntegrationsWhatsappNewRoute
   '/_auth/settings/api-keys/$apiKeyId': typeof AuthSettingsApiKeysApiKeyIdRoute
   '/_auth/settings/api-keys/new': typeof AuthSettingsApiKeysNewRoute
   '/_auth/settings/members/$memberId': typeof AuthSettingsMembersMemberIdRoute
@@ -216,6 +255,7 @@ export interface FileRoutesById {
   '/_auth/settings/organization/new': typeof AuthSettingsOrganizationNewRoute
   '/_auth/settings/webhooks/$webhookId': typeof AuthSettingsWebhooksWebhookIdRoute
   '/_auth/settings/webhooks/new': typeof AuthSettingsWebhooksNewRoute
+  '/_auth/integrations/whatsapp/': typeof AuthIntegrationsWhatsappIndexRoute
   '/_auth/settings/api-keys/': typeof AuthSettingsApiKeysIndexRoute
   '/_auth/settings/members/': typeof AuthSettingsMembersIndexRoute
   '/_auth/settings/organization/': typeof AuthSettingsOrganizationIndexRoute
@@ -225,15 +265,18 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/login'
-    | '/integrations'
     | '/oauth/callback'
     | '/'
     | '/agents/$agentId'
     | '/agents/new'
     | '/conversations/new'
+    | '/integrations/annotator'
     | '/agents'
     | '/conversations'
+    | '/integrations'
     | '/settings'
+    | '/integrations/whatsapp/$orgAddressId'
+    | '/integrations/whatsapp/new'
     | '/settings/api-keys/$apiKeyId'
     | '/settings/api-keys/new'
     | '/settings/members/$memberId'
@@ -241,6 +284,7 @@ export interface FileRouteTypes {
     | '/settings/organization/new'
     | '/settings/webhooks/$webhookId'
     | '/settings/webhooks/new'
+    | '/integrations/whatsapp'
     | '/settings/api-keys'
     | '/settings/members'
     | '/settings/organization'
@@ -248,15 +292,18 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
-    | '/integrations'
     | '/oauth/callback'
     | '/'
     | '/agents/$agentId'
     | '/agents/new'
     | '/conversations/new'
+    | '/integrations/annotator'
     | '/agents'
     | '/conversations'
+    | '/integrations'
     | '/settings'
+    | '/integrations/whatsapp/$orgAddressId'
+    | '/integrations/whatsapp/new'
     | '/settings/api-keys/$apiKeyId'
     | '/settings/api-keys/new'
     | '/settings/members/$memberId'
@@ -264,6 +311,7 @@ export interface FileRouteTypes {
     | '/settings/organization/new'
     | '/settings/webhooks/$webhookId'
     | '/settings/webhooks/new'
+    | '/integrations/whatsapp'
     | '/settings/api-keys'
     | '/settings/members'
     | '/settings/organization'
@@ -272,15 +320,18 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_auth'
     | '/login'
-    | '/_auth/integrations'
     | '/oauth/callback'
     | '/_auth/'
     | '/_auth/agents/$agentId'
     | '/_auth/agents/new'
     | '/_auth/conversations/new'
+    | '/_auth/integrations/annotator'
     | '/_auth/agents/'
     | '/_auth/conversations/'
+    | '/_auth/integrations/'
     | '/_auth/settings/'
+    | '/_auth/integrations/whatsapp/$orgAddressId'
+    | '/_auth/integrations/whatsapp/new'
     | '/_auth/settings/api-keys/$apiKeyId'
     | '/_auth/settings/api-keys/new'
     | '/_auth/settings/members/$memberId'
@@ -288,6 +339,7 @@ export interface FileRouteTypes {
     | '/_auth/settings/organization/new'
     | '/_auth/settings/webhooks/$webhookId'
     | '/_auth/settings/webhooks/new'
+    | '/_auth/integrations/whatsapp/'
     | '/_auth/settings/api-keys/'
     | '/_auth/settings/members/'
     | '/_auth/settings/organization/'
@@ -330,18 +382,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OauthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_auth/integrations': {
-      id: '/_auth/integrations'
-      path: '/integrations'
-      fullPath: '/integrations'
-      preLoaderRoute: typeof AuthIntegrationsRouteImport
-      parentRoute: typeof AuthRoute
-    }
     '/_auth/settings/': {
       id: '/_auth/settings/'
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof AuthSettingsIndexRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/integrations/': {
+      id: '/_auth/integrations/'
+      path: '/integrations'
+      fullPath: '/integrations'
+      preLoaderRoute: typeof AuthIntegrationsIndexRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_auth/conversations/': {
@@ -356,6 +408,13 @@ declare module '@tanstack/react-router' {
       path: '/agents'
       fullPath: '/agents'
       preLoaderRoute: typeof AuthAgentsIndexRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/integrations/annotator': {
+      id: '/_auth/integrations/annotator'
+      path: '/integrations/annotator'
+      fullPath: '/integrations/annotator'
+      preLoaderRoute: typeof AuthIntegrationsAnnotatorRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_auth/conversations/new': {
@@ -407,6 +466,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSettingsApiKeysIndexRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/integrations/whatsapp/': {
+      id: '/_auth/integrations/whatsapp/'
+      path: '/integrations/whatsapp'
+      fullPath: '/integrations/whatsapp'
+      preLoaderRoute: typeof AuthIntegrationsWhatsappIndexRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/settings/webhooks/new': {
       id: '/_auth/settings/webhooks/new'
       path: '/settings/webhooks/new'
@@ -456,18 +522,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSettingsApiKeysApiKeyIdRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/integrations/whatsapp/new': {
+      id: '/_auth/integrations/whatsapp/new'
+      path: '/integrations/whatsapp/new'
+      fullPath: '/integrations/whatsapp/new'
+      preLoaderRoute: typeof AuthIntegrationsWhatsappNewRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/integrations/whatsapp/$orgAddressId': {
+      id: '/_auth/integrations/whatsapp/$orgAddressId'
+      path: '/integrations/whatsapp/$orgAddressId'
+      fullPath: '/integrations/whatsapp/$orgAddressId'
+      preLoaderRoute: typeof AuthIntegrationsWhatsappOrgAddressIdRouteImport
+      parentRoute: typeof AuthRoute
+    }
   }
 }
 
 interface AuthRouteChildren {
-  AuthIntegrationsRoute: typeof AuthIntegrationsRoute
   AuthIndexRoute: typeof AuthIndexRoute
   AuthAgentsAgentIdRoute: typeof AuthAgentsAgentIdRoute
   AuthAgentsNewRoute: typeof AuthAgentsNewRoute
   AuthConversationsNewRoute: typeof AuthConversationsNewRoute
+  AuthIntegrationsAnnotatorRoute: typeof AuthIntegrationsAnnotatorRoute
   AuthAgentsIndexRoute: typeof AuthAgentsIndexRoute
   AuthConversationsIndexRoute: typeof AuthConversationsIndexRoute
+  AuthIntegrationsIndexRoute: typeof AuthIntegrationsIndexRoute
   AuthSettingsIndexRoute: typeof AuthSettingsIndexRoute
+  AuthIntegrationsWhatsappOrgAddressIdRoute: typeof AuthIntegrationsWhatsappOrgAddressIdRoute
+  AuthIntegrationsWhatsappNewRoute: typeof AuthIntegrationsWhatsappNewRoute
   AuthSettingsApiKeysApiKeyIdRoute: typeof AuthSettingsApiKeysApiKeyIdRoute
   AuthSettingsApiKeysNewRoute: typeof AuthSettingsApiKeysNewRoute
   AuthSettingsMembersMemberIdRoute: typeof AuthSettingsMembersMemberIdRoute
@@ -475,6 +558,7 @@ interface AuthRouteChildren {
   AuthSettingsOrganizationNewRoute: typeof AuthSettingsOrganizationNewRoute
   AuthSettingsWebhooksWebhookIdRoute: typeof AuthSettingsWebhooksWebhookIdRoute
   AuthSettingsWebhooksNewRoute: typeof AuthSettingsWebhooksNewRoute
+  AuthIntegrationsWhatsappIndexRoute: typeof AuthIntegrationsWhatsappIndexRoute
   AuthSettingsApiKeysIndexRoute: typeof AuthSettingsApiKeysIndexRoute
   AuthSettingsMembersIndexRoute: typeof AuthSettingsMembersIndexRoute
   AuthSettingsOrganizationIndexRoute: typeof AuthSettingsOrganizationIndexRoute
@@ -482,14 +566,18 @@ interface AuthRouteChildren {
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
-  AuthIntegrationsRoute: AuthIntegrationsRoute,
   AuthIndexRoute: AuthIndexRoute,
   AuthAgentsAgentIdRoute: AuthAgentsAgentIdRoute,
   AuthAgentsNewRoute: AuthAgentsNewRoute,
   AuthConversationsNewRoute: AuthConversationsNewRoute,
+  AuthIntegrationsAnnotatorRoute: AuthIntegrationsAnnotatorRoute,
   AuthAgentsIndexRoute: AuthAgentsIndexRoute,
   AuthConversationsIndexRoute: AuthConversationsIndexRoute,
+  AuthIntegrationsIndexRoute: AuthIntegrationsIndexRoute,
   AuthSettingsIndexRoute: AuthSettingsIndexRoute,
+  AuthIntegrationsWhatsappOrgAddressIdRoute:
+    AuthIntegrationsWhatsappOrgAddressIdRoute,
+  AuthIntegrationsWhatsappNewRoute: AuthIntegrationsWhatsappNewRoute,
   AuthSettingsApiKeysApiKeyIdRoute: AuthSettingsApiKeysApiKeyIdRoute,
   AuthSettingsApiKeysNewRoute: AuthSettingsApiKeysNewRoute,
   AuthSettingsMembersMemberIdRoute: AuthSettingsMembersMemberIdRoute,
@@ -497,6 +585,7 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthSettingsOrganizationNewRoute: AuthSettingsOrganizationNewRoute,
   AuthSettingsWebhooksWebhookIdRoute: AuthSettingsWebhooksWebhookIdRoute,
   AuthSettingsWebhooksNewRoute: AuthSettingsWebhooksNewRoute,
+  AuthIntegrationsWhatsappIndexRoute: AuthIntegrationsWhatsappIndexRoute,
   AuthSettingsApiKeysIndexRoute: AuthSettingsApiKeysIndexRoute,
   AuthSettingsMembersIndexRoute: AuthSettingsMembersIndexRoute,
   AuthSettingsOrganizationIndexRoute: AuthSettingsOrganizationIndexRoute,
