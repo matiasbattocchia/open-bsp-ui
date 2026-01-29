@@ -164,7 +164,14 @@ export default function ToolsSection<T extends FieldValues>({ control, register,
         className="text w-full flex justify-between items-center text-left"
         onClick={() => setIsOpen(true)}
       >
-        <span className="text-foreground">{t("Herramientas")}</span>
+        <div className="flex flex-col gap-[2px]">
+          <span className="text-foreground">{t("Herramientas")}</span>
+          <span className="text-muted-foreground text-[14px]">
+            {allTools.length > 0
+              ? `${allTools.length} ${allTools.length === 1 ? t("herramienta") : t("herramientas")}`
+              : t("Ninguna")}
+          </span>
+        </div>
         <ChevronRight className="w-[20px] h-[20px] text-muted-foreground shrink-0" />
       </button>
 
@@ -276,7 +283,7 @@ export default function ToolsSection<T extends FieldValues>({ control, register,
               {/* Calculator */}
               {/* Calculator */}
               <label className="flex items-center gap-[12px] cursor-pointer justify-between">
-                <div className="flex-1">
+                <div className="flex flex-col gap-[2px]">
                   <div className="text-foreground">{t("Calculadora")}</div>
                   <p className="text-muted-foreground text-[14px]">
                     {t("Evita errores de cálculo en LLMs")}
@@ -291,7 +298,7 @@ export default function ToolsSection<T extends FieldValues>({ control, register,
 
               {/* Transfer to Human */}
               <label className="flex items-center gap-[12px] cursor-pointer justify-between">
-                <div className="flex-1">
+                <div className="flex flex-col gap-[2px]">
                   <div className="text-foreground">{t("Transferir a humano")}</div>
                   <p className="text-muted-foreground text-[14px]">
                     {t("Dejar que un humano responda cuando no se tiene la respuesta exacta")}

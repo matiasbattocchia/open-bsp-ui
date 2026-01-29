@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import SectionHeader from "@/components/SectionHeader";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAgent, useDeleteAgent, useUpdateAgent, useCurrentAgent } from "@/queries/useAgents";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import SectionBody from "@/components/SectionBody";
 import useBoundStore from "@/stores/useBoundStore";
 import { type AIAgentRow, type AIAgentUpdate } from "@/supabase/client";
@@ -63,6 +63,8 @@ function AgentDetail() {
     control,
     formState: { isDirty, isValid },
   } = useForm<AIAgentUpdate>({ values: normalizedAgent });
+
+  const model = useWatch({ control, name: "extra.model" });
 
   const handleChat = () => {
     if (!activeOrgId || !localAddress) return;
@@ -132,7 +134,7 @@ function AgentDetail() {
           <ToolsSection control={control} register={register} setValue={setValue} />
 
           {/* AI Section */}
-          <SectionField label={t("Modelo de IA")}>
+          <SectionField label={t("Modelo de IA")} description={model || t("Ninguno")}>
             <SelectField
               value={provider}
               onChange={(val) => {

@@ -5,12 +5,14 @@ import SectionBody from "@/components/SectionBody";
 
 interface SectionFieldProps {
   label: string;
+  description?: string;
   children: ReactNode;
   disabled?: boolean;
 }
 
 export default function SectionField({
   label,
+  description,
   children,
   disabled,
 }: SectionFieldProps) {
@@ -26,7 +28,10 @@ export default function SectionField({
         onClick={() => !disabled && setIsOpen(true)}
         disabled={disabled}
       >
-        <span className="text-foreground">{label}</span>
+        <div className="flex flex-col gap-[2px]">
+          <span className="text-foreground">{label}</span>
+          {description && <span className="text-muted-foreground text-[14px]">{description}</span>}
+        </div>
         <ChevronRight className="w-[20px] h-[20px] text-muted-foreground shrink-0" />
       </button>
 

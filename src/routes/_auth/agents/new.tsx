@@ -3,7 +3,7 @@ import SectionHeader from "@/components/SectionHeader";
 import SectionFooter from "@/components/SectionFooter";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useCreateAgent, useCurrentAgent } from "@/queries/useAgents";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import SectionBody from "@/components/SectionBody";
 import { type AIAgentInsert, type AIAgentExtra } from "@/supabase/client";
 import { useState } from "react";
@@ -56,6 +56,8 @@ function AddAgent() {
       }
     },
   });
+
+  const model = useWatch({ control, name: "extra.model" });
 
   const onSubmit = (data: AIAgentInsert) => {
     createAgent.mutate(
@@ -118,7 +120,7 @@ function AddAgent() {
             <ToolsSection control={control} register={register} setValue={setValue} />
 
             {/* AI Section */}
-            <SectionField label={t("Modelo de IA")}>
+            <SectionField label={t("Modelo de IA")} description={model || t("Ninguno")}>
               <SelectField
                 value={provider}
                 onChange={(val) => {
@@ -167,7 +169,7 @@ function AddAgent() {
               )}
 
               <label>
-                <div className="label">{t("API Key")}</div>
+                <div className="label">{t("Clave API")}</div>
                 <input
                   type="text"
                   className="text"

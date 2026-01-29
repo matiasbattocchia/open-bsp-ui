@@ -67,11 +67,6 @@ function ListAgents() {
             }
           />
         ))}
-        {agents?.length === 0 && (
-          <div className="p-8 text-center text-muted-foreground text-sm">
-            {t("No tienes agentes AI configurados.")}
-          </div>
-        )}
       </SectionBody>
     </>
   );

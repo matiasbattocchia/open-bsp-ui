@@ -15,8 +15,8 @@ function ListMembers() {
   const { translate: t } = useTranslation();
   const navigate = useNavigate();
   const { data: agents } = useCurrentAgents();
-  const { data: agent } = useCurrentAgent();
-  const isOwner = agent?.extra?.role === "owner";
+  const { data: currentAgent } = useCurrentAgent();
+  const isOwner = currentAgent?.extra?.role === "owner";
 
   const roles: Record<string, string> = {
     "owner": t("Propietario"),
@@ -50,10 +50,11 @@ function ListMembers() {
           .map((agent) => {
             const role = roles[agent.extra?.role || "member"];
             const pending = agent.extra?.invitation?.status === "pending";
+            const isMe = agent.id === currentAgent?.id;
 
             return (<SectionItem
               key={agent.id}
-              title={agent.name}
+              title={agent.name + (isMe ? ` (${t("tú")})` : "")}
               description={role + (pending ? ` (${t("pendiente")})` : "")}
               aside={
                 <Avatar

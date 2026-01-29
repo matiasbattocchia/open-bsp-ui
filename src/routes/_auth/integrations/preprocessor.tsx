@@ -61,7 +61,7 @@ function AnnotatorSettings() {
             name="extra.annotations.mode"
             render={({ field }) => (
               <label className="flex items-center gap-[12px] cursor-pointer justify-between">
-                <div className="flex-1">
+                <div className="flex flex-col gap-[2px]">
                   <div className="text-foreground">{t("Estado")}</div>
                 </div>
                 <Switch
