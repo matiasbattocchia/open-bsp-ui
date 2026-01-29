@@ -2,8 +2,9 @@ import { ArrowLeft, Trash2, X } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useLocation, useRouter } from "@tanstack/react-router";
 import { LinkButton } from "./LinkButton";
+import Spinner from "./Spinner";
 
-export default function SectionHeader({ title, closeButton, onDelete, deleteDisabled, deleteDisabledReason }: { title: string; closeButton?: boolean; onDelete?: () => void; deleteDisabled?: boolean; deleteDisabledReason?: string }) {
+export default function SectionHeader({ title, closeButton, onDelete, deleteDisabled, deleteDisabledReason, deleteLoading }: { title: string; closeButton?: boolean; onDelete?: () => void; deleteDisabled?: boolean; deleteDisabledReason?: string; deleteLoading?: boolean }) {
   const { translate: t } = useTranslation();
   const location = useLocation();
   const router = useRouter();
@@ -48,9 +49,9 @@ export default function SectionHeader({ title, closeButton, onDelete, deleteDisa
             ? `${t("Eliminar")} - ${deleteDisabledReason}`
             : t("Eliminar")}
           onClick={onDelete}
-          disabled={deleteDisabled} // Ensure this prop is passed to disable the button
+          disabled={deleteDisabled || deleteLoading}
         >
-          <Trash2 className="w-[24px] h-[24px]" />
+          {deleteLoading ? <Spinner size={24} /> : <Trash2 className="w-[24px] h-[24px]" />}
         </button>
       )}
     </div>

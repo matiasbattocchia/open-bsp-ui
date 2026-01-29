@@ -60,11 +60,12 @@ function EditOrganization() {
         onDelete={() => deleteOrg.mutate(undefined, {
           onSuccess: () => {
             setActiveOrg(null);
-            navigate({ to: "..", hash: (prevHash) => prevHash! })
+            navigate({ to: "/conversations" })
           }
         })}
         deleteDisabled={!isOwner}
         deleteDisabledReason={t("Requiere permisos de propietario")}
+        deleteLoading={deleteOrg.isPending}
       />
 
       <SectionBody>

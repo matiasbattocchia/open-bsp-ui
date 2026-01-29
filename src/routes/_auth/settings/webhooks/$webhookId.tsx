@@ -42,6 +42,7 @@ function EditWebhook() {
         })}
         deleteDisabled={!isAdmin}
         deleteDisabledReason={t("Requiere permisos de administrador")}
+        deleteLoading={deleteWebhook.isPending}
       />
 
       <SectionBody>

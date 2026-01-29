@@ -77,14 +77,19 @@ export default function SelectField<T extends FieldValues>(
   ) => {
     const getDisplayLabel = () => {
       if (multiple && Array.isArray(value)) {
-        if (value.length === 0) return placeholder || t("Seleccionar...");
-        return options
+        if (value.length === 0) return placeholder || t("Seleccionar") + "...";
+        const selectedLabels = options
           .filter((o) => value.includes(o.value))
-          .map((o) => o.label)
-          .join(", ");
+          .map((o) => o.label);
+        if (selectedLabels.length <= 5) {
+          return selectedLabels.join(", ");
+        }
+        const first5 = selectedLabels.slice(0, 5).join(", ");
+        const remaining = selectedLabels.length - 5;
+        return `${first5} ${t("y")} ${remaining} ${t("más")}...`;
       }
       const selectedOption = options.find((o) => o.value === value);
-      return selectedOption?.label || placeholder || t("Seleccionar...");
+      return selectedOption?.label || placeholder || t("Seleccionar") + "...";
     };
 
     const hasSelection = multiple

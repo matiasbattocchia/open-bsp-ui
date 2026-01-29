@@ -89,6 +89,7 @@ function AgentDetail() {
         }}
         deleteDisabled={!isAdmin}
         deleteDisabledReason={t("Requiere permisos de administrador")}
+        deleteLoading={deleteAgent.isPending}
       />
 
       <SectionBody>

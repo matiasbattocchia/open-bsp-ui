@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { ArrowLeft, Calendar, ChevronRight, Database, FileSpreadsheet, Globe, Plus, Server, Trash2 } from "lucide-react";
+import { useState, useRef } from "react";
+import { ArrowLeft, Calendar, Check, ChevronRight, Database, FileSpreadsheet, Globe, Plus, Server, Trash2 } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { type Control, useFieldArray, type FieldValues, type UseFormRegister, useWatch, type UseFormSetValue } from "react-hook-form";
 import SectionBody from "@/components/SectionBody";
@@ -29,7 +29,7 @@ export default function ToolsSection<T extends FieldValues>({ control, register,
 
   // useFieldArray for structure (IDs) and operations (append/remove)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, update } = useFieldArray({
     control,
     name: "extra.tools" as any,
   });
@@ -107,7 +107,9 @@ export default function ToolsSection<T extends FieldValues>({ control, register,
       provider: "local",
       type: "http",
       label: "",
-      config: {},
+      config: {
+        methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+      },
     };
     append(newTool as any);
     setEditor({ type: "http", index: fields.length });
@@ -127,7 +129,7 @@ export default function ToolsSection<T extends FieldValues>({ control, register,
   const handleAddGoogle = (product: "calendar" | "sheets") => {
     const defaultTools = product === "calendar"
       ? ["list_calendars", "list_events", "check_availability", "create_event", "update_event", "delete_event"]
-      : ["get_spreadsheet", "get_sheet_schema", "describe_sheet", "search_rows", "read_sheet", "write_sheet", "append_rows", "create_spreadsheet"];
+      : ["list_authorized_files", "get_spreadsheet", "get_sheet_schema", "describe_sheet", "search_rows", "read_sheet", "write_sheet", "append_rows", "create_spreadsheet"];
 
     const newTool: LocalMCPToolConfig = {
       provider: "local",
@@ -324,6 +326,7 @@ export default function ToolsSection<T extends FieldValues>({ control, register,
           register={register}
           control={control}
           setValue={setValue}
+          updateTool={(idx, data) => update(idx, data as any)}
           onDelete={() => {
             handleDeleteTool(editor.index);
             setEditor({ type: "closed" });
@@ -540,13 +543,28 @@ function HTTPClientEditor<T extends FieldValues>({
           />
         </label>
 
+        <SelectField
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          name={`extra.tools.${index}.config.methods` as any}
+          control={control}
+          label={t("Métodos")}
+          multiple
+          options={[
+            { value: "GET", label: "GET" },
+            { value: "POST", label: "POST" },
+            { value: "PUT", label: "PUT" },
+            { value: "PATCH", label: "PATCH" },
+            { value: "DELETE", label: "DELETE" },
+          ]}
+        />
+
         <label>
           <div className="label">{t("URL base")} ({t("opcional")})</div>
           <input
             type="url"
             className="text"
             placeholder="https://api.example.com"
-            {...register(`extra.tools.${index}.config.url` as any)}
+            {...register(`extra.tools.${index}.config.base_url` as any)}
           />
         </label>
 
@@ -748,6 +766,7 @@ function GoogleMCPClientEditor<T extends FieldValues>({
   register,
   control,
   setValue,
+  updateTool,
   onDelete,
   onBack,
 }: {
@@ -755,6 +774,7 @@ function GoogleMCPClientEditor<T extends FieldValues>({
   register: UseFormRegister<T>;
   control: Control<T>;
   setValue: UseFormSetValue<T>;
+  updateTool: (index: number, data: ToolConfig) => void;
   onDelete: () => void;
   onBack: () => void;
 }) {
@@ -766,6 +786,14 @@ function GoogleMCPClientEditor<T extends FieldValues>({
   const label = (useWatch({ control, name: `extra.tools.${index}.label` as any }) as string) || "";
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const token = (useWatch({ control, name: `extra.tools.${index}.config.headers.authorization` as any }) as string) || "";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const files = (useWatch({ control, name: `extra.tools.${index}.config.files` as any }) as string[]) || [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const allowedTools = (useWatch({ control, name: `extra.tools.${index}.config.allowed_tools` as any }) as string[]) || [];
+
+  // Keep a ref with fresh values that the callback can access
+  const currentValuesRef = useRef({ label, token, files, allowedTools, product });
+  currentValuesRef.current = { label, token, files, allowedTools, product };
 
   const isValid = label.trim() !== "" && token.trim() !== "";
   const isEmpty = label.trim() === "" && token.trim() === "";
@@ -804,9 +832,30 @@ function GoogleMCPClientEditor<T extends FieldValues>({
       if (event.origin !== window.location.origin) return;
 
       if (event.data?.type === "oauth-callback" && event.data?.apiKey) {
-        // Set the token
+        // Build tool from fresh ref values (not stale closure data)
+        const { label: freshLabel, files: freshFiles, allowedTools: freshAllowedTools, product: freshProduct } = currentValuesRef.current;
+        const newToken = `Bearer ${event.data.apiKey}`;
+        const updatedTool: LocalMCPToolConfig = {
+          provider: "local",
+          type: "mcp",
+          label: freshLabel,
+          config: {
+            url: "https://g.mcp.openbsp.dev/mcp",
+            product: freshProduct as "calendar" | "sheets",
+            allowed_tools: freshAllowedTools,
+            files: event.data?.files
+              ? (typeof event.data.files === 'string' ? event.data.files.split(',') : [])
+              : freshFiles,
+            headers: {
+              authorization: newToken,
+            },
+          },
+        };
+        updateTool(index, updatedTool);
+
+        // Explicitly set the token field to force dirty state
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        setValue(`extra.tools.${index}.config.headers.authorization` as any, `Bearer ${event.data.apiKey}` as any, { shouldDirty: true });
+        setValue(`extra.tools.${index}.config.headers.authorization` as any, newToken as any, { shouldDirty: true, shouldValidate: true, shouldTouch: true });
 
         // Remove listener
         window.removeEventListener("message", handleMessage);
@@ -826,6 +875,7 @@ function GoogleMCPClientEditor<T extends FieldValues>({
       { value: "delete_event", label: t("Eliminar evento") },
     ]
     : [
+      { value: "list_authorized_files", label: t("Listar archivos autorizados") },
       { value: "get_spreadsheet", label: t("Obtener hoja de cálculo") },
       { value: "get_sheet_schema", label: t("Obtener esquema de la hoja") },
       { value: "describe_sheet", label: t("Describir hoja") },
@@ -873,38 +923,38 @@ function GoogleMCPClientEditor<T extends FieldValues>({
           />
         </label>
 
-        {
-          product === "calendar" ?
-            <p>
-              {t("Es recomendable activar la variable de fecha y hora actual en las instrucciones del agente.")}
-            </p>
-            :
-            <p>
-              {t("Es recomendable compartir los IDs de las hojas de cálculo en las instrucciones del agente.")}
-            </p>
-        }
-
         <p>
-          {t("Para obtener el token, inicia sesión en Google desde el")} <a href="https://g.mcp.openbsp.dev" target="_blank" rel="noreferrer">servidor MCP de OpenBSP</a> {t("usando el siguiente botón:")}
+          {t("Autoriza el acceso a tu cuenta de Google para que el agente pueda interactuar con")} {product === "calendar" ? t("tu calendario") : t("tus hojas de cálculo")}.
         </p>
 
         <button
           type="button"
-          className="bg-secondary text-secondary-foreground hover:bg-secondary/80 px-4 py-2 rounded-full font-medium transition-colors w-fit text-[14px]"
+          className="bg-secondary text-secondary-foreground hover:bg-secondary/80 px-4 py-2 rounded-full font-medium transition-colors w-fit text-[14px] flex items-center gap-2"
           onClick={handleGetToken}
         >
-          {t("Obtener token")}
+          {token && <Check className="w-4 h-4" />}
+          {token ? t("Autorizado") : t("Autorizar")}
         </button>
 
-        <label>
-          <div className="label">{t("Token")}</div>
-          <input
-            type="text"
-            className="text"
-            placeholder="Bearer gmc_..."
-            {...register(`extra.tools.${index}.config.headers.authorization` as any, { required: true })}
-          />
-        </label>
+        {/* Hidden input to register field for setValue to work */}
+        <input
+          type="hidden"
+          {...register(`extra.tools.${index}.config.headers.authorization` as any, { required: true })}
+        />
+
+        {product === "sheets" && files.length > 0 && (
+          <div>
+            <div className="label mb-2">{t("Archivos compartidos")}</div>
+            <div className="flex flex-wrap gap-2">
+              {files.map((file, i) => (
+                <div key={i} className="bg-muted px-3 py-1 rounded-full text-sm text-foreground flex items-center gap-2">
+                  <FileSpreadsheet className="w-4 h-4 text-muted-foreground" />
+                  {file}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <SelectField
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -918,7 +968,7 @@ function GoogleMCPClientEditor<T extends FieldValues>({
         />
 
       </SectionBody>
-    </div>
+    </div >
   );
 }
 

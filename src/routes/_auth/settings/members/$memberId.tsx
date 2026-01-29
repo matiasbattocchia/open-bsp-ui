@@ -48,6 +48,7 @@ function EditMember() {
         })}
         deleteDisabled={!isOwner}
         deleteDisabledReason={t("Requiere permisos de propietario")}
+        deleteLoading={deleteAgent.isPending}
       />
       <SectionBody>
         <form

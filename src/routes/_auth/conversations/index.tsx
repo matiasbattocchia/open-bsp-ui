@@ -4,6 +4,7 @@ import ChatSearch from "@/components/ChatSearch";
 import Header from "@/components/Header";
 import ChatFilter from "@/components/ChatFilter";
 import SectionItem from "@/components/SectionItem";
+import Spinner from "@/components/Spinner";
 import { Bell } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useInvitations, useUpdateAgent } from "@/queries/useAgents";
@@ -58,20 +59,24 @@ function Conversations() {
                   <div className="flex flex-col gap-[6px] w-full">
                     <p>{invitation.extra!.invitation!.organization_name} ({roles[invitation.extra!.role || "member"]})</p>
                     <div className="flex gap-[16px] justify-end">
-                      <button
-                        onClick={() => handleInvitationAction(invitation.id, "accepted")}
-                        className="font-bold text-primary/90 hover:text-primary cursor-pointer"
-                        disabled={updateAgent.isPending}
-                      >
-                        {t("Aceptar")}
-                      </button>
-                      <button
-                        onClick={() => handleInvitationAction(invitation.id, "rejected")}
-                        className="font-bold text-muted-foreground/90 hover:text-muted-foreground cursor-pointer"
-                        disabled={updateAgent.isPending}
-                      >
-                        {t("Rechazar")}
-                      </button>
+                      {updateAgent.isPending ? (
+                        <Spinner size={16} />
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => handleInvitationAction(invitation.id, "accepted")}
+                            className="font-bold text-primary/90 hover:text-primary cursor-pointer"
+                          >
+                            {t("Aceptar")}
+                          </button>
+                          <button
+                            onClick={() => handleInvitationAction(invitation.id, "rejected")}
+                            className="font-bold text-muted-foreground/90 hover:text-muted-foreground cursor-pointer"
+                          >
+                            {t("Rechazar")}
+                          </button>
+                        </>
+                      )}
                     </div>
                   </div>
                 }

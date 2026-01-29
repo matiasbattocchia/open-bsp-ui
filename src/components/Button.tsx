@@ -38,7 +38,11 @@ export default function Button({
         " flex items-center justify-center gap-2"
       }
     >
-      {loading ? <Spinner /> : children}
+      {/* Spinner on left - invisible when not loading, visible placeholder on right for balance */}
+      <Spinner className={loading ? "" : "invisible"} />
+      {children}
+      {/* Invisible placeholder to keep text centered */}
+      <Spinner className="invisible" />
     </button>
   );
 }

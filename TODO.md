@@ -14,7 +14,7 @@
 
 - [ ] (feat) Modals (delete confirmation)
 
-- [ ] (feat) Annotator configuration
+- [x] (feat) Annotator configuration
 
 - [ ] (enhacement) Translations
 
@@ -24,9 +24,9 @@
 
 - [x] (enhacement) Hide empty conversations from the chat list
 
-- [ ] (enhacement) General feedback / spinner (delete, accept invitation, ...)
+- [x] (enhacement) General feedback / spinner (delete, accept invitation, ...)
 
-- [ ] (enhancement) Primary button spinner placement to the left of the text
+- [x] (enhancement) Primary button spinner placement to the left of the text
 
 - [ ] (enhancement) Active conversation or resource in path from another organization
   - The conversation is not in the store

@@ -33,6 +33,7 @@ function ApiKeyDetail() {
         })}
         deleteDisabled={!isOwner}
         deleteDisabledReason={t("Requiere permisos de propietario")}
+        deleteLoading={deleteApiKey.isPending}
       />
 
       <SectionBody>
