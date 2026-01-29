@@ -1,7 +1,7 @@
 import SectionBody from "@/components/SectionBody";
 import SectionHeader from "@/components/SectionHeader";
 import SectionItem from "@/components/SectionItem";
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useOrganizationsAddresses } from "@/queries/useOrganizationsAddresses";
 import { useTranslation } from "@/hooks/useTranslation";
 import { WhatsAppOutlined } from "@ant-design/icons";
