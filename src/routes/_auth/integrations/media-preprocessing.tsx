@@ -13,11 +13,11 @@ import { type OrganizationUpdate } from "@/supabase/client";
 import { useForm, Controller } from "react-hook-form";
 import { useMemo } from "react";
 
-export const Route = createFileRoute("/_auth/integrations/preprocessor")({
-  component: AnnotatorSettings,
+export const Route = createFileRoute("/_auth/integrations/media-preprocessing")({
+  component: MediaPreprocessingSettings,
 });
 
-function AnnotatorSettings() {
+function MediaPreprocessingSettings() {
   const { translate: t } = useTranslation();
   const { data: org } = useCurrentOrganization();
   const { data: agent } = useCurrentAgent();
@@ -31,10 +31,10 @@ function AnnotatorSettings() {
       ...org,
       extra: {
         ...org.extra,
-        annotations: {
+        media_preprocessing: {
           mode: "inactive" as "active" | "inactive",
           model: "gemini-2.5-flash" as "gemini-2.5-pro" | "gemini-2.5-flash",
-          ...org.extra?.annotations
+          ...org.extra?.media_preprocessing
         }
       }
     };
@@ -49,16 +49,16 @@ function AnnotatorSettings() {
 
   return (
     <>
-      <SectionHeader title={t("Pre-procesador de mensajes")} />
+      <SectionHeader title={t("Pre-procesamiento de media")} />
 
       <SectionBody>
         <form
-          id="annotator-form"
+          id="media-preprocessing-form"
           onSubmit={handleSubmit((data) => updateOrg.mutate(data))}
         >
           <Controller
             control={control}
-            name="extra.annotations.mode"
+            name="extra.media_preprocessing.mode"
             render={({ field }) => (
               <label className="flex items-center gap-[12px] cursor-pointer justify-between">
                 <div className="flex flex-col gap-[2px]">
@@ -78,7 +78,7 @@ function AnnotatorSettings() {
 
           <SelectField
             control={control}
-            name="extra.annotations.model"
+            name="extra.media_preprocessing.model"
             label={t("Modelo")}
             options={[
               { value: "gemini-2.5-flash", label: "Gemini 2.5 Flash" },
@@ -94,7 +94,7 @@ function AnnotatorSettings() {
               className="text"
               placeholder="sk-..."
               disabled={!isOwner}
-              {...register("extra.annotations.api_key")}
+              {...register("extra.media_preprocessing.api_key")}
             />
           </label>
 
@@ -105,13 +105,13 @@ function AnnotatorSettings() {
               className="text"
               placeholder="Español"
               disabled={!isOwner}
-              {...register("extra.annotations.language")}
+              {...register("extra.media_preprocessing.language")}
             />
           </label>
 
           <TextAreaField
             control={control}
-            name="extra.annotations.extra_prompt"
+            name="extra.media_preprocessing.extra_prompt"
             label={t("Instrucciones adicionales")}
             placeholder={t("Instrucciones adicionales para el modelo...")}
             disabled={!isOwner}
@@ -121,7 +121,7 @@ function AnnotatorSettings() {
 
       <SectionFooter>
         <Button
-          form="annotator-form"
+          form="media-preprocessing-form"
           type="submit"
           disabled={!isOwner}
           invalid={!isValid || !isDirty}

@@ -39,11 +39,11 @@ function IntegrationsIndex() {
                 <FileText className="w-[24px] h-[24px]" />
               </div>
             }
-            title="Pre-procesador de mensajes"
+            title="Pre-procesamiento de media"
             description={t("Interpreta audios, imágenes y documentos")}
             onClick={() =>
               navigate({
-                to: "/integrations/preprocessor",
+                to: "/integrations/media-preprocessing",
                 hash: (prevHash) => prevHash!,
               })
             }
