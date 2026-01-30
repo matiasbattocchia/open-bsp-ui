@@ -454,7 +454,8 @@ function MCPClientEditor<T extends FieldValues>({
             type="text"
             className="text"
             placeholder={t("Mi cliente MCP")}
-            {...register(`extra.tools.${index}.label` as any, { required: true })}
+            maxLength={32}
+            {...register(`extra.tools.${index}.label` as any, { required: true, maxLength: 40 })}
           />
         </label>
 
@@ -546,7 +547,8 @@ function HTTPClientEditor<T extends FieldValues>({
             type="text"
             className="text"
             placeholder={t("Mi cliente HTTP")}
-            {...register(`extra.tools.${index}.label` as any, { required: true })}
+            maxLength={32}
+            {...register(`extra.tools.${index}.label` as any, { required: true, maxLength: 40 })}
           />
         </label>
 
@@ -668,7 +670,8 @@ function SQLClientEditor<T extends FieldValues>({
             type="text"
             className="text"
             placeholder={t("Mi base de datos")}
-            {...register(`extra.tools.${index}.label` as any, { required: true })}
+            maxLength={32}
+            {...register(`extra.tools.${index}.label` as any, { required: true, maxLength: 40 })}
           />
         </label>
 
@@ -929,7 +932,8 @@ function GoogleMCPClientEditor<T extends FieldValues>({
             type="text"
             className="text"
             placeholder={product === "calendar" ? t("Mi calendario") : t("Mi hoja de cálculo")}
-            {...register(`extra.tools.${index}.label` as any, { required: true })}
+            maxLength={32}
+            {...register(`extra.tools.${index}.label` as any, { required: true, maxLength: 40 })}
           />
         </label>
 
