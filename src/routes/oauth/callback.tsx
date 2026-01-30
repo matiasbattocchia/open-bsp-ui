@@ -14,12 +14,18 @@ function OAuthCallback() {
     const hash = window.location.hash.substring(1);
     const params = new URLSearchParams(hash);
     const apiKey = params.get("api_key");
+    const url = params.get("url");
+    const email = params.get("email");
     const files = params.get("files");
+    const error = params.get("error");
 
-    if (apiKey && window.opener) {
-      // Send the API key to the opener
+    if (error) {
+      console.error("OAuth error:", error);
+      document.body.innerText = `Error: ${error}`;
+    } else if (apiKey && window.opener) {
+      // Send the data to the opener
       window.opener.postMessage(
-        { type: "oauth-callback", apiKey, files },
+        { type: "oauth-callback", apiKey, url, email, files },
         window.location.origin
       );
       // Close the popup

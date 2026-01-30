@@ -574,6 +574,7 @@ export type LocalMCPToolConfig = {
     headers?: Record<string, string>;
     allowed_tools?: string[];
     files?: string[];
+    email?: string;
   };
 };
 

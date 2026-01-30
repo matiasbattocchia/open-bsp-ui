@@ -794,13 +794,15 @@ function GoogleMCPClientEditor<T extends FieldValues>({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const token = (useWatch({ control, name: `extra.tools.${index}.config.headers.authorization` as any }) as string) || "";
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const email = (useWatch({ control, name: `extra.tools.${index}.config.email` as any }) as string) || "";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const files = (useWatch({ control, name: `extra.tools.${index}.config.files` as any }) as string[]) || [];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const allowedTools = (useWatch({ control, name: `extra.tools.${index}.config.allowed_tools` as any }) as string[]) || [];
 
   // Keep a ref with fresh values that the callback can access
-  const currentValuesRef = useRef({ label, token, files, allowedTools, product });
-  currentValuesRef.current = { label, token, files, allowedTools, product };
+  const currentValuesRef = useRef({ label, token, email, files, allowedTools, product });
+  currentValuesRef.current = { label, token, email, files, allowedTools, product };
 
   const isValid = label.trim() !== "" && token.trim() !== "";
   const isEmpty = label.trim() === "" && token.trim() === "";
@@ -840,16 +842,17 @@ function GoogleMCPClientEditor<T extends FieldValues>({
 
       if (event.data?.type === "oauth-callback" && event.data?.apiKey) {
         // Build tool from fresh ref values (not stale closure data)
-        const { label: freshLabel, files: freshFiles, allowedTools: freshAllowedTools, product: freshProduct } = currentValuesRef.current;
+        const { label: freshLabel, email: freshEmail, files: freshFiles, allowedTools: freshAllowedTools, product: freshProduct } = currentValuesRef.current;
         const newToken = `Bearer ${event.data.apiKey}`;
         const updatedTool: LocalMCPToolConfig = {
           provider: "local",
           type: "mcp",
           label: freshLabel,
           config: {
-            url: "https://g.mcp.openbsp.dev/mcp",
+            url: event.data.url || "https://g.mcp.openbsp.dev/mcp",
             product: freshProduct as "calendar" | "sheets",
             allowed_tools: freshAllowedTools,
+            email: event.data.email || freshEmail || undefined,
             files: event.data?.files
               ? (typeof event.data.files === 'string' ? event.data.files.split(',') : [])
               : freshFiles,
@@ -940,7 +943,10 @@ function GoogleMCPClientEditor<T extends FieldValues>({
           onClick={handleGetToken}
         >
           {token && <Check className="w-4 h-4" />}
-          {token ? t("Autorizado") : t("Autorizar")}
+          {token ?
+            email || t("Autorizado")
+            : t("Autorizar")
+          }
         </button>
 
         {/* Hidden input to register field for setValue to work */}
