@@ -3,7 +3,9 @@ import SectionHeader from "@/components/SectionHeader";
 import SectionBody from "@/components/SectionBody";
 import SectionFooter from "@/components/SectionFooter";
 import { useTranslation } from "@/hooks/useTranslation";
-import { useAgent, useUpdateAgent, useDeleteAgent, useCurrentAgent } from "@/queries/useAgents";
+import { useAgent, useUpdateAgent, useDeleteAgent, useCurrentAgent, useCurrentAgents } from "@/queries/useAgents";
+import useBoundStore from "@/stores/useBoundStore";
+import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import type { HumanAgentRow, HumanAgentUpdate } from "@/supabase/client";
 import SectionItem from "@/components/SectionItem";
@@ -20,11 +22,34 @@ function EditMember() {
   const { translate: t } = useTranslation();
   const navigate = useNavigate();
   const { data: agent } = useAgent<HumanAgentRow>(memberId);
+  const { data: allAgents } = useCurrentAgents(); // Fetch all agents to check for owners
   const { data: currentAgent } = useCurrentAgent();
   const isOwner = currentAgent?.extra?.role === "owner";
+  const isMe = currentAgent?.id === memberId;
+  const setActiveOrg = useBoundStore((state) => state.ui.setActiveOrg);
+  const queryClient = useQueryClient();
+
+  // Count owners to prevent deleting the last one
+  const ownersCount = allAgents?.filter(a => !a.ai && a.extra?.role === "owner").length || 0;
+  const isLastOwner = agent?.extra?.role === "owner" && ownersCount <= 1;
 
   const updateAgent = useUpdateAgent();
   const deleteAgent = useDeleteAgent();
+
+  const onDelete = () => {
+    deleteAgent.mutate(memberId, {
+      onSuccess: () => {
+        if (isMe) {
+          // If the user deletes themselves, invalidate organizations and redirect to conversations
+          queryClient.invalidateQueries({ queryKey: ["organizations"] });
+          setActiveOrg(null);
+          navigate({ to: "/conversations" });
+        } else {
+          navigate({ to: "..", hash: (prevHash) => prevHash! });
+        }
+      }
+    });
+  };
 
   const {
     register,
@@ -43,11 +68,13 @@ function EditMember() {
     <>
       <SectionHeader
         title={agent.name}
-        onDelete={() => deleteAgent.mutate(memberId, {
-          onSuccess: () => navigate({ to: "..", hash: (prevHash) => prevHash! })
-        })}
-        deleteDisabled={!isOwner}
-        deleteDisabledReason={t("Requiere permisos de propietario")}
+        onDelete={onDelete}
+        deleteDisabled={(!isOwner && !isMe) || (isOwner && isLastOwner && memberId === agent.id)} // Prevent deleting last owner
+        deleteDisabledReason={
+          isLastOwner
+            ? t("No se puede eliminar al único propietario")
+            : t("Requiere permisos de propietario")
+        }
         deleteLoading={deleteAgent.isPending}
       />
       <SectionBody>
@@ -71,7 +98,7 @@ function EditMember() {
             <div className="label">{t("Nombre")}</div>
             <input
               className="text"
-              disabled={!isOwner}
+              disabled={!isOwner && !isMe}
               placeholder={t("Nombre del miembro")}
               {...register("name", { required: true })}
             />
@@ -107,7 +134,7 @@ function EditMember() {
         <Button
           form="member-form"
           type="submit"
-          disabled={!isOwner}
+          disabled={!isOwner && !isMe}
           invalid={!isValid || !isDirty}
           loading={updateAgent.isPending}
           disabledReason={t("Requiere permisos de propietario")}
