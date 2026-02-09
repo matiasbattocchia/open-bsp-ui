@@ -20,6 +20,8 @@
 
 - [ ] (feat) Templates
 
+- [ ] (feat) Not found section message for conversations, contacts, etc.
+
 - [ ] (feat) Client-side cache using IndexedDB
 
 - [x] (enhacement) Hide empty conversations from the chat list
@@ -42,10 +44,6 @@ If redirected to organizations/new from this URL, the cancel button returns to S
 
 ---
 
-http client base_url -> url
-
 ver más... newline limit
 
 always show email in member view
-
-remove hover underline from disabled input fields

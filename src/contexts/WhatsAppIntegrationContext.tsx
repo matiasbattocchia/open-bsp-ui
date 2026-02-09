@@ -59,7 +59,7 @@ type EventListenerData =
 
 type WhatsAppIntegrationContextType = {
   launchWhatsAppSignup: (
-    onSuccess: () => void,
+    onSuccess: (phone_number_id: string) => void,
     setLoading: (loading: boolean) => void,
   ) => void;
 };
@@ -173,7 +173,7 @@ export function WhatsAppIntegrationProvider({
 
   const launchWhatsAppSignup = useCallback(
     (
-      onSuccess: () => void,
+      onSuccess: (phone_number_id: string) => void,
       setLoading: (loading: boolean) => void,
     ) => {
       // Launch Facebook login
@@ -207,7 +207,7 @@ export function WhatsAppIntegrationProvider({
 
             signup(payload)
               .then(() => {
-                onSuccess();
+                onSuccess(sessionInfo.phone_number_id || "");
               })
               .catch((error: Error) => {
                 console.error("Signup failed:", error);

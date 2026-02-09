@@ -127,7 +127,7 @@ function AppLayout() {
                 <ActionCard
                   icon={<Settings className="w-[24px] h-[24px]" />}
                   title="Configurar WhatsApp"
-                  to="/integrations"
+                  to="/integrations/whatsapp/new"
                 />
               </>
             )}

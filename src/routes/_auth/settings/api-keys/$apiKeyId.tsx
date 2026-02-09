@@ -37,14 +37,16 @@ function ApiKeyDetail() {
       />
 
       <SectionBody>
-        <div className="flex flex-col gap-[24px] grow">
-          <p className="text-muted-foreground text-[14px]">
-            {t("Configura los siguientes encabezados HTTP para autenticarte:")}
-          </p>
-          <ul className="text-muted-foreground text-[14px] list-disc ml-[20px]">
-            <li><code className="font-mono">authorization:</code> <code className="font-mono break-all">{import.meta.env.VITE_SUPABASE_ANON_KEY}</code></li>
-            <li><code className="font-mono">api-key:</code> {t("el valor de la clave generada abajo")}</li>
-          </ul>
+        <form>
+          <div className="instructions">
+            <p>
+              {t("Configura los siguientes encabezados HTTP para autenticarte:")}
+            </p>
+            <ul>
+              <li><code className="font-mono">authorization:</code> <code className="font-mono break-all">{import.meta.env.VITE_SUPABASE_ANON_KEY}</code></li>
+              <li><code className="font-mono">api-key:</code> {t("el valor de la clave generada abajo")}</li>
+            </ul>
+          </div>
 
           <label>
             <div className="label">{t("Nombre")}</div>
@@ -74,7 +76,7 @@ function ApiKeyDetail() {
               {...register("key")}
             />
           </label>
-        </div>
+        </form>
       </SectionBody>
     </>
   );

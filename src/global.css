@@ -169,6 +169,22 @@ button:disabled {
     @apply w-full focus-visible:outline-none text-[16px] text-foreground placeholder:text-muted-foreground bg-transparent focus-visible:border-primary;
   }
 
+  .instructions {
+    @apply text-[14px] flex flex-col gap-[8px] leading-relaxed;
+  }
+
+  .instructions p {
+    @apply text-foreground;
+  }
+
+  .instructions ul {
+    @apply list-disc ml-[16px] space-y-[6px];
+  }
+
+  .instructions ol {
+    @apply list-decimal ml-[16px] space-y-[6px];
+  }
+
   select {
     @apply w-full pb-[2px] border-b-[2px] border-transparent hover:border-input focus-visible:outline-none text-[16px] text-foreground placeholder:text-muted-foreground bg-transparent focus-visible:border-primary;
   }
