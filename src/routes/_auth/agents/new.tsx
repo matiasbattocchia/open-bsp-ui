@@ -187,6 +187,20 @@ function AddAgent() {
                   {...register("extra.model")}
                 />
               </label>
+
+              {provider === 'custom' && (
+                <div className="instructions">
+                  <p>{t("Se envían los siguientes encabezados HTTP con cada solicitud:")}</p>
+                  <ul>
+                    <li><code>organization-id</code></li>
+                    <li><code>organization-address</code></li>
+                    <li><code>conversation-id</code></li>
+                    <li><code>agent-id</code></li>
+                    <li><code>contact-id</code></li>
+                    <li><code>contact-address</code></li>
+                  </ul>
+                </div>
+              )}
             </SectionField>
           </fieldset>
         </form>

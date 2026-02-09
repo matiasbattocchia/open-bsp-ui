@@ -114,11 +114,10 @@ export function useCreateAgent() {
 
 export function useUpdateAgent() {
   const queryClient = useQueryClient();
-  const orgId = useBoundStore((state) => state.ui.activeOrgId);
 
   return useMutation({
     mutationFn: async (data: AgentUpdate) => {
-      if (!orgId) throw new Error("No active organization");
+      // No active organization check because invitations don't have an organization_id
       if (!data.id) throw new Error("No agent id");
 
       const { data: agent } = await supabase
@@ -133,10 +132,10 @@ export function useUpdateAgent() {
     },
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({
-        queryKey: queryKeys.agents.all(orgId),
+        queryKey: queryKeys.agents.all(data.organization_id),
       });
       queryClient.setQueryData(
-        queryKeys.agents.detail(orgId, variables.id),
+        queryKeys.agents.detail(data.organization_id, variables.id),
         data,
       );
     },
