@@ -39,3 +39,13 @@ https://develop.open-bsp-ui.pages.dev/settings/organization/new#access_token=eyJ
 If redirected to organizations/new from this URL, the cancel button returns to SSO
 
 - [ ] (bug) Re-login does not initializes data, needs to refresh
+
+---
+
+http client base_url -> url
+
+ver más... newline limit
+
+always show email in member view
+
+remove hover underline from disabled input fields

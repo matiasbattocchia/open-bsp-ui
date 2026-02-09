@@ -537,13 +537,16 @@ export type ConversationExtra = {
   */
 };
 
-export type ContactExtra = {
-  addresses: string[];
-};
+export type ContactExtra = Record<PropertyKey, never>;
 
 export type ContactAddressExtra = {
   name?: string;
-  synced?: boolean; // True if the contact was synced from WhatsApp
+  synced?: { // if the contact address was synced from WhatsApp
+    name: string;
+    action: "add" | "remove";
+  }
+  replaces_address?: string;
+  replaced_by_address?: string;
 }
 
 // Function tools have a JSON input (data part).
@@ -612,7 +615,7 @@ export type LocalHTTPToolConfig = {
   label: string; // client label
   config: {
     headers?: Record<string, string>;
-    base_url?: string;
+    url?: string;
     methods?: string[];
   };
 };
@@ -814,10 +817,10 @@ export type Database = MergeDeep<
             extra: ContactAddressExtra | null;
           };
           Insert: {
-            extra?: ContactAddressExtra;
+            extra?: ContactAddressExtra | null;
           };
           Update: {
-            extra?: ContactAddressExtra;
+            extra?: ContactAddressExtra | null;
           };
         };
         agents: {
@@ -851,8 +854,16 @@ export type OrganizationUpdate =
   Database["public"]["Tables"]["organizations"]["Update"];
 
 export type ContactRow = Database["public"]["Tables"]["contacts"]["Row"];
+export type ContactInsert = Database["public"]["Tables"]["contacts"]["Insert"];
+export type ContactUpdate = Database["public"]["Tables"]["contacts"]["Update"];
 
 export type ContactAddressRow = Database["public"]["Tables"]["contacts_addresses"]["Row"];
+export type ContactAddressInsert = Database["public"]["Tables"]["contacts_addresses"]["Insert"];
+export type ContactAddressUpdate = Database["public"]["Tables"]["contacts_addresses"]["Update"];
+
+export type ContactWithAddressesRow = ContactRow & { addresses: ContactAddressRow[] };
+export type ContactWithAddressesInsert = ContactInsert & { addresses: ContactAddressUpdate[] };
+export type ContactWithAddressesUpdate = ContactUpdate & { addresses: ContactAddressUpdate[] };
 
 export type AgentRow = Database["public"]["Tables"]["agents"]["Row"];
 export type AgentInsert = Database["public"]["Tables"]["agents"]["Insert"];

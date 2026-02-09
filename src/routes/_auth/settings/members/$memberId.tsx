@@ -12,6 +12,7 @@ import SectionItem from "@/components/SectionItem";
 import { Bell } from "lucide-react";
 import Button from "@/components/Button";
 import SelectField from "@/components/SelectField";
+import { queryKeys } from "@/queries/queryKeys";
 
 export const Route = createFileRoute("/_auth/settings/members/$memberId")({
   component: EditMember,
@@ -41,7 +42,7 @@ function EditMember() {
       onSuccess: () => {
         if (isMe) {
           // If the user deletes themselves, invalidate organizations and redirect to conversations
-          queryClient.invalidateQueries({ queryKey: ["organizations"] });
+          queryClient.invalidateQueries({ queryKey: queryKeys.organizations.all() });
           setActiveOrg(null);
           navigate({ to: "/conversations" });
         } else {
@@ -117,12 +118,12 @@ function EditMember() {
             required
           />
 
-          {invitation && invitation.status === "pending" && <label>
+          {invitation && invitation.email && <label>
             <div className="label">{t("Correo electrónico")}</div>
             <input
               type="email"
               className="text"
-              disabled
+              readOnly
               placeholder={t("usuario@ejemplo.com")}
               {...register("extra.invitation.email")}
             />

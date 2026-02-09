@@ -16,9 +16,12 @@ import { Route as OauthCallbackRouteImport } from './routes/oauth/callback'
 import { Route as AuthSettingsIndexRouteImport } from './routes/_auth/settings/index'
 import { Route as AuthIntegrationsIndexRouteImport } from './routes/_auth/integrations/index'
 import { Route as AuthConversationsIndexRouteImport } from './routes/_auth/conversations/index'
+import { Route as AuthContactsIndexRouteImport } from './routes/_auth/contacts/index'
 import { Route as AuthAgentsIndexRouteImport } from './routes/_auth/agents/index'
 import { Route as AuthIntegrationsMediaPreprocessingRouteImport } from './routes/_auth/integrations/media-preprocessing'
 import { Route as AuthConversationsNewRouteImport } from './routes/_auth/conversations/new'
+import { Route as AuthContactsNewRouteImport } from './routes/_auth/contacts/new'
+import { Route as AuthContactsContactIdRouteImport } from './routes/_auth/contacts/$contactId'
 import { Route as AuthAgentsNewRouteImport } from './routes/_auth/agents/new'
 import { Route as AuthAgentsAgentIdRouteImport } from './routes/_auth/agents/$agentId'
 import { Route as AuthSettingsWebhooksIndexRouteImport } from './routes/_auth/settings/webhooks/index'
@@ -70,6 +73,11 @@ const AuthConversationsIndexRoute = AuthConversationsIndexRouteImport.update({
   path: '/conversations/',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthContactsIndexRoute = AuthContactsIndexRouteImport.update({
+  id: '/contacts/',
+  path: '/contacts/',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthAgentsIndexRoute = AuthAgentsIndexRouteImport.update({
   id: '/agents/',
   path: '/agents/',
@@ -84,6 +92,16 @@ const AuthIntegrationsMediaPreprocessingRoute =
 const AuthConversationsNewRoute = AuthConversationsNewRouteImport.update({
   id: '/conversations/new',
   path: '/conversations/new',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthContactsNewRoute = AuthContactsNewRouteImport.update({
+  id: '/contacts/new',
+  path: '/contacts/new',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthContactsContactIdRoute = AuthContactsContactIdRouteImport.update({
+  id: '/contacts/$contactId',
+  path: '/contacts/$contactId',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthAgentsNewRoute = AuthAgentsNewRouteImport.update({
@@ -184,9 +202,12 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthIndexRoute
   '/agents/$agentId': typeof AuthAgentsAgentIdRoute
   '/agents/new': typeof AuthAgentsNewRoute
+  '/contacts/$contactId': typeof AuthContactsContactIdRoute
+  '/contacts/new': typeof AuthContactsNewRoute
   '/conversations/new': typeof AuthConversationsNewRoute
   '/integrations/media-preprocessing': typeof AuthIntegrationsMediaPreprocessingRoute
   '/agents': typeof AuthAgentsIndexRoute
+  '/contacts': typeof AuthContactsIndexRoute
   '/conversations': typeof AuthConversationsIndexRoute
   '/integrations': typeof AuthIntegrationsIndexRoute
   '/settings': typeof AuthSettingsIndexRoute
@@ -211,9 +232,12 @@ export interface FileRoutesByTo {
   '/': typeof AuthIndexRoute
   '/agents/$agentId': typeof AuthAgentsAgentIdRoute
   '/agents/new': typeof AuthAgentsNewRoute
+  '/contacts/$contactId': typeof AuthContactsContactIdRoute
+  '/contacts/new': typeof AuthContactsNewRoute
   '/conversations/new': typeof AuthConversationsNewRoute
   '/integrations/media-preprocessing': typeof AuthIntegrationsMediaPreprocessingRoute
   '/agents': typeof AuthAgentsIndexRoute
+  '/contacts': typeof AuthContactsIndexRoute
   '/conversations': typeof AuthConversationsIndexRoute
   '/integrations': typeof AuthIntegrationsIndexRoute
   '/settings': typeof AuthSettingsIndexRoute
@@ -240,9 +264,12 @@ export interface FileRoutesById {
   '/_auth/': typeof AuthIndexRoute
   '/_auth/agents/$agentId': typeof AuthAgentsAgentIdRoute
   '/_auth/agents/new': typeof AuthAgentsNewRoute
+  '/_auth/contacts/$contactId': typeof AuthContactsContactIdRoute
+  '/_auth/contacts/new': typeof AuthContactsNewRoute
   '/_auth/conversations/new': typeof AuthConversationsNewRoute
   '/_auth/integrations/media-preprocessing': typeof AuthIntegrationsMediaPreprocessingRoute
   '/_auth/agents/': typeof AuthAgentsIndexRoute
+  '/_auth/contacts/': typeof AuthContactsIndexRoute
   '/_auth/conversations/': typeof AuthConversationsIndexRoute
   '/_auth/integrations/': typeof AuthIntegrationsIndexRoute
   '/_auth/settings/': typeof AuthSettingsIndexRoute
@@ -269,9 +296,12 @@ export interface FileRouteTypes {
     | '/'
     | '/agents/$agentId'
     | '/agents/new'
+    | '/contacts/$contactId'
+    | '/contacts/new'
     | '/conversations/new'
     | '/integrations/media-preprocessing'
     | '/agents'
+    | '/contacts'
     | '/conversations'
     | '/integrations'
     | '/settings'
@@ -296,9 +326,12 @@ export interface FileRouteTypes {
     | '/'
     | '/agents/$agentId'
     | '/agents/new'
+    | '/contacts/$contactId'
+    | '/contacts/new'
     | '/conversations/new'
     | '/integrations/media-preprocessing'
     | '/agents'
+    | '/contacts'
     | '/conversations'
     | '/integrations'
     | '/settings'
@@ -324,9 +357,12 @@ export interface FileRouteTypes {
     | '/_auth/'
     | '/_auth/agents/$agentId'
     | '/_auth/agents/new'
+    | '/_auth/contacts/$contactId'
+    | '/_auth/contacts/new'
     | '/_auth/conversations/new'
     | '/_auth/integrations/media-preprocessing'
     | '/_auth/agents/'
+    | '/_auth/contacts/'
     | '/_auth/conversations/'
     | '/_auth/integrations/'
     | '/_auth/settings/'
@@ -403,6 +439,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthConversationsIndexRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/contacts/': {
+      id: '/_auth/contacts/'
+      path: '/contacts'
+      fullPath: '/contacts'
+      preLoaderRoute: typeof AuthContactsIndexRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/agents/': {
       id: '/_auth/agents/'
       path: '/agents'
@@ -422,6 +465,20 @@ declare module '@tanstack/react-router' {
       path: '/conversations/new'
       fullPath: '/conversations/new'
       preLoaderRoute: typeof AuthConversationsNewRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/contacts/new': {
+      id: '/_auth/contacts/new'
+      path: '/contacts/new'
+      fullPath: '/contacts/new'
+      preLoaderRoute: typeof AuthContactsNewRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/contacts/$contactId': {
+      id: '/_auth/contacts/$contactId'
+      path: '/contacts/$contactId'
+      fullPath: '/contacts/$contactId'
+      preLoaderRoute: typeof AuthContactsContactIdRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_auth/agents/new': {
@@ -543,9 +600,12 @@ interface AuthRouteChildren {
   AuthIndexRoute: typeof AuthIndexRoute
   AuthAgentsAgentIdRoute: typeof AuthAgentsAgentIdRoute
   AuthAgentsNewRoute: typeof AuthAgentsNewRoute
+  AuthContactsContactIdRoute: typeof AuthContactsContactIdRoute
+  AuthContactsNewRoute: typeof AuthContactsNewRoute
   AuthConversationsNewRoute: typeof AuthConversationsNewRoute
   AuthIntegrationsMediaPreprocessingRoute: typeof AuthIntegrationsMediaPreprocessingRoute
   AuthAgentsIndexRoute: typeof AuthAgentsIndexRoute
+  AuthContactsIndexRoute: typeof AuthContactsIndexRoute
   AuthConversationsIndexRoute: typeof AuthConversationsIndexRoute
   AuthIntegrationsIndexRoute: typeof AuthIntegrationsIndexRoute
   AuthSettingsIndexRoute: typeof AuthSettingsIndexRoute
@@ -569,10 +629,13 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthIndexRoute: AuthIndexRoute,
   AuthAgentsAgentIdRoute: AuthAgentsAgentIdRoute,
   AuthAgentsNewRoute: AuthAgentsNewRoute,
+  AuthContactsContactIdRoute: AuthContactsContactIdRoute,
+  AuthContactsNewRoute: AuthContactsNewRoute,
   AuthConversationsNewRoute: AuthConversationsNewRoute,
   AuthIntegrationsMediaPreprocessingRoute:
     AuthIntegrationsMediaPreprocessingRoute,
   AuthAgentsIndexRoute: AuthAgentsIndexRoute,
+  AuthContactsIndexRoute: AuthContactsIndexRoute,
   AuthConversationsIndexRoute: AuthConversationsIndexRoute,
   AuthIntegrationsIndexRoute: AuthIntegrationsIndexRoute,
   AuthSettingsIndexRoute: AuthSettingsIndexRoute,

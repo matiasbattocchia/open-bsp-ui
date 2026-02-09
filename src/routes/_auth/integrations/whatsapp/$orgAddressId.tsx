@@ -7,6 +7,7 @@ import { useOrganizationsAddresses } from "@/queries/useOrganizationsAddresses";
 import { useWhatsAppDisconnect } from "@/queries/useWhatsAppSignup";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useCurrentAgent } from "@/queries/useAgents";
+import { formatPhoneNumber } from "@/utils/FormatUtils";
 
 export const Route = createFileRoute("/_auth/integrations/whatsapp/$orgAddressId")({
   component: WhatsAppDetails,
@@ -49,7 +50,7 @@ function WhatsAppDetails() {
         <div className="p-4 space-y-4">
           <div>
             <div className="text-sm text-muted-foreground">{t("Número de teléfono")}</div>
-            <div className="font-medium">{(integration.extra as any)?.phone_number || integration.address}</div>
+            <div className="font-medium">{formatPhoneNumber((integration.extra as any)?.phone_number || integration.address)}</div>
           </div>
 
           <div>

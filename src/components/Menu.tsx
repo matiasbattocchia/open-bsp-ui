@@ -10,6 +10,7 @@ import {
   Bot,
   Languages,
   Plus,
+  NotebookTabs,
 } from "lucide-react";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import { LinkButton } from "./LinkButton";
@@ -64,6 +65,16 @@ export default function Menu() {
           className="mt-[10px]"
         >
           <Bot className="w-[24px] h-[24px] stroke-[2]" />
+        </LinkButton>
+
+        {/* Contacts button */}
+        <LinkButton
+          to="/contacts"
+          title={t("Contactos")}
+          isActive={pathname.startsWith("/contacts")}
+          className="mt-[10px]"
+        >
+          <NotebookTabs className="w-[24px] h-[24px] stroke-[2]" />
         </LinkButton>
 
         {/* Integrations button */}

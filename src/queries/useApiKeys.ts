@@ -1,13 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { type ApiKeyInsert, type ApiKeyRow, supabase } from "@/supabase/client";
 import useBoundStore from "@/stores/useBoundStore";
+import { queryKeys } from "./queryKeys";
 
 export function useApiKeys() {
   const userId = useBoundStore((state) => state.ui.user?.id);
   const orgId = useBoundStore((state) => state.ui.activeOrgId);
 
   return useQuery({
-    queryKey: [orgId, "api_keys"],
+    queryKey: queryKeys.apiKeys.all(orgId),
     queryFn: async () =>
       await supabase
         .from("api_keys")
@@ -25,7 +26,7 @@ export function useApiKey(id: string) {
   const orgId = useBoundStore((state) => state.ui.activeOrgId);
 
   return useQuery({
-    queryKey: [orgId, "api_keys", id],
+    queryKey: queryKeys.apiKeys.detail(orgId, id),
     queryFn: async () =>
       await supabase
         .from("api_keys")
@@ -60,8 +61,9 @@ export function useCreateApiKey() {
 
       return apiKey;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [orgId, "api_keys"] });
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.apiKeys.all(orgId) });
+      queryClient.setQueryData(queryKeys.apiKeys.detail(orgId, data.id), data);
     },
   });
 }
@@ -77,7 +79,7 @@ export function useDeleteApiKey() {
       await supabase.from("api_keys").delete().eq("id", id).throwOnError();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [orgId, "api_keys"] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.apiKeys.all(orgId) });
     },
   });
 }

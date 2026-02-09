@@ -7,12 +7,14 @@ import {
   supabase,
 } from "@/supabase/client";
 import useBoundStore from "@/stores/useBoundStore";
+import { queryKeys } from "./queryKeys";
 
 export function useAgent<T = AgentRow>(id: string) {
   const userId = useBoundStore((state) => state.ui.user?.id);
+  const orgId = useBoundStore((state) => state.ui.activeOrgId);
 
   return useQuery({
-    queryKey: ["agents", id],
+    queryKey: queryKeys.agents.detail(orgId, id),
     queryFn: async () =>
       await supabase
         .from("agents")
@@ -20,7 +22,7 @@ export function useAgent<T = AgentRow>(id: string) {
         .eq("id", id)
         .throwOnError()
         .single(),
-    enabled: !!userId,
+    enabled: !!userId && !!orgId,
     select: (data) => data.data as T,
     experimental_prefetchInRender: true,
   });
@@ -30,7 +32,7 @@ export function useInvitations() {
   const userId = useBoundStore((state) => state.ui.user?.id);
 
   return useQuery({
-    queryKey: ["invitations"],
+    queryKey: queryKeys.agents.invitations(),
     queryFn: async () =>
       await supabase
         .from("agents")
@@ -49,7 +51,7 @@ export function useCurrentAgent() {
   const orgId = useBoundStore((state) => state.ui.activeOrgId);
 
   return useQuery({
-    queryKey: [orgId, "agents", "current"],
+    queryKey: queryKeys.agents.current(orgId),
     queryFn: async () =>
       await supabase
         .from("agents")
@@ -69,7 +71,7 @@ export function useCurrentAgents() {
   const orgId = useBoundStore((state) => state.ui.activeOrgId);
 
   return useQuery({
-    queryKey: [orgId, "agents"],
+    queryKey: queryKeys.agents.all(orgId),
     queryFn: async () =>
       await supabase
         .from("agents")
@@ -98,8 +100,14 @@ export function useCreateAgent() {
 
       return agent;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [orgId, "agents"] });
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.agents.all(orgId),
+      });
+      queryClient.setQueryData(
+        queryKeys.agents.detail(orgId, data.id),
+        data,
+      );
     },
   });
 }
@@ -123,9 +131,14 @@ export function useUpdateAgent() {
 
       return agent;
     },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: [orgId, "agents"] });
-      queryClient.invalidateQueries({ queryKey: ["agents", variables.id] });
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.agents.all(orgId),
+      });
+      queryClient.setQueryData(
+        queryKeys.agents.detail(orgId, variables.id),
+        data,
+      );
     },
   });
 }
@@ -141,7 +154,9 @@ export function useDeleteAgent() {
       await supabase.from("agents").delete().eq("id", id).throwOnError();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [orgId, "agents"] });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.agents.all(orgId),
+      });
     },
   });
 }

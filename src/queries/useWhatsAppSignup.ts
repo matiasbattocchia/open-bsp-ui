@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/supabase/client";
 import type { SignupPayload } from "@/contexts/WhatsAppIntegrationContext";
 import useBoundStore from "@/stores/useBoundStore";
+import { queryKeys } from "./queryKeys";
 
 export function useWhatsAppSignup() {
   const queryClient = useQueryClient();
@@ -28,10 +29,9 @@ export function useWhatsAppSignup() {
 
       return data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["integrations", organization_id],
-      });
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.organizations.addresses(organization_id) });
+      queryClient.setQueryData(queryKeys.organizations.addressDetail(organization_id, data.id), data);
     },
   });
 }
@@ -61,10 +61,9 @@ export function useWhatsAppDisconnect() {
 
       return data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["integrations", organization_id],
-      });
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.organizations.addresses(organization_id) });
+      queryClient.setQueryData(queryKeys.organizations.addressDetail(organization_id, data.id), data);
     },
   });
 }

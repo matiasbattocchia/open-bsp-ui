@@ -50,8 +50,8 @@ function ApiKeyDetail() {
             <div className="label">{t("Nombre")}</div>
             <input
               type="text"
-              className="text hover:border-transparent"
-              disabled
+              className="text"
+              readOnly
               {...register("name")}
             />
           </label>
@@ -69,8 +69,8 @@ function ApiKeyDetail() {
             <div className="label">{t("Clave")}</div>
             <input
               type="text"
-              className="text hover:border-transparent"
-              disabled
+              className="text"
+              readOnly
               {...register("key")}
             />
           </label>

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { type Database, supabase } from "@/supabase/client";
 import useBoundStore from "@/stores/useBoundStore";
+import { queryKeys } from "./queryKeys";
 
 export type WebhookRow = Database["public"]["Tables"]["webhooks"]["Row"];
 export type WebhookInsert = Database["public"]["Tables"]["webhooks"]["Insert"];
@@ -11,7 +12,7 @@ export function useWebhooks() {
   const orgId = useBoundStore((state) => state.ui.activeOrgId);
 
   return useQuery({
-    queryKey: [orgId, "webhooks"],
+    queryKey: queryKeys.webhooks.all(orgId),
     queryFn: async () =>
       await supabase
         .from("webhooks")
@@ -28,7 +29,7 @@ export function useWebhook(id: string) {
   const orgId = useBoundStore((state) => state.ui.activeOrgId);
 
   return useQuery({
-    queryKey: [orgId, "webhooks", id],
+    queryKey: queryKeys.webhooks.detail(orgId, id),
     queryFn: async () =>
       await supabase
         .from("webhooks")
@@ -60,8 +61,12 @@ export function useCreateWebhook() {
 
       return webhook;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [orgId, "webhooks"] });
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.webhooks.all(orgId) });
+      queryClient.setQueryData(
+        queryKeys.webhooks.detail(orgId, data.id),
+        data,
+      );
     },
   });
 }
@@ -75,17 +80,22 @@ export function useUpdateWebhook() {
       if (!orgId) throw new Error("No active organization");
       if (!data.id) throw new Error("No webhook id");
 
-      await supabase
+      const { data: webhook } = await supabase
         .from("webhooks")
         .update(data)
         .eq("id", data.id)
+        .select()
+        .single()
         .throwOnError();
+
+      return webhook;
     },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: [orgId, "webhooks"] });
-      queryClient.invalidateQueries({
-        queryKey: [orgId, "webhooks", variables.id],
-      });
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.webhooks.all(orgId) });
+      queryClient.setQueryData(
+        queryKeys.webhooks.detail(orgId, variables.id),
+        data,
+      );
     },
   });
 }
@@ -101,7 +111,7 @@ export function useDeleteWebhook() {
       await supabase.from("webhooks").delete().eq("id", id).throwOnError();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [orgId, "webhooks"] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.webhooks.all(orgId) });
     },
   });
 }

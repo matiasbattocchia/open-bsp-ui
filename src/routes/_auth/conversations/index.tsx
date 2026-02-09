@@ -9,6 +9,7 @@ import { Bell } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useInvitations, useUpdateAgent } from "@/queries/useAgents";
 import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/queries/queryKeys";
 
 export const Route = createFileRoute("/_auth/conversations/")({
   component: Conversations,
@@ -36,8 +37,8 @@ function Conversations() {
       },
     }, {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["invitations"] })
-        queryClient.invalidateQueries({ queryKey: ["organizations"] })
+        queryClient.invalidateQueries({ queryKey: queryKeys.agents.invitations() })
+        queryClient.invalidateQueries({ queryKey: queryKeys.organizations.all() })
       }
     });
   };

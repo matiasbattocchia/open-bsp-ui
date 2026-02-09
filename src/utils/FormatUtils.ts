@@ -1,3 +1,5 @@
+import { parsePhoneNumberWithError } from 'libphonenumber-js';
+
 export function removeAccents(str: string): string {
   return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
@@ -35,14 +37,43 @@ export function nameInitials(name: string): string {
 }
 
 export function formatPhoneNumber(phoneNumber: string): string {
-  const areaCodeLenght = phoneNumber.slice(3, 5) === "11" ? 2 : 3;
+  try {
+    const parsed = parsePhoneNumberWithError("+" + phoneNumber, { extract: false });
+    return parsed.formatInternational();
+  } catch (error) {
+    return phoneNumber;
+  }
+}
 
-  // Format phone number with spaces and hyphen using splice
-  const chars = phoneNumber.split("");
-  chars.splice(2, 0, " "); // Country code
-  chars.splice(4, 0, " "); // Nine
-  chars.splice(5 + areaCodeLenght, 0, " "); // Area code
-  chars.splice(12, 0, "-"); // Hyphen
+export function isValidPhoneNumber(phoneNumber: string): boolean {
+  if (!phoneNumber?.trim()) { return true; }
 
-  return "+" + chars.join("");
+  try {
+    const parsed = parsePhoneNumberWithError(phoneNumber, { extract: true });
+    return parsed.isValid();
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Normalize phone number to E.164 format without the plus sign.
+ * For Argentina (+54), ensures the 9 is included after country code for mobile numbers.
+ * Returns original if parsing fails.
+ */
+export function normalizePhoneNumber(phoneNumber: string): string {
+  try {
+    const parsed = parsePhoneNumberWithError(phoneNumber, { extract: true });
+    // remove the +
+    let number = parsed.number.slice(1);
+
+    if (parsed.country === "AR" && !number.startsWith("549")) {
+      number = number.replace("54", "549");
+    }
+
+    return number
+  } catch {
+    // Return cleaned version (digits only) if parsing fails
+    return phoneNumber.replace(/\D/g, '');
+  }
 }
