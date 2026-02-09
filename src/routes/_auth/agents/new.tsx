@@ -51,7 +51,7 @@ function AddAgent() {
         mode: "active",
         api_url: "openai",
         protocol: "chat_completions",
-        model: "gpt-4.1-mini",
+        model: "gpt-5.2-chat-latest",
         tools: [],
       }
     },
@@ -185,6 +185,19 @@ function AddAgent() {
                   className="text"
                   placeholder={t("Nombre del modelo")}
                   {...register("extra.model")}
+                />
+              </label>
+
+              <label>
+                <div className="label">{t("Temperatura")}</div>
+                <input
+                  type="number"
+                  className="text"
+                  min={0}
+                  max={2}
+                  step={0.1}
+                  placeholder="1.0"
+                  {...register("extra.temperature", { valueAsNumber: true })}
                 />
               </label>
 

@@ -202,6 +202,19 @@ function AgentDetail() {
               />
             </label>
 
+            <label>
+              <div className="label">{t("Temperatura")}</div>
+              <input
+                type="number"
+                className="text"
+                min={0}
+                max={2}
+                step={0.1}
+                placeholder="1.0"
+                {...register("extra.temperature", { valueAsNumber: true })}
+              />
+            </label>
+
             {provider === 'custom' && (
               <div className="instructions">
                 <p>{t("Se envían los siguientes encabezados HTTP con cada solicitud:")}</p>
