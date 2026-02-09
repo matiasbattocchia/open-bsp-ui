@@ -8,6 +8,8 @@
 
 - [ ] (enhacement) Media messages colors
 
+- [ ] (enhancement) Display form errors
+
 - [x] (enhacement) Internal messages preview
 
 - [x] (bug) Error internal messages are shown as incoming in test conversations

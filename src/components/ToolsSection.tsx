@@ -568,14 +568,17 @@ function HTTPClientEditor<T extends FieldValues>({
         />
 
         <label>
-          <div className="label">{t("URL base")} ({t("opcional")})</div>
+          <div className="label">{t("URL")} ({t("opcional")})</div>
           <input
             type="url"
             className="text"
-            placeholder="https://api.example.com"
-            {...register(`extra.tools.${index}.config.base_url` as any)}
+            placeholder="https://api.example.com/*"
+            {...register(`extra.tools.${index}.config.url` as any)}
           />
         </label>
+        <p>
+          {t("Si termina en /*, solo se permiten URLs que comiencen con esa base. De lo contrario, debe coincidir exactamente.")}
+        </p>
 
         <label>
           <div className="label">{t("Token")} ({t("opcional")})</div>
