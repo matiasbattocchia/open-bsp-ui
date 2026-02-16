@@ -573,7 +573,7 @@ export type LocalMCPToolConfig = {
   label: string; // server label
   config: {
     url: string;
-    product?: "calendar" | "sheets";
+    product?: "calendar" | "sheets" | "openbsp";
     headers?: Record<string, string>;
     allowed_tools?: string[];
     files?: string[];

@@ -1,5 +1,5 @@
-import { useState, useRef } from "react";
-import { ArrowLeft, Calendar, Check, ChevronRight, Database, FileSpreadsheet, Globe, Plus, Server, Trash2 } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { ArrowLeft, Calendar, Check, ChevronRight, Database, FileSpreadsheet, Globe, MessageSquare, Plus, Server, Trash2 } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { type Control, useFieldArray, type FieldValues, type UseFormRegister, useWatch, type UseFormSetValue } from "react-hook-form";
 import SectionBody from "@/components/SectionBody";
@@ -7,6 +7,8 @@ import SectionItem from "@/components/SectionItem";
 import SelectField from "@/components/SelectField";
 import Switch from "@/components/Switch";
 import type { LocalMCPToolConfig, LocalHTTPToolConfig, LocalSQLToolConfig, LocalFunctionToolConfig, ToolConfig } from "@/supabase/client";
+import { useCurrentAgent } from "@/queries/useAgents";
+import { useApiKeys, useCreateApiKey } from "@/queries/useApiKeys";
 
 type ToolsSectionProps<T extends FieldValues> = {
   control: Control<T>;
@@ -19,6 +21,7 @@ type EditorState =
   | { type: "new-selection" }
   | { type: "mcp"; index: number }
   | { type: "google-mcp"; index: number }
+  | { type: "openbsp-mcp"; index: number }
   | { type: "http"; index: number }
   | { type: "sql"; index: number };
 
@@ -49,8 +52,12 @@ export default function ToolsSection<T extends FieldValues>({ control, register,
     (tool as any).type === "mcp" && ["calendar", "sheets"].includes((tool as any).config?.product)
   );
 
+  const openbspTools = allTools.filter((tool): tool is LocalMCPToolConfig & { id: string; _index: number } =>
+    (tool as any).type === "mcp" && (tool as any).config?.product === "openbsp"
+  );
+
   const mcpTools = allTools.filter((tool): tool is LocalMCPToolConfig & { id: string; _index: number } =>
-    (tool as any).type === "mcp" && !["calendar", "sheets"].includes((tool as any).config?.product)
+    (tool as any).type === "mcp" && !["calendar", "sheets", "openbsp"].includes((tool as any).config?.product)
   );
 
   const httpTools = allTools.filter((tool): tool is LocalHTTPToolConfig & { id: string; _index: number } =>
@@ -145,6 +152,25 @@ export default function ToolsSection<T extends FieldValues>({ control, register,
     setEditor({ type: "google-mcp", index: fields.length });
   };
 
+  const handleAddOpenBSP = () => {
+    const defaultTools = [
+      "list_conversations", "fetch_conversation", "search_contacts",
+      "list_accounts", "send_message", "list_templates", "fetch_template",
+    ];
+    const newTool: LocalMCPToolConfig = {
+      provider: "local",
+      type: "mcp",
+      label: "",
+      config: {
+        url: `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/mcp`,
+        product: "openbsp",
+        allowed_tools: defaultTools,
+      },
+    };
+    append(newTool as any);
+    setEditor({ type: "openbsp-mcp", index: fields.length });
+  };
+
   const handleDeleteTool = (index: number) => {
     remove(index);
   };
@@ -218,6 +244,21 @@ export default function ToolsSection<T extends FieldValues>({ control, register,
                   </div>
                 }
                 onClick={() => setEditor({ type: "google-mcp", index: tool._index })}
+              />
+            ))}
+
+            {/* OpenBSP Tools */}
+            {openbspTools.map((tool) => (
+              <SectionItem
+                key={tool.id}
+                title={tool.label || t("Sin nombre")}
+                description={tool.config.url || t("Sin URL")}
+                aside={
+                  <div className="p-[8px] bg-muted rounded-full">
+                    <MessageSquare className="w-[24px] h-[24px] text-muted-foreground" />
+                  </div>
+                }
+                onClick={() => setEditor({ type: "openbsp-mcp", index: tool._index })}
               />
             ))}
 
@@ -323,6 +364,7 @@ export default function ToolsSection<T extends FieldValues>({ control, register,
           onAddHTTP={handleAddHTTP}
           onAddSQL={handleAddSQL}
           onAddGoogle={handleAddGoogle}
+          onAddOpenBSP={handleAddOpenBSP}
         />
       )}
 
@@ -334,6 +376,21 @@ export default function ToolsSection<T extends FieldValues>({ control, register,
           control={control}
           setValue={setValue}
           updateTool={(idx, data) => update(idx, data as any)}
+          onDelete={() => {
+            handleDeleteTool(editor.index);
+            setEditor({ type: "closed" });
+          }}
+          onBack={() => setEditor({ type: "closed" })}
+        />
+      )}
+
+      {/* OpenBSP MCP Client Editor */}
+      {isOpen && editor.type === "openbsp-mcp" && (
+        <OpenBSPMCPClientEditor
+          index={editor.index}
+          register={register}
+          control={control}
+          setValue={setValue}
           onDelete={() => {
             handleDeleteTool(editor.index);
             setEditor({ type: "closed" });
@@ -478,6 +535,18 @@ function MCPClientEditor<T extends FieldValues>({
             {...register(`extra.tools.${index}.config.headers.authorization` as any)}
           />
         </label>
+
+        <div className="instructions">
+          <p>{t("Se envían los siguientes encabezados HTTP con cada solicitud:")}</p>
+          <ul>
+            <li><code>organization-id</code></li>
+            <li><code>organization-address</code></li>
+            <li><code>conversation-id</code></li>
+            <li><code>agent-id</code></li>
+            <li><code>contact-id</code></li>
+            <li><code>contact-address</code></li>
+          </ul>
+        </div>
       </SectionBody>
     </div>
   );
@@ -589,6 +658,18 @@ function HTTPClientEditor<T extends FieldValues>({
             {...register(`extra.tools.${index}.config.headers.authorization` as any)}
           />
         </label>
+
+        <div className="instructions">
+          <p>{t("Se envían los siguientes encabezados HTTP con cada solicitud:")}</p>
+          <ul>
+            <li><code>organization-id</code></li>
+            <li><code>organization-address</code></li>
+            <li><code>conversation-id</code></li>
+            <li><code>agent-id</code></li>
+            <li><code>contact-id</code></li>
+            <li><code>contact-address</code></li>
+          </ul>
+        </div>
       </SectionBody>
     </div>
   );
@@ -992,6 +1073,165 @@ function GoogleMCPClientEditor<T extends FieldValues>({
   );
 }
 
+// OpenBSP MCP Client Editor
+function OpenBSPMCPClientEditor<T extends FieldValues>({
+  index,
+  register,
+  control,
+  setValue,
+  onDelete,
+  onBack,
+}: {
+  index: number;
+  register: UseFormRegister<T>;
+  control: Control<T>;
+  setValue: UseFormSetValue<T>;
+  onDelete: () => void;
+  onBack: () => void;
+}) {
+  const { translate: t } = useTranslation();
+
+  const { data: currentAgent } = useCurrentAgent();
+  const isOwner = currentAgent?.extra?.role === "owner";
+
+  const { data: apiKeys } = useApiKeys();
+  const { mutateAsync: createApiKey } = useCreateApiKey();
+  const [autoAuthDone, setAutoAuthDone] = useState(false);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const label = (useWatch({ control, name: `extra.tools.${index}.label` as any }) as string) || "";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const token = (useWatch({ control, name: `extra.tools.${index}.config.headers.authorization` as any }) as string) || "";
+
+  // Auto-auth for owners: find or create an "OpenBSP MCP" API key
+  const hasToken = token.trim() !== "";
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!isOwner || autoAuthDone || hasToken || !apiKeys) return;
+
+    const existing = apiKeys.find((k) => k.name === "OpenBSP MCP");
+    if (existing) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      setValue(`extra.tools.${index}.config.headers.authorization` as any, `Bearer ${existing.key}` as any, { shouldDirty: true });
+      setAutoAuthDone(true);
+    } else {
+      createApiKey({ name: "OpenBSP MCP", role: "member" }).then((newKey) => {
+        if (newKey) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          setValue(`extra.tools.${index}.config.headers.authorization` as any, `Bearer ${newKey.key}` as any, { shouldDirty: true });
+        }
+        setAutoAuthDone(true);
+      });
+    }
+  }, [isOwner, apiKeys, autoAuthDone, hasToken]);
+
+  const isValid = label.trim() !== "" && hasToken;
+  const isEmpty = label.trim() === "" && !hasToken;
+  const canGoBack = isValid || isEmpty;
+
+  const handleBack = () => {
+    if (isEmpty) {
+      onDelete();
+    } else {
+      onBack();
+    }
+  };
+
+  const allowedToolsOptions = [
+    { value: "list_conversations", label: t("Listar conversaciones") },
+    { value: "fetch_conversation", label: t("Obtener conversación") },
+    { value: "search_contacts", label: t("Buscar contactos") },
+    { value: "list_accounts", label: t("Listar cuentas") },
+    { value: "send_message", label: t("Enviar mensaje") },
+    { value: "list_templates", label: t("Listar plantillas") },
+    { value: "fetch_template", label: t("Obtener plantilla") },
+  ];
+
+  return (
+    <div className="absolute inset-0 bottom-[80px] z-50 bg-background flex flex-col">
+      <div className="header items-center truncate shrink-0">
+        <button
+          type="button"
+          className="p-[8px] rounded-full hover:bg-muted mr-[8px] ml-[-8px] disabled:opacity-30 disabled:hover:bg-transparent"
+          title={canGoBack ? t("Volver") : t("Volver") + " - " + t("Completa los campos requeridos")}
+          onClick={handleBack}
+          disabled={!canGoBack}
+        >
+          <ArrowLeft className="w-[24px] h-[24px]" />
+        </button>
+        <div className="text-[16px]">WhatsApp</div>
+
+        <button
+          type="button"
+          className="p-[8px] rounded-full hover:bg-muted ml-auto"
+          title={t("Eliminar")}
+          onClick={onDelete}
+        >
+          <Trash2 className="w-[24px] h-[24px]" />
+        </button>
+      </div>
+
+      <SectionBody className="gap-[24px] pl-[10px]">
+        <label>
+          <div className="label">{t("Nombre")}</div>
+          <input
+            type="text"
+            className="text"
+            placeholder="Mis chats"
+            maxLength={32}
+            {...register(`extra.tools.${index}.label` as any, { required: true, maxLength: 32 })}
+          />
+        </label>
+
+        {isOwner ? (
+          <div className="flex items-center gap-[8px] text-[14px]">
+            {hasToken ? (
+              <>
+                <Check className="w-[16px] h-[16px] text-primary" />
+                <span className="text-muted-foreground">{t("Autenticación configurada automáticamente")}</span>
+              </>
+            ) : (
+              <span className="text-muted-foreground">{t("Configurando autenticación...")}</span>
+            )}
+          </div>
+        ) : (
+          <label>
+            <div className="label">{t("Token")}</div>
+            <input
+              type="text"
+              className="text"
+              placeholder="Bearer sk_..."
+              {...register(`extra.tools.${index}.config.headers.authorization` as any, { required: true })}
+            />
+            <p className="text-muted-foreground text-[14px] mt-[4px]">
+              {t("Obtén una API key en Configuración > API Keys")}
+            </p>
+          </label>
+        )}
+
+        {/* Hidden input for owner auth */}
+        {isOwner && (
+          <input
+            type="hidden"
+            {...register(`extra.tools.${index}.config.headers.authorization` as any, { required: true })}
+          />
+        )}
+
+        <SelectField
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          name={`extra.tools.${index}.config.allowed_tools` as any}
+          control={control}
+          label={t("Herramientas permitidas")}
+          multiple
+          options={allowedToolsOptions}
+          placeholder={t("Ninguna")}
+          modalClassName="bottom-0"
+        />
+      </SectionBody>
+    </div>
+  );
+}
+
 // New Tool Selection View
 function NewToolSelection({
   onBack,
@@ -999,12 +1239,14 @@ function NewToolSelection({
   onAddHTTP,
   onAddSQL,
   onAddGoogle,
+  onAddOpenBSP,
 }: {
   onBack: () => void;
   onAddMCP: () => void;
   onAddHTTP: () => void;
   onAddSQL: () => void;
   onAddGoogle: (product: "calendar" | "sheets") => void;
+  onAddOpenBSP: () => void;
 }) {
   const { translate: t } = useTranslation();
 
@@ -1023,6 +1265,16 @@ function NewToolSelection({
       </div>
 
       <SectionBody>
+        <SectionItem
+          title="WhatsApp"
+          description={t("Gestionar conversaciones de WhatsApp")}
+          aside={
+            <div className="p-[8px] bg-muted rounded-full">
+              <MessageSquare className="w-[24px] h-[24px] text-muted-foreground" />
+            </div>
+          }
+          onClick={onAddOpenBSP}
+        />
         <SectionItem
           title={t("Cliente MCP")}
           description={t("Conectar servidor MCP externo")}

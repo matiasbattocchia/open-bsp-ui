@@ -46,7 +46,7 @@ export function useCreateApiKey() {
   const orgId = useBoundStore((state) => state.ui.activeOrgId);
 
   return useMutation({
-    mutationFn: async (data: ApiKeyInsert) => {
+    mutationFn: async (data: Omit<ApiKeyInsert, "key" | "organization_id">) => {
       if (!orgId) throw new Error("No active organization");
 
       // Simple key generation logic
