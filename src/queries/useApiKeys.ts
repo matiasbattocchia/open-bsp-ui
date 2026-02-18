@@ -63,7 +63,11 @@ export function useCreateApiKey() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.apiKeys.all(orgId) });
-      queryClient.setQueryData(queryKeys.apiKeys.detail(orgId, data.id), data);
+      queryClient.setQueryData(
+        queryKeys.apiKeys.detail(orgId, data.id),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (old: any) => old ? { ...old, data } : { data, error: null },
+      );
     },
   });
 }

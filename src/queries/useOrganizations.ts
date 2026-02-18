@@ -71,7 +71,11 @@ export function useCreateOrganization() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.organizations.all() });
-      queryClient.setQueryData(queryKeys.organizations.detail(data.id), data);
+      queryClient.setQueryData(
+        queryKeys.organizations.detail(data.id),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (old: any) => old ? { ...old, data } : { data, error: null },
+      );
     },
   });
 }
@@ -96,7 +100,11 @@ export function useUpdateCurrentOrganization() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.organizations.all() });
-      queryClient.setQueryData(queryKeys.organizations.detail(data.id), data);
+      queryClient.setQueryData(
+        queryKeys.organizations.detail(data.id),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (old: any) => old ? { ...old, data } : old,
+      );
     },
   });
 }

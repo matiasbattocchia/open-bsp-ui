@@ -19,6 +19,9 @@ export default defineConfig({
     }),
     tailwindcss(),
   ],
+  build: {
+    chunkSizeWarningLimit: 600,
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

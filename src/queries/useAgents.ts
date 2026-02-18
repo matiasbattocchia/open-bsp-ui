@@ -106,7 +106,8 @@ export function useCreateAgent() {
       });
       queryClient.setQueryData(
         queryKeys.agents.detail(orgId, data.id),
-        data,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (old: any) => old ? { ...old, data } : { data, error: null },
       );
     },
   });
@@ -134,9 +135,13 @@ export function useUpdateAgent() {
       queryClient.invalidateQueries({
         queryKey: queryKeys.agents.all(data.organization_id),
       });
+      // Use function updater to preserve the Supabase response wrapper.
+      // queryFn returns { data: AgentRow, ... } and select does data.data,
+      // so setting a raw AgentRow would make select return undefined.
       queryClient.setQueryData(
         queryKeys.agents.detail(data.organization_id, variables.id),
-        data,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (old: any) => old ? { ...old, data } : old,
       );
     },
   });

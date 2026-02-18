@@ -65,7 +65,8 @@ export function useCreateWebhook() {
       queryClient.invalidateQueries({ queryKey: queryKeys.webhooks.all(orgId) });
       queryClient.setQueryData(
         queryKeys.webhooks.detail(orgId, data.id),
-        data,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (old: any) => old ? { ...old, data } : { data, error: null },
       );
     },
   });
@@ -94,7 +95,8 @@ export function useUpdateWebhook() {
       queryClient.invalidateQueries({ queryKey: queryKeys.webhooks.all(orgId) });
       queryClient.setQueryData(
         queryKeys.webhooks.detail(orgId, variables.id),
-        data,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (old: any) => old ? { ...old, data } : old,
       );
     },
   });

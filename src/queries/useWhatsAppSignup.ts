@@ -31,7 +31,11 @@ export function useWhatsAppSignup() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.organizations.addresses(organization_id) });
-      queryClient.setQueryData(queryKeys.organizations.addressDetail(organization_id, data.id), data);
+      queryClient.setQueryData(
+        queryKeys.organizations.addressDetail(organization_id, data.id),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (old: any) => old ? { ...old, data } : { data, error: null },
+      );
     },
   });
 }
@@ -63,7 +67,11 @@ export function useWhatsAppDisconnect() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.organizations.addresses(organization_id) });
-      queryClient.setQueryData(queryKeys.organizations.addressDetail(organization_id, data.id), data);
+      queryClient.setQueryData(
+        queryKeys.organizations.addressDetail(organization_id, data.id),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (old: any) => old ? { ...old, data } : { data, error: null },
+      );
     },
   });
 }
