@@ -56,6 +56,7 @@ function Login() {
           <GoogleOutlined /> {t("Continuar con Google")}
         </button>
 
+        {/*
         <div className="border-b border-border w-full" />
 
         <form onSubmit={handleLogInWithEmail} className="login-form">
@@ -92,6 +93,7 @@ function Login() {
             {t("Entrar")}
           </button>
         </form>
+        */}
       </div>
     </div>
   );
