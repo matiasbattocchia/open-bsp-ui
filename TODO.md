@@ -1,12 +1,20 @@
 # TODO
 
+## Before Product Hunt Launch
+
+- [ ] (enhacement) Translations
+
+- [ ] (feat) Templates
+
+- [ ] (enhacement) Media messages colors
+
+## General
+
 - [x] (enhacement) Test conversation names
 
 - [x] (feat) Respond to invitation
 
 - [ ] (enhacement) Eliminated agent messages display name
-
-- [ ] (enhacement) Media messages colors
 
 - [ ] (enhancement) Display form errors
 
@@ -17,10 +25,6 @@
 - [ ] (feat) Modals (delete confirmation)
 
 - [x] (feat) Annotator configuration
-
-- [ ] (enhacement) Translations
-
-- [ ] (feat) Templates
 
 - [ ] (feat) Not found section message for conversations, contacts, etc.
 
@@ -44,8 +48,6 @@ If redirected to organizations/new from this URL, the cancel button returns to S
 
 - [ ] (bug) Re-login does not initializes data, needs to refresh
 
----
+- [ ] (enhacement) Display email in member view (should be made available at extra so we don't need RLS to read auth.users)
 
-ver más... newline limit
-
-always show email in member view
+- [ ] (enhacement) Show more... could improve (it counts chars but many new lines can make it show more than expected)

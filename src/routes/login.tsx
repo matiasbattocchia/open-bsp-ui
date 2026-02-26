@@ -56,9 +56,9 @@ function Login() {
           <GoogleOutlined /> {t("Continuar con Google")}
         </button>
 
-        <div className="border-b border-border w-full" />
+        <div className="border-b border-border w-full hidden" />
 
-        <form onSubmit={handleLogInWithEmail} className="login-form">
+        <form onSubmit={handleLogInWithEmail} className="login-form hidden">
           <label>
             <div className="label">{t("Correo electrónico")}</div>
             <input
