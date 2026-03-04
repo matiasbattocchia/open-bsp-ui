@@ -56,9 +56,9 @@ function Login() {
           <GoogleOutlined /> {t("Continuar con Google")}
         </button>
 
-        <div className="border-b border-border w-full hidden" />
+        <div className={`border-b border-border w-full ${import.meta.env.DEV ? "" : "hidden"}`} />
 
-        <form onSubmit={handleLogInWithEmail} className="login-form hidden">
+        <form onSubmit={handleLogInWithEmail} className={`login-form ${import.meta.env.DEV ? "" : "hidden"}`}>
           <label>
             <div className="label">{t("Correo electrónico")}</div>
             <input

@@ -136,7 +136,7 @@ export default function ToolsSection<T extends FieldValues>({ control, register,
   const handleAddGoogle = (product: "calendar" | "sheets") => {
     const defaultTools = product === "calendar"
       ? ["list_calendars", "list_events", "check_availability", "create_event", "update_event", "delete_event"]
-      : ["list_authorized_files", "get_spreadsheet", "get_sheet_schema", "describe_sheet", "search_rows", "read_sheet", "write_sheet", "append_rows", "create_spreadsheet"];
+      : ["list_authorized_files", "get_spreadsheet", "get_sheet_schema", "describe_sheet", "search_rows", "read_sheet", "write_sheet", "append_rows", "create_spreadsheet", "semantic_search"];
 
     const newTool: LocalMCPToolConfig = {
       provider: "local",
@@ -981,6 +981,7 @@ function GoogleMCPClientEditor<T extends FieldValues>({
       { value: "write_sheet", label: t("Escribir hoja") },
       { value: "append_rows", label: t("Agregar filas") },
       { value: "create_spreadsheet", label: t("Crear hoja de cálculo") },
+      { value: "semantic_search", label: t("Búsqueda semántica") },
     ];
 
   return (
