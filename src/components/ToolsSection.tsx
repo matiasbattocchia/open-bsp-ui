@@ -69,7 +69,7 @@ export default function ToolsSection<T extends FieldValues>({ control, register,
   );
 
   // Simple tools (function type) - only one instance of each allowed
-  const simpleToolNames = ["calculator", "transfer_to_human_agent"] as const;
+  const simpleToolNames = ["calculator"] as const;
   type SimpleToolName = typeof simpleToolNames[number];
 
   const hasSimpleTool = (name: SimpleToolName): boolean => {
@@ -333,21 +333,6 @@ export default function ToolsSection<T extends FieldValues>({ control, register,
                 <Switch
                   checked={hasSimpleTool("calculator")}
                   onCheckedChange={() => toggleSimpleTool("calculator")}
-                  className="mt-[4px]"
-                />
-              </label>
-
-              {/* Transfer to Human */}
-              <label className="flex items-center gap-[12px] cursor-pointer justify-between">
-                <div className="flex flex-col gap-[2px]">
-                  <div className="text-foreground">{t("Transferir a humano")}</div>
-                  <p className="text-muted-foreground text-[14px]">
-                    {t("Dejar que un humano responda cuando no se tiene la respuesta exacta")}
-                  </p>
-                </div>
-                <Switch
-                  checked={hasSimpleTool("transfer_to_human_agent")}
-                  onCheckedChange={() => toggleSimpleTool("transfer_to_human_agent")}
                   className="mt-[4px]"
                 />
               </label>

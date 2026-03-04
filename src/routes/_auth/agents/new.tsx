@@ -189,6 +189,17 @@ function AddAgent() {
               </label>
 
               <label>
+                <div className="label">{t("Mensajes máximos")}</div>
+                <input
+                  type="number"
+                  className="text"
+                  min={1}
+                  placeholder="50"
+                  {...register("extra.max_messages", { valueAsNumber: true })}
+                />
+              </label>
+
+              <label>
                 <div className="label">{t("Temperatura")}</div>
                 <input
                   type="number"
