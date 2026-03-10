@@ -2,23 +2,30 @@
 
 ## Before Product Hunt Launch
 
-- [ ] (enhacement) Translations
+- [ ] (enhancement) Translations
 
 - [ ] (feat) Templates
 
-- [ ] (enhacement) Media messages colors
+- [ ] (enhancement) Media messages colors
 
 ## General
 
-- [x] (enhacement) Test conversation names
+- [ ] (enhancement) Auth headers / tokens
+  - Webhooks -> token, the back prepends Bearer
+  - API keys -> confusing: Supa client vs cURL / Supa API vs Edge Functions
+  - HTTP tool -> front sets the auth header but says "token" in the UI
+  - MCP tool -> same
+  - SQL tool (Turso) -> ok
+
+- [x] (enhancement) Test conversation names
 
 - [x] (feat) Respond to invitation
 
-- [ ] (enhacement) Eliminated agent messages display name
+- [ ] (enhancement) Eliminated agent messages display name
 
 - [ ] (enhancement) Display form errors
 
-- [x] (enhacement) Internal messages preview
+- [x] (enhancement) Internal messages preview
 
 - [x] (bug) Error internal messages are shown as incoming in test conversations
 
@@ -30,9 +37,9 @@
 
 - [ ] (feat) Client-side cache using IndexedDB
 
-- [x] (enhacement) Hide empty conversations from the chat list
+- [x] (enhancement) Hide empty conversations from the chat list
 
-- [x] (enhacement) General feedback / spinner (delete, accept invitation, ...)
+- [x] (enhancement) General feedback / spinner (delete, accept invitation, ...)
 
 - [x] (enhancement) Primary button spinner placement to the left of the text
 
@@ -48,6 +55,6 @@ If redirected to organizations/new from this URL, the cancel button returns to S
 
 - [ ] (bug) Re-login does not initializes data, needs to refresh
 
-- [ ] (enhacement) Display email in member view (should be made available at extra so we don't need RLS to read auth.users)
+- [ ] (enhancement) Display email in member view (should be made available at extra so we don't need RLS to read auth.users)
 
-- [ ] (enhacement) Show more... could improve (it counts chars but many new lines can make it show more than expected)
+- [ ] (enhancement) Show more... could improve (it counts chars but many new lines can make it show more than expected)

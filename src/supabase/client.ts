@@ -878,6 +878,12 @@ export type Role = Database["public"]["Enums"]["role"];
 export const supabase = createClient<Database>(
   import.meta.env.VITE_SUPABASE_URL!,
   import.meta.env.VITE_SUPABASE_ANON_KEY!,
+  {
+    auth: {
+      flowType: "pkce",
+      detectSessionInUrl: true,
+    },
+  },
 );
 
 supabase.realtime.reconnectAfterMs = (attempt: number) => {
