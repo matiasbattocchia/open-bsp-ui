@@ -103,7 +103,7 @@ export default function Menu() {
             ],
           }}
           trigger={["click"]}
-          placement="rightBottom"
+          placement="bottomRight"
         >
           <div
             title={t("Preferencias")}
