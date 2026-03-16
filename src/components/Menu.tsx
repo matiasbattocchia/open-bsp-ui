@@ -90,6 +90,11 @@ export default function Menu() {
           <Settings className="w-[20px] h-[20px] stroke-[2]" />
         </LinkButton>
 
+        {/* Deploy/version marker (for debugging previews on mobile) */}
+        <div className="mt-[2px] text-[10px] leading-none text-muted-foreground select-none">
+          v{__APP_VERSION__} · {__DEPLOY_SHA__}
+        </div>
+
         <Dropdown
           menu={{
             items: [
