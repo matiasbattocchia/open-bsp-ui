@@ -333,7 +333,7 @@ export default function ChatListItem({
                   itemId={itemId}
                 >
                   <svg
-                    className="h-[20px] w-[19px] ml-[6px] text-muted-foreground hidden group-hover:block"
+                    className="h-[20px] w-[19px] ml-[6px] text-muted-foreground block md:hidden md:group-hover:block"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <use href="/icons.svg#down" />
