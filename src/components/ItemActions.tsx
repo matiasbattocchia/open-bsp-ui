@@ -10,15 +10,11 @@ export default function ItemActions({
   itemId,
   trigger,
   visible,
-  open,
-  onOpenChange,
 }: {
   children: React.ReactNode;
   itemId: string;
   trigger: ("contextMenu" | "click" | "hover")[] | undefined;
   visible?: boolean;
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
 }) {
   const conversation = useBoundStore((state) =>
     state.chat.conversations.get(itemId || ""),
@@ -83,8 +79,6 @@ export default function ItemActions({
     <Dropdown
       menu={{ items }}
       trigger={trigger}
-      open={open}
-      onOpenChange={onOpenChange}
       className={`${visible || visible == undefined ? "visible" : "hidden"} rounded-none`}
     >
       {children}

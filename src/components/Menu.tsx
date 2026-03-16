@@ -80,20 +80,38 @@ export default function Menu() {
       {/* Lower section */}
       <div className="flex flex-col items-center">
 
-        {/* Settings button */}
-        <LinkButton
-          to="/settings"
-          title={t("Preferencias")}
-          isActive={pathname.startsWith("/settings")}
-          className="mt-[10px]"
+        {/* Settings menu (click gear) */}
+        <Dropdown
+          menu={{
+            items: [
+              {
+                key: "settings",
+                label: t("Preferencias"),
+                icon: <Settings className="w-[16px] h-[16px]" />,
+                onClick: () => navigate({ to: "/settings", hash: (prevHash) => prevHash! }),
+              },
+              { type: "divider" },
+              {
+                key: "version",
+                label: (
+                  <span className="text-muted-foreground">
+                    v{__APP_VERSION__} · {__DEPLOY_SHA__}
+                  </span>
+                ),
+                disabled: true,
+              },
+            ],
+          }}
+          trigger={["click"]}
+          placement="rightBottom"
         >
-          <Settings className="w-[20px] h-[20px] stroke-[2]" />
-        </LinkButton>
-
-        {/* Deploy/version marker (for debugging previews on mobile) */}
-        <div className="mt-[2px] text-[10px] leading-none text-muted-foreground select-none">
-          v{__APP_VERSION__} · {__DEPLOY_SHA__}
-        </div>
+          <div
+            title={t("Preferencias")}
+            className={`cursor-pointer mt-[10px] p-[8px] rounded-full hover:bg-muted ${pathname.startsWith("/settings") ? "bg-muted" : ""}`}
+          >
+            <Settings className="w-[20px] h-[20px] stroke-[2]" />
+          </div>
+        </Dropdown>
 
         <Dropdown
           menu={{

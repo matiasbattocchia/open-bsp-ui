@@ -1,4 +1,4 @@
-import { type ReactNode, useContext, useRef, useState } from "react";
+import { type ReactNode, useContext } from "react";
 import Avatar from "./Avatar";
 import { getHighestStatus, getStatusIcon } from "@/utils/MessageStatusUtils";
 import useBoundStore from "@/stores/useBoundStore";
@@ -123,12 +123,6 @@ export default function ChatListItem({
   itemId: string;
 }) {
   const navigate = useNavigate();
-
-  // Mobile: enable long-press to open the same actions menu (Pause/Resume, etc.)
-  const [actionsOpen, setActionsOpen] = useState(false);
-  const longPressTimerRef = useRef<number | null>(null);
-  const longPressFiredRef = useRef(false);
-  const rootRef = useRef<HTMLDivElement | null>(null);
   const activeConvId = useBoundStore((state) => state.ui.activeConvId);
 
   const active = itemId === activeConvId;
@@ -244,71 +238,15 @@ export default function ChatListItem({
 
   return (
     conversation && (
-      <ItemActions
-        trigger={["contextMenu"]}
-        itemId={itemId}
-        open={actionsOpen}
-        onOpenChange={setActionsOpen}
-      >
+      <ItemActions trigger={["contextMenu"]} itemId={itemId}>
         <div
-          ref={rootRef}
           className={
             "chat-list-item h-[72px] flex cursor-pointer rounded-xl group" +
             (active ? " bg-accent" : " hover:bg-accent")
           }
-          onTouchStart={(e) => {
-            longPressFiredRef.current = false;
-
-            if (longPressTimerRef.current) {
-              window.clearTimeout(longPressTimerRef.current);
-            }
-
-            const touch = e.touches?.[0];
-            const x = touch?.clientX ?? 0;
-            const y = touch?.clientY ?? 0;
-
-            // 450ms feels close to native long-press without being annoying.
-            longPressTimerRef.current = window.setTimeout(() => {
-              longPressFiredRef.current = true;
-              setActionsOpen(true);
-
-              // Best-effort: also dispatch a contextmenu event (useful on desktop / some browsers)
-              rootRef.current?.dispatchEvent(
-                new MouseEvent("contextmenu", {
-                  bubbles: true,
-                  cancelable: true,
-                  clientX: x,
-                  clientY: y,
-                }),
-              );
-            }, 450);
-          }}
-          onTouchEnd={(e) => {
-            if (longPressTimerRef.current) {
-              window.clearTimeout(longPressTimerRef.current);
-              longPressTimerRef.current = null;
-            }
-
-            // Avoid the synthetic click navigation after a long-press.
-            if (longPressFiredRef.current) {
-              e.preventDefault();
-              e.stopPropagation();
-            }
-          }}
-          onTouchCancel={() => {
-            if (longPressTimerRef.current) {
-              window.clearTimeout(longPressTimerRef.current);
-              longPressTimerRef.current = null;
-            }
-          }}
           onClick={(e) => {
-            if (longPressFiredRef.current) {
-              return;
-            }
-
             e.stopPropagation();
             e.preventDefault();
-            // setActiveConv(itemId);
             navigate({ to: "/conversations", hash: itemId });
           }}
         >
