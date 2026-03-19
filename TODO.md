@@ -10,6 +10,10 @@
 
 ## General
 
+- [ ] (feat) Users onboard their own clients flow (add org address without giving access to org)
+
+- [ ] (enhancement) Free AI providers API keys instructions (in the UI)
+
 - [ ] (enhancement) Auth headers / tokens
   - Webhooks -> token, the back prepends Bearer
   - API keys -> confusing: Supa client vs cURL / Supa API vs Edge Functions

@@ -12,6 +12,7 @@ import ActionCard from "@/components/ActionCard";
 import { Bot, Building2, MessageSquarePlus, Settings } from "lucide-react";
 import { useResizable } from "@/hooks/useResizable";
 import { useCurrentAgents } from "@/queries/useAgents";
+import { StatsProvider, useStatsContext } from "@/contexts/StatsContext";
 
 export const Route = createFileRoute("/_auth")({
   component: AppLayout,
@@ -30,12 +31,24 @@ function getMaxPanelWidth() {
 }
 
 function AppLayout() {
+  return (
+    <StatsProvider>
+      <AppLayoutInner />
+    </StatsProvider>
+  );
+}
+
+function AppLayoutInner() {
   const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
   const { data: agents } = useCurrentAgents();
   const hasAiAgents = agents?.some((a) => a.ai);
   const activeConvId = useBoundStore((state) => state.ui.activeConvId);
   const setActiveConv = useBoundStore((state) => state.ui.setActiveConv);
   const location = useLocation();
+  const pathname = location.pathname;
+  const isStatsRoute = pathname.startsWith("/stats");
+
+  const { centerContent } = useStatsContext();
 
   const [isHoveringFiles, setIsHoveringFiles] = useState(false);
 
@@ -55,13 +68,15 @@ function AppLayout() {
   console.log("active org ", activeOrgId)
   console.log("active conv", activeConvId)
 
+  const showCenterPanel = activeConvId || isStatsRoute;
+
   return (
     <div
       className="app-grid"
       style={panelWidth !== null ? { gridTemplateColumns: `${getMenuWidth()}px ${panelWidth}px 1fr` } : undefined}
     >
       {/* Menu - Fixed width */}
-      <div className={activeConvId ? "hidden md:flex" : "flex"}>
+      <div className={showCenterPanel ? "hidden md:flex" : "flex"}>
         <Menu />
       </div>
       {/* Left Panel - Router Outlet */}
@@ -69,7 +84,7 @@ function AppLayout() {
         ref={panelRef}
         className={
           "flex-col overflow-hidden md:border-r border-border bg-background text-foreground col-span-2 md:col-span-1 relative " +
-          (activeConvId ? "hidden md:flex" : "flex")
+          (showCenterPanel ? "hidden md:flex" : "flex")
         }
       >
         <Outlet />
@@ -80,16 +95,24 @@ function AppLayout() {
         />
       </div>
 
-      {/* Center Panel - Chat */}
+      {/* Center Panel */}
       <div
         className={
           "flex-col min-w-0 relative overflow-hidden col-span-full md:col-span-1" +
-          (activeConvId ? " flex bg-chat" : " hidden md:flex bg-muted")
+          (isStatsRoute
+            ? " flex bg-muted"
+            : activeConvId
+              ? " flex bg-chat"
+              : " hidden md:flex bg-muted")
         }
         onDragEnter={() => setIsHoveringFiles(true)}
         onDrop={() => setIsHoveringFiles(false)}
       >
-        {activeConvId ? (
+        {isStatsRoute ? (
+          <div className="overflow-y-auto h-full">
+            {centerContent}
+          </div>
+        ) : activeConvId ? (
           <>
             {isHoveringFiles && (
               <FilePicker setHovering={setIsHoveringFiles} />
