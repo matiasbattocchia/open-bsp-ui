@@ -12,7 +12,7 @@ import ActionCard from "@/components/ActionCard";
 import { Bot, Building2, MessageSquarePlus, Settings } from "lucide-react";
 import { useResizable } from "@/hooks/useResizable";
 import { useCurrentAgents } from "@/queries/useAgents";
-import { StatsProvider, useStatsContext } from "@/contexts/StatsContext";
+import StatsCenter from "@/components/stats/StatsCenter";
 
 export const Route = createFileRoute("/_auth")({
   component: AppLayout,
@@ -31,14 +31,6 @@ function getMaxPanelWidth() {
 }
 
 function AppLayout() {
-  return (
-    <StatsProvider>
-      <AppLayoutInner />
-    </StatsProvider>
-  );
-}
-
-function AppLayoutInner() {
   const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
   const { data: agents } = useCurrentAgents();
   const hasAiAgents = agents?.some((a) => a.ai);
@@ -47,8 +39,6 @@ function AppLayoutInner() {
   const location = useLocation();
   const pathname = location.pathname;
   const isStatsRoute = pathname.startsWith("/stats");
-
-  const { centerContent } = useStatsContext();
 
   const [isHoveringFiles, setIsHoveringFiles] = useState(false);
 
@@ -110,7 +100,7 @@ function AppLayoutInner() {
       >
         {isStatsRoute ? (
           <div className="overflow-y-auto h-full">
-            {centerContent}
+            <StatsCenter />
           </div>
         ) : activeConvId ? (
           <>
