@@ -114,12 +114,12 @@ export default function AudioMessage({
               <>
                 {paused && (
                   <svg className="w-[34px] h-[34px]">
-                    <use className="text-[#728977]" href="/icons.svg#play" />
+                    <use className="text-primary" href="/icons.svg#play" />
                   </svg>
                 )}
                 {!paused && (
                   <svg className="w-[34px] h-[34px]">
-                    <use className="text-[#728977]" href="/icons.svg#pause" />
+                    <use className="text-primary" href="/icons.svg#pause" />
                   </svg>
                 )}
               </>
@@ -133,7 +133,7 @@ export default function AudioMessage({
                 className={
                   "left-[6px] h-full absolute cursor-pointer" +
                   (true
-                    ? " [&::-moz-range-thumb]:bg-[#4fc3f7] [&::-webkit-slider-thumb]::bg-[#4fc3f7]"
+                    ? " [&::-moz-range-thumb]:bg-primary [&::-webkit-slider-thumb]::bg-primary"
                     : " [&::-moz-range-thumb]:bg-gray-light [&::-webkit-slider-thumb]::bg-gray-light")
                 }
                 type="range"
@@ -156,10 +156,10 @@ export default function AudioMessage({
             )}
             {/* REPLACED: AudioVisualizer with simple progress bar for React 19 compatibility */}
             {load.blob && (
-              <div className="relative w-[166px] h-[24px] bg-[#e0e0e0] rounded-sm overflow-hidden">
+              <div className="relative w-[166px] h-[24px] bg-black/10 dark:bg-white/10 rounded-sm overflow-hidden">
                 {/* Progress indicator */}
                 <div
-                  className="absolute top-0 left-0 h-full bg-[#728977] transition-all duration-100"
+                  className="absolute top-0 left-0 h-full bg-primary transition-all duration-100"
                   style={{
                     width: duration > 0 ? `${((seekTime || time) / duration) * 100}%` : '0%'
                   }}
@@ -169,7 +169,7 @@ export default function AudioMessage({
                   {Array.from({ length: 40 }).map((_, i) => (
                     <div
                       key={i}
-                      className="w-[2px] bg-[#b0ceae] rounded-full"
+                      className="w-[2px] bg-primary/50 rounded-full"
                       style={{
                         height: `${Math.random() * 60 + 40}%`,
                       }}
@@ -193,7 +193,7 @@ export default function AudioMessage({
             )}
             */}
             {duration > 0 && (
-              <div className="absolute left-0 -bottom-[22px] text-[11px] text-[#ced0d1]">
+              <div className="absolute left-0 -bottom-[22px] text-[11px] text-muted-foreground">
                 {dayjs.duration(time || duration, "seconds").format("m:ss")}
               </div>
             )}
@@ -227,7 +227,7 @@ export default function AudioMessage({
               (message.direction === "incoming" ? convName : orgName) || "?",
             )}
             size={55}
-            className="bg-blue-400 text-xl"
+            className="bg-primary text-xl"
           />
           <svg
             className={
@@ -236,7 +236,7 @@ export default function AudioMessage({
             }
           >
             {/* TODO: out message mic background should match the green background of the message - cabra 05/06/2024 */}
-            <use className="text-[#4d5f56]" href="/icons.svg#mic" />
+            <use className="text-primary" href="/icons.svg#mic" />
           </svg>
         </div>
       </div>

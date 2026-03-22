@@ -106,7 +106,7 @@ export default function DocumentMessage(message: MessageRow) {
       <div
         className={
           "py-[13px] px-[19px] rounded-md flex items-start cursor-pointer" +
-          (message.direction === "outgoing" ? " bg-blue-200" : " bg-[#f5f6f6]")
+          " bg-black/5 dark:bg-white/5"
         }
         onClick={() => {
           if (load.status === "done") {

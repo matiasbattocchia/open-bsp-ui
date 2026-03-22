@@ -451,7 +451,7 @@ function TemplateEditor({
           </div>
           <div className="flex gap-[6px] self-end">
             <button
-              className="bg-blue-300 hover:bg-blue-400"
+              className="bg-primary hover:bg-primary/90"
               onClick={async () => {
                 await manageTemplate(existingTemplate ? "PATCH" : "POST");
                 setShowEditor(false);
@@ -459,14 +459,14 @@ function TemplateEditor({
             >
               <div className="flex items-center gap-[3px]">
                 {upsertLoading && (
-                  <LoaderCircle className="h-5 w-5 animate-spin stroke-blue-700" />
+                  <LoaderCircle className="h-5 w-5 animate-spin stroke-primary-foreground" />
                 )}
                 <T>Enviar a revisión</T>
               </div>
             </button>
             {existingTemplate && (
               <button
-                className="bg-red-300 hover:bg-red-400"
+                className="bg-destructive hover:bg-destructive/90"
                 onClick={async () => {
                   await manageTemplate("DELETE");
                   setShowEditor(false);
@@ -474,7 +474,7 @@ function TemplateEditor({
               >
                 <div className="flex items-center gap-[3px]">
                   {deleteLoading && (
-                    <LoaderCircle className="h-5 w-5 animate-spin stroke-red-700" />
+                    <LoaderCircle className="h-5 w-5 animate-spin stroke-destructive-foreground" />
                   )}
                   <T>Eliminar</T>
                 </div>
@@ -482,7 +482,7 @@ function TemplateEditor({
             )}
             <T
               as="button"
-              className="bg-zinc-300 hover:bg-zinc-400"
+              className="bg-muted hover:bg-muted/80"
               onClick={() => setShowEditor(false)}
             >
               Descartar
@@ -629,7 +629,7 @@ export default function WhatsAppTemplates() {
 
               <T
                 as="button"
-                className="bg-blue-300 hover:bg-blue-400 mb-[12px]"
+                className="bg-primary hover:bg-primary/90 mb-[12px]"
                 onClick={() => {
                   setTemplateToEdit(undefined);
                   setShowEditor(true);
@@ -641,7 +641,7 @@ export default function WhatsAppTemplates() {
               {templates?.map((template) => (
                 <div className="mb-[12px] relative group" key={template.id}>
                   {template.status !== "APPROVED" && (
-                    <p className="absolute bg-red-100 text-red-500 px-[12px] py-[6px] rounded-full capitalize">
+                    <p className="absolute bg-destructive/20 text-destructive px-[12px] py-[6px] rounded-full capitalize">
                       {template.status.toLowerCase()}
                     </p>
                   )}
