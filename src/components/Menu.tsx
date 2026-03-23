@@ -129,7 +129,10 @@ export default function Menu() {
                   ...(organizations?.map((org) => ({
                     key: org.id,
                     label: org.name,
-                    onClick: () => setActiveOrg(org.id),
+                    onClick: () => {
+                      setActiveOrg(org.id);
+                      navigate({ to: "/conversations" });
+                    },
                   })) || []),
                   {
                     key: "new_org",
