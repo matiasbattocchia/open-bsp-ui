@@ -5,7 +5,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useOrganizationsAddresses } from "@/queries/useOrganizationsAddresses";
 import { useTranslation } from "@/hooks/useTranslation";
 import { WhatsAppOutlined } from "@ant-design/icons";
-import { Plus } from "lucide-react";
+import { Link, Plus } from "lucide-react";
 import type { JSX } from "react";
 import { formatPhoneNumber } from "@/utils/FormatUtils";
 
@@ -43,6 +43,20 @@ function WhatsAppIndex() {
             onClick={() =>
               navigate({
                 to: "/integrations/whatsapp/new",
+                hash: (prevHash) => prevHash!,
+              })
+            }
+          />
+          <SectionItem
+            title={t("Invitaciones a terceros")}
+            aside={
+              <div className="p-[8px]">
+                <Link className="w-[24px] h-[24px] text-muted-foreground" />
+              </div>
+            }
+            onClick={() =>
+              navigate({
+                to: "/integrations/whatsapp/onboarding",
                 hash: (prevHash) => prevHash!,
               })
             }

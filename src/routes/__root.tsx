@@ -34,7 +34,7 @@ export const Route = createRootRoute({
       });
     }
 
-    if (!user && !location.pathname.startsWith("/login")) {
+    if (!user && !location.pathname.startsWith("/login") && !location.pathname.startsWith("/onboard")) {
       throw redirect({
         to: "/login",
         search: {

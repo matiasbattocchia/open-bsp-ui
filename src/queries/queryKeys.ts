@@ -28,6 +28,9 @@ export const queryKeys = {
     all: (orgId: NullableId) => [orgId, "webhooks"] as const,
     detail: (orgId: NullableId, id: NullableId) => [orgId, "webhooks", id] as const,
   },
+  onboardingTokens: {
+    all: (orgId: NullableId) => [orgId, "onboarding_tokens"] as const,
+  },
   billing: {
     products: () => ["billing", "products"] as const,
     usage: (orgId: NullableId, interval: string) => [orgId, "billing", "usage", interval] as const,
