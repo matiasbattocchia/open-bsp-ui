@@ -34,7 +34,7 @@ function NewOnboardingToken() {
 
   return (
     <>
-      <SectionHeader title={t("Generar enlace de onboarding")} />
+      <SectionHeader title={t("Generar enlace")} />
 
       <SectionBody>
         <form
@@ -60,7 +60,7 @@ function NewOnboardingToken() {
               <input
                 type="text"
                 className="text"
-                placeholder={t("Ej: Cliente ABC")}
+                placeholder={t("Nombre del enlace")}
                 {...register("name", { required: true })}
               />
             </label>
