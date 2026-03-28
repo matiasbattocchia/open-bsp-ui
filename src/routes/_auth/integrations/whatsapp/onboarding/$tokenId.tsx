@@ -41,7 +41,7 @@ function OnboardingTokenDetail() {
   return token && (
     <>
       <SectionHeader
-        title={t("Enlace de onboarding")}
+        title={token.name}
         onDelete={() =>
           deleteToken.mutate(tokenId, {
             onSuccess: () =>

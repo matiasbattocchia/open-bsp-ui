@@ -5,6 +5,7 @@ import { queryKeys } from "./queryKeys";
 
 export type OnboardingTokenRow = {
   id: string;
+  name: string;
   organization_id: string;
   created_by: string;
   created_at: string;
@@ -37,7 +38,7 @@ export function useCreateOnboardingToken() {
   const userId = useBoundStore((state) => state.ui.user?.id);
 
   return useMutation({
-    mutationFn: async (expiresInDays: number) => {
+    mutationFn: async ({ name, expiresInDays }: { name: string; expiresInDays: number }) => {
       if (!orgId) throw new Error("No active organization");
       if (!userId) throw new Error("No authenticated user");
 
@@ -48,6 +49,7 @@ export function useCreateOnboardingToken() {
       const { data } = await supabase
         .from("onboarding_tokens")
         .insert({
+          name,
           organization_id: orgId,
           created_by: userId,
           expires_at,

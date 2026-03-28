@@ -54,11 +54,7 @@ function OnboardingIndex() {
                 <Link className="w-[24px] h-[24px] text-muted-foreground" />
               </div>
             }
-            title={
-              <span className="font-mono text-[13px]">
-                {token.id.slice(0, 8)}...
-              </span>
-            }
+            title={token.name}
             description={
               <span>
                 {getStatus(token)}

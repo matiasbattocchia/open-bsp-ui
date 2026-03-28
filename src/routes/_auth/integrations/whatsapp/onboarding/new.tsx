@@ -14,6 +14,7 @@ export const Route = createFileRoute("/_auth/integrations/whatsapp/onboarding/ne
 });
 
 type FormValues = {
+  name: string;
   expires_in_days: string;
 };
 
@@ -24,8 +25,9 @@ function NewOnboardingToken() {
   const { data: currentAgent } = useCurrentAgent();
   const isOwner = currentAgent?.extra?.role === "owner";
 
-  const { control, handleSubmit } = useForm<FormValues>({
+  const { control, register, handleSubmit } = useForm<FormValues>({
     defaultValues: {
+      name: "",
       expires_in_days: "7",
     },
   });
@@ -38,7 +40,7 @@ function NewOnboardingToken() {
         <form
           id="create-onboarding-token-form"
           onSubmit={handleSubmit((data) =>
-            createToken.mutate(Number(data.expires_in_days), {
+            createToken.mutate({ name: data.name, expiresInDays: Number(data.expires_in_days) }, {
               onSuccess: (token) =>
                 navigate({
                   to: "/integrations/whatsapp/onboarding/$tokenId",
@@ -52,6 +54,16 @@ function NewOnboardingToken() {
             <p className="text-muted-foreground text-[14px]">
               {t("Generá un enlace para que un tercero conecte su número de WhatsApp a tu organización. No necesita tener cuenta en Open BSP ni ser miembro de tu organización.")}
             </p>
+
+            <label>
+              <div className="label">{t("Nombre")}</div>
+              <input
+                type="text"
+                className="text"
+                placeholder={t("Ej: Cliente ABC")}
+                {...register("name", { required: true })}
+              />
+            </label>
 
             <SelectField
               name="expires_in_days"
