@@ -29,6 +29,32 @@ md.renderer.rules.link_open = function (tokens, idx) {
   return `<a href="${tokens[idx].href}"${title} target="_blank" rel="noopener noreferrer">`;
 };
 
+// Convert WhatsApp formatting to standard markdown for Remarkable rendering
+// Mirrors whatsappToMarkdown from open-bsp-api/_shared/markdown.ts
+function whatsappToMarkdown(text: string): string {
+  const parts = text.split(/(`{3}[\s\S]*?`{3})/);
+
+  return parts.map((part) => {
+    if (part.startsWith("```")) return part;
+
+    const subParts = part.split(/(`[^`]+`)/);
+
+    return subParts.map((subPart) => {
+      if (subPart.startsWith("`")) return subPart;
+
+      let processed = subPart;
+      // Bold: *text* -> **text**
+      processed = processed.replace(/\*([^\*]+?)\*/g, "**$1**");
+      // Italic: _text_ -> *text*
+      processed = processed.replace(/_([^_]+?)_/g, "*$1*");
+      // Strikethrough: ~text~ -> ~~text~~
+      processed = processed.replace(/~([^~]+?)~/g, "~~$1~~");
+
+      return processed;
+    }).join("");
+  }).join("");
+}
+
 export function Markdown({
   content,
   direction,
@@ -49,7 +75,7 @@ export function Markdown({
     }
   }
 
-  const renderedHTML = md.render(content);
+  const renderedHTML = md.render(whatsappToMarkdown(content));
 
   return (
     <div
