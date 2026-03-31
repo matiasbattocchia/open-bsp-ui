@@ -4,13 +4,13 @@
 
 - [ ] (enhancement) Translations
 
-- [ ] (feat) Templates
+- [-] (feat) Templates
 
-- [ ] (enhancement) Media messages colors
+- [x] (enhancement) Media messages colors
 
 ## General
 
-- [ ] (feat) Users onboard their own clients flow (add org address without giving access to org)
+- [x] (feat) Users onboard their own clients flow (add org address without giving access to org)
 
 - [ ] (enhancement) Free AI providers API keys instructions (in the UI)
 
@@ -27,7 +27,11 @@
 
 - [ ] (enhancement) Eliminated agent messages display name
 
-- [ ] (enhancement) Display form errors
+- [ ] (enhancement) Display form errors (like in /templates)
+
+- [ ] (enhancement) Not found section message for conversations, contacts, etc. (like in /templates)
+
+- [ ] (enhancement) Loader (spinner or skeleton) for list and detail views (like in /templates)
 
 - [x] (enhancement) Internal messages preview
 
@@ -36,8 +40,6 @@
 - [ ] (feat) Modals (delete confirmation)
 
 - [x] (feat) Annotator configuration
-
-- [ ] (feat) Not found section message for conversations, contacts, etc.
 
 - [ ] (feat) Client-side cache using IndexedDB
 
