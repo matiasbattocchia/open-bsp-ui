@@ -22,33 +22,41 @@ export default function TemplatePreview({
   ) => void;
   editMode?: boolean;
 }) {
+  "use no memo";
   const toggle = useBoundStore((store) => store.ui.toggle);
 
-  const head = useMemo(
+  const headMemo = useMemo(
     () => components.find((c) => c.type === "HEADER"),
     [components],
   );
-  const body = useMemo(
+  const bodyMemo = useMemo(
     () => components.find((c) => c.type === "BODY")!,
     [components],
   );
-  const foot = useMemo(
+  const footMemo = useMemo(
     () => components.find((c) => c.type === "FOOTER"),
     [components],
   );
-  const butt = useMemo(
+  const buttMemo = useMemo(
     () => components.find((c) => c.type === "BUTTONS"),
     [components],
   );
+
+  // In editMode, bypass memos to always reflect latest form values
+  const head = editMode ? components.find((c) => c.type === "HEADER") : headMemo;
+  const body = editMode ? components.find((c) => c.type === "BODY")! : bodyMemo;
+  const foot = editMode ? components.find((c) => c.type === "FOOTER") : footMemo;
+  const butt = editMode ? components.find((c) => c.type === "BUTTONS") : buttMemo;
 
   let headPlaceholders = head?.text;
   let bodyPlaceholders = body.text;
 
   const headExamples = head?.example?.header_text || [];
-  const bodyExamples = useMemo(
+  const bodyExamplesMemo = useMemo(
     () => body.example?.body_text[0] || [],
     [body.example?.body_text],
   );
+  const bodyExamples = editMode ? (body.example?.body_text[0] || []) : bodyExamplesMemo;
 
   const buttons = butt?.buttons;
 
@@ -56,20 +64,26 @@ export default function TemplatePreview({
   const [bodyValues, setBodyValues] = useState(bodyExamples);
 
   useEffect(() => {
-    setBodyValues(bodyExamples);
+    if (!editMode) setBodyValues(bodyExamples);
   }, [bodyExamples]);
 
+  // In editMode, use examples directly from props (no internal state needed)
+  const effectiveHeadValues = editMode ? headExamples : headValues;
+  const effectiveBodyValues = editMode ? bodyExamples : bodyValues;
+
   let idx = 1;
-  for (const value of headValues) {
+  for (const value of effectiveHeadValues) {
     headPlaceholders = headPlaceholders?.replaceAll(
       `{{${idx}}}`,
-      `<span id="${idx}" class="templateField templateHeader" contentEditable>${value}</span>`,
+      editMode
+        ? value
+        : `<span id="${idx}" class="templateField templateHeader" contentEditable>${value}</span>`,
     );
     idx++;
   }
 
   idx = 1;
-  for (const value of bodyValues) {
+  for (const value of effectiveBodyValues) {
     bodyPlaceholders = bodyPlaceholders.replaceAll(
       `{{${idx}}}`,
       editMode
