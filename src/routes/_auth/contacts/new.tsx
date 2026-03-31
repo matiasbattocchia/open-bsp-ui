@@ -9,6 +9,7 @@ import Button from "@/components/Button";
 import { Plus, X } from "lucide-react";
 import type { ContactWithAddressesInsert } from "@/supabase/client";
 import { isValidPhoneNumber } from "@/utils/FormatUtils";
+import FieldError from "@/components/FieldError";
 
 export const Route = createFileRoute("/_auth/contacts/new")({
   component: ContactNew,
@@ -81,9 +82,7 @@ function ContactNew() {
                   <X className="w-5 h-5" />
                 </button>
               </div>
-              {errors.addresses?.[idx]?.address && (
-                <div className="text-destructive text-[12px]">{errors.addresses[idx]!.address!.message}</div>
-              )}
+              <FieldError error={errors.addresses?.[idx]?.address} />
             </label>
           ))}
 

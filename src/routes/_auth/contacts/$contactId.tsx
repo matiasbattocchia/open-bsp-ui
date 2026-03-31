@@ -14,6 +14,7 @@ import { Plus, X } from "lucide-react";
 import { useMemo } from "react";
 import type { ContactWithAddressesUpdate } from "@/supabase/client";
 import { isValidPhoneNumber, formatPhoneNumber } from "@/utils/FormatUtils";
+import FieldError from "@/components/FieldError";
 
 export const Route = createFileRoute("/_auth/contacts/$contactId")({
   component: ContactDetail,
@@ -107,9 +108,7 @@ function ContactDetail() {
                     <X className="w-5 h-5" />
                   </button>
                 </div>
-                {errors.addresses?.[idx]?.address && (
-                  <div className="text-destructive text-[12px]">{errors.addresses[idx]!.address!.message}</div>
-                )}
+                <FieldError error={errors.addresses?.[idx]?.address} />
               </label>
             );
           })}
