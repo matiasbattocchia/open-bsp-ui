@@ -8,7 +8,6 @@ import { useEffect, useState } from "react";
 import { useLocation } from "@tanstack/react-router";
 import FilePicker from "@/components/FileUploader/FilePicker";
 import FilePreviewer from "@/components/FilePreviewer";
-import WhatsAppTemplates from "@/components/Templates";
 import ActionCard from "@/components/ActionCard";
 import { Bot, Building2, MessageSquarePlus, Settings } from "lucide-react";
 import { useResizable } from "@/hooks/useResizable";
@@ -109,7 +108,6 @@ function AppLayout() {
               <FilePicker setHovering={setIsHoveringFiles} />
             )}
             <FilePreviewer />
-            <WhatsAppTemplates />
             <ChatHeader />
             <Chat />
             <ChatFooter />

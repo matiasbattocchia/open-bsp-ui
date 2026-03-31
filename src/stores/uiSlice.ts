@@ -2,7 +2,7 @@ import type { StateCreator } from "zustand";
 import type { User } from "@supabase/supabase-js";
 import type { AppState } from "./useBoundStore";
 import dayjs from "dayjs";
-import type { ConversationRow, MessageRow } from "@/supabase/client";
+import type { ConversationRow, MessageRow, TemplateData } from "@/supabase/client";
 
 export function isArchived(conv: ConversationRow, msg?: MessageRow) {
   const archivedTimestamp: string | null | undefined = conv.extra?.archived;
@@ -31,8 +31,15 @@ export const filters: {
   archivadas: (conv, msg) => isArchived(conv, msg),
 } as const;
 
+export type TemplateDraft = {
+  template: TemplateData;
+  bodyVarValues: string[];
+  headVarValues: string[];
+};
+
 export type UIState = {
   templatePicker: boolean;
+  templateDrafts: Map<string, TemplateDraft>;
   activeOrgId: string | null;
   activeConvId: string | null;
   user: User | null;
@@ -50,6 +57,7 @@ export type UIActions = {
   setSendAsContact: (sendAsContact: boolean) => void;
   setFilter: (filter: keyof typeof filters) => void;
   setSearchPattern: (searchPattern: string) => void;
+  setTemplateDraft: (convId: string, draft: TemplateDraft | null) => void;
 };
 
 export type UISlice = UIState & UIActions;
@@ -65,6 +73,7 @@ export const createUISlice: StateCreator<Partial<AppState>> = (
   ) => void,
 ) => ({
   templatePicker: false,
+  templateDrafts: new Map(),
   activeOrgId: null,
   activeConvId: null,
   user: null,
@@ -121,4 +130,14 @@ export const createUISlice: StateCreator<Partial<AppState>> = (
         searchPattern,
       },
     })),
+  setTemplateDraft: (convId: string, draft: TemplateDraft | null) =>
+    set((state) => {
+      const templateDrafts = new Map(state.ui.templateDrafts);
+      if (draft) {
+        templateDrafts.set(convId, draft);
+      } else {
+        templateDrafts.delete(convId);
+      }
+      return { ui: { ...state.ui, templateDrafts } };
+    }),
 });

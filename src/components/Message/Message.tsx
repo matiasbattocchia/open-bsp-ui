@@ -385,6 +385,19 @@ export default function Message(props: UIMessage & { message: MessageRow }) {
       />
     );
     text = true;
+  } else if (props.message.content.type === "data" && props.message.content.text) {
+    content = (
+      <TextMessage
+        header={headerText}
+        body={props.message.content.text}
+        type="markdown"
+        direction={props.message.direction}
+        timestamp={props.message.timestamp}
+        status={props.message.direction === "outgoing" ? props.message.status : undefined}
+        fixedWidth={fixedWidth}
+      />
+    );
+    text = true;
   } else if (props.message.content.type === "data") {
     content = (
       <TextMessage

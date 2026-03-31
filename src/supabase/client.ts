@@ -373,6 +373,7 @@ export type DataPart<Kind = "data", T = Json> = {
   type: "data";
   kind: Kind;
   data: T;
+  text?: string;
   artifacts?: Part[];
 };
 
