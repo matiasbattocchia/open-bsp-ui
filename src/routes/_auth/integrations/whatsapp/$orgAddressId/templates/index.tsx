@@ -5,30 +5,23 @@ import SectionItem from "@/components/SectionItem";
 import { useTranslation } from "@/hooks/useTranslation";
 import { Plus, LayoutTemplate, LoaderCircle } from "lucide-react";
 import { useTemplates } from "@/queries/useTemplates";
-import { useOrganizationsAddresses } from "@/queries/useOrganizationsAddresses";
 
-export const Route = createFileRoute("/_auth/templates/")({
+export const Route = createFileRoute(
+  "/_auth/integrations/whatsapp/$orgAddressId/templates/",
+)({
   component: TemplatesIndex,
 });
 
 function TemplatesIndex() {
   const { translate: t } = useTranslation();
   const navigate = useNavigate();
+  const { orgAddressId } = Route.useParams();
 
-  const { data: addresses, isLoading: loadingAddresses } =
-    useOrganizationsAddresses();
-  const whatsappAddress = addresses?.find(
-    (a) => a.service === "whatsapp",
-  )?.address;
-
-  const { data: templates, isLoading: loadingTemplates } =
-    useTemplates(whatsappAddress);
-
-  const isLoading = loadingAddresses || loadingTemplates;
+  const { data: templates, isLoading } = useTemplates(orgAddressId);
 
   return (
     <>
-      <SectionHeader title={t("Plantillas") as string} />
+      <SectionHeader title={t("Plantillas")} />
       <SectionBody>
         <SectionItem
           title={t("Crear plantilla")}
@@ -39,7 +32,8 @@ function TemplatesIndex() {
           }
           onClick={() =>
             navigate({
-              to: "/templates/new",
+              to: "/integrations/whatsapp/$orgAddressId/templates/new",
+              params: { orgAddressId },
               hash: (prevHash) => prevHash!,
             })
           }
@@ -74,7 +68,8 @@ function TemplatesIndex() {
             }
             onClick={() =>
               navigate({
-                to: `/templates/${template.id}`,
+                to: "/integrations/whatsapp/$orgAddressId/templates/$templateId",
+                params: { orgAddressId, templateId: template.id },
                 hash: (prevHash) => prevHash!,
               })
             }

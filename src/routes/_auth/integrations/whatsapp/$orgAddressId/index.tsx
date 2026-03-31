@@ -9,8 +9,10 @@ import { formatPhoneNumber } from "@/utils/FormatUtils";
 import type { OrganizationAddressExtra } from "@/supabase/client";
 import { useState } from "react";
 import Button from "@/components/Button";
+import SectionItem from "@/components/SectionItem";
+import { LayoutTemplate } from "lucide-react";
 
-export const Route = createFileRoute("/_auth/integrations/whatsapp/$orgAddressId")({
+export const Route = createFileRoute("/_auth/integrations/whatsapp/$orgAddressId/")({
   component: WhatsAppDetails,
 });
 
@@ -58,6 +60,21 @@ function WhatsAppDetails() {
       <SectionHeader title={integration.extra?.verified_name || t("Cuenta de WhatsApp")} />
 
       <SectionBody className="pb-[40px]">
+        <SectionItem
+          title={t("Plantillas de mensajes")}
+          aside={
+            <div className="p-[8px]">
+              <LayoutTemplate className="w-[24px] h-[24px] text-muted-foreground" />
+            </div>
+          }
+          onClick={() =>
+            navigate({
+              to: "/integrations/whatsapp/$orgAddressId/templates",
+              params: { orgAddressId },
+              hash: (prevHash) => prevHash!,
+            })
+          }
+        />
         <form>
           <label>
             <div className="label">{t("Nombre verificado")}</div>

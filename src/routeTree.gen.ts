@@ -15,15 +15,12 @@ import { Route as AuthIndexRouteImport } from './routes/_auth/index'
 import { Route as OnboardTokenRouteImport } from './routes/onboard.$token'
 import { Route as OauthCallbackRouteImport } from './routes/oauth/callback'
 import { Route as AuthStatsRouteImport } from './routes/_auth/stats'
-import { Route as AuthTemplatesIndexRouteImport } from './routes/_auth/templates/index'
 import { Route as AuthStatsIndexRouteImport } from './routes/_auth/stats/index'
 import { Route as AuthSettingsIndexRouteImport } from './routes/_auth/settings/index'
 import { Route as AuthIntegrationsIndexRouteImport } from './routes/_auth/integrations/index'
 import { Route as AuthConversationsIndexRouteImport } from './routes/_auth/conversations/index'
 import { Route as AuthContactsIndexRouteImport } from './routes/_auth/contacts/index'
 import { Route as AuthAgentsIndexRouteImport } from './routes/_auth/agents/index'
-import { Route as AuthTemplatesNewRouteImport } from './routes/_auth/templates/new'
-import { Route as AuthTemplatesTemplateIdRouteImport } from './routes/_auth/templates/$templateId'
 import { Route as AuthStatsUsageRouteImport } from './routes/_auth/stats/usage'
 import { Route as AuthStatsQuotasRouteImport } from './routes/_auth/stats/quotas'
 import { Route as AuthIntegrationsMediaPreprocessingRouteImport } from './routes/_auth/integrations/media-preprocessing'
@@ -45,10 +42,13 @@ import { Route as AuthSettingsMembersMemberIdRouteImport } from './routes/_auth/
 import { Route as AuthSettingsApiKeysNewRouteImport } from './routes/_auth/settings/api-keys/new'
 import { Route as AuthSettingsApiKeysApiKeyIdRouteImport } from './routes/_auth/settings/api-keys/$apiKeyId'
 import { Route as AuthIntegrationsWhatsappNewRouteImport } from './routes/_auth/integrations/whatsapp/new'
-import { Route as AuthIntegrationsWhatsappOrgAddressIdRouteImport } from './routes/_auth/integrations/whatsapp/$orgAddressId'
 import { Route as AuthIntegrationsWhatsappOnboardingIndexRouteImport } from './routes/_auth/integrations/whatsapp/onboarding/index'
+import { Route as AuthIntegrationsWhatsappOrgAddressIdIndexRouteImport } from './routes/_auth/integrations/whatsapp/$orgAddressId/index'
 import { Route as AuthIntegrationsWhatsappOnboardingNewRouteImport } from './routes/_auth/integrations/whatsapp/onboarding/new'
 import { Route as AuthIntegrationsWhatsappOnboardingTokenIdRouteImport } from './routes/_auth/integrations/whatsapp/onboarding/$tokenId'
+import { Route as AuthIntegrationsWhatsappOrgAddressIdTemplatesIndexRouteImport } from './routes/_auth/integrations/whatsapp/$orgAddressId/templates/index'
+import { Route as AuthIntegrationsWhatsappOrgAddressIdTemplatesNewRouteImport } from './routes/_auth/integrations/whatsapp/$orgAddressId/templates/new'
+import { Route as AuthIntegrationsWhatsappOrgAddressIdTemplatesTemplateIdRouteImport } from './routes/_auth/integrations/whatsapp/$orgAddressId/templates/$templateId'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -79,11 +79,6 @@ const AuthStatsRoute = AuthStatsRouteImport.update({
   path: '/stats',
   getParentRoute: () => AuthRoute,
 } as any)
-const AuthTemplatesIndexRoute = AuthTemplatesIndexRouteImport.update({
-  id: '/templates/',
-  path: '/templates/',
-  getParentRoute: () => AuthRoute,
-} as any)
 const AuthStatsIndexRoute = AuthStatsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -112,16 +107,6 @@ const AuthContactsIndexRoute = AuthContactsIndexRouteImport.update({
 const AuthAgentsIndexRoute = AuthAgentsIndexRouteImport.update({
   id: '/agents/',
   path: '/agents/',
-  getParentRoute: () => AuthRoute,
-} as any)
-const AuthTemplatesNewRoute = AuthTemplatesNewRouteImport.update({
-  id: '/templates/new',
-  path: '/templates/new',
-  getParentRoute: () => AuthRoute,
-} as any)
-const AuthTemplatesTemplateIdRoute = AuthTemplatesTemplateIdRouteImport.update({
-  id: '/templates/$templateId',
-  path: '/templates/$templateId',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthStatsUsageRoute = AuthStatsUsageRouteImport.update({
@@ -240,16 +225,16 @@ const AuthIntegrationsWhatsappNewRoute =
     path: '/integrations/whatsapp/new',
     getParentRoute: () => AuthRoute,
   } as any)
-const AuthIntegrationsWhatsappOrgAddressIdRoute =
-  AuthIntegrationsWhatsappOrgAddressIdRouteImport.update({
-    id: '/integrations/whatsapp/$orgAddressId',
-    path: '/integrations/whatsapp/$orgAddressId',
-    getParentRoute: () => AuthRoute,
-  } as any)
 const AuthIntegrationsWhatsappOnboardingIndexRoute =
   AuthIntegrationsWhatsappOnboardingIndexRouteImport.update({
     id: '/integrations/whatsapp/onboarding/',
     path: '/integrations/whatsapp/onboarding/',
+    getParentRoute: () => AuthRoute,
+  } as any)
+const AuthIntegrationsWhatsappOrgAddressIdIndexRoute =
+  AuthIntegrationsWhatsappOrgAddressIdIndexRouteImport.update({
+    id: '/integrations/whatsapp/$orgAddressId/',
+    path: '/integrations/whatsapp/$orgAddressId/',
     getParentRoute: () => AuthRoute,
   } as any)
 const AuthIntegrationsWhatsappOnboardingNewRoute =
@@ -262,6 +247,24 @@ const AuthIntegrationsWhatsappOnboardingTokenIdRoute =
   AuthIntegrationsWhatsappOnboardingTokenIdRouteImport.update({
     id: '/integrations/whatsapp/onboarding/$tokenId',
     path: '/integrations/whatsapp/onboarding/$tokenId',
+    getParentRoute: () => AuthRoute,
+  } as any)
+const AuthIntegrationsWhatsappOrgAddressIdTemplatesIndexRoute =
+  AuthIntegrationsWhatsappOrgAddressIdTemplatesIndexRouteImport.update({
+    id: '/integrations/whatsapp/$orgAddressId/templates/',
+    path: '/integrations/whatsapp/$orgAddressId/templates/',
+    getParentRoute: () => AuthRoute,
+  } as any)
+const AuthIntegrationsWhatsappOrgAddressIdTemplatesNewRoute =
+  AuthIntegrationsWhatsappOrgAddressIdTemplatesNewRouteImport.update({
+    id: '/integrations/whatsapp/$orgAddressId/templates/new',
+    path: '/integrations/whatsapp/$orgAddressId/templates/new',
+    getParentRoute: () => AuthRoute,
+  } as any)
+const AuthIntegrationsWhatsappOrgAddressIdTemplatesTemplateIdRoute =
+  AuthIntegrationsWhatsappOrgAddressIdTemplatesTemplateIdRouteImport.update({
+    id: '/integrations/whatsapp/$orgAddressId/templates/$templateId',
+    path: '/integrations/whatsapp/$orgAddressId/templates/$templateId',
     getParentRoute: () => AuthRoute,
   } as any)
 
@@ -279,16 +282,12 @@ export interface FileRoutesByFullPath {
   '/integrations/media-preprocessing': typeof AuthIntegrationsMediaPreprocessingRoute
   '/stats/quotas': typeof AuthStatsQuotasRoute
   '/stats/usage': typeof AuthStatsUsageRoute
-  '/templates/$templateId': typeof AuthTemplatesTemplateIdRoute
-  '/templates/new': typeof AuthTemplatesNewRoute
   '/agents': typeof AuthAgentsIndexRoute
   '/contacts': typeof AuthContactsIndexRoute
   '/conversations': typeof AuthConversationsIndexRoute
   '/integrations': typeof AuthIntegrationsIndexRoute
   '/settings': typeof AuthSettingsIndexRoute
   '/stats/': typeof AuthStatsIndexRoute
-  '/templates': typeof AuthTemplatesIndexRoute
-  '/integrations/whatsapp/$orgAddressId': typeof AuthIntegrationsWhatsappOrgAddressIdRoute
   '/integrations/whatsapp/new': typeof AuthIntegrationsWhatsappNewRoute
   '/settings/api-keys/$apiKeyId': typeof AuthSettingsApiKeysApiKeyIdRoute
   '/settings/api-keys/new': typeof AuthSettingsApiKeysNewRoute
@@ -304,7 +303,11 @@ export interface FileRoutesByFullPath {
   '/settings/webhooks': typeof AuthSettingsWebhooksIndexRoute
   '/integrations/whatsapp/onboarding/$tokenId': typeof AuthIntegrationsWhatsappOnboardingTokenIdRoute
   '/integrations/whatsapp/onboarding/new': typeof AuthIntegrationsWhatsappOnboardingNewRoute
+  '/integrations/whatsapp/$orgAddressId': typeof AuthIntegrationsWhatsappOrgAddressIdIndexRoute
   '/integrations/whatsapp/onboarding': typeof AuthIntegrationsWhatsappOnboardingIndexRoute
+  '/integrations/whatsapp/$orgAddressId/templates/$templateId': typeof AuthIntegrationsWhatsappOrgAddressIdTemplatesTemplateIdRoute
+  '/integrations/whatsapp/$orgAddressId/templates/new': typeof AuthIntegrationsWhatsappOrgAddressIdTemplatesNewRoute
+  '/integrations/whatsapp/$orgAddressId/templates': typeof AuthIntegrationsWhatsappOrgAddressIdTemplatesIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -319,16 +322,12 @@ export interface FileRoutesByTo {
   '/integrations/media-preprocessing': typeof AuthIntegrationsMediaPreprocessingRoute
   '/stats/quotas': typeof AuthStatsQuotasRoute
   '/stats/usage': typeof AuthStatsUsageRoute
-  '/templates/$templateId': typeof AuthTemplatesTemplateIdRoute
-  '/templates/new': typeof AuthTemplatesNewRoute
   '/agents': typeof AuthAgentsIndexRoute
   '/contacts': typeof AuthContactsIndexRoute
   '/conversations': typeof AuthConversationsIndexRoute
   '/integrations': typeof AuthIntegrationsIndexRoute
   '/settings': typeof AuthSettingsIndexRoute
   '/stats': typeof AuthStatsIndexRoute
-  '/templates': typeof AuthTemplatesIndexRoute
-  '/integrations/whatsapp/$orgAddressId': typeof AuthIntegrationsWhatsappOrgAddressIdRoute
   '/integrations/whatsapp/new': typeof AuthIntegrationsWhatsappNewRoute
   '/settings/api-keys/$apiKeyId': typeof AuthSettingsApiKeysApiKeyIdRoute
   '/settings/api-keys/new': typeof AuthSettingsApiKeysNewRoute
@@ -344,7 +343,11 @@ export interface FileRoutesByTo {
   '/settings/webhooks': typeof AuthSettingsWebhooksIndexRoute
   '/integrations/whatsapp/onboarding/$tokenId': typeof AuthIntegrationsWhatsappOnboardingTokenIdRoute
   '/integrations/whatsapp/onboarding/new': typeof AuthIntegrationsWhatsappOnboardingNewRoute
+  '/integrations/whatsapp/$orgAddressId': typeof AuthIntegrationsWhatsappOrgAddressIdIndexRoute
   '/integrations/whatsapp/onboarding': typeof AuthIntegrationsWhatsappOnboardingIndexRoute
+  '/integrations/whatsapp/$orgAddressId/templates/$templateId': typeof AuthIntegrationsWhatsappOrgAddressIdTemplatesTemplateIdRoute
+  '/integrations/whatsapp/$orgAddressId/templates/new': typeof AuthIntegrationsWhatsappOrgAddressIdTemplatesNewRoute
+  '/integrations/whatsapp/$orgAddressId/templates': typeof AuthIntegrationsWhatsappOrgAddressIdTemplatesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -362,16 +365,12 @@ export interface FileRoutesById {
   '/_auth/integrations/media-preprocessing': typeof AuthIntegrationsMediaPreprocessingRoute
   '/_auth/stats/quotas': typeof AuthStatsQuotasRoute
   '/_auth/stats/usage': typeof AuthStatsUsageRoute
-  '/_auth/templates/$templateId': typeof AuthTemplatesTemplateIdRoute
-  '/_auth/templates/new': typeof AuthTemplatesNewRoute
   '/_auth/agents/': typeof AuthAgentsIndexRoute
   '/_auth/contacts/': typeof AuthContactsIndexRoute
   '/_auth/conversations/': typeof AuthConversationsIndexRoute
   '/_auth/integrations/': typeof AuthIntegrationsIndexRoute
   '/_auth/settings/': typeof AuthSettingsIndexRoute
   '/_auth/stats/': typeof AuthStatsIndexRoute
-  '/_auth/templates/': typeof AuthTemplatesIndexRoute
-  '/_auth/integrations/whatsapp/$orgAddressId': typeof AuthIntegrationsWhatsappOrgAddressIdRoute
   '/_auth/integrations/whatsapp/new': typeof AuthIntegrationsWhatsappNewRoute
   '/_auth/settings/api-keys/$apiKeyId': typeof AuthSettingsApiKeysApiKeyIdRoute
   '/_auth/settings/api-keys/new': typeof AuthSettingsApiKeysNewRoute
@@ -387,7 +386,11 @@ export interface FileRoutesById {
   '/_auth/settings/webhooks/': typeof AuthSettingsWebhooksIndexRoute
   '/_auth/integrations/whatsapp/onboarding/$tokenId': typeof AuthIntegrationsWhatsappOnboardingTokenIdRoute
   '/_auth/integrations/whatsapp/onboarding/new': typeof AuthIntegrationsWhatsappOnboardingNewRoute
+  '/_auth/integrations/whatsapp/$orgAddressId/': typeof AuthIntegrationsWhatsappOrgAddressIdIndexRoute
   '/_auth/integrations/whatsapp/onboarding/': typeof AuthIntegrationsWhatsappOnboardingIndexRoute
+  '/_auth/integrations/whatsapp/$orgAddressId/templates/$templateId': typeof AuthIntegrationsWhatsappOrgAddressIdTemplatesTemplateIdRoute
+  '/_auth/integrations/whatsapp/$orgAddressId/templates/new': typeof AuthIntegrationsWhatsappOrgAddressIdTemplatesNewRoute
+  '/_auth/integrations/whatsapp/$orgAddressId/templates/': typeof AuthIntegrationsWhatsappOrgAddressIdTemplatesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -405,16 +408,12 @@ export interface FileRouteTypes {
     | '/integrations/media-preprocessing'
     | '/stats/quotas'
     | '/stats/usage'
-    | '/templates/$templateId'
-    | '/templates/new'
     | '/agents'
     | '/contacts'
     | '/conversations'
     | '/integrations'
     | '/settings'
     | '/stats/'
-    | '/templates'
-    | '/integrations/whatsapp/$orgAddressId'
     | '/integrations/whatsapp/new'
     | '/settings/api-keys/$apiKeyId'
     | '/settings/api-keys/new'
@@ -430,7 +429,11 @@ export interface FileRouteTypes {
     | '/settings/webhooks'
     | '/integrations/whatsapp/onboarding/$tokenId'
     | '/integrations/whatsapp/onboarding/new'
+    | '/integrations/whatsapp/$orgAddressId'
     | '/integrations/whatsapp/onboarding'
+    | '/integrations/whatsapp/$orgAddressId/templates/$templateId'
+    | '/integrations/whatsapp/$orgAddressId/templates/new'
+    | '/integrations/whatsapp/$orgAddressId/templates'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -445,16 +448,12 @@ export interface FileRouteTypes {
     | '/integrations/media-preprocessing'
     | '/stats/quotas'
     | '/stats/usage'
-    | '/templates/$templateId'
-    | '/templates/new'
     | '/agents'
     | '/contacts'
     | '/conversations'
     | '/integrations'
     | '/settings'
     | '/stats'
-    | '/templates'
-    | '/integrations/whatsapp/$orgAddressId'
     | '/integrations/whatsapp/new'
     | '/settings/api-keys/$apiKeyId'
     | '/settings/api-keys/new'
@@ -470,7 +469,11 @@ export interface FileRouteTypes {
     | '/settings/webhooks'
     | '/integrations/whatsapp/onboarding/$tokenId'
     | '/integrations/whatsapp/onboarding/new'
+    | '/integrations/whatsapp/$orgAddressId'
     | '/integrations/whatsapp/onboarding'
+    | '/integrations/whatsapp/$orgAddressId/templates/$templateId'
+    | '/integrations/whatsapp/$orgAddressId/templates/new'
+    | '/integrations/whatsapp/$orgAddressId/templates'
   id:
     | '__root__'
     | '/_auth'
@@ -487,16 +490,12 @@ export interface FileRouteTypes {
     | '/_auth/integrations/media-preprocessing'
     | '/_auth/stats/quotas'
     | '/_auth/stats/usage'
-    | '/_auth/templates/$templateId'
-    | '/_auth/templates/new'
     | '/_auth/agents/'
     | '/_auth/contacts/'
     | '/_auth/conversations/'
     | '/_auth/integrations/'
     | '/_auth/settings/'
     | '/_auth/stats/'
-    | '/_auth/templates/'
-    | '/_auth/integrations/whatsapp/$orgAddressId'
     | '/_auth/integrations/whatsapp/new'
     | '/_auth/settings/api-keys/$apiKeyId'
     | '/_auth/settings/api-keys/new'
@@ -512,7 +511,11 @@ export interface FileRouteTypes {
     | '/_auth/settings/webhooks/'
     | '/_auth/integrations/whatsapp/onboarding/$tokenId'
     | '/_auth/integrations/whatsapp/onboarding/new'
+    | '/_auth/integrations/whatsapp/$orgAddressId/'
     | '/_auth/integrations/whatsapp/onboarding/'
+    | '/_auth/integrations/whatsapp/$orgAddressId/templates/$templateId'
+    | '/_auth/integrations/whatsapp/$orgAddressId/templates/new'
+    | '/_auth/integrations/whatsapp/$orgAddressId/templates/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -566,13 +569,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthStatsRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/_auth/templates/': {
-      id: '/_auth/templates/'
-      path: '/templates'
-      fullPath: '/templates'
-      preLoaderRoute: typeof AuthTemplatesIndexRouteImport
-      parentRoute: typeof AuthRoute
-    }
     '/_auth/stats/': {
       id: '/_auth/stats/'
       path: '/'
@@ -613,20 +609,6 @@ declare module '@tanstack/react-router' {
       path: '/agents'
       fullPath: '/agents'
       preLoaderRoute: typeof AuthAgentsIndexRouteImport
-      parentRoute: typeof AuthRoute
-    }
-    '/_auth/templates/new': {
-      id: '/_auth/templates/new'
-      path: '/templates/new'
-      fullPath: '/templates/new'
-      preLoaderRoute: typeof AuthTemplatesNewRouteImport
-      parentRoute: typeof AuthRoute
-    }
-    '/_auth/templates/$templateId': {
-      id: '/_auth/templates/$templateId'
-      path: '/templates/$templateId'
-      fullPath: '/templates/$templateId'
-      preLoaderRoute: typeof AuthTemplatesTemplateIdRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_auth/stats/usage': {
@@ -776,18 +758,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthIntegrationsWhatsappNewRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/_auth/integrations/whatsapp/$orgAddressId': {
-      id: '/_auth/integrations/whatsapp/$orgAddressId'
-      path: '/integrations/whatsapp/$orgAddressId'
-      fullPath: '/integrations/whatsapp/$orgAddressId'
-      preLoaderRoute: typeof AuthIntegrationsWhatsappOrgAddressIdRouteImport
-      parentRoute: typeof AuthRoute
-    }
     '/_auth/integrations/whatsapp/onboarding/': {
       id: '/_auth/integrations/whatsapp/onboarding/'
       path: '/integrations/whatsapp/onboarding'
       fullPath: '/integrations/whatsapp/onboarding'
       preLoaderRoute: typeof AuthIntegrationsWhatsappOnboardingIndexRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/integrations/whatsapp/$orgAddressId/': {
+      id: '/_auth/integrations/whatsapp/$orgAddressId/'
+      path: '/integrations/whatsapp/$orgAddressId'
+      fullPath: '/integrations/whatsapp/$orgAddressId'
+      preLoaderRoute: typeof AuthIntegrationsWhatsappOrgAddressIdIndexRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_auth/integrations/whatsapp/onboarding/new': {
@@ -802,6 +784,27 @@ declare module '@tanstack/react-router' {
       path: '/integrations/whatsapp/onboarding/$tokenId'
       fullPath: '/integrations/whatsapp/onboarding/$tokenId'
       preLoaderRoute: typeof AuthIntegrationsWhatsappOnboardingTokenIdRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/integrations/whatsapp/$orgAddressId/templates/': {
+      id: '/_auth/integrations/whatsapp/$orgAddressId/templates/'
+      path: '/integrations/whatsapp/$orgAddressId/templates'
+      fullPath: '/integrations/whatsapp/$orgAddressId/templates'
+      preLoaderRoute: typeof AuthIntegrationsWhatsappOrgAddressIdTemplatesIndexRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/integrations/whatsapp/$orgAddressId/templates/new': {
+      id: '/_auth/integrations/whatsapp/$orgAddressId/templates/new'
+      path: '/integrations/whatsapp/$orgAddressId/templates/new'
+      fullPath: '/integrations/whatsapp/$orgAddressId/templates/new'
+      preLoaderRoute: typeof AuthIntegrationsWhatsappOrgAddressIdTemplatesNewRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/integrations/whatsapp/$orgAddressId/templates/$templateId': {
+      id: '/_auth/integrations/whatsapp/$orgAddressId/templates/$templateId'
+      path: '/integrations/whatsapp/$orgAddressId/templates/$templateId'
+      fullPath: '/integrations/whatsapp/$orgAddressId/templates/$templateId'
+      preLoaderRoute: typeof AuthIntegrationsWhatsappOrgAddressIdTemplatesTemplateIdRouteImport
       parentRoute: typeof AuthRoute
     }
   }
@@ -832,15 +835,11 @@ interface AuthRouteChildren {
   AuthContactsNewRoute: typeof AuthContactsNewRoute
   AuthConversationsNewRoute: typeof AuthConversationsNewRoute
   AuthIntegrationsMediaPreprocessingRoute: typeof AuthIntegrationsMediaPreprocessingRoute
-  AuthTemplatesTemplateIdRoute: typeof AuthTemplatesTemplateIdRoute
-  AuthTemplatesNewRoute: typeof AuthTemplatesNewRoute
   AuthAgentsIndexRoute: typeof AuthAgentsIndexRoute
   AuthContactsIndexRoute: typeof AuthContactsIndexRoute
   AuthConversationsIndexRoute: typeof AuthConversationsIndexRoute
   AuthIntegrationsIndexRoute: typeof AuthIntegrationsIndexRoute
   AuthSettingsIndexRoute: typeof AuthSettingsIndexRoute
-  AuthTemplatesIndexRoute: typeof AuthTemplatesIndexRoute
-  AuthIntegrationsWhatsappOrgAddressIdRoute: typeof AuthIntegrationsWhatsappOrgAddressIdRoute
   AuthIntegrationsWhatsappNewRoute: typeof AuthIntegrationsWhatsappNewRoute
   AuthSettingsApiKeysApiKeyIdRoute: typeof AuthSettingsApiKeysApiKeyIdRoute
   AuthSettingsApiKeysNewRoute: typeof AuthSettingsApiKeysNewRoute
@@ -856,7 +855,11 @@ interface AuthRouteChildren {
   AuthSettingsWebhooksIndexRoute: typeof AuthSettingsWebhooksIndexRoute
   AuthIntegrationsWhatsappOnboardingTokenIdRoute: typeof AuthIntegrationsWhatsappOnboardingTokenIdRoute
   AuthIntegrationsWhatsappOnboardingNewRoute: typeof AuthIntegrationsWhatsappOnboardingNewRoute
+  AuthIntegrationsWhatsappOrgAddressIdIndexRoute: typeof AuthIntegrationsWhatsappOrgAddressIdIndexRoute
   AuthIntegrationsWhatsappOnboardingIndexRoute: typeof AuthIntegrationsWhatsappOnboardingIndexRoute
+  AuthIntegrationsWhatsappOrgAddressIdTemplatesTemplateIdRoute: typeof AuthIntegrationsWhatsappOrgAddressIdTemplatesTemplateIdRoute
+  AuthIntegrationsWhatsappOrgAddressIdTemplatesNewRoute: typeof AuthIntegrationsWhatsappOrgAddressIdTemplatesNewRoute
+  AuthIntegrationsWhatsappOrgAddressIdTemplatesIndexRoute: typeof AuthIntegrationsWhatsappOrgAddressIdTemplatesIndexRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
@@ -869,16 +872,11 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthConversationsNewRoute: AuthConversationsNewRoute,
   AuthIntegrationsMediaPreprocessingRoute:
     AuthIntegrationsMediaPreprocessingRoute,
-  AuthTemplatesTemplateIdRoute: AuthTemplatesTemplateIdRoute,
-  AuthTemplatesNewRoute: AuthTemplatesNewRoute,
   AuthAgentsIndexRoute: AuthAgentsIndexRoute,
   AuthContactsIndexRoute: AuthContactsIndexRoute,
   AuthConversationsIndexRoute: AuthConversationsIndexRoute,
   AuthIntegrationsIndexRoute: AuthIntegrationsIndexRoute,
   AuthSettingsIndexRoute: AuthSettingsIndexRoute,
-  AuthTemplatesIndexRoute: AuthTemplatesIndexRoute,
-  AuthIntegrationsWhatsappOrgAddressIdRoute:
-    AuthIntegrationsWhatsappOrgAddressIdRoute,
   AuthIntegrationsWhatsappNewRoute: AuthIntegrationsWhatsappNewRoute,
   AuthSettingsApiKeysApiKeyIdRoute: AuthSettingsApiKeysApiKeyIdRoute,
   AuthSettingsApiKeysNewRoute: AuthSettingsApiKeysNewRoute,
@@ -896,8 +894,16 @@ const AuthRouteChildren: AuthRouteChildren = {
     AuthIntegrationsWhatsappOnboardingTokenIdRoute,
   AuthIntegrationsWhatsappOnboardingNewRoute:
     AuthIntegrationsWhatsappOnboardingNewRoute,
+  AuthIntegrationsWhatsappOrgAddressIdIndexRoute:
+    AuthIntegrationsWhatsappOrgAddressIdIndexRoute,
   AuthIntegrationsWhatsappOnboardingIndexRoute:
     AuthIntegrationsWhatsappOnboardingIndexRoute,
+  AuthIntegrationsWhatsappOrgAddressIdTemplatesTemplateIdRoute:
+    AuthIntegrationsWhatsappOrgAddressIdTemplatesTemplateIdRoute,
+  AuthIntegrationsWhatsappOrgAddressIdTemplatesNewRoute:
+    AuthIntegrationsWhatsappOrgAddressIdTemplatesNewRoute,
+  AuthIntegrationsWhatsappOrgAddressIdTemplatesIndexRoute:
+    AuthIntegrationsWhatsappOrgAddressIdTemplatesIndexRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)

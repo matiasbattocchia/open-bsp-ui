@@ -13,8 +13,8 @@ export function useTemplates(organizationAddress?: string) {
       const { data } = await supabase.functions.invoke(
         "whatsapp-management/templates",
         {
-          method: "PUT", // PUT as workaround for Supabase JS client GET bug
-          body: { organization_address: organizationAddress },
+          method: "PUT",
+          body: { organization_id: activeOrgId, organization_address: organizationAddress },
         },
       );
 
@@ -40,7 +40,7 @@ export function useCreateTemplate() {
         "whatsapp-management/templates",
         {
           method: "POST",
-          body: { organization_address: organizationAddress, template },
+          body: { organization_id: activeOrgId, organization_address: organizationAddress, template },
         },
       );
 
@@ -70,7 +70,7 @@ export function useUpdateTemplate() {
         "whatsapp-management/templates",
         {
           method: "PATCH",
-          body: { organization_address: organizationAddress, template },
+          body: { organization_id: activeOrgId, organization_address: organizationAddress, template },
         },
       );
 
@@ -100,7 +100,7 @@ export function useDeleteTemplate() {
         "whatsapp-management/templates",
         {
           method: "DELETE",
-          body: { organization_address: organizationAddress, template },
+          body: { organization_id: activeOrgId, organization_address: organizationAddress, template },
         },
       );
 
