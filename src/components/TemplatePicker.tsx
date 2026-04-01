@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from "react";
-import { Search, X } from "lucide-react";
+import { Plus, Search, X } from "lucide-react";
 import useBoundStore from "@/stores/useBoundStore";
 import { useTemplates } from "@/queries/useTemplates";
 import { Translate as T, useTranslation } from "@/hooks/useTranslation";
 import type { TemplateData } from "@/supabase/client";
+import { useNavigate } from "@tanstack/react-router";
 
 export default function TemplatePicker() {
   const activeConvId = useBoundStore((store) => store.ui.activeConvId);
@@ -20,6 +21,7 @@ export default function TemplatePicker() {
   const [search, setSearch] = useState("");
   const ref = useRef<HTMLDivElement>(null);
   const { translate: t } = useTranslation();
+  const navigate = useNavigate();
 
   const filtered = search
     ? approved?.filter((tpl) =>
@@ -85,18 +87,18 @@ export default function TemplatePicker() {
       </div>
 
       {/* List — ChatList style */}
-      <div className="overflow-y-auto px-[40px] pb-[8px]">
-        {isLoading ? (
-          <div className="px-[10px] py-[16px] text-muted-foreground text-[14px]">
-            <T>Cargando...</T>
-          </div>
-        ) : !filtered?.length ? (
-          <div className="px-[10px] py-[16px] text-muted-foreground text-[14px]">
-            <T>No hay plantillas aprobadas</T>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-[4px]">
-            {filtered.map((tpl) => {
+      <div className="overflow-y-auto px-[40px] pb-[8px] mb-[16px]">
+        <div className="flex flex-col gap-[4px]">
+          {isLoading ? (
+            <div className="px-[10px] py-[16px] text-muted-foreground text-[14px]">
+              <T>Cargando...</T>
+            </div>
+          ) : !filtered?.length ? (
+            <div className="px-[10px] py-[8px] text-muted-foreground text-[13px]">
+              <T>Solo se muestran plantillas aprobadas</T>
+            </div>
+          ) : (
+            filtered.map((tpl) => {
               const body = tpl.components.find((c) => c.type === "BODY")?.text || "";
               return (
                 <button
@@ -110,9 +112,27 @@ export default function TemplatePicker() {
                   </div>
                 </button>
               );
-            })}
-          </div>
-        )}
+            })
+          )}
+          {orgAddress && (
+            <div
+              className="w-full text-left px-[10px] py-[8px] rounded-xl hover:bg-accent cursor-pointer"
+              onClick={() => {
+                toggle("templatePicker", false);
+                navigate({
+                  to: "/integrations/whatsapp/$orgAddressId/templates/new",
+                  params: { orgAddressId: orgAddress },
+                  hash: (prevHash) => prevHash!,
+                });
+              }}
+            >
+              <div className="font-medium text-[14px] flex items-center gap-[4px]">
+                <Plus className="w-[14px] h-[14px]" />
+                <T>Crear plantilla</T>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

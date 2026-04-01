@@ -26,6 +26,56 @@ import { moveCursorToEnd } from "@/utils/UtilityFunctions";
 import { htmlToMarkdown } from "@/utils/htmlToMarkdown";
 import TemplatePicker from "./TemplatePicker";
 
+function TemplateVarInput({
+  placeholder,
+  value,
+  onChange,
+  onEnter,
+  autoFocus,
+}: {
+  placeholder: string;
+  value: string;
+  onChange: (value: string) => void;
+  onEnter: () => void;
+  autoFocus?: boolean;
+}) {
+  const measureRef = useRef<HTMLSpanElement>(null);
+  const [width, setWidth] = useState<number | undefined>();
+
+  useEffect(() => {
+    if (measureRef.current) {
+      setWidth(measureRef.current.offsetWidth);
+    }
+  }, [value, placeholder]);
+
+  return (
+    <>
+      <span
+        ref={measureRef}
+        className="absolute invisible whitespace-pre text-[14px] px-[12px]"
+        aria-hidden
+      >
+        {value || placeholder}
+      </span>
+      <input
+        type="text"
+        className="inline-block bg-primary/10 border border-primary/30 rounded-full px-[12px] py-[1px] mx-[2px] text-[14px] leading-[18px] outline-none focus:border-primary"
+        style={{ width: width ? `${width + 4}px` : undefined }}
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            onEnter();
+          }
+        }}
+        autoFocus={autoFocus}
+      />
+    </>
+  );
+}
+
 export default function ChatFooter() {
   const activeConvId = useBoundStore((store) => store.ui.activeConvId);
   const conv = useBoundStore((store) =>
@@ -363,11 +413,8 @@ export default function ChatFooter() {
           typeof part === "string" ? (
             <span key={i}>{part}</span>
           ) : (
-            <input
+            <TemplateVarInput
               key={i}
-              type="text"
-              className="inline-block bg-primary/10 border border-primary/30 rounded-[4px] px-[4px] mx-[2px] text-[14px] leading-[20px] outline-none focus:border-primary min-w-[60px]"
-              style={{ width: `${Math.max(60, (part.isHeader ? headVarValues[part.varIndex] : bodyVarValues[part.varIndex])?.length * 8 + 20 || 60)}px` }}
               placeholder={
                 part.isHeader
                   ? headExamples[part.varIndex] || `{{${part.varIndex + 1}}}`
@@ -378,29 +425,23 @@ export default function ChatFooter() {
                   ? headVarValues[part.varIndex] || ""
                   : bodyVarValues[part.varIndex] || ""
               }
-              onChange={(e) => {
+              onChange={(value) => {
                 if (part.isHeader) {
                   const next = [...headVarValues];
-                  next[part.varIndex] = e.target.value;
+                  next[part.varIndex] = value;
                   updateVarValues(bodyVarValues, next);
                 } else {
                   const next = [...bodyVarValues];
-                  next[part.varIndex] = e.target.value;
+                  next[part.varIndex] = value;
                   updateVarValues(next, headVarValues);
                 }
               }}
-              onKeyDown={(e) => {
-                if (
-                  e.key === "Enter" &&
-                  !e.shiftKey &&
-                  allVarsFilled &&
-                  window.matchMedia("(min-width: 768px)").matches
-                ) {
-                  e.preventDefault();
+              onEnter={() => {
+                if (allVarsFilled && window.matchMedia("(min-width: 768px)").matches) {
                   sendTemplateMessage();
                 }
               }}
-              autoFocus={i === 0 || (typeof parts[i - 1] === "string" && i === parts.findIndex((p) => typeof p !== "string"))}
+              autoFocus={i === parts.findIndex((p) => typeof p !== "string")}
             />
           ),
         )}
