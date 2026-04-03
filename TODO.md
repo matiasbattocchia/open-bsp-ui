@@ -1,10 +1,12 @@
 # TODO
 
+> Internal tracking file for UI polish items. Core functionality is production-ready.
+
 ## Before Product Hunt Launch
 
-- [ ] (enhancement) Translations
+- [x] (enhancement) Translations
 
-- [-] (feat) Templates
+- [x] (feat) Templates
 
 - [x] (enhancement) Media messages colors
 
