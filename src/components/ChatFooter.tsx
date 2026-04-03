@@ -20,7 +20,7 @@ import { TickContext } from "@/contexts/useTick";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
 import "dayjs/locale/pt";
-import { Translate as T, useTranslation } from "@/hooks/useTranslation";
+import { useTranslation } from "@/hooks/useTranslation";
 import { useCurrentAgent } from "@/queries/useAgents";
 import { moveCursorToEnd } from "@/utils/UtilityFunctions";
 import { htmlToMarkdown } from "@/utils/htmlToMarkdown";
@@ -561,35 +561,34 @@ export default function ChatFooter() {
                 >
                   {!inCSWindow ? (
                     <>
-                      <T as="span" className="lg:hidden">
-                        Conversación cerrada
-                      </T>
-                      <T as="span" className="hidden lg:inline">
-                        Conversación cerrada, abre la conversación con una plantilla
-                      </T>
+                      <span className="lg:hidden">
+                        {t("Conversación cerrada")}
+                      </span>
+                      <span className="hidden lg:inline">
+                        {t("Conversación cerrada, abre la conversación con una plantilla")}
+                      </span>
                     </>
                   ) : sendAsContact ? (
                     <>
-                      <T as="span" className="lg:hidden">
-                        Mensaje entrante
-                      </T>
-                      <T as="span" className="hidden lg:inline">
-                        Simula un mensaje entrante
-                      </T>
+                      <span className="lg:hidden">
+                        {t("Mensaje entrante")}
+                      </span>
+                      <span className="hidden lg:inline">
+                        {t("Simula un mensaje entrante")}
+                      </span>
                     </>
                   ) : conv.service === "whatsapp" ? (
                     <>
-                      <T as="span" className="lg:hidden">
-                        Cerrará en
-                      </T>
-                      <T as="span" className="hidden lg:inline">
-                        La conversación cerrará en
-                      </T>
-                      {/* I had to split T and span because react-dialect is not working as expected with interpolated strings - cabra 2024-11-04 */}
+                      <span className="lg:hidden">
+                        {t("Cerrará en")}
+                      </span>
+                      <span className="hidden lg:inline">
+                        {t("La conversación cerrará en")}
+                      </span>
                       <span> {remaining}</span>
                     </>
                   ) : (
-                    <T as="span">Escribe un mensaje</T>
+                    <span>{t("Escribe un mensaje")}</span>
                   )}
                 </div>
               )}

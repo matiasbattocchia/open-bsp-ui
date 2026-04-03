@@ -14,7 +14,7 @@ import "dayjs/locale/pt";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 dayjs.extend(localizedFormat);
 import { TickContext } from "@/contexts/useTick";
-import { Translate as T, useTranslation } from "@/hooks/useTranslation";
+import { useTranslation } from "@/hooks/useTranslation";
 import { AtSign, Pause } from "lucide-react";
 
 import { useCurrentAgents, useCurrentAgent } from "@/queries/useAgents";
@@ -283,15 +283,15 @@ export default function ChatListItem({
                 )}
                 {mediaIcon}
                 {draft && (
-                  <T as="div" className="text-[14px] text-primary mr-1">
-                    Borrador:
-                  </T>
+                  <div className="text-[14px] text-primary mr-1">
+                    {t("Borrador:")}
+                  </div>
                 )}
                 {preview?.content.type === "data" &&
                   preview?.content.kind === "template" && (
-                    <T as="div" className="text-[14px] text-primary mr-1">
-                      Plantilla:
-                    </T>
+                    <div className="text-[14px] text-primary mr-1">
+                      {t("Plantilla:")}
+                    </div>
                   )}
                 <div className="truncate text-[14px]">
                   {preview?.content.type === "text" && preview.content.text}

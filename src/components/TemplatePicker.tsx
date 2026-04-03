@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Plus, Search, X } from "lucide-react";
 import useBoundStore from "@/stores/useBoundStore";
 import { useTemplates } from "@/queries/useTemplates";
-import { Translate as T, useTranslation } from "@/hooks/useTranslation";
+import { useTranslation } from "@/hooks/useTranslation";
 import type { TemplateData } from "@/supabase/client";
 import { useNavigate } from "@tanstack/react-router";
 
@@ -91,11 +91,11 @@ export default function TemplatePicker() {
         <div className="flex flex-col gap-[4px]">
           {isLoading ? (
             <div className="px-[10px] py-[16px] text-muted-foreground text-[14px]">
-              <T>Cargando...</T>
+              {t("Cargando...")}
             </div>
           ) : !filtered?.length ? (
             <div className="px-[10px] py-[8px] text-muted-foreground text-[13px]">
-              <T>Solo se muestran plantillas aprobadas</T>
+              {t("Solo se muestran plantillas aprobadas")}
             </div>
           ) : (
             filtered.map((tpl) => {
@@ -128,7 +128,7 @@ export default function TemplatePicker() {
             >
               <div className="font-medium text-[14px] flex items-center gap-[4px]">
                 <Plus className="w-[14px] h-[14px]" />
-                <T>Crear plantilla</T>
+                {t("Crear plantilla")}
               </div>
             </div>
           )}

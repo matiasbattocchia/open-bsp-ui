@@ -37,6 +37,8 @@ export type TemplateDraft = {
   headVarValues: string[];
 };
 
+export type Language = "es" | "en" | "pt";
+
 export type UIState = {
   templatePicker: boolean;
   templateDrafts: Map<string, TemplateDraft>;
@@ -47,6 +49,7 @@ export type UIState = {
   filter: keyof typeof filters;
   searchPattern: string;
   isLoading: boolean;
+  language: Language;
 };
 
 export type UIActions = {
@@ -58,6 +61,7 @@ export type UIActions = {
   setFilter: (filter: keyof typeof filters) => void;
   setSearchPattern: (searchPattern: string) => void;
   setTemplateDraft: (convId: string, draft: TemplateDraft | null) => void;
+  setLanguage: (lang: Language) => void;
 };
 
 export type UISlice = UIState & UIActions;
@@ -81,6 +85,7 @@ export const createUISlice: StateCreator<Partial<AppState>> = (
   filter: "todas" as keyof typeof filters,
   searchPattern: "",
   isLoading: false,
+  language: "es" as Language,
   toggle: (component: keyof UIState, value?: boolean) =>
     set((state) => ({
       ui: {
@@ -140,4 +145,8 @@ export const createUISlice: StateCreator<Partial<AppState>> = (
       }
       return { ui: { ...state.ui, templateDrafts } };
     }),
+  setLanguage: (language: Language) =>
+    set((state) => ({
+      ui: { ...state.ui, language },
+    })),
 });

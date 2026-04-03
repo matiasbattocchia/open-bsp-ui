@@ -4,7 +4,7 @@ import { type ConversationRow, type MessageRow } from "@/supabase/client";
 import { timestampDescending } from "@/stores/chatSlice";
 import { filters, Filters } from "@/stores/uiSlice";
 import Fuse from "fuse.js";
-import { Translate as T } from "@/hooks/useTranslation";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export type ConvMetadata = {
   convId: string;
@@ -28,6 +28,7 @@ function pinnedAscending(a: ConversationRow, b: ConversationRow) {
 }
 
 const ChatList = () => {
+  const { translate: t } = useTranslation();
   const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
   const conversations = useBoundStore((state) => state.chat.conversations);
   const messages = useBoundStore((state) => state.chat.messages);
@@ -83,18 +84,17 @@ const ChatList = () => {
         </div>
       ) : (
         <div className="h-full flex items-center justify-center flex-col text-foreground text-[15px] mt-[-24px]">
-          <T>Nada por aquí</T>
+          {t("Nada por aquí")}
           {(searchPattern || filterName !== Filters.ALL) && (
-            <T
+            <button
               className="text-[13px] text-primary"
-              as="button"
               onClick={() => {
                 setSearchPattern("");
                 setFilterName(Filters.ALL);
               }}
             >
-              remover filtros...
-            </T>
+              {t("remover filtros...")}
+            </button>
           )}
         </div>
       )}

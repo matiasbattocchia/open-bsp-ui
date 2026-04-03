@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { type ChatSlice, createChatSlice } from "./chatSlice";
 import { type UISlice, createUISlice } from "./uiSlice";
+import { loadTranslations } from "@/i18n/translations";
 
 export type AppState = {
   chat: ChatSlice;
@@ -40,6 +41,9 @@ const useBoundStore = create<AppState>()(
             ...prev.ui,
             ...state.ui,
           };
+          if (state.ui.language && state.ui.language !== "es") {
+            loadTranslations(state.ui.language);
+          }
         }
       },
       // Pick the keys to be persisted
@@ -48,6 +52,7 @@ const useBoundStore = create<AppState>()(
           searchPattern: state.ui.searchPattern,
           filter: state.ui.filter,
           activeOrgId: state.ui.activeOrgId,
+          language: state.ui.language,
         },
       }),
     },

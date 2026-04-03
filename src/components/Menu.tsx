@@ -30,9 +30,7 @@ export default function Menu() {
 
   const { data: organizations } = useOrganizations();
 
-  // react-dialect may have issues with React 19, add fallback
-  const translation = useTranslation();
-  const t = translation?.translate || ((text: string) => text);
+  const { translate: t, currentLanguage, setCurrentLanguage } = useTranslation();
 
   // Simpler approach - call useLocation without select first
   const location = useLocation();
@@ -151,12 +149,17 @@ export default function Menu() {
                   {
                     key: "es",
                     label: "Español",
-                    onClick: () => translation.setCurrentLanguage("es"),
+                    onClick: () => setCurrentLanguage("es"),
                   },
                   {
                     key: "en",
                     label: "English",
-                    onClick: () => translation.setCurrentLanguage("en"),
+                    onClick: () => setCurrentLanguage("en"),
+                  },
+                  {
+                    key: "pt",
+                    label: "Português",
+                    onClick: () => setCurrentLanguage("pt"),
                   },
                 ],
               },
@@ -172,7 +175,10 @@ export default function Menu() {
               },
             ],
             selectable: true,
-            selectedKeys: activeOrgId ? [activeOrgId] : [],
+            selectedKeys: [
+              ...(activeOrgId ? [activeOrgId] : []),
+              currentLanguage,
+            ],
           }}
           trigger={["click"]}
         >
