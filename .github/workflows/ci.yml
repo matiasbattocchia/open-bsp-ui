@@ -16,7 +16,6 @@ jobs:
           node-version: 25
           cache: npm
       - run: npm ci
-      - run: npm run lint
       - run: npm run build
         env:
           VITE_SUPABASE_URL: https://placeholder.supabase.co

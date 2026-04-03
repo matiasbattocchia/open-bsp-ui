@@ -145,23 +145,12 @@ export default function Menu() {
                 key: "lang",
                 label: t("Idioma"),
                 icon: <Languages className="w-[16px] h-[16px]" />,
-                children: [
-                  {
-                    key: "es",
-                    label: "Español",
-                    onClick: () => setCurrentLanguage("es"),
-                  },
-                  {
-                    key: "en",
-                    label: "English",
-                    onClick: () => setCurrentLanguage("en"),
-                  },
-                  {
-                    key: "pt",
-                    label: "Português",
-                    onClick: () => setCurrentLanguage("pt"),
-                  },
-                ],
+                children: (["es", "en", "pt"] as const).map((lang) => ({
+                  key: lang,
+                  label: { es: "Español", en: "English", pt: "Português" }[lang],
+                  className: lang === currentLanguage ? "ant-dropdown-menu-item-selected" : "",
+                  onClick: () => setCurrentLanguage(lang),
+                })),
               },
               { type: "divider" },
               {
@@ -177,7 +166,6 @@ export default function Menu() {
             selectable: true,
             selectedKeys: [
               ...(activeOrgId ? [activeOrgId] : []),
-              currentLanguage,
             ],
           }}
           trigger={["click"]}
