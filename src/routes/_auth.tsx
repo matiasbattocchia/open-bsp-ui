@@ -9,6 +9,7 @@ import { useLocation } from "@tanstack/react-router";
 import FilePicker from "@/components/FileUploader/FilePicker";
 import FilePreviewer from "@/components/FilePreviewer";
 import ActionCard from "@/components/ActionCard";
+import { useTranslation } from "@/hooks/useTranslation";
 import { Bot, Building2, MessageSquarePlus, Settings } from "lucide-react";
 import { useResizable } from "@/hooks/useResizable";
 import { useCurrentAgents } from "@/queries/useAgents";
@@ -31,6 +32,7 @@ function getMaxPanelWidth() {
 }
 
 function AppLayout() {
+  const { translate: t } = useTranslation();
   const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
   const { data: agents } = useCurrentAgents();
   const hasAiAgents = agents?.some((a) => a.ai);
@@ -117,7 +119,7 @@ function AppLayout() {
             {!activeOrgId && (
               <ActionCard
                 icon={<Building2 className="w-[24px] h-[24px]" />}
-                title="Crear organización"
+                title={t("Crear organización")}
                 to="/settings/organization/new"
               />
             )}
@@ -126,20 +128,20 @@ function AppLayout() {
                 {!hasAiAgents && (
                   <ActionCard
                     icon={<Bot className="w-[24px] h-[24px]" />}
-                    title="Crear agente"
+                    title={t("Crear agente")}
                     to="/agents/new"
                   />
                 )}
                 {hasAiAgents && (
                   <ActionCard
                     icon={<MessageSquarePlus className="w-[24px] h-[24px]" />}
-                    title="Iniciar conversación"
+                    title={t("Iniciar conversación")}
                     to="/conversations/new"
                   />
                 )}
                 <ActionCard
                   icon={<Settings className="w-[24px] h-[24px]" />}
-                  title="Configurar WhatsApp"
+                  title={t("Configurar WhatsApp")}
                   to="/integrations/whatsapp/new"
                 />
               </>

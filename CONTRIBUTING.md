@@ -32,7 +32,7 @@ Thanks for your interest in contributing to Open BSP UI!
 
 ## Submitting Changes
 
-1. Fork the repo and create a branch from `main`
+1. Fork the repo and create a branch from `develop`
 2. Make your changes
 3. Ensure `npm run build` and `npm run lint` pass
 4. Open a pull request with a clear description

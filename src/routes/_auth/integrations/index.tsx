@@ -39,7 +39,7 @@ function IntegrationsIndex() {
                 <FileText className="w-[24px] h-[24px]" />
               </div>
             }
-            title="Pre-procesamiento de media"
+            title={t("Pre-procesamiento de media")}
             description={t("Interpreta audios, imágenes y documentos")}
             onClick={() =>
               navigate({
