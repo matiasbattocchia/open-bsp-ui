@@ -1,6 +1,12 @@
 import { supabase } from "@/supabase/client";
+import type { ConversationRow, MessageRow } from "@/supabase/client";
 import useBoundStore from "@/stores/useBoundStore";
 import { useEffect, useRef } from "react";
+
+type InitDataResponse = {
+  conversations: ConversationRow[];
+  messages: MessageRow[];
+};
 
 export const useInitialDataFetch = () => {
   const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
@@ -12,19 +18,49 @@ export const useInitialDataFetch = () => {
   );
   const pushMessages = useBoundStore((state) => state.chat.pushMessages);
 
-  const loadConvs = async (since?: Date) => {
+  // App init: windowed fetch via RPC (timestamp-based), returns convs + msgs
+  const initData = async () => {
     if (!activeOrgId) return;
 
-    let query = supabase
+    // Phase 1: recent messages with chat context
+    const { data: phase1 } = await supabase
+      .rpc("init_data", {
+        p_organization_id: activeOrgId,
+        p_limit: 200,
+        p_per_conversation: 10,
+      })
+      .throwOnError();
+
+    const p1 = phase1 as unknown as InitDataResponse;
+    pushConversations(p1.conversations);
+    pushMessages(p1.messages);
+
+    // Phase 2: older conversations with preview messages
+    if (p1.messages.length) {
+      const oldest = p1.messages[p1.messages.length - 1].timestamp;
+      const { data: phase2 } = await supabase
+        .rpc("init_data", {
+          p_organization_id: activeOrgId,
+          p_limit: 100,
+          p_per_conversation: 5,
+          p_until: oldest,
+        })
+        .throwOnError();
+
+      const p2 = phase2 as unknown as InitDataResponse;
+      pushConversations(p2.conversations);
+      pushMessages(p2.messages);
+    }
+  };
+
+  // Tab-visibility recovery: flat queries (updated_at-based)
+  const loadConvs = async (since: Date) => {
+    if (!activeOrgId) return;
+    const { data: conversations } = await supabase
       .from("conversations")
       .select()
-      .eq("organization_id", activeOrgId);
-
-    if (since) {
-      query = query.gt("updated_at", since.toISOString());
-    }
-
-    const { data: conversations } = await query
+      .eq("organization_id", activeOrgId)
+      .gt("updated_at", since.toISOString())
       .order("updated_at", { ascending: false })
       .limit(999)
       .throwOnError();
@@ -32,19 +68,13 @@ export const useInitialDataFetch = () => {
     pushConversations(conversations);
   };
 
-  const loadMsgs = async (since?: Date) => {
+  const loadMsgs = async (since: Date) => {
     if (!activeOrgId) return;
-
-    let query = supabase
+    const { data: messages } = await supabase
       .from("messages")
       .select()
-      .eq("organization_id", activeOrgId);
-
-    if (since) {
-      query = query.gt("updated_at", since.toISOString());
-    }
-
-    const { data: messages } = await query
+      .eq("organization_id", activeOrgId)
+      .gt("updated_at", since.toISOString())
       .order("updated_at", { ascending: false })
       .limit(999)
       .throwOnError();
@@ -53,8 +83,7 @@ export const useInitialDataFetch = () => {
   };
 
   useEffect(() => {
-    loadConvs();
-    loadMsgs();
+    initData();
 
     lastVisibleAt.current = new Date();
   }, [activeOrgId]);
