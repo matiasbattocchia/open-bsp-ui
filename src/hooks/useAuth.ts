@@ -12,6 +12,7 @@ import { useQueryClient } from "@tanstack/react-query";
  */
 export function useAuth() {
   const setUser = useBoundStore((state) => state.ui.setUser);
+  const setActiveOrg = useBoundStore((state) => state.ui.setActiveOrg);
   const navigate = useNavigate();
   const { redirect } = Route.useSearch();
   const queryClient = useQueryClient();
@@ -41,8 +42,9 @@ export function useAuth() {
       if (
         loggedUser && !user && !window.location.pathname.startsWith("/login")
       ) {
-        // Clear all queries
+        // Clear all queries and org state
         queryClient.clear();
+        setActiveOrg(null);
 
         navigate({
           to: "/login",

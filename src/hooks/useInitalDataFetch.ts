@@ -18,6 +18,8 @@ export const useInitialDataFetch = () => {
   );
   const pushMessages = useBoundStore((state) => state.chat.pushMessages);
 
+  const PHASE1_LIMIT = 200;
+
   // App init: windowed fetch via RPC (timestamp-based), returns convs + msgs
   const initData = async () => {
     if (!activeOrgId) return;
@@ -26,7 +28,7 @@ export const useInitialDataFetch = () => {
     const { data: phase1 } = await supabase
       .rpc("init_data", {
         p_organization_id: activeOrgId,
-        p_limit: 200,
+        p_limit: PHASE1_LIMIT,
         p_per_conversation: 10,
       })
       .throwOnError();
@@ -36,7 +38,8 @@ export const useInitialDataFetch = () => {
     pushMessages(p1.messages);
 
     // Phase 2: older conversations with preview messages
-    if (p1.messages.length) {
+    // Skip if phase 1 returned fewer than the limit (all messages fit)
+    if (p1.messages.length >= PHASE1_LIMIT) {
       const oldest = p1.messages[p1.messages.length - 1].timestamp;
       const { data: phase2 } = await supabase
         .rpc("init_data", {
