@@ -2,18 +2,20 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { useProducts, useUsage, useTierLimits } from "@/queries/useBilling";
 import UsageChart from "./UsageChart";
 
-const PRODUCT_NAMES: Record<string, string> = {
-  "Messages": "Mensajes",
-  "Conversations": "Conversaciones",
-  "Storage": "Almacenamiento",
-  "AI Credits": "Créditos IA",
-};
+function translateProductName(name: string, t: (s: string) => string) {
+  switch (name) {
+    case "Messages": return t("Mensajes");
+    case "Conversations": return t("Conversaciones");
+    case "Storage": return t("Almacenamiento");
+    case "AI Credits": return t("Créditos IA");
+    default: return name;
+  }
+}
 
-const MONTH_NAMES = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
-
-function formatMonth(period: string) {
+function formatMonth(period: string, t: (s: string) => string) {
+  const names = [t("Ene"), t("Feb"), t("Mar"), t("Abr"), t("May"), t("Jun"), t("Jul"), t("Ago"), t("Sep"), t("Oct"), t("Nov"), t("Dic")];
   const m = parseInt(period.slice(5, 7), 10);
-  return MONTH_NAMES[m - 1] || period.slice(5, 7);
+  return names[m - 1] || period.slice(5, 7);
 }
 
 function formatDay(period: string) {
@@ -79,7 +81,7 @@ export default function StatsUsage() {
     <div className="flex flex-col gap-[32px] p-[24px] w-full">
       <h2 className="text-[20px] font-medium">{t("Uso")}</h2>
       {visibleProducts?.map((product) => {
-        const name = t(PRODUCT_NAMES[product.name] ?? product.name);
+        const name = translateProductName(product.name, t);
         const carry = product.kind === "balance" || product.kind === "gauge";
         return (
           <div key={product.id} className="flex flex-col gap-[8px]">
@@ -91,7 +93,7 @@ export default function StatsUsage() {
                   data={fillSeries(months, monthUsage, product.id, carry)}
                   unit={product.unit}
                   periodLabel={t("Mes")}
-                  formatLabel={formatMonth}
+                  formatLabel={(p) => formatMonth(p, t)}
                 />
               </div>
               <div className="flex flex-col gap-[4px]">

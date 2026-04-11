@@ -11,12 +11,15 @@ type QuotaBarProps = {
   budget?: number;
 };
 
-const PRODUCT_NAMES: Record<string, string> = {
-  "Messages": "Mensajes",
-  "Conversations": "Conversaciones",
-  "Storage": "Almacenamiento",
-  "AI Credits": "Créditos IA",
-};
+function translateProductName(name: string, t: (s: string) => string) {
+  switch (name) {
+    case "Messages": return t("Mensajes");
+    case "Conversations": return t("Conversaciones");
+    case "Storage": return t("Almacenamiento");
+    case "AI Credits": return t("Créditos IA");
+    default: return name;
+  }
+}
 
 function fmt(n: number, unit: string) {
   if (unit === "usd") return `$${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -50,7 +53,7 @@ export default function QuotaBar({
     return (
       <div className="flex flex-col gap-[8px] p-[16px] rounded-xl bg-background border border-border">
         <div className="flex justify-between items-baseline">
-          <span className="text-[16px] font-medium text-foreground">{t(PRODUCT_NAMES[productName] ?? productName)}</span>
+          <span className="text-[16px] font-medium text-foreground">{translateProductName(productName, t)}</span>
           <span className="text-[13px] text-muted-foreground">
             <span className="text-foreground font-medium">{fmt(remaining, unit)}</span> / {fmt(total, unit)}
           </span>
@@ -84,7 +87,7 @@ export default function QuotaBar({
   return (
     <div className="flex flex-col gap-[8px] p-[16px] rounded-xl bg-background border border-border">
       <div className="flex justify-between items-baseline gap-[8px]">
-        <span className="text-[16px] font-medium text-foreground">{t(PRODUCT_NAMES[productName] ?? productName)}</span>
+        <span className="text-[16px] font-medium text-foreground">{translateProductName(productName, t)}</span>
         <span className="text-[13px] text-muted-foreground whitespace-nowrap">
           <span className="text-foreground font-medium">{fmt(used, unit)}</span>{rest}
         </span>
