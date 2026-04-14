@@ -1,20 +1,21 @@
-<h1 align="center">Open BSP UI</h1>
+<h1 align="center">OpenBSP UI</h1>
 <p align="center">
   <strong>Open-source WhatsApp Web interface</strong>
 </p>
 <p align="center">
-  Self-hostable, multi-tenant, and AI-agent ready. Built for <a href="https://github.com/matiasbattocchia/open-bsp-api">Open BSP API</a>.
+  Self-hostable, multi-tenant, and AI-agent ready. Built for <a href="https://github.com/matiasbattocchia/open-bsp-api">OpenBSP API</a>.
 </p>
 
 <p align="center">
-  <a href="https://web.openbsp.dev"><img src="https://img.shields.io/badge/%F0%9F%9A%80_Try_it-web.openbsp.dev-C26A3D" alt="Try it"></a>&nbsp;
+  <a href="https://web.openbsp.dev"><img src="https://img.shields.io/badge/%F0%9F%9A%80_try_it-web.openbsp.dev-C26A3D" alt="Try it"></a>&nbsp;
   <a href="https://unlicense.org/"><img src="https://img.shields.io/badge/license-Unlicense-blue.svg" alt="License: Unlicense"></a>&nbsp;
   <a href="https://github.com/matiasbattocchia/open-bsp-ui/stargazers"><img src="https://img.shields.io/github/stars/matiasbattocchia/open-bsp-ui" alt="GitHub Stars"></a>&nbsp;
-  <a href="https://github.com/matiasbattocchia/open-bsp-ui/commits/main"><img src="https://img.shields.io/github/last-commit/matiasbattocchia/open-bsp-ui" alt="Last Commit"></a>
+  <a href="https://github.com/matiasbattocchia/open-bsp-ui/commits/main"><img src="https://img.shields.io/github/last-commit/matiasbattocchia/open-bsp-ui" alt="Last Commit"></a>&nbsp;
+  <a href="https://chat.whatsapp.com/Ch6AwZizSDt5quzHodcYh5"><img src="https://img.shields.io/badge/Community-25D366?logo=whatsapp&logoColor=white" alt="Community"></a>
 </p>
 
 <p align="center">
-  <img src="./screenshot.png" alt="Open BSP UI Screenshot" width="800">
+  <img src="./screenshot.png" alt="OpenBSP UI Screenshot" width="800">
 </p>
 
 ## Features
@@ -65,7 +66,7 @@ You are live! 🚀
 
 ### Local setup
 
-You need a running [Open BSP API](https://github.com/matiasbattocchia/open-bsp-api) — either locally via `npx supabase start` or a hosted Supabase project.
+You need a running [OpenBSP API](https://github.com/matiasbattocchia/open-bsp-api) — either locally via `npx supabase start` or a hosted Supabase project.
 
 ```bash
 npm install
@@ -101,3 +102,7 @@ The UI is written in Spanish (the default language) and supports English and Por
 ```bash
 ./scripts/sync-translations.sh
 ```
+
+## Community
+
+Questions, ideas, or feedback? Join our [WhatsApp Community](https://chat.whatsapp.com/Ch6AwZizSDt5quzHodcYh5) or open an [issue](https://github.com/matiasbattocchia/open-bsp-ui/issues). We'd love to hear from you.

@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for your interest in contributing to Open BSP UI!
+Thanks for your interest in contributing to OpenBSP UI!
 
 ## Local Setup
 
