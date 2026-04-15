@@ -122,7 +122,7 @@ function Onboard() {
   return (
     <div className="flex flex-col gap-9 justify-center items-center bg-background text-foreground h-dvh w-screen">
       <div className="text-primary tracking-tighter font-bold text-[36px]">
-        Open BSP
+        OpenBSP
       </div>
 
       <div className="flex flex-col gap-4 w-[320px] text-center">
