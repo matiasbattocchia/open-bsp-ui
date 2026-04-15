@@ -37,8 +37,5 @@
   },
   "include": [
     "src"
-  ],
-  "exclude": [
-    "src/deprecated"
   ]
 }

@@ -10,9 +10,8 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 EN="$ROOT/public/locales/en.json"
 PT="$ROOT/public/locales/pt.json"
 
-# ── 1. Extract all t("...") keys from source (excluding deprecated) ──────────
+# ── 1. Extract all t("...") keys from source ────────────────────────────────
 CODE_KEYS=$(grep -roh 't("[^"]*")' "$ROOT/src/" --include='*.tsx' --include='*.ts' \
-  | grep -v 'src/deprecated/' \
   | sed 's/^t("//;s/")$//' \
   | sort -u)
 

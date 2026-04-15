@@ -39,6 +39,15 @@
 - **Stats** — Usage charts and billing quota dashboards
 - **Multi-org** — Switch between organizations; invite and onboard team members
 
+<table align="center">
+  <tr>
+    <td><img src="./screenshots/conversations.png" alt="Conversations list" width="180"></td>
+    <td><img src="./screenshots/chat.png" alt="Chat view" width="180"></td>
+    <td><img src="./screenshots/agent-tools.png" alt="Agent tools" width="180"></td>
+    <td><img src="./screenshots/template-editor.png" alt="Template editor" width="180"></td>
+  </tr>
+</table>
+
 ## Deployment
 
 > [!NOTE]
