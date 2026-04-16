@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  <img src="./screenshot.png" alt="OpenBSP UI Screenshot" width="800">
+  <video src="./demo.mp4" width="800" autoplay loop muted></video>
 </p>
 
 ## Features
