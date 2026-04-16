@@ -14,9 +14,7 @@
   <a href="https://chat.whatsapp.com/Ch6AwZizSDt5quzHodcYh5"><img src="https://img.shields.io/badge/Community-25D366?logo=whatsapp&logoColor=white" alt="Community"></a>
 </p>
 
-<p align="center">
-  <video src="https://github.com/user-attachments/assets/1ef30dde-9de1-4f5a-856a-db34ca2e3063" width="800" autoplay loop muted></video>
-</p>
+https://github.com/user-attachments/assets/1ef30dde-9de1-4f5a-856a-db34ca2e3063
 
 ## Features
 
