@@ -2,6 +2,7 @@ import { supabase } from "@/supabase/client";
 import Avatar from "./Avatar";
 import useBoundStore from "@/stores/useBoundStore";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useTheme } from "@/hooks/useTheme";
 import {
   LogOut,
   Settings,
@@ -12,6 +13,8 @@ import {
   Languages,
   Plus,
   NotebookTabs,
+  Moon,
+  Sun,
 } from "lucide-react";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import { LinkButton } from "./LinkButton";
@@ -22,6 +25,7 @@ import { useOrganizations } from "@/queries/useOrganizations";
 
 export default function Menu() {
   const user = useBoundStore((state) => state.ui.user);
+  const { isDark, toggleTheme } = useTheme();
 
   const { data: agent } = useCurrentAgent();
 
@@ -53,7 +57,7 @@ export default function Menu() {
           isActive={pathname.startsWith("/conversations")}
           className="mt-[10px]"
         >
-          <MessageSquareText className="w-[24px] h-[24px] stroke-[2]" />
+          <MessageSquareText className="w-5 h-5" strokeWidth={1.75} />
         </LinkButton>
 
         {/* Agents button */}
@@ -63,7 +67,7 @@ export default function Menu() {
           isActive={pathname.startsWith("/agents")}
           className="mt-[10px]"
         >
-          <Bot className="w-[24px] h-[24px] stroke-[2]" />
+          <Bot className="w-5 h-5" strokeWidth={1.75} />
         </LinkButton>
 
         {/* Contacts button */}
@@ -73,7 +77,7 @@ export default function Menu() {
           isActive={pathname.startsWith("/contacts")}
           className="mt-[10px]"
         >
-          <NotebookTabs className="w-[24px] h-[24px] stroke-[2]" />
+          <NotebookTabs className="w-5 h-5" strokeWidth={1.75} />
         </LinkButton>
 
         {/* Integrations button */}
@@ -83,7 +87,7 @@ export default function Menu() {
           isActive={pathname.startsWith("/integrations")}
           className="mt-[10px]"
         >
-          <Unplug className="w-[24px] h-[24px] stroke-[2]" />
+          <Unplug className="w-5 h-5" strokeWidth={1.75} />
         </LinkButton>
 
         {/* Stats button */}
@@ -93,12 +97,25 @@ export default function Menu() {
           isActive={pathname.startsWith("/stats")}
           className="mt-[10px]"
         >
-          <BarChart3 className="w-[24px] h-[24px] stroke-[2]" />
+          <BarChart3 className="w-5 h-5" strokeWidth={1.75} />
         </LinkButton>
       </div>
 
       {/* Lower section */}
       <div className="flex flex-col items-center">
+
+        {/* Theme toggle button */}
+        <button
+          onClick={toggleTheme}
+          className="mt-[10px] p-[8px] rounded-lg hover:bg-sidebar-accent transition-colors"
+          title={isDark ? t("Modo claro") : t("Modo escuro")}
+        >
+          {isDark ? (
+            <Sun className="w-5 h-5 text-sidebar-foreground" strokeWidth={1.75} />
+          ) : (
+            <Moon className="w-5 h-5 text-sidebar-foreground" strokeWidth={1.75} />
+          )}
+        </button>
 
         {/* Settings button */}
         <LinkButton
@@ -107,7 +124,7 @@ export default function Menu() {
           isActive={pathname.startsWith("/settings")}
           className="mt-[10px]"
         >
-          <Settings className="w-[20px] h-[20px] stroke-[2]" />
+          <Settings className="w-5 h-5" strokeWidth={1.75} />
         </LinkButton>
 
         <Dropdown
