@@ -18,17 +18,55 @@ export const Route = createFileRoute("/_auth/agents/new")({
 });
 
 export const protocols: Record<string, NonNullable<AIAgentExtra['protocol']>[]> = {
-  openai: ["chat_completions", "assistants"],
+  openai: ["chat_completions"],
   google: ["chat_completions"],
   anthropic: ["chat_completions"],
   groq: ["chat_completions"],
-  custom: ["chat_completions", "a2a", "assistants"],
+  custom: ["chat_completions", "a2a"],
 };
 
 export const protocolLabels: Record<NonNullable<AIAgentExtra['protocol']>, string> = {
   "chat_completions": "Chat Completions",
-  assistants: "Assistants",
   a2a: "A2A",
+};
+
+export const defaultModels: Record<string, string> = {
+  openai: "gpt-5-mini",
+  anthropic: "claude-sonnet-4-6",
+  google: "gemini-3-flash-preview",
+  groq: "openai/gpt-oss-20b",
+};
+
+export const creditModels: Record<string, string[]> = {
+  openai: ["gpt-5-mini", "gpt-5.3-chat-latest"],
+  anthropic: ["claude-sonnet-4-6"],
+  google: ["gemini-2.5-flash", "gemini-3-flash-preview"],
+  groq: ["openai/gpt-oss-20b", "openai/gpt-oss-120b"],
+};
+
+export const apiKeyInstructions: Record<string, { url: string; label: string; steps: string; free?: boolean }> = {
+  openai: {
+    url: "https://platform.openai.com/api-keys",
+    label: "platform.openai.com",
+    steps: "API Keys > Create new secret key.",
+  },
+  anthropic: {
+    url: "https://console.anthropic.com/settings/keys",
+    label: "console.anthropic.com",
+    steps: "Settings > API Keys > Create Key.",
+  },
+  google: {
+    url: "https://aistudio.google.com/app/apikey",
+    label: "aistudio.google.com",
+    steps: "Get API key > Create API key.",
+    free: true,
+  },
+  groq: {
+    url: "https://console.groq.com/keys",
+    label: "console.groq.com",
+    steps: "API Keys > Create API Key.",
+    free: true,
+  },
 };
 
 function AddAgent() {
@@ -37,7 +75,7 @@ function AddAgent() {
   const createAgent = useCreateAgent();
   const { data: currentAgent } = useCurrentAgent();
   const isAdmin = ["admin", "owner"].includes(currentAgent?.extra?.role || "");
-  const [provider, setProvider] = useState<keyof typeof protocols>("openai");
+  const [provider, setProvider] = useState<keyof typeof protocols>("groq");
 
   const {
     register,
@@ -49,9 +87,9 @@ function AddAgent() {
     defaultValues: {
       extra: {
         mode: "active",
-        api_url: "openai",
+        api_url: "groq",
         protocol: "chat_completions",
-        model: "gpt-5.2-chat-latest",
+        model: "openai/gpt-oss-20b",
         tools: [],
       }
     },
@@ -125,7 +163,7 @@ function AddAgent() {
                 value={provider}
                 onChange={(val) => {
                   setProvider(val);
-                  setValue("extra.model", "");
+                  setValue("extra.model", defaultModels[val] || "");
 
                   const availableProtocols = protocols[val as keyof typeof protocols];
                   setValue("extra.protocol", availableProtocols[0]);
@@ -178,6 +216,19 @@ function AddAgent() {
                 />
               </label>
 
+              {provider !== 'custom' && apiKeyInstructions[provider] && (
+                <div className="instructions">
+                  <p>
+                    {t("Usar una clave API propia no consume créditos locales y permite usar cualquier modelo.")}
+                  </p>
+                  <p>
+                    <a href={apiKeyInstructions[provider].url} target="_blank" rel="noopener noreferrer" className="underline">{apiKeyInstructions[provider].label}</a>
+                    {" > "}{apiKeyInstructions[provider].steps}
+                    {apiKeyInstructions[provider].free && ` — ${t("Gratuito.")}`}
+                  </p>
+                </div>
+              )}
+
               <label>
                 <div className="label">{t("Modelo")}</div>
                 <input
@@ -187,6 +238,15 @@ function AddAgent() {
                   {...register("extra.model")}
                 />
               </label>
+
+              {provider !== 'custom' && creditModels[provider] && (
+                <div className="instructions">
+                  <p>{t("Los siguientes modelos funcionan con créditos de IA:")}</p>
+                  <ul>
+                    {creditModels[provider].map((m) => <li key={m}><code>{m}</code></li>)}
+                  </ul>
+                </div>
+              )}
 
               <label>
                 <div className="label">{t("Mensajes máximos")}</div>

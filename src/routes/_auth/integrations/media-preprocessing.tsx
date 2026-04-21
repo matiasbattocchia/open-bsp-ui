@@ -98,6 +98,13 @@ function MediaPreprocessingSettings() {
             />
           </label>
 
+          <div className="instructions">
+            <p>
+              <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="underline">aistudio.google.com</a>
+              {" > "}Get API key {" > "} Create API key. {" — "}{t("Gratuito.")}
+            </p>
+          </div>
+
           <label>
             <div className="label">{t("Idioma")}</div>
             <input

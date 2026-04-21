@@ -10,7 +10,7 @@ import { type AIAgentRow, type AIAgentUpdate } from "@/supabase/client";
 import { startConversation } from "@/utils/ConversationUtils";
 import { useOrganizationsAddresses } from "@/queries/useOrganizationsAddresses";
 import SectionFooter from "@/components/SectionFooter";
-import { protocols, protocolLabels } from "./new";
+import { protocols, protocolLabels, defaultModels, creditModels, apiKeyInstructions } from "./new";
 import Button from "@/components/Button";
 import SelectField from "@/components/SelectField";
 import TextAreaField from "@/components/TextAreaField";
@@ -139,7 +139,7 @@ function AgentDetail() {
               value={provider}
               onChange={(val) => {
                 setProvider(val);
-                setValue("extra.model", "");
+                setValue("extra.model", defaultModels[val] || "");
 
                 const availableProtocols = protocols[val as keyof typeof protocols];
                 setValue("extra.protocol", availableProtocols[0]);
@@ -192,6 +192,19 @@ function AgentDetail() {
               />
             </label>
 
+            {provider !== 'custom' && apiKeyInstructions[provider] && (
+              <div className="instructions">
+                <p>
+                  {t("Usar una clave API propia no consume créditos locales y permite usar cualquier modelo.")}
+                </p>
+                <p>
+                  <a href={apiKeyInstructions[provider].url} target="_blank" rel="noopener noreferrer" className="underline">{apiKeyInstructions[provider].label}</a>
+                  {" > "}{apiKeyInstructions[provider].steps}
+                  {apiKeyInstructions[provider].free && ` — ${t("Gratuito.")}`}
+                </p>
+              </div>
+            )}
+
             <label>
               <div className="label">{t("Modelo")}</div>
               <input
@@ -201,6 +214,15 @@ function AgentDetail() {
                 {...register("extra.model")}
               />
             </label>
+
+            {provider !== 'custom' && creditModels[provider] && (
+              <div className="instructions">
+                <p>{t("Los siguientes modelos funcionan con créditos de IA:")}</p>
+                <ul>
+                  {creditModels[provider].map((m) => <li key={m}><code>{m}</code></li>)}
+                </ul>
+              </div>
+            )}
 
             <label>
               <div className="label">{t("Mensajes máximos")}</div>
