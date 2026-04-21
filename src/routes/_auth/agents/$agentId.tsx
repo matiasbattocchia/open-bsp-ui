@@ -137,6 +137,7 @@ function AgentDetail() {
           <SectionField label={t("Modelo de IA")} description={model || t("Ninguno")}>
             <SelectField
               value={provider}
+              modalClassName="bottom-0"
               onChange={(val) => {
                 setProvider(val);
                 setValue("extra.model", defaultModels[val] || "");
@@ -163,6 +164,7 @@ function AgentDetail() {
             <SelectField
               name="extra.protocol"
               control={control}
+              modalClassName="bottom-0"
               label={t("Protocolo")}
               options={(protocols[provider as keyof typeof protocols] || []).map((p) => ({
                 value: p,
