@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
-import { Plus, Search, X } from "lucide-react";
+import { Plus } from "lucide-react";
 import useBoundStore from "@/stores/useBoundStore";
+import SearchBar from "@/components/SearchBar";
 import { useTemplates } from "@/queries/useTemplates";
 import { useTranslation } from "@/hooks/useTranslation";
 import type { TemplateData } from "@/supabase/client";
@@ -65,32 +66,21 @@ export default function TemplatePicker() {
       ref={ref}
       className="absolute bottom-0 w-full max-h-[320px] overflow-hidden flex flex-col z-20 bg-background rounded-[24px] shadow-lg"
     >
-      {/* Search — ChatSearch style */}
-      <div className="px-[40px] pt-[12px] pb-[8px]">
-        <div className="flex items-center bg-incoming-chat-bubble h-[32px] rounded-full px-[12px]">
-          <Search className="text-muted-foreground w-[16px] h-[16px] stroke-[3px] shrink-0" />
-          <input
-            type="text"
-            className="bg-transparent border-none outline-none w-full text-[14px] mx-[12px] placeholder:text-muted-foreground"
-            placeholder={t("Buscar plantilla...")}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            autoFocus
-          />
-          {search && (
-            <X
-              className="cursor-pointer text-muted-foreground w-[16px] h-[16px] stroke-[3px]"
-              onClick={() => setSearch("")}
-            />
-          )}
-        </div>
-      </div>
+      {/* Search */}
+      <SearchBar
+        value={search}
+        onChange={setSearch}
+        placeholder={t("Buscar plantilla...")}
+        autoFocus
+        size="small"
+        className="px-[40px] pt-[12px] pb-[8px] flex"
+      />
 
       {/* List — ChatList style */}
       <div className="overflow-y-auto px-[40px] pb-[8px] mb-[16px]">
         <div className="flex flex-col gap-[4px]">
           {isLoading ? (
-            <div className="px-[10px] py-[16px] text-muted-foreground text-[14px]">
+            <div className="px-[10px] py-[8px] text-muted-foreground text-[13px]">
               {t("Cargando...")}
             </div>
           ) : !filtered?.length ? (

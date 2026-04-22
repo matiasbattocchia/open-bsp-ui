@@ -33,18 +33,40 @@ export function useContactByAddress(address: string | null | undefined) {
 export function useContacts() {
   const userId = useBoundStore((state) => state.ui.user?.id);
   const orgId = useBoundStore((state) => state.ui.activeOrgId);
+  const queryClient = useQueryClient();
 
   return useQuery({
     queryKey: queryKeys.contacts.all(orgId),
-    queryFn: async () =>
-      await supabase
-        .from("contacts")
-        .select("*, primary_address:contacts_addresses(*)")
-        .eq("organization_id", orgId!)
-        .order("name", { ascending: true })
-        .order("created_at", { referencedTable: "primary_address", ascending: true })
-        .limit(1, { referencedTable: "primary_address" })
-        .throwOnError(),
+    queryFn: async () => {
+      const PAGE_SIZE = 1000;
+      let allData: ContactWithAddressesRow[] = [];
+      let offset = 0;
+
+      while (true) {
+        const { data: page } = await supabase
+          .from("contacts")
+          .select("*, addresses:contacts_addresses(*)")
+          .eq("organization_id", orgId!)
+          .order("name", { ascending: true })
+          .order("created_at", { referencedTable: "addresses", ascending: true })
+          .range(offset, offset + PAGE_SIZE - 1)
+          .throwOnError();
+
+        allData = [...allData, ...(page as ContactWithAddressesRow[])];
+        if (page.length < PAGE_SIZE) break;
+        offset += PAGE_SIZE;
+      }
+
+      // Seed individual contact cache entries
+      for (const contact of allData) {
+        queryClient.setQueryData(
+          queryKeys.contacts.detail(orgId, contact.id),
+          { data: contact }
+        );
+      }
+
+      return { data: allData };
+    },
     enabled: !!userId && !!orgId,
     select: (data) => data.data,
   });

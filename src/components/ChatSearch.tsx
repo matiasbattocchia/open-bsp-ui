@@ -1,30 +1,14 @@
-import { Search, X } from "lucide-react";
 import useBoundStore from "@/stores/useBoundStore";
-import { useTranslation } from "@/hooks/useTranslation";
+import SearchBar from "@/components/SearchBar";
 
 export default function ChatSearch() {
   const searchPattern = useBoundStore((state) => state.ui.searchPattern);
   const setSearchPattern = useBoundStore((state) => state.ui.setSearchPattern);
 
-  const { translate: t } = useTranslation();
-
   return (
-    <div className="px-[20px] pb-[12px] flex">
-      <div className="flex items-center w-full bg-incoming-chat-bubble h-[40px] rounded-full hover:ring ring-border px-[12px] text-foreground">
-        <Search className="text-muted-foreground w-[16px] h-[16px] stroke-[3px] shrink-0" />
-        <input
-          placeholder={t("Buscar")}
-          className="bg-transparent border-none outline-none w-full h-full text-[15px] mx-[12px] placeholder:text-muted-foreground"
-          value={searchPattern}
-          onChange={(e) => setSearchPattern(e.target.value)}
-        />
-        {searchPattern && (
-          <X
-            className="cursor-pointer text-muted-foreground w-[16px] h-[16px] stroke-[3px]"
-            onClick={() => setSearchPattern("")}
-          />
-        )}
-      </div>
-    </div>
+    <SearchBar
+      value={searchPattern}
+      onChange={setSearchPattern}
+    />
   );
 }

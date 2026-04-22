@@ -276,6 +276,7 @@
   "Si termina en /*, solo se permiten URLs que comiencen con esa base. De lo contrario, debe coincidir exactamente.": "If it ends in /*, only URLs starting with that base are allowed. Otherwise, it must match exactly.",
   "Si usás la app WhatsApp Business, podés conectar tu número actual y seguir usando la app.": "If you use the WhatsApp Business app, you can connect your current number and continue using the app.",
   "Simula un mensaje entrante": "Simulates an incoming message",
+  "Sin resultados para": "No results for",
   "Sin URL": "No URL",
   "Sin URL base": "No base URL",
   "Sin cuotas configuradas": "No quotas configured",
