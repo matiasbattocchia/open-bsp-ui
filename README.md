@@ -98,11 +98,11 @@ Open [http://localhost:5173](http://localhost:5173).
 
 ### i18n (Internationalization)
 
-The UI is written in Spanish (the default language) and supports English and Portuguese translations. All user-facing strings use the `t()` function from `src/hooks/useTranslation.tsx`, which returns the Spanish key as-is or looks up a translation from `public/locales/{lang}.json`.
+The UI is written in Spanish (the default language) and supports English, Portuguese, French, and Swahili translations. All user-facing strings use the `t()` function from `src/hooks/useTranslation.tsx`, which returns the Spanish key as-is or looks up a translation from `public/locales/{lang}.json`.
 
 **Adding new strings**: wrap any user-facing text with `t("Texto en español")`. The Spanish key is the source of truth — no entry in `en.json`/`pt.json` means the Spanish text is shown.
 
-**Adding translations**: add the corresponding entries to `public/locales/en.json` and `public/locales/pt.json`.
+**Adding translations**: add the corresponding entries to each `public/locales/{lang}.json` file.
 
 **Checking for drift**: run the sync script to detect missing or stale keys:
 

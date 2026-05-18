@@ -37,9 +37,9 @@ export type TemplateDraft = {
   headVarValues: string[];
 };
 
-export type Language = "es" | "en" | "pt";
+export type Language = "es" | "en" | "pt" | "sw" | "fr";
 
-const SUPPORTED_LANGUAGES: Language[] = ["es", "en", "pt"];
+const SUPPORTED_LANGUAGES: Language[] = ["es", "en", "pt", "sw", "fr"];
 
 export function detectDefaultLanguage(): Language {
   const candidates =

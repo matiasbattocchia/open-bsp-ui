@@ -13,7 +13,7 @@ export function useTranslation() {
   return {
     translate: (text: string) => getTranslation(text, language),
     currentLanguage: language,
-    setCurrentLanguage: async (lang: "es" | "en" | "pt") => {
+    setCurrentLanguage: async (lang: "es" | "en" | "pt" | "sw" | "fr") => {
       await loadTranslations(lang);
       setLanguage(lang);
     },

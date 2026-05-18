@@ -145,9 +145,9 @@ export default function Menu() {
                 key: "lang",
                 label: t("Idioma"),
                 icon: <Languages className="w-[16px] h-[16px]" />,
-                children: (["es", "en", "pt"] as const).map((lang) => ({
+                children: (["es", "en", "pt", "sw", "fr"] as const).map((lang) => ({
                   key: lang,
-                  label: { es: "Español", en: "English", pt: "Português" }[lang],
+                  label: { es: "Español", en: "English", pt: "Português", sw: "Kiswahili", fr: "Français" }[lang],
                   className: lang === currentLanguage ? "ant-dropdown-menu-item-selected" : "",
                   onClick: () => setCurrentLanguage(lang),
                 })),
