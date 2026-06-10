@@ -8,12 +8,9 @@ import { useEffect, useState } from "react";
 import { useLocation } from "@tanstack/react-router";
 import FilePicker from "@/components/FileUploader/FilePicker";
 import FilePreviewer from "@/components/FilePreviewer";
-import ActionCard from "@/components/ActionCard";
-import { useTranslation } from "@/hooks/useTranslation";
-import { Bot, Building2, MessageSquarePlus, Settings } from "lucide-react";
 import { useResizable } from "@/hooks/useResizable";
-import { useCurrentAgents } from "@/queries/useAgents";
 import StatsCenter from "@/components/stats/StatsCenter";
+import TenantDashboard from "@/components/TenantDashboard";
 
 export const Route = createFileRoute("/_auth")({
   component: AppLayout,
@@ -32,10 +29,6 @@ function getMaxPanelWidth() {
 }
 
 function AppLayout() {
-  const { translate: t } = useTranslation();
-  const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
-  const { data: agents } = useCurrentAgents();
-  const hasAiAgents = agents?.some((a) => a.ai);
   const activeConvId = useBoundStore((state) => state.ui.activeConvId);
   const setActiveConv = useBoundStore((state) => state.ui.setActiveConv);
   const location = useLocation();
@@ -55,10 +48,6 @@ function AppLayout() {
     const convId = location.hash;
     setActiveConv(convId);
   }, [location.hash]);
-
-  console.log("--------")
-  console.log("active org ", activeOrgId)
-  console.log("active conv", activeConvId)
 
   const showCenterPanel = activeConvId || isStatsRoute;
 
@@ -115,38 +104,7 @@ function AppLayout() {
             <ChatFooter />
           </>
         ) : (
-          <div className="flex gap-[32px] items-center justify-center h-full">
-            {!activeOrgId && (
-              <ActionCard
-                icon={<Building2 className="w-[24px] h-[24px]" />}
-                title={t("Crear organización")}
-                to="/settings/organization/new"
-              />
-            )}
-            {activeOrgId && (
-              <>
-                {!hasAiAgents && (
-                  <ActionCard
-                    icon={<Bot className="w-[24px] h-[24px]" />}
-                    title={t("Crear agente")}
-                    to="/agents/new"
-                  />
-                )}
-                {hasAiAgents && (
-                  <ActionCard
-                    icon={<MessageSquarePlus className="w-[24px] h-[24px]" />}
-                    title={t("Iniciar conversación")}
-                    to="/conversations/new"
-                  />
-                )}
-                <ActionCard
-                  icon={<Settings className="w-[24px] h-[24px]" />}
-                  title={t("Configurar WhatsApp")}
-                  to="/integrations/whatsapp/new"
-                />
-              </>
-            )}
-          </div>
+          <TenantDashboard />
         )}
       </div>
     </div>
