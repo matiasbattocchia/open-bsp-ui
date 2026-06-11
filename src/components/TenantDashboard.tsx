@@ -7,6 +7,7 @@ import {
 import useBoundStore from "@/stores/useBoundStore";
 import Spinner from "@/components/Spinner";
 import Button from "@/components/Button";
+import WhatsAppIntegration from "@/components/WhatsAppIntegration";
 import {
   Wrench,
   Webhook,
@@ -192,13 +193,16 @@ function ManagementGrid({ orgId }: { orgId: string }) {
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between px-4 py-3 border-b border-border">
         <h2 className="text-[16px] text-foreground">Organization Addresses</h2>
-        <button
-          className="p-1.5 rounded-full hover:bg-muted text-muted-foreground"
-          title="Refresh"
-          onClick={fetchRows}
-        >
-          <RefreshCw className="w-4 h-4" />
-        </button>
+        <div className="flex items-center gap-2">
+          <WhatsAppIntegration onSuccess={() => { fetchRows(); }} />
+          <button
+            className="p-1.5 rounded-full hover:bg-muted text-muted-foreground"
+            title="Refresh"
+            onClick={fetchRows}
+          >
+            <RefreshCw className="w-4 h-4" />
+          </button>
+        </div>
       </div>
       <div className="flex-1 overflow-auto">
         {loading ? (
@@ -355,20 +359,14 @@ function WebhookSettings({ orgId }: { orgId: string }) {
   const [url, setUrl] = useState("");
   const [token, setToken] = useState("");
   const [saving, setSaving] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editUrl, setEditUrl] = useState("");
-  const [editToken, setEditToken] = useState("");
 
   const fetchWebhooks = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("webhooks")
-      .select("*")
-      .eq("organization_id", orgId);
-
-    if (!error && data) {
-      setWebhooks(data as WebhookRow[]);
-    }
+    const { data, error } = await supabase.functions.invoke(
+      `manage-webhooks?organization_id=${orgId}`,
+      { method: "GET" },
+    );
+    if (!error && data) setWebhooks(data as WebhookRow[]);
     setLoading(false);
   }, [orgId]);
 
@@ -379,72 +377,26 @@ function WebhookSettings({ orgId }: { orgId: string }) {
   const handleInsert = async () => {
     if (!url.trim()) return;
     setSaving(true);
-
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const userJwt = session?.access_token;
-      const anonKey = (supabase as any).supabaseKey;
-
-      if (!userJwt) {
-        throw new Error("No active session found.");
-      }
-
-      const response = await fetch(
-        "https://wlnquwjdbrlnxfwonvnd.supabase.co/functions/v1/register-webhook",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${userJwt}`,
-            apikey: anonKey,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            organization_id: orgId,
-            url: url.trim(),
-            token: token.trim() || null,
-          }),
-        },
-      );
-
-      if (response.ok) {
-        setUrl("");
-        setToken("");
-        await fetchWebhooks();
-      }
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleUpdate = async (id: string) => {
-    if (!editUrl.trim()) return;
-    setSaving(true);
-    const { error } = await supabase
-      .from("webhooks")
-      .update({
-        url: editUrl.trim(),
-        token: editToken.trim() || null,
-      } as never)
-      .eq("id", id);
+    const { error } = await supabase.functions.invoke("manage-webhooks", {
+      method: "POST",
+      body: { organization_id: orgId, url: url.trim(), token: token.trim() || null },
+    });
     if (!error) {
-      setEditingId(null);
-      fetchWebhooks();
+      setUrl("");
+      setToken("");
+      await fetchWebhooks();
     }
     setSaving(false);
   };
 
   const handleDelete = async (id: string) => {
-    const { error } = await supabase.from("webhooks").delete().eq("id", id);
-    if (!error) {
-      fetchWebhooks();
-    }
+    const { error } = await supabase.functions.invoke(
+      `manage-webhooks?id=${id}`,
+      { method: "DELETE" },
+    );
+    if (!error) await fetchWebhooks();
   };
 
-  const startEdit = (wh: WebhookRow) => {
-    setEditingId(wh.id);
-    setEditUrl(wh.url);
-    setEditToken(wh.token || "");
-  };
 
   return (
     <div className="flex flex-col h-full">
@@ -502,83 +454,35 @@ function WebhookSettings({ orgId }: { orgId: string }) {
               No webhooks configured.
             </div>
           ) : (
-            <div className="space-y-2">
-              {webhooks.map((wh) => (
-                <div
-                  key={wh.id}
-                  className="border border-border rounded-lg p-3 space-y-2"
-                >
-                  {editingId === wh.id ? (
-                    <>
-                      <input
-                        type="text"
-                        className="text w-full"
-                        value={editUrl}
-                        onChange={(e) => setEditUrl(e.target.value)}
-                      />
-                      <input
-                        type="text"
-                        className="text w-full"
-                        placeholder="Token (optional)"
-                        value={editToken}
-                        onChange={(e) => setEditToken(e.target.value)}
-                      />
-                      <div className="flex gap-2">
-                        <Button
-                          loading={saving}
-                          disabled={!editUrl.trim()}
-                          onClick={() => handleUpdate(wh.id)}
-                          className="primary px-3 text-[13px]"
-                        >
-                          <Check className="w-4 h-4" /> Save
-                        </Button>
-                        <button
-                          className="px-3 py-1.5 rounded-full text-[13px] hover:bg-muted text-muted-foreground flex items-center gap-1"
-                          onClick={() => setEditingId(null)}
-                        >
-                          <X className="w-4 h-4" /> Cancel
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div className="flex items-center justify-between">
-                        <span className="font-mono text-[13px] text-foreground truncate">
-                          {wh.url}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
-                        <span className="px-1.5 py-0.5 rounded bg-muted">
-                          {wh.table_name}
-                        </span>
-                        <span>
-                          {wh.operations?.join(", ") || "insert"}
-                        </span>
-                        {wh.token && (
-                          <span className="font-mono">
-                            token: {wh.token.substring(0, 8)}...
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex gap-2">
-                        <button
-                          className="px-3 py-1 rounded-full text-[12px] hover:bg-muted text-muted-foreground"
-                          onClick={() => startEdit(wh)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="px-3 py-1 rounded-full text-[12px] hover:bg-destructive/10 text-destructive flex items-center gap-1"
-                          onClick={() => handleDelete(wh.id)}
-                        >
-                          <Trash2 className="w-3 h-3" /> Delete
-                        </button>
-                      </div>
-                    </>
-                  )}
-                </div>
-              ))}
-            </div>
+            <table className="w-full text-[14px]">
+              <thead>
+                <tr className="border-b border-border text-muted-foreground text-left">
+                  <th className="px-4 py-2 font-medium">URL</th>
+                  <th className="px-4 py-2 font-medium w-16"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {webhooks.map((wh) => (
+                  <tr
+                    key={wh.id}
+                    className="border-b border-border hover:bg-muted/50"
+                  >
+                    <td className="px-4 py-2 font-mono text-[13px] text-foreground truncate max-w-0 w-full">
+                      {wh.url}
+                    </td>
+                    <td className="px-4 py-2">
+                      <button
+                        className="p-1.5 rounded-full hover:bg-destructive/10 text-destructive flex items-center gap-1 transition-colors"
+                        onClick={() => handleDelete(wh.id)}
+                        title="Delete webhook"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           )}
         </div>
       </div>

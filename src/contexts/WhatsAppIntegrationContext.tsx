@@ -5,6 +5,7 @@ import {
   type ReactNode,
 } from "react";
 import { useWhatsAppSignup } from "@/queries/useWhatsAppSignup";
+import useBoundStore from "@/stores/useBoundStore";
 
 const FB_API_VERSION = "v24.0";
 
@@ -178,6 +179,7 @@ export function WhatsAppIntegrationProvider({
   }, []);
 
   const { mutateAsync: signup } = useWhatsAppSignup();
+  const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
 
   const launchWhatsAppSignup = useCallback(
     (
@@ -206,6 +208,7 @@ export function WhatsAppIntegrationProvider({
             const payload: SignupPayload = {
               code,
               application_id: import.meta.env.VITE_META_APP_ID,
+              organization_id: activeOrgId || undefined,
               phone_number_id: sessionInfo.phone_number_id,
               waba_id: sessionInfo.waba_id,
               business_id: sessionInfo.business_id,
@@ -217,8 +220,8 @@ export function WhatsAppIntegrationProvider({
             console.log("Sending signup payload:", payload); // Remove after testing
 
             signup(payload)
-              .then(() => {
-                onSuccess(sessionInfo.phone_number_id || "");
+              .then((data) => {
+                onSuccess((data as any)?.phone_number_id || sessionInfo.phone_number_id || "");
               })
               .catch((error: Error) => {
                 console.error("Signup failed:", error);
@@ -242,7 +245,7 @@ export function WhatsAppIntegrationProvider({
         },
       );
     },
-    [],
+    [activeOrgId],
   );
 
   return (

@@ -13,7 +13,7 @@ export function useWhatsAppSignup() {
       if (!organization_id) throw new Error("No active organization");
 
       const { data, error } = await supabase.functions.invoke(
-        "whatsapp-management/signup",
+        "whatsapp-management",
         {
           method: "POST",
           body: {
@@ -49,7 +49,7 @@ export function useWhatsAppDisconnect() {
       if (!organization_id) throw new Error("No active organization");
 
       const { data, error } = await supabase.functions.invoke(
-        "whatsapp-management/signup",
+        "whatsapp-management",
         {
           method: "DELETE",
           body: {
