@@ -27,4 +27,11 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  // ONLY ADD THIS BLOCK HERE:
+  server: {
+    port: 5173,
+    allowedHosts: [
+      '.ngrok-free.dev'
+    ]
+  }
 });
