@@ -6,12 +6,9 @@ import {
   LogOut,
   Settings,
   MessageSquareText,
-  Unplug,
-  Bot,
   BarChart3,
   Languages,
   Plus,
-  NotebookTabs,
 } from "lucide-react";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import { LinkButton } from "./LinkButton";
@@ -32,7 +29,6 @@ export default function Menu() {
 
   const { translate: t, currentLanguage, setCurrentLanguage } = useTranslation();
 
-  // Simpler approach - call useLocation without select first
   const location = useLocation();
   const navigate = useNavigate();
   const pathname = location.pathname;
@@ -54,36 +50,6 @@ export default function Menu() {
           className="mt-[10px]"
         >
           <MessageSquareText className="w-[24px] h-[24px] stroke-[2]" />
-        </LinkButton>
-
-        {/* Agents button */}
-        <LinkButton
-          to="/agents"
-          title={t("Agentes")}
-          isActive={pathname.startsWith("/agents")}
-          className="mt-[10px]"
-        >
-          <Bot className="w-[24px] h-[24px] stroke-[2]" />
-        </LinkButton>
-
-        {/* Contacts button */}
-        <LinkButton
-          to="/contacts"
-          title={t("Contactos")}
-          isActive={pathname.startsWith("/contacts")}
-          className="mt-[10px]"
-        >
-          <NotebookTabs className="w-[24px] h-[24px] stroke-[2]" />
-        </LinkButton>
-
-        {/* Integrations button */}
-        <LinkButton
-          to="/integrations"
-          title={t("Integraciones")}
-          isActive={pathname.startsWith("/integrations")}
-          className="mt-[10px]"
-        >
-          <Unplug className="w-[24px] h-[24px] stroke-[2]" />
         </LinkButton>
 
         {/* Stats button */}
@@ -115,7 +81,7 @@ export default function Menu() {
             items: [
               {
                 key: "user_email",
-                type: "group", // using group name as title style
+                type: "group",
                 label: user?.email || "",
               },
               { type: "divider" },

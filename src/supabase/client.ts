@@ -886,12 +886,13 @@ export const supabase = createClient<Database>(
       flowType: "pkce",
       detectSessionInUrl: true,
     },
+    realtime: {
+      reconnectAfterMs: (attempt: number) => {
+        return Math.min(10 * 1000, attempt * 1000);
+      },
+    },
   },
 );
-
-supabase.realtime.reconnectAfterMs = (attempt: number) => {
-  return Math.min(10 * 1000, attempt * 1000);
-};
 
 export type Status = IncomingStatus & OutgoingStatus;
 export type MessageTypes = IncomingMessage["type"] | OutgoingMessage["type"];
