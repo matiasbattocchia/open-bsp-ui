@@ -130,12 +130,7 @@ export default function AudioMessage({
           <div className="relative px-[12px]">
             {audio && (
               <input
-                className={
-                  "left-[6px] h-full absolute cursor-pointer" +
-                  (true
-                    ? " [&::-moz-range-thumb]:bg-primary [&::-webkit-slider-thumb]::bg-primary"
-                    : " [&::-moz-range-thumb]:bg-gray-light [&::-webkit-slider-thumb]::bg-gray-light")
-                }
+                className="left-[6px] h-full absolute cursor-pointer [&::-moz-range-thumb]:bg-primary [&::-webkit-slider-thumb]::bg-primary"
                 type="range"
                 min={0}
                 max={duration}
@@ -161,7 +156,10 @@ export default function AudioMessage({
                 <div
                   className="absolute top-0 left-0 h-full bg-primary transition-all duration-100"
                   style={{
-                    width: duration > 0 ? `${((seekTime || time) / duration) * 100}%` : '0%'
+                    width:
+                      duration > 0
+                        ? `${((seekTime || time) / duration) * 100}%`
+                        : "0%",
                   }}
                 />
                 {/* Simple waveform-like bars */}

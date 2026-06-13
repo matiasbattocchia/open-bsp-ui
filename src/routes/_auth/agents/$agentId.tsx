@@ -2,7 +2,12 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import SectionHeader from "@/components/SectionHeader";
 import { useTranslation } from "@/hooks/useTranslation";
-import { useAgent, useDeleteAgent, useUpdateAgent, useCurrentAgent } from "@/queries/useAgents";
+import {
+  useAgent,
+  useDeleteAgent,
+  useUpdateAgent,
+  useCurrentAgent,
+} from "@/queries/useAgents";
 import { useForm, useWatch } from "react-hook-form";
 import SectionBody from "@/components/SectionBody";
 import useBoundStore from "@/stores/useBoundStore";
@@ -10,7 +15,13 @@ import { type AIAgentRow, type AIAgentUpdate } from "@/supabase/client";
 import { startConversation } from "@/utils/ConversationUtils";
 import { useOrganizationsAddresses } from "@/queries/useOrganizationsAddresses";
 import SectionFooter from "@/components/SectionFooter";
-import { protocols, protocolLabels, defaultModels, creditModels, apiKeyInstructions } from "./new";
+import {
+  protocols,
+  protocolLabels,
+  defaultModels,
+  creditModels,
+  apiKeyInstructions,
+} from "./new";
 import Button from "@/components/Button";
 import SelectField from "@/components/SelectField";
 import TextAreaField from "@/components/TextAreaField";
@@ -80,216 +91,258 @@ function AgentDetail() {
     navigate({ hash: convId });
   };
 
-  return agent && (
-    <>
-      <SectionHeader
-        title={agent.name}
-        onDelete={() => {
-          deleteAgent.mutate(agentId, {
-            onSuccess: () => navigate({ to: "..", hash: (prevHash) => prevHash! })
-          });
-        }}
-        deleteDisabled={!isAdmin}
-        deleteDisabledReason={t("Requiere permisos de administrador")}
-        deleteLoading={deleteAgent.isPending}
-      />
+  return (
+    agent && (
+      <>
+        <SectionHeader
+          title={agent.name}
+          onDelete={() => {
+            deleteAgent.mutate(agentId, {
+              onSuccess: () =>
+                navigate({ to: "..", hash: (prevHash) => prevHash! }),
+            });
+          }}
+          deleteDisabled={!isAdmin}
+          deleteDisabledReason={t("Requiere permisos de administrador")}
+          deleteLoading={deleteAgent.isPending}
+        />
 
-      <SectionBody>
-        <form
-          id="agent-form"
-          onSubmit={handleSubmit(data => updateAgent.mutate(data))}
-        >
-          {/* Root view fields */}
-          <label>
-            <div className="label">{t("Nombre")}</div>
-            <input
-              type="text"
-              className="text"
-              placeholder={t("Nombre del agente")}
-              {...register("name", { required: true })}
-            />
-          </label>
+        <SectionBody>
+          <form
+            id="agent-form"
+            onSubmit={handleSubmit((data) => updateAgent.mutate(data))}
+          >
+            {/* Root view fields */}
+            <label>
+              <div className="label">{t("Nombre")}</div>
+              <input
+                type="text"
+                className="text"
+                placeholder={t("Nombre del agente")}
+                {...register("name", { required: true })}
+              />
+            </label>
 
-          <SelectField
-            name="extra.mode"
-            control={control}
-            label={t("Estado")}
-            options={[
-              { value: "active", label: t("Activo") },
-              { value: "draft", label: t("Borrador") },
-              { value: "inactive", label: t("Inactivo") },
-            ]}
-          />
-
-          <div className="border-t border-border" />
-
-          <TextAreaField
-            name="extra.instructions"
-            control={control}
-            label={t("Instrucciones")}
-            placeholder={t("Eres un asistente útil...")}
-          />
-
-          {/* Tools Section */}
-          <ToolsSection control={control} register={register} setValue={setValue} />
-
-          {/* AI Section */}
-          <SectionField label={t("Modelo de IA")} description={model || t("Ninguno")}>
             <SelectField
-              value={provider}
-              modalClassName="bottom-0"
-              onChange={(val) => {
-                setProvider(val);
-                setValue("extra.model", defaultModels[val] || "");
-
-                const availableProtocols = protocols[val as keyof typeof protocols];
-                setValue("extra.protocol", availableProtocols[0]);
-
-                if (val !== "custom") {
-                  setValue("extra.api_url", val, { shouldDirty: true });
-                } else {
-                  setValue("extra.api_url", "", { shouldDirty: true });
-                }
-              }}
-              label={t("Proveedor")}
+              name="extra.mode"
+              control={control}
+              label={t("Estado")}
               options={[
-                { value: "openai", label: "OpenAI" },
-                { value: "anthropic", label: "Anthropic" },
-                { value: "groq", label: "Groq" },
-                { value: "google", label: "Google" },
-                { value: "custom", label: t("Personalizado") },
+                { value: "active", label: t("Activo") },
+                { value: "draft", label: t("Borrador") },
+                { value: "inactive", label: t("Inactivo") },
               ]}
             />
 
-            <SelectField
-              name="extra.protocol"
+            <div className="border-t border-border" />
+
+            <TextAreaField
+              name="extra.instructions"
               control={control}
-              modalClassName="bottom-0"
-              label={t("Protocolo")}
-              options={(protocols[provider as keyof typeof protocols] || []).map((p) => ({
-                value: p,
-                label: protocolLabels[p] || p,
-              }))}
+              label={t("Instrucciones")}
+              placeholder={t("Eres un asistente útil...")}
             />
 
-            {provider === "custom" && (
+            {/* Tools Section */}
+            <ToolsSection
+              control={control}
+              register={register}
+              setValue={setValue}
+            />
+
+            {/* AI Section */}
+            <SectionField
+              label={t("Modelo de IA")}
+              description={model || t("Ninguno")}
+            >
+              <SelectField
+                value={provider}
+                modalClassName="bottom-0"
+                onChange={(val) => {
+                  setProvider(val);
+                  setValue("extra.model", defaultModels[val] || "");
+
+                  const availableProtocols =
+                    protocols[val as keyof typeof protocols];
+                  setValue("extra.protocol", availableProtocols[0]);
+
+                  if (val !== "custom") {
+                    setValue("extra.api_url", val, { shouldDirty: true });
+                  } else {
+                    setValue("extra.api_url", "", { shouldDirty: true });
+                  }
+                }}
+                label={t("Proveedor")}
+                options={[
+                  { value: "openai", label: "OpenAI" },
+                  { value: "anthropic", label: "Anthropic" },
+                  { value: "groq", label: "Groq" },
+                  { value: "google", label: "Google" },
+                  { value: "custom", label: t("Personalizado") },
+                ]}
+              />
+
+              <SelectField
+                name="extra.protocol"
+                control={control}
+                modalClassName="bottom-0"
+                label={t("Protocolo")}
+                options={(
+                  protocols[provider as keyof typeof protocols] || []
+                ).map((p) => ({
+                  value: p,
+                  label: protocolLabels[p] || p,
+                }))}
+              />
+
+              {provider === "custom" && (
+                <label>
+                  <div className="label">{t("API URL")}</div>
+                  <input
+                    type="text"
+                    className="text"
+                    placeholder="https://api.example.com/v1"
+                    {...register("extra.api_url")}
+                  />
+                </label>
+              )}
+
               <label>
-                <div className="label">{t("API URL")}</div>
+                <div className="label">{t("Clave API")}</div>
                 <input
                   type="text"
                   className="text"
-                  placeholder="https://api.example.com/v1"
-                  {...register("extra.api_url")}
+                  placeholder={t("Clave API del proveedor")}
+                  {...register("extra.api_key")}
                 />
               </label>
-            )}
 
-            <label>
-              <div className="label">{t("Clave API")}</div>
-              <input
-                type="text"
-                className="text"
-                placeholder={t("Clave API del proveedor")}
-                {...register("extra.api_key")}
-              />
-            </label>
+              {provider !== "custom" && apiKeyInstructions[provider] && (
+                <div className="instructions">
+                  <p>
+                    {t(
+                      "Usar una clave API propia no consume créditos locales y permite usar cualquier modelo.",
+                    )}
+                  </p>
+                  <p>
+                    <a
+                      href={apiKeyInstructions[provider].url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline"
+                    >
+                      {apiKeyInstructions[provider].label}
+                    </a>
+                    {" > "}
+                    {apiKeyInstructions[provider].steps}
+                    {apiKeyInstructions[provider].free &&
+                      ` — ${t("Gratuito.")}`}
+                  </p>
+                </div>
+              )}
 
-            {provider !== 'custom' && apiKeyInstructions[provider] && (
-              <div className="instructions">
-                <p>
-                  {t("Usar una clave API propia no consume créditos locales y permite usar cualquier modelo.")}
-                </p>
-                <p>
-                  <a href={apiKeyInstructions[provider].url} target="_blank" rel="noopener noreferrer" className="underline">{apiKeyInstructions[provider].label}</a>
-                  {" > "}{apiKeyInstructions[provider].steps}
-                  {apiKeyInstructions[provider].free && ` — ${t("Gratuito.")}`}
-                </p>
-              </div>
-            )}
+              <label>
+                <div className="label">{t("Modelo")}</div>
+                <input
+                  type="text"
+                  className="text"
+                  placeholder={t("Nombre del modelo")}
+                  {...register("extra.model")}
+                />
+              </label>
 
-            <label>
-              <div className="label">{t("Modelo")}</div>
-              <input
-                type="text"
-                className="text"
-                placeholder={t("Nombre del modelo")}
-                {...register("extra.model")}
-              />
-            </label>
+              {provider !== "custom" && creditModels[provider] && (
+                <div className="instructions">
+                  <p>
+                    {t("Los siguientes modelos funcionan con créditos de IA:")}
+                  </p>
+                  <ul>
+                    {creditModels[provider].map((m) => (
+                      <li key={m}>
+                        <code>{m}</code>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
-            {provider !== 'custom' && creditModels[provider] && (
-              <div className="instructions">
-                <p>{t("Los siguientes modelos funcionan con créditos de IA:")}</p>
-                <ul>
-                  {creditModels[provider].map((m) => <li key={m}><code>{m}</code></li>)}
-                </ul>
-              </div>
-            )}
+              <label>
+                <div className="label">{t("Mensajes máximos")}</div>
+                <input
+                  type="number"
+                  className="text"
+                  min={1}
+                  placeholder="50"
+                  {...register("extra.max_messages", { valueAsNumber: true })}
+                />
+              </label>
 
-            <label>
-              <div className="label">{t("Mensajes máximos")}</div>
-              <input
-                type="number"
-                className="text"
-                min={1}
-                placeholder="50"
-                {...register("extra.max_messages", { valueAsNumber: true })}
-              />
-            </label>
+              <label>
+                <div className="label">{t("Temperatura")}</div>
+                <input
+                  type="number"
+                  className="text"
+                  min={0}
+                  max={2}
+                  step={0.1}
+                  placeholder="1.0"
+                  {...register("extra.temperature", { valueAsNumber: true })}
+                />
+              </label>
 
-            <label>
-              <div className="label">{t("Temperatura")}</div>
-              <input
-                type="number"
-                className="text"
-                min={0}
-                max={2}
-                step={0.1}
-                placeholder="1.0"
-                {...register("extra.temperature", { valueAsNumber: true })}
-              />
-            </label>
+              {provider === "custom" && (
+                <div className="instructions">
+                  <p>
+                    {t(
+                      "Se envían los siguientes encabezados HTTP con cada solicitud:",
+                    )}
+                  </p>
+                  <ul>
+                    <li>
+                      <code>organization-id</code>
+                    </li>
+                    <li>
+                      <code>organization-address</code>
+                    </li>
+                    <li>
+                      <code>conversation-id</code>
+                    </li>
+                    <li>
+                      <code>agent-id</code>
+                    </li>
+                    <li>
+                      <code>contact-id</code>
+                    </li>
+                    <li>
+                      <code>contact-address</code>
+                    </li>
+                  </ul>
+                </div>
+              )}
+            </SectionField>
+          </form>
+        </SectionBody>
 
-            {provider === 'custom' && (
-              <div className="instructions">
-                <p>{t("Se envían los siguientes encabezados HTTP con cada solicitud:")}</p>
-                <ul>
-                  <li><code>organization-id</code></li>
-                  <li><code>organization-address</code></li>
-                  <li><code>conversation-id</code></li>
-                  <li><code>agent-id</code></li>
-                  <li><code>contact-id</code></li>
-                  <li><code>contact-address</code></li>
-                </ul>
-              </div>
-            )}
-          </SectionField>
-        </form>
-      </SectionBody >
-
-      <SectionFooter>
-        {!isDirty ? (
-          <button
-            type="button"
-            className="primary"
-            onClick={handleChat}
-          >
-            {t("Chatea con este agente")}
-          </button>
-        ) : (
-          <Button
-            form="agent-form"
-            type="submit"
-            disabled={!isAdmin}
-            invalid={!isValid}
-            loading={updateAgent.isPending}
-            disabledReason={t("Requiere permisos de administrador")}
-            className="primary"
-          >
-            {t("Actualizar")}
-          </Button>
-        )}
-      </SectionFooter>
-    </>
+        <SectionFooter>
+          {!isDirty ? (
+            <button type="button" className="primary" onClick={handleChat}>
+              {t("Chatea con este agente")}
+            </button>
+          ) : (
+            <Button
+              form="agent-form"
+              type="submit"
+              disabled={!isAdmin}
+              invalid={!isValid}
+              loading={updateAgent.isPending}
+              disabledReason={t("Requiere permisos de administrador")}
+              className="primary"
+            >
+              {t("Actualizar")}
+            </Button>
+          )}
+        </SectionFooter>
+      </>
+    )
   );
 }

@@ -1,5 +1,10 @@
 import { useTranslation } from "@/hooks/useTranslation";
-import { useProducts, useUsage, useTierLimits, usePlanProducts } from "@/queries/useBilling";
+import {
+  useProducts,
+  useUsage,
+  useTierLimits,
+  usePlanProducts,
+} from "@/queries/useBilling";
 import QuotaBar from "./QuotaBar";
 
 const AI_CREDITS_BUDGET = 20;
@@ -13,12 +18,20 @@ export default function StatsQuotas() {
   const { data: planProducts } = usePlanProducts();
 
   const monthMap = new Map(monthUsage?.map((u) => [u.product_id, u.quantity]));
-  const lifetimeMap = new Map(lifetimeUsage?.map((u) => [u.product_id, u.quantity]));
+  const lifetimeMap = new Map(
+    lifetimeUsage?.map((u) => [u.product_id, u.quantity]),
+  );
   const tierMap = new Map(
-    tierLimits?.map((tl) => [tl.product_id, { cap: tl.cap, interval: tl.interval }]),
+    tierLimits?.map((tl) => [
+      tl.product_id,
+      { cap: tl.cap, interval: tl.interval },
+    ]),
   );
   const planMap = new Map(
-    planProducts?.map((pp) => [pp.product_id, { included: pp.included, interval: pp.interval }]),
+    planProducts?.map((pp) => [
+      pp.product_id,
+      { included: pp.included, interval: pp.interval },
+    ]),
   );
 
   const visibleProducts = products?.filter((p) => tierMap.has(p.id));

@@ -1,4 +1,9 @@
-import { createFileRoute, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Outlet,
+  useLocation,
+  useNavigate,
+} from "@tanstack/react-router";
 import SectionHeader from "@/components/SectionHeader";
 import SectionBody from "@/components/SectionBody";
 import SectionItem from "@/components/SectionItem";
@@ -22,21 +27,33 @@ function StatsLayout() {
         <SectionItem
           title={t("Cuotas")}
           aside={
-            <div className={`p-[8px] rounded-full ${pathname === "/stats/quotas" ? "bg-primary/10" : ""}`}>
-              <Gauge className={`w-[24px] h-[24px] ${pathname === "/stats/quotas" ? "text-primary" : "text-muted-foreground"}`} />
+            <div
+              className={`p-[8px] rounded-full ${pathname === "/stats/quotas" ? "bg-primary/10" : ""}`}
+            >
+              <Gauge
+                className={`w-[24px] h-[24px] ${pathname === "/stats/quotas" ? "text-primary" : "text-muted-foreground"}`}
+              />
             </div>
           }
-          onClick={() => navigate({ to: "/stats/quotas", hash: (prev) => prev! })}
+          onClick={() =>
+            navigate({ to: "/stats/quotas", hash: (prev) => prev! })
+          }
           className={pathname === "/stats/quotas" ? "bg-accent" : ""}
         />
         <SectionItem
           title={t("Uso")}
           aside={
-            <div className={`p-[8px] rounded-full ${pathname === "/stats/usage" ? "bg-primary/10" : ""}`}>
-              <BarChart3 className={`w-[24px] h-[24px] ${pathname === "/stats/usage" ? "text-primary" : "text-muted-foreground"}`} />
+            <div
+              className={`p-[8px] rounded-full ${pathname === "/stats/usage" ? "bg-primary/10" : ""}`}
+            >
+              <BarChart3
+                className={`w-[24px] h-[24px] ${pathname === "/stats/usage" ? "text-primary" : "text-muted-foreground"}`}
+              />
             </div>
           }
-          onClick={() => navigate({ to: "/stats/usage", hash: (prev) => prev! })}
+          onClick={() =>
+            navigate({ to: "/stats/usage", hash: (prev) => prev! })
+          }
           className={pathname === "/stats/usage" ? "bg-accent" : ""}
         />
       </SectionBody>

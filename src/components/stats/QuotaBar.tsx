@@ -13,17 +13,26 @@ type QuotaBarProps = {
 
 function translateProductName(name: string, t: (s: string) => string) {
   switch (name) {
-    case "Messages": return t("Mensajes");
-    case "Conversations": return t("Conversaciones");
-    case "Storage": return t("Almacenamiento");
-    case "AI Credits": return t("Créditos IA");
-    default: return name;
+    case "Messages":
+      return t("Mensajes");
+    case "Conversations":
+      return t("Conversaciones");
+    case "Storage":
+      return t("Almacenamiento");
+    case "AI Credits":
+      return t("Créditos IA");
+    default:
+      return name;
   }
 }
 
 function fmt(n: number, unit: string) {
-  if (unit === "usd") return `$${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  return n.toLocaleString(undefined, { minimumFractionDigits: n % 1 !== 0 ? 2 : 0, maximumFractionDigits: 2 });
+  if (unit === "usd")
+    return `$${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  return n.toLocaleString(undefined, {
+    minimumFractionDigits: n % 1 !== 0 ? 2 : 0,
+    maximumFractionDigits: 2,
+  });
 }
 
 function unitLabel(unit: string) {
@@ -53,9 +62,14 @@ export default function QuotaBar({
     return (
       <div className="flex flex-col gap-[8px] p-[16px] rounded-xl bg-background border border-border">
         <div className="flex justify-between items-baseline">
-          <span className="text-[16px] font-medium text-foreground">{translateProductName(productName, t)}</span>
+          <span className="text-[16px] font-medium text-foreground">
+            {translateProductName(productName, t)}
+          </span>
           <span className="text-[13px] text-muted-foreground">
-            <span className="text-foreground font-medium">{fmt(remaining, unit)}</span> / {fmt(total, unit)}
+            <span className="text-foreground font-medium">
+              {fmt(remaining, unit)}
+            </span>{" "}
+            / {fmt(total, unit)}
           </span>
         </div>
 
@@ -87,9 +101,12 @@ export default function QuotaBar({
   return (
     <div className="flex flex-col gap-[8px] p-[16px] rounded-xl bg-background border border-border">
       <div className="flex justify-between items-baseline gap-[8px]">
-        <span className="text-[16px] font-medium text-foreground">{translateProductName(productName, t)}</span>
+        <span className="text-[16px] font-medium text-foreground">
+          {translateProductName(productName, t)}
+        </span>
         <span className="text-[13px] text-muted-foreground whitespace-nowrap">
-          <span className="text-foreground font-medium">{fmt(used, unit)}</span>{rest}
+          <span className="text-foreground font-medium">{fmt(used, unit)}</span>
+          {rest}
         </span>
       </div>
 

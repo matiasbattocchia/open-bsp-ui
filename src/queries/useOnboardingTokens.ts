@@ -38,7 +38,13 @@ export function useCreateOnboardingToken() {
   const userId = useBoundStore((state) => state.ui.user?.id);
 
   return useMutation({
-    mutationFn: async ({ name, expiresInDays }: { name: string; expiresInDays: number }) => {
+    mutationFn: async ({
+      name,
+      expiresInDays,
+    }: {
+      name: string;
+      expiresInDays: number;
+    }) => {
       if (!orgId) throw new Error("No active organization");
       if (!userId) throw new Error("No authenticated user");
 

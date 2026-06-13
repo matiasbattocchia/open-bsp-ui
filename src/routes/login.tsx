@@ -66,9 +66,14 @@ function Login() {
           <GithubOutlined /> {t("Continuar con GitHub")}
         </button>
 
-        <div className={`border-b border-border w-full ${import.meta.env.DEV ? "" : "hidden"}`} />
+        <div
+          className={`border-b border-border w-full ${import.meta.env.DEV ? "" : "hidden"}`}
+        />
 
-        <form onSubmit={handleLogInWithEmail} className={`login-form ${import.meta.env.DEV ? "" : "hidden"}`}>
+        <form
+          onSubmit={handleLogInWithEmail}
+          className={`login-form ${import.meta.env.DEV ? "" : "hidden"}`}
+        >
           <label>
             <div className="label">{t("Correo electrónico")}</div>
             <input
@@ -92,13 +97,12 @@ function Login() {
           </label>
 
           {message && (
-            <div className="self-center text-destructive text-md">{message}</div>
+            <div className="self-center text-destructive text-md">
+              {message}
+            </div>
           )}
 
-          <button
-            type="submit"
-            className="primary w-full mt-[16px]"
-          >
+          <button type="submit" className="primary w-full mt-[16px]">
             {t("Entrar")}
           </button>
         </form>

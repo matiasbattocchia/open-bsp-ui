@@ -26,7 +26,7 @@ function OAuthCallback() {
       // Send the data to the opener
       window.opener.postMessage(
         { type: "oauth-callback", apiKey, url, email, files },
-        window.location.origin
+        window.location.origin,
       );
       // Close the popup
       window.close();

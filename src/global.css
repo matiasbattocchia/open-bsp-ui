@@ -27,7 +27,7 @@
   --sidebar-accent-foreground: oklch(0.33 0 0);
   --sidebar-border: oklch(0.94 0 0);
   --sidebar-ring: oklch(0.77 0 0);
-  
+
   --chat-out: oklch(91.619% 0.0445 38.665);
   --chat-in: oklch(1 0 0);
 }
@@ -51,7 +51,7 @@
   --border: oklch(0.36 0.01 106.89);
   --input: oklch(0.43 0.01 100.22);
   --ring: oklch(0.59 0.17 253.06);
-  --sidebar: oklch(0.24 0.00 67.71); 
+  --sidebar: oklch(0.24 0 67.71);
   --sidebar-foreground: oklch(0.81 0.01 93.01);
   --sidebar-primary: oklch(0.33 0 0);
   --sidebar-primary-foreground: oklch(0.99 0 0);
@@ -164,7 +164,7 @@ button:disabled {
   input.text:read-only {
     @apply hover:border-transparent focus-visible:border-transparent cursor-default;
   }
-  
+
   textarea.text {
     @apply w-full focus-visible:outline-none text-[16px] text-foreground placeholder:text-muted-foreground bg-transparent focus-visible:border-primary;
   }
@@ -220,7 +220,9 @@ button:disabled {
     background-image: url("/bg-chat-tile-dark.png");
     background-repeat: repeat;
     opacity: 0.06; /* Subtle pattern for light mode */
-    filter: invert(1); /* Invert to make dark pattern on light background if original is light-on-dark */
+    filter: invert(
+      1
+    ); /* Invert to make dark pattern on light background if original is light-on-dark */
     z-index: -1;
     pointer-events: none;
   }
@@ -274,7 +276,7 @@ button:disabled {
   }
 
   /* Responsive breakpoints */
-  
+
   /* 
    Tailwind CSS v4 default breakpoints:
 
@@ -416,7 +418,7 @@ input[type="range"]::-moz-range-track {
   color: var(--ring);
 }
 
-.json-number, 
+.json-number,
 .json-boolean {
   color: var(--primary);
 }

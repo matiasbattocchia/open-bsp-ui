@@ -44,7 +44,11 @@ function AppLayout() {
 
   const [isHoveringFiles, setIsHoveringFiles] = useState(false);
 
-  const { width: panelWidth, panelRef, handleMouseDown } = useResizable({
+  const {
+    width: panelWidth,
+    panelRef,
+    handleMouseDown,
+  } = useResizable({
     minWidth: MIN_PANEL_WIDTH,
     getMaxWidth: getMaxPanelWidth,
   });
@@ -56,16 +60,20 @@ function AppLayout() {
     setActiveConv(convId);
   }, [location.hash]);
 
-  console.log("--------")
-  console.log("active org ", activeOrgId)
-  console.log("active conv", activeConvId)
+  console.log("--------");
+  console.log("active org ", activeOrgId);
+  console.log("active conv", activeConvId);
 
   const showCenterPanel = activeConvId || isStatsRoute;
 
   return (
     <div
       className="app-grid"
-      style={panelWidth !== null ? { gridTemplateColumns: `${getMenuWidth()}px ${panelWidth}px 1fr` } : undefined}
+      style={
+        panelWidth !== null
+          ? { gridTemplateColumns: `${getMenuWidth()}px ${panelWidth}px 1fr` }
+          : undefined
+      }
     >
       {/* Menu - Fixed width */}
       <div className={showCenterPanel ? "hidden md:flex" : "flex"}>
@@ -81,10 +89,7 @@ function AppLayout() {
       >
         <Outlet />
         {/* Resize Handle */}
-        <div
-          className="resize-handle z-[60]"
-          onMouseDown={handleMouseDown}
-        />
+        <div className="resize-handle z-[60]" onMouseDown={handleMouseDown} />
       </div>
 
       {/* Center Panel */}
@@ -106,9 +111,7 @@ function AppLayout() {
           </div>
         ) : activeConvId ? (
           <>
-            {isHoveringFiles && (
-              <FilePicker setHovering={setIsHoveringFiles} />
-            )}
+            {isHoveringFiles && <FilePicker setHovering={setIsHoveringFiles} />}
             <FilePreviewer />
             <ChatHeader />
             <Chat />

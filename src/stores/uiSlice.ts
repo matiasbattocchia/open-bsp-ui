@@ -2,7 +2,11 @@ import type { StateCreator } from "zustand";
 import type { User } from "@supabase/supabase-js";
 import type { AppState } from "./useBoundStore";
 import dayjs from "dayjs";
-import type { ConversationRow, MessageRow, TemplateData } from "@/supabase/client";
+import type {
+  ConversationRow,
+  MessageRow,
+  TemplateData,
+} from "@/supabase/client";
 
 export function isArchived(conv: ConversationRow, msg?: MessageRow) {
   const archivedTimestamp: string | null | undefined = conv.extra?.archived;
@@ -82,14 +86,14 @@ export type UIActions = {
 
 export type UISlice = UIState & UIActions;
 
-// @ts-expect-error
+// @ts-expect-error partializing the slice creator's state type
 export const createUISlice: StateCreator<Partial<AppState>> = (
   set: (
     partial:
       | AppState
       | Partial<AppState>
       | ((state: AppState) => AppState | Partial<AppState>),
-    replace?: boolean | undefined,
+    replace?: boolean,
   ) => void,
 ) => ({
   templatePicker: false,

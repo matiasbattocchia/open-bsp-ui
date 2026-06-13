@@ -46,27 +46,29 @@ function ListAgents() {
           disabled={!isAdmin}
           disabledReason={t("Requiere permisos de administrador")}
         />
-        {agents?.filter(a => a.ai).map((agent) => (
-          <SectionItem
-            key={agent.id}
-            title={agent.name}
-            description={modeLabels[agent.extra?.mode || ""]}
-            aside={
-              <Avatar
-                src={agent.picture}
-                fallback={agent.name?.substring(0, 2).toUpperCase()}
-                size={40}
-                className="bg-muted text-muted-foreground"
-              />
-            }
-            onClick={() =>
-              navigate({
-                to: `/agents/${agent.id}`,
-                hash: (prevHash) => prevHash!,
-              })
-            }
-          />
-        ))}
+        {agents
+          ?.filter((a) => a.ai)
+          .map((agent) => (
+            <SectionItem
+              key={agent.id}
+              title={agent.name}
+              description={modeLabels[agent.extra?.mode || ""]}
+              aside={
+                <Avatar
+                  src={agent.picture}
+                  fallback={agent.name?.substring(0, 2).toUpperCase()}
+                  size={40}
+                  className="bg-muted text-muted-foreground"
+                />
+              }
+              onClick={() =>
+                navigate({
+                  to: `/agents/${agent.id}`,
+                  hash: (prevHash) => prevHash!,
+                })
+              }
+            />
+          ))}
       </SectionBody>
     </>
   );

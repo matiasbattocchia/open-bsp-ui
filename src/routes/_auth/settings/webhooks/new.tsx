@@ -40,21 +40,20 @@ function AddWebhook() {
         <form
           id="create-webhook-form"
           onSubmit={handleSubmit((data) =>
-            createWebhook.mutate(
-              data,
-              {
-                onSuccess: (webhook) =>
-                  navigate({
-                    to: `/settings/webhooks/${webhook!.id}`,
-                    hash: (prevHash) => prevHash!,
-                  }),
-              }
-            )
+            createWebhook.mutate(data, {
+              onSuccess: (webhook) =>
+                navigate({
+                  to: `/settings/webhooks/${webhook!.id}`,
+                  hash: (prevHash) => prevHash!,
+                }),
+            }),
           )}
         >
           <fieldset disabled={!isAdmin} className="contents">
             <p>
-              {t("Los webhooks notifican a tu servidor cuando ocurren eventos. Selecciona la tabla y operaciones que quieres monitorear.")}
+              {t(
+                "Los webhooks notifican a tu servidor cuando ocurren eventos. Selecciona la tabla y operaciones que quieres monitorear.",
+              )}
             </p>
 
             <label>

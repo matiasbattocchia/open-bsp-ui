@@ -157,7 +157,11 @@ function WhatsAppDetails() {
           )}
 
           <div className="instructions">
-            <p>{t("Sobrescribir la URL de callback es útil para evadir OpenBSP y recibir los webhooks crudos en el endpoint que indiques. OpenBSP seguirá recibiendo los eventos de cuenta y plantillas (no se pueden redirigir), pero no recibirá los mensajes.")}</p>
+            <p>
+              {t(
+                "Sobrescribir la URL de callback es útil para evadir OpenBSP y recibir los webhooks crudos en el endpoint que indiques. OpenBSP seguirá recibiendo los eventos de cuenta y plantillas (no se pueden redirigir), pero no recibirá los mensajes.",
+              )}
+            </p>
           </div>
 
           <label>

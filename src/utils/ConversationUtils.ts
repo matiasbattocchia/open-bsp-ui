@@ -63,10 +63,10 @@ export async function saveDraft(
     extra: {
       draft: text
         ? {
-          text,
-          timestamp: new Date().toISOString(),
-          origin,
-        }
+            text,
+            timestamp: new Date().toISOString(),
+            origin,
+          }
         : null,
     },
   };

@@ -55,7 +55,7 @@ const ChatList = () => {
       (a) =>
         a.conv.organization_id === activeOrgId &&
         filters[filterName](a.conv, a.mostRecentMsg) &&
-        !!a.mostRecentMsg
+        !!a.mostRecentMsg,
     );
 
   if (searchPattern) {
@@ -99,8 +99,7 @@ const ChatList = () => {
         </div>
       )}
     </div>
-  )
+  );
 };
 
 export default ChatList;
-

@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { ArrowLeft, ChevronRight, Check } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
-import { Controller, type Control, type FieldValues, type Path } from "react-hook-form";
+import {
+  Controller,
+  type Control,
+  type FieldValues,
+  type Path,
+} from "react-hook-form";
 
 export interface SelectOption {
   value: string;
@@ -19,7 +24,8 @@ interface BaseSelectProps {
 }
 
 // Single Select
-interface SingleSelectControlledProps<T extends FieldValues> extends BaseSelectProps {
+interface SingleSelectControlledProps<T extends FieldValues>
+  extends BaseSelectProps {
   multiple?: false;
   name: Path<T>;
   control: Control<T>;
@@ -34,7 +40,8 @@ interface SingleSelectUncontrolledProps extends BaseSelectProps {
 }
 
 // Multi Select
-interface MultiSelectControlledProps<T extends FieldValues> extends BaseSelectProps {
+interface MultiSelectControlledProps<T extends FieldValues>
+  extends BaseSelectProps {
   multiple: true;
   name: Path<T>;
   control: Control<T>;
@@ -56,13 +63,13 @@ type SelectFieldProps<T extends FieldValues> =
   | MultiSelectUncontrolledProps;
 
 function isControlled<T extends FieldValues>(
-  props: SelectFieldProps<T>
+  props: SelectFieldProps<T>,
 ): props is SingleSelectControlledProps<T> | MultiSelectControlledProps<T> {
   return "control" in props;
 }
 
 export default function SelectField<T extends FieldValues>(
-  props: SelectFieldProps<T>
+  props: SelectFieldProps<T>,
 ) {
   const { translate: t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -73,7 +80,7 @@ export default function SelectField<T extends FieldValues>(
   // internally we treat value as string | string[] to share logic
   const renderSelect = (
     value: string | string[] | undefined,
-    handleChange: (val: string | string[]) => void
+    handleChange: (val: string | string[]) => void,
   ) => {
     const getDisplayLabel = () => {
       if (multiple && Array.isArray(value)) {
@@ -108,7 +115,9 @@ export default function SelectField<T extends FieldValues>(
             disabled={disabled}
           >
             <span
-              className={hasSelection ? "text-foreground" : "text-muted-foreground"}
+              className={
+                hasSelection ? "text-foreground" : "text-muted-foreground"
+              }
             >
               {getDisplayLabel()}
             </span>
@@ -118,7 +127,9 @@ export default function SelectField<T extends FieldValues>(
 
         {/* Options Modal */}
         {isOpen && (
-          <div className={`absolute inset-0 z-50 bg-background flex flex-col ${props.modalClassName ?? "bottom-[80px]"}`}>
+          <div
+            className={`absolute inset-0 z-50 bg-background flex flex-col ${props.modalClassName ?? "bottom-[80px]"}`}
+          >
             {/* Header */}
             <div className="header items-center truncate">
               <button
@@ -159,18 +170,18 @@ export default function SelectField<T extends FieldValues>(
                   >
                     {/* Indicator */}
                     <span
-                      className={`w-[20px] h-[20px] border-[2px] flex items-center justify-center shrink-0 ${isSelected
-                        ? "border-primary bg-primary"
-                        : "border-muted-foreground"
-                        } ${multiple ? "rounded-[4px]" : "rounded-full"}`}
+                      className={`w-[20px] h-[20px] border-[2px] flex items-center justify-center shrink-0 ${
+                        isSelected
+                          ? "border-primary bg-primary"
+                          : "border-muted-foreground"
+                      } ${multiple ? "rounded-[4px]" : "rounded-full"}`}
                     >
-                      {isSelected && (
-                        multiple ? (
+                      {isSelected &&
+                        (multiple ? (
                           <Check className="w-[14px] h-[14px] text-primary-foreground" />
                         ) : (
                           <span className="w-[8px] h-[8px] rounded-full bg-primary-foreground" />
-                        )
-                      )}
+                        ))}
                     </span>
                     <span className="text-[16px] text-foreground">
                       {option.label}
@@ -215,7 +226,9 @@ export default function SelectField<T extends FieldValues>(
   }
 
   // Uncontrolled mode
-  const p = props as unknown as (SingleSelectUncontrolledProps | MultiSelectUncontrolledProps);
+  const p = props as unknown as
+    | SingleSelectUncontrolledProps
+    | MultiSelectUncontrolledProps;
 
   return renderSelect(p.value, (val) => {
     if (p.multiple) {

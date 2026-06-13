@@ -1,4 +1,4 @@
-import { parsePhoneNumberWithError } from 'libphonenumber-js';
+import { parsePhoneNumberWithError } from "libphonenumber-js";
 
 export function removeAccents(str: string): string {
   return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -14,8 +14,8 @@ export function removeAccents(str: string): string {
 export function isIncludedIn(searchCriteria: string, term: string) {
   return searchCriteria.length
     ? removeAccents(term)
-      .toLowerCase()
-      .includes(removeAccents(searchCriteria).toLowerCase())
+        .toLowerCase()
+        .includes(removeAccents(searchCriteria).toLowerCase())
     : true;
 }
 
@@ -38,7 +38,9 @@ export function nameInitials(name: string): string {
 
 export function formatPhoneNumber(phoneNumber: string): string {
   try {
-    const parsed = parsePhoneNumberWithError("+" + phoneNumber, { extract: false });
+    const parsed = parsePhoneNumberWithError("+" + phoneNumber, {
+      extract: false,
+    });
     return parsed.formatInternational();
   } catch (error) {
     return phoneNumber;
@@ -46,7 +48,9 @@ export function formatPhoneNumber(phoneNumber: string): string {
 }
 
 export function isValidPhoneNumber(phoneNumber: string): boolean {
-  if (!phoneNumber?.trim()) { return true; }
+  if (!phoneNumber?.trim()) {
+    return true;
+  }
 
   try {
     const parsed = parsePhoneNumberWithError(phoneNumber, { extract: true });
@@ -71,9 +75,9 @@ export function normalizePhoneNumber(phoneNumber: string): string {
       number = number.replace("54", "549");
     }
 
-    return number
+    return number;
   } catch {
     // Return cleaned version (digits only) if parsing fails
-    return phoneNumber.replace(/\D/g, '');
+    return phoneNumber.replace(/\D/g, "");
   }
 }

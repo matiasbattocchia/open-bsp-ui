@@ -35,7 +35,7 @@ export const fetchMessagesFromBackend = async (
 ) => {
   const timeWindowStart =
     lastFetched === 0 ? dayjs().subtract(days, "days") : dayjs(lastFetched);
-  let messagesResponse: MessageRow[] = [];
+  const messagesResponse: MessageRow[] = [];
 
   try {
     const fetch = async (from: number = 0, to: number = 999) => {

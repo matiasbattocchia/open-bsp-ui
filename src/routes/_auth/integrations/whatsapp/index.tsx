@@ -66,19 +66,27 @@ function WhatsAppIndex() {
               key={integration.address}
               aside={
                 <div className="p-[8px]">
-                  <WhatsAppOutlined style={{ fontSize: "24px", color: "#25D366" }} />
+                  <WhatsAppOutlined
+                    style={{ fontSize: "24px", color: "#25D366" }}
+                  />
                 </div>
               }
-              title={formatPhoneNumber((integration.extra as { phone_number?: string })?.phone_number || integration.address)}
-              description={statusLabels[integration.status] || integration.status}
-              onClick={() => navigate({
-                to: "/integrations/whatsapp/$orgAddressId",
-                params: { orgAddressId: integration.address },
-                hash: (prevHash) => prevHash!
-              })}
+              title={formatPhoneNumber(
+                (integration.extra as { phone_number?: string })
+                  ?.phone_number || integration.address,
+              )}
+              description={
+                statusLabels[integration.status] || integration.status
+              }
+              onClick={() =>
+                navigate({
+                  to: "/integrations/whatsapp/$orgAddressId",
+                  params: { orgAddressId: integration.address },
+                  hash: (prevHash) => prevHash!,
+                })
+              }
             />
-          ))
-          }
+          ))}
         </div>
       </SectionBody>
     </>

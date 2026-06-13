@@ -14,7 +14,10 @@ export function useTemplates(organizationAddress?: string) {
         "whatsapp-management/templates",
         {
           method: "PUT",
-          body: { organization_id: activeOrgId, organization_address: organizationAddress },
+          body: {
+            organization_id: activeOrgId,
+            organization_address: organizationAddress,
+          },
         },
       );
 
@@ -40,7 +43,11 @@ export function useCreateTemplate() {
         "whatsapp-management/templates",
         {
           method: "POST",
-          body: { organization_id: activeOrgId, organization_address: organizationAddress, template },
+          body: {
+            organization_id: activeOrgId,
+            organization_address: organizationAddress,
+            template,
+          },
         },
       );
 
@@ -70,7 +77,11 @@ export function useUpdateTemplate() {
         "whatsapp-management/templates",
         {
           method: "PATCH",
-          body: { organization_id: activeOrgId, organization_address: organizationAddress, template },
+          body: {
+            organization_id: activeOrgId,
+            organization_address: organizationAddress,
+            template,
+          },
         },
       );
 
@@ -100,7 +111,11 @@ export function useDeleteTemplate() {
         "whatsapp-management/templates",
         {
           method: "DELETE",
-          body: { organization_id: activeOrgId, organization_address: organizationAddress, template },
+          body: {
+            organization_id: activeOrgId,
+            organization_address: organizationAddress,
+            template,
+          },
         },
       );
 

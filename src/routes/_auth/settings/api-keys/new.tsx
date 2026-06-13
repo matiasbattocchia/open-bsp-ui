@@ -46,21 +46,20 @@ function AddApiKey() {
         <form
           id="create-apikey-form"
           onSubmit={handleSubmit((data) =>
-            createApiKey.mutate(
-              data,
-              {
-                onSuccess: (apiKey) =>
-                  navigate({
-                    to: `/settings/api-keys/${apiKey.id}`,
-                    hash: (prevHash) => prevHash!,
-                  }),
-              }
-            )
+            createApiKey.mutate(data, {
+              onSuccess: (apiKey) =>
+                navigate({
+                  to: `/settings/api-keys/${apiKey.id}`,
+                  hash: (prevHash) => prevHash!,
+                }),
+            }),
           )}
         >
           <fieldset disabled={!isOwner} className="contents">
             <p className="text-muted-foreground text-[14px]">
-              {t("Esto generará una nueva clave API que podrás usar para autenticarte.")}
+              {t(
+                "Esto generará una nueva clave API que podrás usar para autenticarte.",
+              )}
             </p>
 
             <label>

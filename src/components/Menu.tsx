@@ -30,7 +30,11 @@ export default function Menu() {
 
   const { data: organizations } = useOrganizations();
 
-  const { translate: t, currentLanguage, setCurrentLanguage } = useTranslation();
+  const {
+    translate: t,
+    currentLanguage,
+    setCurrentLanguage,
+  } = useTranslation();
 
   // Simpler approach - call useLocation without select first
   const location = useLocation();
@@ -45,7 +49,6 @@ export default function Menu() {
     >
       {/* Upper section */}
       <div className="flex flex-col items-center">
-
         {/* Conversations button */}
         <LinkButton
           to="/conversations"
@@ -99,7 +102,6 @@ export default function Menu() {
 
       {/* Lower section */}
       <div className="flex flex-col items-center">
-
         {/* Settings button */}
         <LinkButton
           to="/settings"
@@ -136,7 +138,11 @@ export default function Menu() {
                     key: "new_org",
                     label: t("Nueva organización"),
                     icon: <Plus className="w-[16px] h-[16px]" />,
-                    onClick: () => navigate({ to: "/settings/organization/new", hash: (prevHash) => prevHash! }),
+                    onClick: () =>
+                      navigate({
+                        to: "/settings/organization/new",
+                        hash: (prevHash) => prevHash!,
+                      }),
                   },
                 ],
               },
@@ -145,12 +151,23 @@ export default function Menu() {
                 key: "lang",
                 label: t("Idioma"),
                 icon: <Languages className="w-[16px] h-[16px]" />,
-                children: (["es", "en", "pt", "sw", "fr"] as const).map((lang) => ({
-                  key: lang,
-                  label: { es: "Español", en: "English", pt: "Português", sw: "Kiswahili", fr: "Français" }[lang],
-                  className: lang === currentLanguage ? "ant-dropdown-menu-item-selected" : "",
-                  onClick: () => setCurrentLanguage(lang),
-                })),
+                children: (["es", "en", "pt", "sw", "fr"] as const).map(
+                  (lang) => ({
+                    key: lang,
+                    label: {
+                      es: "Español",
+                      en: "English",
+                      pt: "Português",
+                      sw: "Kiswahili",
+                      fr: "Français",
+                    }[lang],
+                    className:
+                      lang === currentLanguage
+                        ? "ant-dropdown-menu-item-selected"
+                        : "",
+                    onClick: () => setCurrentLanguage(lang),
+                  }),
+                ),
               },
               { type: "divider" },
               {
@@ -164,9 +181,7 @@ export default function Menu() {
               },
             ],
             selectable: true,
-            selectedKeys: [
-              ...(activeOrgId ? [activeOrgId] : []),
-            ],
+            selectedKeys: [...(activeOrgId ? [activeOrgId] : [])],
           }}
           trigger={["click"]}
         >

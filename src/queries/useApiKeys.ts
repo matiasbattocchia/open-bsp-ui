@@ -66,7 +66,7 @@ export function useCreateApiKey() {
       queryClient.setQueryData(
         queryKeys.apiKeys.detail(orgId, data.id),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (old: any) => old ? { ...old, data } : { data, error: null },
+        (old: any) => (old ? { ...old, data } : { data, error: null }),
       );
     },
   });

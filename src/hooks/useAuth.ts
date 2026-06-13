@@ -40,7 +40,9 @@ export function useAuth() {
 
       // Signed out
       if (
-        loggedUser && !user && !window.location.pathname.startsWith("/login")
+        loggedUser &&
+        !user &&
+        !window.location.pathname.startsWith("/login")
       ) {
         // Clear all queries and org state
         queryClient.clear();

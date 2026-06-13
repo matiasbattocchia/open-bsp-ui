@@ -9,7 +9,9 @@ import { useCreateOnboardingToken } from "@/queries/useOnboardingTokens";
 import { useCurrentAgent } from "@/queries/useAgents";
 import { useForm } from "react-hook-form";
 
-export const Route = createFileRoute("/_auth/integrations/whatsapp/onboarding/new")({
+export const Route = createFileRoute(
+  "/_auth/integrations/whatsapp/onboarding/new",
+)({
   component: NewOnboardingToken,
 });
 
@@ -40,19 +42,24 @@ function NewOnboardingToken() {
         <form
           id="create-onboarding-token-form"
           onSubmit={handleSubmit((data) =>
-            createToken.mutate({ name: data.name, expiresInDays: Number(data.expires_in_days) }, {
-              onSuccess: (token) =>
-                navigate({
-                  to: "/integrations/whatsapp/onboarding/$tokenId",
-                  params: { tokenId: token.id },
-                  hash: (prevHash) => prevHash!,
-                }),
-            })
+            createToken.mutate(
+              { name: data.name, expiresInDays: Number(data.expires_in_days) },
+              {
+                onSuccess: (token) =>
+                  navigate({
+                    to: "/integrations/whatsapp/onboarding/$tokenId",
+                    params: { tokenId: token.id },
+                    hash: (prevHash) => prevHash!,
+                  }),
+              },
+            ),
           )}
         >
           <fieldset disabled={!isOwner} className="contents">
             <p className="text-muted-foreground text-[14px]">
-              {t("Generá un enlace para que un tercero conecte su número de WhatsApp a tu organización. No necesita tener cuenta en OpenBSP ni ser miembro de tu organización.")}
+              {t(
+                "Generá un enlace para que un tercero conecte su número de WhatsApp a tu organización. No necesita tener cuenta en OpenBSP ni ser miembro de tu organización.",
+              )}
             </p>
 
             <label>

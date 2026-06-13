@@ -17,15 +17,13 @@ type SeparatorType = { text: string; first: true; last: true };
 
 function Separator({ text }: { text: string }) {
   // TODO: just a placeholder
-  let type = "date";
+  const type: string = "date";
 
   return (
     <div
       className={
         "flex justify-center mb-[12px]" +
-        (type === "unread"
-          ? " py-[5px] bg-incoming-chat-bubble/25"
-          : "")
+        (type === "unread" ? " py-[5px] bg-incoming-chat-bubble/25" : "")
       }
     >
       {/* unreads has rounded-16px px-22px py-0 but I prefer to keep the date style */}
@@ -93,9 +91,7 @@ export default function Chat() {
     return agentIds;
   }
 
-  function assignAgentColors(
-    agentIds: Set<string>,
-  ): Map<string, string> {
+  function assignAgentColors(agentIds: Set<string>): Map<string, string> {
     const colorMap = new Map<string, string>();
     let colorIndex = 0;
 
@@ -103,10 +99,7 @@ export default function Chat() {
     const sortedAgentIds = Array.from(agentIds).sort();
 
     for (const agentId of sortedAgentIds) {
-      colorMap.set(
-        agentId,
-        AVATAR_COLORS[colorIndex % AVATAR_COLORS.length],
-      );
+      colorMap.set(agentId, AVATAR_COLORS[colorIndex % AVATAR_COLORS.length]);
       colorIndex++;
     }
 
@@ -126,8 +119,6 @@ export default function Chat() {
 
     return { agentId, color: colorMap.get(agentId)! };
   }
-
-
 
   function insertDateSeparators(
     chat: MessageRow[],
@@ -211,12 +202,11 @@ export default function Chat() {
    */
 
   useEffect(() => {
-    let scrollerRef = scroller.current;
+    const scrollerRef = scroller.current;
 
     if (!scrollerRef || !scroller.current) {
       return;
     }
-
   }, [messages.length, activeConvId]);
 
   useEffect(() => {
@@ -278,7 +268,10 @@ export default function Chat() {
 
   return (
     activeConvId && (
-      <div ref={scroller} className="grow pb-[8px] overflow-y-auto [scrollbar-gutter:stable]">
+      <div
+        ref={scroller}
+        className="grow pb-[8px] overflow-y-auto [scrollbar-gutter:stable]"
+      >
         <div className="min-h-[12px]" />
         <div className="flex flex-col">
           {envelopesAndSeparators.map((envOrSep, index) =>

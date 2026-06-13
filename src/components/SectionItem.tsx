@@ -18,7 +18,10 @@ export default function SectionItem({
   disabledReason?: string;
 }) {
   const isDisabled = disabled;
-  const tooltip = title + (isDisabled ? " - " + disabledReason : "");
+  const tooltip =
+    typeof title === "string"
+      ? title + (isDisabled ? " - " + disabledReason : "")
+      : undefined;
 
   return (
     <div
@@ -31,9 +34,7 @@ export default function SectionItem({
       onClick={isDisabled ? undefined : onClick}
     >
       {/* Left Pane: Avatar/Icon */}
-      <div className="pl-[10px] pr-[15px] flex items-center">
-        {aside}
-      </div>
+      <div className="pl-[10px] pr-[15px] flex items-center">{aside}</div>
 
       {/* Right Pane: Content */}
       <div className="flex flex-col justify-center grow min-w-0 pr-[15px]">

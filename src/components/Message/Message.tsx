@@ -48,7 +48,7 @@ function whatsappToMarkdown(text: string): string {
 
           let processed = subPart;
           // Bold: *text* -> **text**
-          processed = processed.replace(/\*([^\*]+?)\*/g, "**$1**");
+          processed = processed.replace(/\*([^*]+?)\*/g, "**$1**");
           // Italic: _text_ -> *text*
           processed = processed.replace(/_([^_]+?)_/g, "*$1*");
           // Strikethrough: ~text~ -> ~~text~~
@@ -340,7 +340,7 @@ export function OutMessage({
   return (
     <div
       className={
-        (!!avatar ? avatarMsgRowClasses : msgRowClasses) +
+        (avatar ? avatarMsgRowClasses : msgRowClasses) +
         " justify-end" +
         (last ? " mb-[12px]" : " mb-[2px]")
       }
@@ -432,7 +432,10 @@ export default function Message(props: UIMessage & { message: MessageRow }) {
       />
     );
     text = true;
-  } else if (props.message.content.type === "data" && props.message.content.text) {
+  } else if (
+    props.message.content.type === "data" &&
+    props.message.content.text
+  ) {
     content = (
       <TextMessage
         header={headerText}
@@ -440,7 +443,11 @@ export default function Message(props: UIMessage & { message: MessageRow }) {
         type="markdown"
         direction={props.message.direction}
         timestamp={props.message.timestamp}
-        status={props.message.direction === "outgoing" ? props.message.status : undefined}
+        status={
+          props.message.direction === "outgoing"
+            ? props.message.status
+            : undefined
+        }
         fixedWidth={fixedWidth}
       />
     );

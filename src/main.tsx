@@ -45,7 +45,9 @@ function detectLanguage(): Language {
   try {
     const stored = JSON.parse(localStorage.getItem("app-state") || "{}");
     if (stored?.state?.ui?.language) return stored.state.ui.language;
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
 
   return detectDefaultLanguage();
 }

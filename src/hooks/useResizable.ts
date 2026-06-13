@@ -28,7 +28,7 @@ export function useResizable({
       }
       setIsResizing(true);
     },
-    [width]
+    [width],
   );
 
   useEffect(() => {

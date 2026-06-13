@@ -159,7 +159,10 @@ export default function DocumentMessage(message: MessageRow) {
       {/* Caption */}
       {content.text && (
         <div className="pl-[6px] pt-[6px] pb-[5px] pr-[4px]">
-          <Markdown content={content.text || ""} direction={message.direction} />
+          <Markdown
+            content={content.text || ""}
+            direction={message.direction}
+          />
         </div>
       )}
 

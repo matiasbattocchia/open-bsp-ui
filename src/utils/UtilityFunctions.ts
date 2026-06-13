@@ -11,7 +11,7 @@ export const debounce = <T extends (...args: any[]) => void>(
 };
 
 // Taken from https://phuoc.ng/collection/html-dom/move-the-cursor-to-the-end-of-a-content-editable-element
-export const moveCursorToEnd = async (element: HTMLDivElement) => {
+export const moveCursorToEnd = (element: HTMLDivElement) => {
   const range = document.createRange();
   const selection = window.getSelection();
   range.setStart(element, element.childNodes.length);

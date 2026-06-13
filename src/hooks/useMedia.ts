@@ -25,12 +25,13 @@ export function useMedia(message: MessageRow) {
     throw new Error(`Message with id ${message.id} has no valid media URI.`);
   }
 
-  const load =
-    useBoundStore((store) => store.chat.mediaLoads.get(message.id)) || {
-      type: "download",
-      status: "pending",
-      handledOnce: false,
-    };
+  const load = useBoundStore((store) =>
+    store.chat.mediaLoads.get(message.id),
+  ) || {
+    type: "download",
+    status: "pending",
+    handledOnce: false,
+  };
   const setLoad = useBoundStore((store) => store.chat.setMediaLoad);
   const [cancel, setCancel] = useState(false);
 
@@ -67,7 +68,7 @@ export function useMedia(message: MessageRow) {
 
     setLoad(message.id, { ...load, status: "done" });
 
-    !error && await pushMessageToDb(message as MessageInsert);
+    !error && (await pushMessageToDb(message as MessageInsert));
   };
 
   const downloadTask = async () => {

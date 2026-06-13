@@ -3,7 +3,13 @@ import SectionHeader from "@/components/SectionHeader";
 import SectionBody from "@/components/SectionBody";
 import SectionFooter from "@/components/SectionFooter";
 import { useTranslation } from "@/hooks/useTranslation";
-import { useAgent, useUpdateAgent, useDeleteAgent, useCurrentAgent, useCurrentAgents } from "@/queries/useAgents";
+import {
+  useAgent,
+  useUpdateAgent,
+  useDeleteAgent,
+  useCurrentAgent,
+  useCurrentAgents,
+} from "@/queries/useAgents";
 import useBoundStore from "@/stores/useBoundStore";
 import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
@@ -31,7 +37,8 @@ function EditMember() {
   const queryClient = useQueryClient();
 
   // Count owners to prevent deleting the last one
-  const ownersCount = allAgents?.filter(a => !a.ai && a.extra?.role === "owner").length || 0;
+  const ownersCount =
+    allAgents?.filter((a) => !a.ai && a.extra?.role === "owner").length || 0;
   const isLastOwner = agent?.extra?.role === "owner" && ownersCount <= 1;
 
   const updateAgent = useUpdateAgent();
@@ -42,13 +49,15 @@ function EditMember() {
       onSuccess: () => {
         if (isMe) {
           // If the user deletes themselves, invalidate organizations and redirect to conversations
-          queryClient.invalidateQueries({ queryKey: queryKeys.organizations.all() });
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.organizations.all(),
+          });
           setActiveOrg(null);
           navigate({ to: "/conversations" });
         } else {
           navigate({ to: "..", hash: (prevHash) => prevHash! });
         }
-      }
+      },
     });
   };
 
@@ -61,16 +70,19 @@ function EditMember() {
     values: agent,
   });
 
-  if (!agent) return
+  if (!agent) return;
 
-  const invitation = agent.extra?.invitation
+  const invitation = agent.extra?.invitation;
 
   return (
     <>
       <SectionHeader
         title={agent.name}
         onDelete={onDelete}
-        deleteDisabled={(!isOwner && !isMe) || (isOwner && isLastOwner && memberId === agent.id)} // Prevent deleting last owner
+        deleteDisabled={
+          (!isOwner && !isMe) ||
+          (isOwner && isLastOwner && memberId === agent.id)
+        } // Prevent deleting last owner
         deleteDisabledReason={
           isLastOwner
             ? t("No se puede eliminar al único propietario")
@@ -81,7 +93,7 @@ function EditMember() {
       <SectionBody>
         <form
           id="member-form"
-          onSubmit={handleSubmit(data => updateAgent.mutate(data))}
+          onSubmit={handleSubmit((data) => updateAgent.mutate(data))}
         >
           {invitation && invitation.status === "pending" && (
             <SectionItem
@@ -118,16 +130,18 @@ function EditMember() {
             required
           />
 
-          {invitation && invitation.email && <label>
-            <div className="label">{t("Correo electrónico")}</div>
-            <input
-              type="email"
-              className="text"
-              readOnly
-              placeholder={t("usuario@ejemplo.com")}
-              {...register("extra.invitation.email")}
-            />
-          </label>}
+          {invitation && invitation.email && (
+            <label>
+              <div className="label">{t("Correo electrónico")}</div>
+              <input
+                type="email"
+                className="text"
+                readOnly
+                placeholder={t("usuario@ejemplo.com")}
+                {...register("extra.invitation.email")}
+              />
+            </label>
+          )}
         </form>
       </SectionBody>
 

@@ -42,11 +42,15 @@ export default function UsageChart({
     quantity: row.quantity,
   }));
 
-  const unitLabel = unit === "count" ? "" : unit === "usd" ? " USD" : ` ${unit.toUpperCase()}`;
+  const unitLabel =
+    unit === "count" ? "" : unit === "usd" ? " USD" : ` ${unit.toUpperCase()}`;
 
   return (
     <ResponsiveContainer width="100%" height={160}>
-      <BarChart data={chartData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+      <BarChart
+        data={chartData}
+        margin={{ top: 4, right: 4, left: -20, bottom: 0 }}
+      >
         <CartesianGrid strokeDasharray="3 3" opacity={0.3} vertical={false} />
         <XAxis dataKey="label" tick={{ fontSize: 11 }} />
         <YAxis tick={{ fontSize: 11 }} />
@@ -58,7 +62,10 @@ export default function UsageChart({
               <div className="bg-background border border-border rounded-lg px-[10px] py-[6px] text-[12px] shadow-sm">
                 {periodLabel}: {label}
                 <br />
-                <span className="font-medium">{val.toLocaleString(undefined, { maximumFractionDigits: 2 })}{unitLabel}</span>
+                <span className="font-medium">
+                  {val.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                  {unitLabel}
+                </span>
               </div>
             );
           }}

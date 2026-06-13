@@ -1,7 +1,7 @@
 import type { ConversationRow, MessageRow } from "@/supabase/client";
 import type { AppState } from "./useBoundStore";
 import type { StateCreator } from "zustand";
-// @ts-ignore
+// @ts-expect-error no type declarations for the core-js-pure submodule
 import groupBy from "core-js-pure/actual/object/group-by";
 import { type MessageRowV0, toV1 } from "@/supabase/messages-v0";
 
@@ -60,14 +60,14 @@ export type ChatActions = {
 
 export type ChatSlice = ChatState & ChatActions;
 
-// @ts-expect-error
+// @ts-expect-error partializing the slice creator's state type
 export const createChatSlice: StateCreator<Partial<AppState>> = (
   set: (
     partial:
       | AppState
       | Partial<AppState>
       | ((state: AppState) => AppState | Partial<AppState>),
-    replace?: boolean | undefined,
+    replace?: boolean,
   ) => void,
 ) => ({
   conversations: new Map(),
@@ -104,7 +104,7 @@ export const createChatSlice: StateCreator<Partial<AppState>> = (
     set((state) => {
       const msgs = msgsMixedVersions
         .map((m) =>
-          m.content.version === "1" ? m : toV1(m as unknown as MessageRowV0)
+          m.content.version === "1" ? m : toV1(m as unknown as MessageRowV0),
         )
         .filter(Boolean) as MessageRow[];
 
@@ -200,8 +200,8 @@ export const createChatSlice: StateCreator<Partial<AppState>> = (
     set((state) => {
       const fileDrafts = new Map(state.chat.fileDrafts);
 
-      const draft = fileDrafts.get(convId) &&
-        fileDrafts.get(convId)![draftIndex];
+      const draft =
+        fileDrafts.get(convId) && fileDrafts.get(convId)![draftIndex];
 
       if (!draft) {
         return {};

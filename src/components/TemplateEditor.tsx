@@ -38,10 +38,12 @@ export default function TemplateEditor({
   const updateMutation = useUpdateTemplate();
   const isPending = createMutation.isPending || updateMutation.isPending;
 
-  const existingHeader =
-    existingTemplate?.components.find((c) => c.type === "HEADER");
-  const existingBody =
-    existingTemplate?.components.find((c) => c.type === "BODY");
+  const existingHeader = existingTemplate?.components.find(
+    (c) => c.type === "HEADER",
+  );
+  const existingBody = existingTemplate?.components.find(
+    (c) => c.type === "BODY",
+  );
 
   const {
     register,
@@ -91,7 +93,10 @@ export default function TemplateEditor({
     const ordered: number[] = [];
     for (const m of text.matchAll(/\{\{(\d+)\}\}/g)) {
       const n = parseInt(m[1]);
-      if (!seen.has(n)) { seen.add(n); ordered.push(n); }
+      if (!seen.has(n)) {
+        seen.add(n);
+        ordered.push(n);
+      }
     }
     return ordered;
   }
@@ -103,7 +108,10 @@ export default function TemplateEditor({
     const ordered: number[] = [];
     for (const m of matches) {
       const n = parseInt(m[1]);
-      if (!seen.has(n)) { seen.add(n); ordered.push(n); }
+      if (!seen.has(n)) {
+        seen.add(n);
+        ordered.push(n);
+      }
     }
     if (ordered.every((n, i) => n === i + 1)) return { text, ordered };
     const renumber = new Map<number, number>();
@@ -122,9 +130,17 @@ export default function TemplateEditor({
   function insertAtPos(text: string, pos: number, insertion: string) {
     const before = text.slice(0, pos);
     const after = text.slice(pos);
-    const needsSpaceBefore = before.length > 0 && !before.endsWith(" ") && !before.endsWith("\n");
-    const needsSpaceAfter = after.length > 0 && !after.startsWith(" ") && !after.startsWith("\n");
-    return before + (needsSpaceBefore ? " " : "") + insertion + (needsSpaceAfter ? " " : "") + after;
+    const needsSpaceBefore =
+      before.length > 0 && !before.endsWith(" ") && !before.endsWith("\n");
+    const needsSpaceAfter =
+      after.length > 0 && !after.startsWith(" ") && !after.startsWith("\n");
+    return (
+      before +
+      (needsSpaceBefore ? " " : "") +
+      insertion +
+      (needsSpaceAfter ? " " : "") +
+      after
+    );
   }
 
   // Track actual variable numbers found in body text
@@ -134,9 +150,12 @@ export default function TemplateEditor({
   useEffect(() => {
     const currentVars = bodyVariablesValue || [];
     if (bodyVarNumbers.length !== currentVars.length) {
-      const newFields = Array.from({ length: bodyVarNumbers.length }, (_, i) => ({
-        value: currentVars[i]?.value || "",
-      }));
+      const newFields = Array.from(
+        { length: bodyVarNumbers.length },
+        (_, i) => ({
+          value: currentVars[i]?.value || "",
+        }),
+      );
       replace(newFields);
     }
   }, [bodyText]);
@@ -144,7 +163,9 @@ export default function TemplateEditor({
   // Build TemplateData from watched form values for preview
   // Renumber for preview so {{N}} indices match example array positions
   const { text: previewBody } = renumberVars(bodyText);
-  const previewVars = bodyVarNumbers.map((_, i) => bodyVariablesValue?.[i]?.value || "");
+  const previewVars = bodyVarNumbers.map(
+    (_, i) => bodyVariablesValue?.[i]?.value || "",
+  );
 
   const previewTemplate: TemplateData = {
     id: existingTemplate?.id || "",
@@ -161,7 +182,9 @@ export default function TemplateEditor({
               text: headerText,
               format: "TEXT" as const,
               ...(headerText.includes("{{1}}") && headerVariableValue
-                ? { example: { header_text: [headerVariableValue] as [string] } }
+                ? {
+                    example: { header_text: [headerVariableValue] as [string] },
+                  }
                 : {}),
             },
           ]
@@ -177,16 +200,16 @@ export default function TemplateEditor({
             }
           : {}),
       },
-      ...(footerText
-        ? [{ type: "FOOTER" as const, text: footerText }]
-        : []),
+      ...(footerText ? [{ type: "FOOTER" as const, text: footerText }] : []),
     ],
   };
 
   function onSubmit(data: TemplateFormData) {
     // Renumber variables to contiguous 1..n on submit
     const { text: renumberedBody, ordered } = renumberVars(data.body);
-    const reorderedVars = ordered.map((_, i) => data.bodyVariables[i]?.value || "");
+    const reorderedVars = ordered.map(
+      (_, i) => data.bodyVariables[i]?.value || "",
+    );
 
     const template: TemplateData = {
       id: existingTemplate?.id || "",
@@ -203,7 +226,11 @@ export default function TemplateEditor({
                 text: data.header,
                 format: "TEXT" as const,
                 ...(data.header.includes("{{1}}") && data.headerVariable
-                  ? { example: { header_text: [data.headerVariable] as [string] } }
+                  ? {
+                      example: {
+                        header_text: [data.headerVariable] as [string],
+                      },
+                    }
                   : {}),
               },
             ]
@@ -228,7 +255,9 @@ export default function TemplateEditor({
     const mutation = existingTemplate ? updateMutation : createMutation;
     mutation.mutate(
       { template, organizationAddress },
-      { onSuccess: () => navigate({ to: "..", hash: (prevHash) => prevHash! }) },
+      {
+        onSuccess: () => navigate({ to: "..", hash: (prevHash) => prevHash! }),
+      },
     );
   }
 
@@ -282,7 +311,9 @@ export default function TemplateEditor({
           {/* Header */}
           <div className="flex flex-col">
             <label>
-              <div className="label">{t("Encabezado")} ({t("opcional")})</div>
+              <div className="label">
+                {t("Encabezado")} ({t("opcional")})
+              </div>
               <input
                 type="text"
                 className="text"
@@ -309,7 +340,9 @@ export default function TemplateEditor({
                   const pos = el?.selectionStart ?? current.length;
                   const newHeader = insertAtPos(current, pos, "{{1}}");
                   setValue("header", newHeader, { shouldDirty: true });
-                  const cursorPos = newHeader.indexOf("{{1}}", pos > 0 ? pos - 1 : 0) + "{{1}}".length;
+                  const cursorPos =
+                    newHeader.indexOf("{{1}}", pos > 0 ? pos - 1 : 0) +
+                    "{{1}}".length;
                   requestAnimationFrame(() => {
                     el?.focus();
                     el?.setSelectionRange(cursorPos, cursorPos);
@@ -324,7 +357,9 @@ export default function TemplateEditor({
 
           {headerText?.includes("{{1}}") && (
             <label>
-              <div className="label">{t("Variable de encabezado")} {"{{1}}"}</div>
+              <div className="label">
+                {t("Variable de encabezado")} {"{{1}}"}
+              </div>
               <input
                 type="text"
                 className="text"
@@ -351,11 +386,16 @@ export default function TemplateEditor({
                 placeholder={t("Hola {{1}}, tu pedido está listo.")}
                 {...register("body", {
                   required: t("El cuerpo es obligatorio"),
-                  maxLength: { value: 1024, message: t("Máximo 1024 caracteres") },
+                  maxLength: {
+                    value: 1024,
+                    message: t("Máximo 1024 caracteres"),
+                  },
                   validate: (value) => {
                     const trimmed = value.trim();
-                    if (/^\{\{\d+\}\}/.test(trimmed)) return t("El cuerpo no puede empezar con una variable");
-                    if (/\{\{\d+\}\}$/.test(trimmed)) return t("El cuerpo no puede terminar con una variable");
+                    if (/^\{\{\d+\}\}/.test(trimmed))
+                      return t("El cuerpo no puede empezar con una variable");
+                    if (/\{\{\d+\}\}$/.test(trimmed))
+                      return t("El cuerpo no puede terminar con una variable");
                     return true;
                   },
                 })}
@@ -378,9 +418,14 @@ export default function TemplateEditor({
                 const next = nums.length > 0 ? Math.max(...nums) + 1 : 1;
                 const pos = el?.selectionStart ?? current.length;
                 const newBody = insertAtPos(current, pos, `{{${next}}}`);
-                setValue("body", newBody, { shouldDirty: true, shouldValidate: true });
+                setValue("body", newBody, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                });
                 // Restore cursor after the inserted variable
-                const cursorPos = newBody.indexOf(`{{${next}}}`, pos > 0 ? pos - 1 : 0) + `{{${next}}}`.length;
+                const cursorPos =
+                  newBody.indexOf(`{{${next}}}`, pos > 0 ? pos - 1 : 0) +
+                  `{{${next}}}`.length;
                 requestAnimationFrame(() => {
                   el?.focus();
                   el?.setSelectionRange(cursorPos, cursorPos);
@@ -411,10 +456,18 @@ export default function TemplateEditor({
 
           {/* Footer */}
           <label>
-            <div className="label">{t("Pie")} ({t("opcional")})</div>
-            <input type="text" className="text" placeholder={t("Texto del pie")} maxLength={60} {...register("footer", {
-              maxLength: { value: 60, message: t("Máximo 60 caracteres") },
-            })} />
+            <div className="label">
+              {t("Pie")} ({t("opcional")})
+            </div>
+            <input
+              type="text"
+              className="text"
+              placeholder={t("Texto del pie")}
+              maxLength={60}
+              {...register("footer", {
+                maxLength: { value: 60, message: t("Máximo 60 caracteres") },
+              })}
+            />
           </label>
 
           {/* Preview */}

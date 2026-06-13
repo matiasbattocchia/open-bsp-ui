@@ -1,9 +1,4 @@
-import {
-  createContext,
-  useEffect,
-  useCallback,
-  type ReactNode,
-} from "react";
+import { createContext, type ReactNode, useCallback, useEffect } from "react";
 import { useWhatsAppSignup } from "@/queries/useWhatsAppSignup";
 
 const FB_API_VERSION = "v24.0";
@@ -51,18 +46,18 @@ type ErrorFlowData = {
 // Event listener data type - discriminated union based on event type
 type EventListenerData =
   | {
-    type: "WA_EMBEDDED_SIGNUP";
-    event:
-    | "FINISH"
-    | "FINISH_ONLY_WABA"
-    | "FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING";
-    data: SuccessfulFlowData;
-  }
+      type: "WA_EMBEDDED_SIGNUP";
+      event:
+        | "FINISH"
+        | "FINISH_ONLY_WABA"
+        | "FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING";
+      data: SuccessfulFlowData;
+    }
   | {
-    type: "WA_EMBEDDED_SIGNUP";
-    event: "CANCEL";
-    data: AbandonedFlowData | ErrorFlowData;
-  };
+      type: "WA_EMBEDDED_SIGNUP";
+      event: "CANCEL";
+      data: AbandonedFlowData | ErrorFlowData;
+    };
 
 type WhatsAppIntegrationContextType = {
   launchWhatsAppSignup: (
@@ -160,10 +155,9 @@ export function WhatsAppIntegrationProvider({
 
     // Copy-pasted from the Embedded Signup integration helper
     (function (d, s, id) {
-      var js,
-        fjs = d.getElementsByTagName(s)[0];
+      const fjs = d.getElementsByTagName(s)[0];
       if (d.getElementById(id)) return;
-      js = d.createElement(s) as any;
+      const js = d.createElement(s) as any;
       js.id = id;
       js.src = "https://connect.facebook.net/en_US/sdk.js";
       fjs.parentNode?.insertBefore(js, fjs);

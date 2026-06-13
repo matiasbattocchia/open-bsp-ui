@@ -2,7 +2,11 @@ import SectionBody from "@/components/SectionBody";
 import SectionHeader from "@/components/SectionHeader";
 import SectionFooter from "@/components/SectionFooter";
 import { useTranslation } from "@/hooks/useTranslation";
-import { useCurrentOrganization, useUpdateCurrentOrganization, useDeleteCurrentOrganization } from "@/queries/useOrganizations";
+import {
+  useCurrentOrganization,
+  useUpdateCurrentOrganization,
+  useDeleteCurrentOrganization,
+} from "@/queries/useOrganizations";
 import { useCurrentAgent } from "@/queries/useAgents";
 import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
@@ -41,7 +45,8 @@ function EditOrganization() {
       ...org,
       extra: {
         ...org.extra,
-        error_messages_direction: org.extra?.error_messages_direction || "internal",
+        error_messages_direction:
+          org.extra?.error_messages_direction || "internal",
       },
     };
   }, [org]);
@@ -57,12 +62,14 @@ function EditOrganization() {
     <>
       <SectionHeader
         title={t("Editar organización")}
-        onDelete={() => deleteOrg.mutate(undefined, {
-          onSuccess: () => {
-            setActiveOrg(null);
-            navigate({ to: "/conversations" })
-          }
-        })}
+        onDelete={() =>
+          deleteOrg.mutate(undefined, {
+            onSuccess: () => {
+              setActiveOrg(null);
+              navigate({ to: "/conversations" });
+            },
+          })
+        }
         deleteDisabled={!isOwner}
         deleteDisabledReason={t("Requiere permisos de propietario")}
         deleteLoading={deleteOrg.isPending}
@@ -90,7 +97,9 @@ function EditOrganization() {
               className="text"
               placeholder="3"
               disabled={!isOwner}
-              {...register("extra.response_delay_seconds", { valueAsNumber: true })}
+              {...register("extra.response_delay_seconds", {
+                valueAsNumber: true,
+              })}
             />
           </label>
 
@@ -98,7 +107,9 @@ function EditOrganization() {
             control={control}
             name="extra.welcome_message"
             label={t("Mensaje de bienvenida")}
-            placeholder={t("Hola! Soy un agente virtual. ¿En qué puedo ayudarte?")}
+            placeholder={t(
+              "Hola! Soy un agente virtual. ¿En qué puedo ayudarte?",
+            )}
             disabled={!isOwner}
           />
 

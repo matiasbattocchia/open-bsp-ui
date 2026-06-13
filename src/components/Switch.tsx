@@ -1,12 +1,16 @@
 import { type InputHTMLAttributes, forwardRef } from "react";
 
-interface SwitchProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {
+interface SwitchProps
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {
   checked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
 }
 
 const Switch = forwardRef<HTMLInputElement, SwitchProps>(
-  ({ className, checked, onCheckedChange, disabled, onChange, ...props }, ref) => {
+  (
+    { className, checked, onCheckedChange, disabled, onChange, ...props },
+    ref,
+  ) => {
     return (
       <div className={`relative inline-flex items-center ${className || ""}`}>
         <input
@@ -45,7 +49,7 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
         ></div>
       </div>
     );
-  }
+  },
 );
 
 Switch.displayName = "Switch";

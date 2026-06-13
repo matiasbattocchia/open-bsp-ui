@@ -1,12 +1,7 @@
-import {
-  useState,
-  useEffect,
-  type FormEventHandler,
-  useMemo,
-} from "react";
+import { type FormEventHandler, useEffect, useMemo, useState } from "react";
 import useBoundStore from "@/stores/useBoundStore";
-import { type TemplateMessage, type TemplateData } from "@/supabase/client";
-import { OutMessage, InMessage, TextMessage } from "./Message/Message";
+import { type TemplateData, type TemplateMessage } from "@/supabase/client";
+import { InMessage, OutMessage, TextMessage } from "./Message/Message";
 
 export default function TemplatePreview({
   template: { name, language, components },
@@ -43,10 +38,16 @@ export default function TemplatePreview({
   );
 
   // In editMode, bypass memos to always reflect latest form values
-  const head = editMode ? components.find((c) => c.type === "HEADER") : headMemo;
+  const head = editMode
+    ? components.find((c) => c.type === "HEADER")
+    : headMemo;
   const body = editMode ? components.find((c) => c.type === "BODY")! : bodyMemo;
-  const foot = editMode ? components.find((c) => c.type === "FOOTER") : footMemo;
-  const butt = editMode ? components.find((c) => c.type === "BUTTONS") : buttMemo;
+  const foot = editMode
+    ? components.find((c) => c.type === "FOOTER")
+    : footMemo;
+  const butt = editMode
+    ? components.find((c) => c.type === "BUTTONS")
+    : buttMemo;
 
   let headPlaceholders = head?.text;
   let bodyPlaceholders = body.text;
@@ -56,7 +57,9 @@ export default function TemplatePreview({
     () => body.example?.body_text[0] || [],
     [body.example?.body_text],
   );
-  const bodyExamples = editMode ? (body.example?.body_text[0] || []) : bodyExamplesMemo;
+  const bodyExamples = editMode
+    ? body.example?.body_text[0] || []
+    : bodyExamplesMemo;
 
   const buttons = butt?.buttons;
 
@@ -173,7 +176,7 @@ export default function TemplatePreview({
     };
 
     if (components.length) {
-      //@ts-expect-error
+      // @ts-expect-error assigning components onto a partial template object
       template["components"] = components;
     }
 

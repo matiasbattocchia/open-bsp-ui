@@ -1,5 +1,8 @@
 import { useContext, useState } from "react";
-import { WhatsAppIntegrationContext, type SignupOptions } from "@/contexts/WhatsAppIntegrationContext";
+import {
+  WhatsAppIntegrationContext,
+  type SignupOptions,
+} from "@/contexts/WhatsAppIntegrationContext";
 import useBoundStore from "@/stores/useBoundStore";
 import Button from "@/components/Button";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -24,10 +27,18 @@ export default function WhatsAppIntegration({
   return (
     <Button
       disabled={!orgId || !isOwner}
-      disabledReason={!isOwner ? t("Requiere permisos de propietario") : undefined}
+      disabledReason={
+        !isOwner ? t("Requiere permisos de propietario") : undefined
+      }
       loading={loading}
       className="primary bg-[#4267b2] hover:bg-[#4267b2]/90 text-white w-full"
-      onClick={() => context.launchWhatsAppSignup(onSuccess || (() => { }), setLoading, signupOptions)}
+      onClick={() =>
+        context.launchWhatsAppSignup(
+          onSuccess || (() => {}),
+          setLoading,
+          signupOptions,
+        )
+      }
     >
       {t("Continuar con Facebook")}
     </Button>

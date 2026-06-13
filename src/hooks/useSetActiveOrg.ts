@@ -11,7 +11,9 @@ export const useSetActiveOrg = () => {
   useEffect(() => {
     if (!data) return;
 
-    const orgIds = data.sort((a, b) => +b.created_at - +a.created_at).map((o) => o.id);
+    const orgIds = data
+      .sort((a, b) => +b.created_at - +a.created_at)
+      .map((o) => o.id);
 
     // Keep the current org if it still exists
     if (activeOrgId && orgIds.includes(activeOrgId)) return;

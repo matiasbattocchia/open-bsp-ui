@@ -30,7 +30,11 @@ export default function SectionField({
       >
         <div className="flex flex-col gap-[2px]">
           <span className="text-foreground">{label}</span>
-          {description && <span className="text-muted-foreground text-[14px]">{description}</span>}
+          {description && (
+            <span className="text-muted-foreground text-[14px]">
+              {description}
+            </span>
+          )}
         </div>
         <ChevronRight className="w-[20px] h-[20px] text-muted-foreground shrink-0" />
       </button>
@@ -51,9 +55,7 @@ export default function SectionField({
           </div>
 
           {/* Content */}
-          <SectionBody className="gap-[24px] pl-[10px]">
-            {children}
-          </SectionBody>
+          <SectionBody className="gap-[24px] pl-[10px]">{children}</SectionBody>
         </div>
       )}
     </>

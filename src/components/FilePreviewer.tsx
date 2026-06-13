@@ -149,16 +149,14 @@ const FilePreviewer = () => {
     }
 
     // If the conv has the `updated_at` unset, it means it has not been pushed to the DB yet.
-    !conv.updated_at && await pushConversationToDb(conv);
+    !conv.updated_at && (await pushConversationToDb(conv));
 
     for (const draft of drafts) {
       const fileKind = isImage(draft.file.type) ? "image" : "document";
 
       const record = newMessage(
         conv,
-        sendAsContact
-          ? "incoming"
-          : "outgoing",
+        sendAsContact ? "incoming" : "outgoing",
         {
           version: "1",
           type: "file",
@@ -207,7 +205,6 @@ const FilePreviewer = () => {
       <div className="flex flex-col bg-background text-foreground z-50 absolute top-[60px] h-[calc(100dvh-60px)] w-full">
         {/* Close button - Filename */}
         <div className="py-[8px] px-[16px] min-h-[60px] flex justify-between items-center">
-
           <button
             className="p-[8px] rounded-full hover:bg-muted mr-[8px] ml-[-8px]"
             title={t("Cerrar")}
@@ -230,7 +227,11 @@ const FilePreviewer = () => {
             /> // TODO: not to memoize URL.createObjectURL could be potentially *stupid* - cabra 30/05/2024
           ) : (
             <>
-              <img src={iconName(previewDraft.file.name)} height={90} className="shadow" />
+              <img
+                src={iconName(previewDraft.file.name)}
+                height={90}
+                className="shadow"
+              />
 
               <div className="text-gray-dark py-[3px] text-[12px]">
                 <span className="uppercase">

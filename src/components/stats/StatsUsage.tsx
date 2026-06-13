@@ -4,16 +4,34 @@ import UsageChart from "./UsageChart";
 
 function translateProductName(name: string, t: (s: string) => string) {
   switch (name) {
-    case "Messages": return t("Mensajes");
-    case "Conversations": return t("Conversaciones");
-    case "Storage": return t("Almacenamiento");
-    case "AI Credits": return t("Créditos IA");
-    default: return name;
+    case "Messages":
+      return t("Mensajes");
+    case "Conversations":
+      return t("Conversaciones");
+    case "Storage":
+      return t("Almacenamiento");
+    case "AI Credits":
+      return t("Créditos IA");
+    default:
+      return name;
   }
 }
 
 function formatMonth(period: string, t: (s: string) => string) {
-  const names = [t("Ene"), t("Feb"), t("Mar"), t("Abr"), t("May"), t("Jun"), t("Jul"), t("Ago"), t("Sep"), t("Oct"), t("Nov"), t("Dic")];
+  const names = [
+    t("Ene"),
+    t("Feb"),
+    t("Mar"),
+    t("Abr"),
+    t("May"),
+    t("Jun"),
+    t("Jul"),
+    t("Ago"),
+    t("Sep"),
+    t("Oct"),
+    t("Nov"),
+    t("Dic"),
+  ];
   const m = parseInt(period.slice(5, 7), 10);
   return names[m - 1] || period.slice(5, 7);
 }
@@ -88,7 +106,9 @@ export default function StatsUsage() {
             <h3 className="text-[16px] font-medium text-foreground">{name}</h3>
             <div className="grid grid-cols-2 gap-[16px]">
               <div className="flex flex-col gap-[4px]">
-                <span className="text-[13px] text-muted-foreground">{t("Últimos 12 meses")}</span>
+                <span className="text-[13px] text-muted-foreground">
+                  {t("Últimos 12 meses")}
+                </span>
                 <UsageChart
                   data={fillSeries(months, monthUsage, product.id, carry)}
                   unit={product.unit}
@@ -97,7 +117,9 @@ export default function StatsUsage() {
                 />
               </div>
               <div className="flex flex-col gap-[4px]">
-                <span className="text-[13px] text-muted-foreground">{t("Últimos 14 días")}</span>
+                <span className="text-[13px] text-muted-foreground">
+                  {t("Últimos 14 días")}
+                </span>
                 <UsageChart
                   data={fillSeries(days, dayUsage, product.id, carry)}
                   unit={product.unit}

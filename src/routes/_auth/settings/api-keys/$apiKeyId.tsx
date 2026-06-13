@@ -35,74 +35,89 @@ function ApiKeyDetail() {
     }
   }
 
-  return apiKey && (
-    <>
-      <SectionHeader
-        title={t("Clave API")}
-        onDelete={() => deleteApiKey.mutate(apiKeyId, {
-          onSuccess: () => navigate({ to: "..", hash: (prevHash) => prevHash! })
-        })}
-        deleteDisabled={!isOwner}
-        deleteDisabledReason={t("Requiere permisos de propietario")}
-        deleteLoading={deleteApiKey.isPending}
-      />
+  return (
+    apiKey && (
+      <>
+        <SectionHeader
+          title={t("Clave API")}
+          onDelete={() =>
+            deleteApiKey.mutate(apiKeyId, {
+              onSuccess: () =>
+                navigate({ to: "..", hash: (prevHash) => prevHash! }),
+            })
+          }
+          deleteDisabled={!isOwner}
+          deleteDisabledReason={t("Requiere permisos de propietario")}
+          deleteLoading={deleteApiKey.isPending}
+        />
 
-      <SectionBody>
-        <form>
-          <div className="instructions">
-            <p>
-              {t("Configura los siguientes encabezados HTTP para autenticarte:")}
-            </p>
-            <ul>
-              <li><code className="font-mono">authorization:</code> <code className="font-mono break-all">{import.meta.env.VITE_SUPABASE_ANON_KEY}</code></li>
-              <li><code className="font-mono">api-key:</code> {t("el valor de la clave generada abajo")}</li>
-            </ul>
-          </div>
-
-          <label>
-            <div className="label">{t("Nombre")}</div>
-            <input
-              type="text"
-              className="text"
-              readOnly
-              {...register("name")}
-            />
-          </label>
-
-          <label>
-            <div className="label">{t("Rol")}</div>
-            <div className="text-[16px] text-foreground">
-              {apiKey.role === "owner" && t("Propietario")}
-              {apiKey.role === "admin" && t("Administrador")}
-              {apiKey.role === "member" && t("Miembro")}
+        <SectionBody>
+          <form>
+            <div className="instructions">
+              <p>
+                {t(
+                  "Configura los siguientes encabezados HTTP para autenticarte:",
+                )}
+              </p>
+              <ul>
+                <li>
+                  <code className="font-mono">authorization:</code>{" "}
+                  <code className="font-mono break-all">
+                    {import.meta.env.VITE_SUPABASE_ANON_KEY}
+                  </code>
+                </li>
+                <li>
+                  <code className="font-mono">api-key:</code>{" "}
+                  {t("el valor de la clave generada abajo")}
+                </li>
+              </ul>
             </div>
-          </label>
 
-          <label>
-            <div className="label">{t("Clave")}</div>
-            <div className="flex items-center gap-2">
+            <label>
+              <div className="label">{t("Nombre")}</div>
               <input
                 type="text"
                 className="text"
                 readOnly
-                {...register("key")}
+                {...register("name")}
               />
-              <button
-                type="button"
-                className="p-[8px] hover:bg-muted rounded-full shrink-0"
-                title={t("Copiar clave")}
-                onClick={copyKey}
-              >
-                {copied ? (
-                  <Check className="w-[20px] h-[20px] text-primary" />
-                ) : (
-                  <Copy className="w-[20px] h-[20px] text-muted-foreground" />
-                )}
-              </button>
-            </div>
-          </label>
-        </form>
-      </SectionBody>
-    </>
+            </label>
+
+            <label>
+              <div className="label">{t("Rol")}</div>
+              <div className="text-[16px] text-foreground">
+                {apiKey.role === "owner" && t("Propietario")}
+                {apiKey.role === "admin" && t("Administrador")}
+                {apiKey.role === "member" && t("Miembro")}
+              </div>
+            </label>
+
+            <label>
+              <div className="label">{t("Clave")}</div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  className="text"
+                  readOnly
+                  {...register("key")}
+                />
+                <button
+                  type="button"
+                  className="p-[8px] hover:bg-muted rounded-full shrink-0"
+                  title={t("Copiar clave")}
+                  onClick={copyKey}
+                >
+                  {copied ? (
+                    <Check className="w-[20px] h-[20px] text-primary" />
+                  ) : (
+                    <Copy className="w-[20px] h-[20px] text-muted-foreground" />
+                  )}
+                </button>
+              </div>
+            </label>
+          </form>
+        </SectionBody>
+      </>
+    )
   );
 }

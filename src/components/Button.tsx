@@ -23,9 +23,12 @@ export default function Button({
   const isDisabled = disabled || invalid || loading;
 
   // Combine disabledReason with existing title if prominent
-  const tooltip = disabled && disabledReason
-    ? (title ? `${title} - ${disabledReason}` : disabledReason)
-    : title;
+  const tooltip =
+    disabled && disabledReason
+      ? title
+        ? `${title} - ${disabledReason}`
+        : disabledReason
+      : title;
 
   return (
     <button

@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { ArrowLeft, ChevronRight } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
-import { Controller, type Control, type FieldValues, type Path } from "react-hook-form";
+import {
+  Controller,
+  type Control,
+  type FieldValues,
+  type Path,
+} from "react-hook-form";
 import SectionBody from "@/components/SectionBody";
 
 interface TextAreaFieldProps<T extends FieldValues> {
@@ -40,7 +45,9 @@ export default function TextAreaField<T extends FieldValues>({
               <div className="flex flex-col gap-[2px]">
                 <span className="text-foreground">{label}</span>
                 <span className="text-muted-foreground text-[14px]">
-                  {charCount > 0 ? `${charCount} ${t("caracteres")}` : t("Ninguna")}
+                  {charCount > 0
+                    ? `${charCount} ${t("caracteres")}`
+                    : t("Ninguna")}
                 </span>
               </div>
               <ChevronRight className="w-[20px] h-[20px] text-muted-foreground shrink-0" />
@@ -79,5 +86,3 @@ export default function TextAreaField<T extends FieldValues>({
     />
   );
 }
-
-

@@ -1,5 +1,5 @@
 import { type OutgoingStatus } from "@/supabase/client";
-// @ts-ignore
+// @ts-expect-error no type declarations for the core-js-pure submodule
 import toReversed from "core-js-pure/actual/array/to-reversed";
 
 const outgoingStatusHierarchy = [

@@ -42,31 +42,35 @@ function AddMember() {
       <SectionBody>
         <form
           id="create-member-form"
-          onSubmit={handleSubmit(data => createAgent.mutate(
-            {
-              ...data,
-              ai: false,
-              extra: {
-                role: data.extra!.role!,
-                invitation: {
-                  organization_name: organization?.name || "",
-                  email: data.extra!.invitation!.email!,
-                  status: "pending"
-                }
-              }
-            },
-            {
-              onSuccess: (agent) =>
-                navigate({
-                  to: `/settings/members/${agent!.id}`,
-                  hash: (prevHash) => prevHash!,
-                }),
-            }),
+          onSubmit={handleSubmit((data) =>
+            createAgent.mutate(
+              {
+                ...data,
+                ai: false,
+                extra: {
+                  role: data.extra!.role!,
+                  invitation: {
+                    organization_name: organization?.name || "",
+                    email: data.extra!.invitation!.email!,
+                    status: "pending",
+                  },
+                },
+              },
+              {
+                onSuccess: (agent) =>
+                  navigate({
+                    to: `/settings/members/${agent!.id}`,
+                    hash: (prevHash) => prevHash!,
+                  }),
+              },
+            ),
           )}
         >
           <fieldset disabled={!isOwner} className="contents">
             <p>
-              {t("Los propietarios tienen control total, los administradores gestionan configuraciones y los miembros responden a las conversaciones.")}
+              {t(
+                "Los propietarios tienen control total, los administradores gestionan configuraciones y los miembros responden a las conversaciones.",
+              )}
             </p>
 
             <label>
@@ -77,7 +81,6 @@ function AddMember() {
                 {...register("name", { required: true })}
               />
             </label>
-
 
             <SelectField
               name="extra.role"
@@ -98,10 +101,11 @@ function AddMember() {
                 className="text"
                 placeholder={t("usuario@ejemplo.com")}
                 {...register("extra.invitation.email", {
-                  required: true, pattern: {
+                  required: true,
+                  pattern: {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: "Invalid email address"
-                  }
+                    message: "Invalid email address",
+                  },
                 })}
               />
             </label>

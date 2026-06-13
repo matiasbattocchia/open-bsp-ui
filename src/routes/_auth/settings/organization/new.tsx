@@ -38,11 +38,13 @@ function NewOrganization() {
                 setActiveOrg(org.id);
                 navigate({ to: "..", hash: (prevHash) => prevHash! });
               },
-            })
+            }),
           )}
         >
           <p>
-            {t("Tu organización es el espacio de trabajo donde colaboras con tu equipo.")}
+            {t(
+              "Tu organización es el espacio de trabajo donde colaboras con tu equipo.",
+            )}
           </p>
 
           <label>

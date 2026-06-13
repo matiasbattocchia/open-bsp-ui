@@ -96,7 +96,8 @@ export const useInitialDataFetch = () => {
       if (document.visibilityState === "hidden") {
         lastVisibleAt.current = new Date();
       } else if (
-        document.visibilityState === "visible" && lastVisibleAt.current
+        document.visibilityState === "visible" &&
+        lastVisibleAt.current
       ) {
         loadConvs(lastVisibleAt.current);
         loadMsgs(lastVisibleAt.current);

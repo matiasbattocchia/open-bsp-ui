@@ -32,12 +32,26 @@ function WhatsAppNew() {
       <SectionBody>
         <form>
           <div className="instructions">
-            <p>{t("Para conectar WhatsApp a la plataforma, iniciá sesión en tu cuenta de Meta y seguí el proceso de registro.")}</p>
+            <p>
+              {t(
+                "Para conectar WhatsApp a la plataforma, iniciá sesión en tu cuenta de Meta y seguí el proceso de registro.",
+              )}
+            </p>
 
-            <p><strong>{t("Requisitos importantes")}</strong></p>
+            <p>
+              <strong>{t("Requisitos importantes")}</strong>
+            </p>
             <ul>
-              <li>{t("Si usás la app WhatsApp Business, podés conectar tu número actual y seguir usando la app.")}</li>
-              <li>{t("Si no usás la app, el número a conectar no debe estar activo en otra cuenta de WhatsApp.")}</li>
+              <li>
+                {t(
+                  "Si usás la app WhatsApp Business, podés conectar tu número actual y seguir usando la app.",
+                )}
+              </li>
+              <li>
+                {t(
+                  "Si no usás la app, el número a conectar no debe estar activo en otra cuenta de WhatsApp.",
+                )}
+              </li>
             </ul>
           </div>
 
@@ -46,17 +60,25 @@ function WhatsAppNew() {
             className="text-primary text-sm font-medium cursor-pointer self-start"
             onClick={() => setShowAdvanced((v) => !v)}
           >
-            {showAdvanced ? t("Ocultar opciones avanzadas") : t("Opciones avanzadas")}
+            {showAdvanced
+              ? t("Ocultar opciones avanzadas")
+              : t("Opciones avanzadas")}
           </button>
 
           {showAdvanced && (
             <>
               <div className="instructions">
-                <p>{t("Sobrescribir la URL de callback es útil para evadir OpenBSP y recibir los webhooks crudos en el endpoint que indiques. OpenBSP seguirá recibiendo los eventos de cuenta y plantillas (no se pueden redirigir), pero no recibirá los mensajes.")}</p>
+                <p>
+                  {t(
+                    "Sobrescribir la URL de callback es útil para evadir OpenBSP y recibir los webhooks crudos en el endpoint que indiques. OpenBSP seguirá recibiendo los eventos de cuenta y plantillas (no se pueden redirigir), pero no recibirá los mensajes.",
+                  )}
+                </p>
               </div>
 
               <label>
-                <div className="label">{t("URL de callback")} ({t("opcional")})</div>
+                <div className="label">
+                  {t("URL de callback")} ({t("opcional")})
+                </div>
                 <input
                   type="url"
                   className="text"
@@ -67,7 +89,9 @@ function WhatsAppNew() {
               </label>
 
               <label>
-                <div className="label">{t("Verify token")} ({t("opcional")})</div>
+                <div className="label">
+                  {t("Verify token")} ({t("opcional")})
+                </div>
                 <input
                   type="text"
                   className="text"

@@ -23,7 +23,9 @@ export default function SearchBar({
 
   return (
     <div className={className ?? "px-[20px] pb-[12px] flex"}>
-      <div className={`flex items-center w-full bg-incoming-chat-bubble rounded-full hover:ring ring-border px-[12px] text-foreground ${isSmall ? "h-[32px]" : "h-[40px]"}`}>
+      <div
+        className={`flex items-center w-full bg-incoming-chat-bubble rounded-full hover:ring ring-border px-[12px] text-foreground ${isSmall ? "h-[32px]" : "h-[40px]"}`}
+      >
         <Search className="text-muted-foreground w-[16px] h-[16px] stroke-[3px] shrink-0" />
         <input
           placeholder={placeholder ?? t("Buscar")}

@@ -9,16 +9,18 @@ interface LinkButtonProps {
   className?: string; // For margin tops etc
 }
 
-export function LinkButton({ to, title, children, isActive, className = "" }: LinkButtonProps) {
+export function LinkButton({
+  to,
+  title,
+  children,
+  isActive,
+  className = "",
+}: LinkButtonProps) {
   className = className + (isActive ? " bg-muted" : "");
 
   return (
     <Link to={to} hash={(prevHash) => prevHash!} title={title}>
-      <div
-        className={
-          `p-[8px] rounded-full hover:bg-muted ${className}`
-        }
-      >
+      <div className={`p-[8px] rounded-full hover:bg-muted ${className}`}>
         {children}
       </div>
     </Link>

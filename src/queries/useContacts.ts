@@ -1,10 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  supabase,
   type ContactAddressInsert,
   type ContactWithAddressesInsert,
   type ContactWithAddressesRow,
   type ContactWithAddressesUpdate,
+  supabase,
+  type WhatsAppContactAddressExtra,
 } from "@/supabase/client";
 import useBoundStore from "@/stores/useBoundStore";
 import { normalizePhoneNumber } from "@/utils/FormatUtils";
@@ -48,7 +49,10 @@ export function useContacts() {
           .select("*, addresses:contacts_addresses(*)")
           .eq("organization_id", orgId!)
           .order("name", { ascending: true })
-          .order("created_at", { referencedTable: "addresses", ascending: true })
+          .order("created_at", {
+            referencedTable: "addresses",
+            ascending: true,
+          })
           .range(offset, offset + PAGE_SIZE - 1)
           .throwOnError();
 
@@ -59,10 +63,9 @@ export function useContacts() {
 
       // Seed individual contact cache entries
       for (const contact of allData) {
-        queryClient.setQueryData(
-          queryKeys.contacts.detail(orgId, contact.id),
-          { data: contact }
-        );
+        queryClient.setQueryData(queryKeys.contacts.detail(orgId, contact.id), {
+          data: contact,
+        });
       }
 
       return { data: allData };
@@ -112,22 +115,28 @@ export function useCreateContact() {
 
       // Link addresses to contact (deduplicate by normalized address)
       const toLink = addresses
-        .filter(a => Boolean(a.address))
-        .map(a => ({ ...a, address: normalizePhoneNumber(a.address!) }))
-        .filter((a, i, arr) => arr.findIndex(x => x.address === a.address) === i);
+        .filter((a) => Boolean(a.address))
+        .map((a) => ({ ...a, address: normalizePhoneNumber(a.address!) }))
+        .filter(
+          (a, i, arr) => arr.findIndex((x) => x.address === a.address) === i,
+        );
 
-      toLink.length && await supabase
-        .from("contacts_addresses")
-        .upsert(
-          toLink.map(a => ({
-            ...a,
-            organization_id: orgId,
-            service: "whatsapp" as const,
-            contact_id: contact.id,
-          } as ContactAddressInsert)),
-          { onConflict: "organization_id, address", defaultToNull: false }
-        )
-        .throwOnError();
+      toLink.length &&
+        (await supabase
+          .from("contacts_addresses")
+          .upsert(
+            toLink.map(
+              (a) =>
+                ({
+                  ...a,
+                  organization_id: orgId,
+                  service: "whatsapp" as const,
+                  contact_id: contact.id,
+                }) as ContactAddressInsert,
+            ),
+            { onConflict: "organization_id, address", defaultToNull: false },
+          )
+          .throwOnError());
 
       return contact;
     },
@@ -158,71 +167,91 @@ export function useUpdateContact() {
         .single()
         .throwOnError();
 
-      const cached = queryClient.getQueryData<{ data: ContactWithAddressesRow }>(
-        queryKeys.contacts.detail(orgId, data.id)
-      );
+      const cached = queryClient.getQueryData<{
+        data: ContactWithAddressesRow;
+      }>(queryKeys.contacts.detail(orgId, data.id));
       const oldAddresses = cached?.data?.addresses ?? [];
 
-      const oldAddressesString = oldAddresses.map(a => a.address) ?? [];
+      const oldAddressesString = oldAddresses.map((a) => a.address) ?? [];
 
-      const newAddresses = rawNewAddresses.map(a => ({
+      const newAddresses = rawNewAddresses.map((a) => ({
         ...a,
         address: normalizePhoneNumber(a.address!),
       }));
 
-      const newAddressesString = [...new Set(
-        newAddresses.map(a => a.address).filter(Boolean) as string[]
-      )];
+      const newAddressesString = [
+        ...new Set(
+          newAddresses.map((a) => a.address).filter(Boolean) as string[],
+        ),
+      ];
 
       // Upsert addresses to link (set contact_id)
       // Note: If address exists in another contact, it will be reassigned (TODO: show warning)
-      const toLink = newAddressesString.filter(a => !oldAddressesString.includes(a)).map(address => {
-        const addressObject = newAddresses.find(a => a.address === address);
+      const toLink = newAddressesString
+        .filter((a) => !oldAddressesString.includes(a))
+        .map((address) => {
+          const addressObject = newAddresses.find((a) => a.address === address);
 
-        return {
-          ...addressObject,
-          organization_id: orgId,
-          service: "whatsapp" as const,
-          contact_id: data.id,
-        } as ContactAddressInsert;
-      })
+          return {
+            ...addressObject,
+            organization_id: orgId,
+            service: "whatsapp" as const,
+            contact_id: data.id,
+          } as ContactAddressInsert;
+        });
 
       // Unlink removed addresses (set contact_id to null)
       // DB trigger will delete if no conversations reference them
-      const toUnlink = oldAddressesString.filter(a => !newAddressesString.includes(a)).map(address => {
-        const addressObject = oldAddresses.find(a => a.address === address);
+      const toUnlink = oldAddressesString
+        .filter((a) => !newAddressesString.includes(a))
+        .map((address) => {
+          const addressObject = oldAddresses.find((a) => a.address === address);
 
-        return {
-          ...addressObject,
-          contact_id: null,
-        } as ContactAddressInsert;
-      })
+          return {
+            ...addressObject,
+            contact_id: null,
+          } as ContactAddressInsert;
+        });
 
       // The insert policy prevents the creation of synced address by the users.
       // The update policy allows synced address to be updated.
       // Upsert with extra.synced.action='add' in payload fails even if the row exists,
       // because PostgreSQL checks INSERT policy BEFORE conflict detection.
-      const toUpsert = [...toLink, ...toUnlink].filter(a => !(a.extra?.synced?.action === 'add'))
-      const toUpdate = [...toLink, ...toUnlink].filter(a => a.extra?.synced?.action === 'add')
+      const toUpsert = [...toLink, ...toUnlink].filter(
+        (a) =>
+          !(
+            (a.extra as WhatsAppContactAddressExtra | undefined)?.synced
+              ?.action === "add"
+          ),
+      );
+      const toUpdate = [...toLink, ...toUnlink].filter(
+        (a) =>
+          (a.extra as WhatsAppContactAddressExtra | undefined)?.synced
+            ?.action === "add",
+      );
 
       await Promise.all([
         // Upsert non-synced addresses
-        toUpsert.length > 0 && supabase
-          .from("contacts_addresses")
-          .upsert(toUpsert, { onConflict: 'organization_id, address', defaultToNull: false })
-          .throwOnError(),
+        toUpsert.length > 0 &&
+          supabase
+            .from("contacts_addresses")
+            .upsert(toUpsert, {
+              onConflict: "organization_id, address",
+              defaultToNull: false,
+            })
+            .throwOnError(),
         // Update synced addresses individually (no mass update in Supabase)
-        ...toUpdate.map(a =>
+        ...toUpdate.map((a) =>
           supabase
             .from("contacts_addresses")
             .update(a)
             .eq("organization_id", a.organization_id)
             .eq("address", a.address)
-            .throwOnError()
+            .throwOnError(),
         ),
       ]);
 
-      return contact
+      return contact;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({

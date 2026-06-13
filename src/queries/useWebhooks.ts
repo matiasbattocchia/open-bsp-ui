@@ -62,11 +62,13 @@ export function useCreateWebhook() {
       return webhook;
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.webhooks.all(orgId) });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.webhooks.all(orgId),
+      });
       queryClient.setQueryData(
         queryKeys.webhooks.detail(orgId, data.id),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (old: any) => old ? { ...old, data } : { data, error: null },
+        (old: any) => (old ? { ...old, data } : { data, error: null }),
       );
     },
   });
@@ -92,11 +94,13 @@ export function useUpdateWebhook() {
       return webhook;
     },
     onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.webhooks.all(orgId) });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.webhooks.all(orgId),
+      });
       queryClient.setQueryData(
         queryKeys.webhooks.detail(orgId, variables.id),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (old: any) => old ? { ...old, data } : old,
+        (old: any) => (old ? { ...old, data } : old),
       );
     },
   });
@@ -113,7 +117,9 @@ export function useDeleteWebhook() {
       await supabase.from("webhooks").delete().eq("id", id).throwOnError();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.webhooks.all(orgId) });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.webhooks.all(orgId),
+      });
     },
   });
 }

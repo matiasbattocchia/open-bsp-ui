@@ -26,7 +26,7 @@ function ContactNew() {
     control,
     formState: { isValid, isDirty, errors },
   } = useForm<ContactWithAddressesInsert>({
-    mode: 'onTouched',
+    mode: "onTouched",
     defaultValues: {
       addresses: [{ address: "" }],
     },
@@ -44,12 +44,15 @@ function ContactNew() {
       <SectionBody>
         <form
           id="contact-form"
-          onSubmit={handleSubmit(data => createContact.mutate(data, {
-            onSuccess: (contact) => navigate({
-              to: `/contacts/${contact.id}`,
-              hash: (prevHash) => prevHash!,
+          onSubmit={handleSubmit((data) =>
+            createContact.mutate(data, {
+              onSuccess: (contact) =>
+                navigate({
+                  to: `/contacts/${contact.id}`,
+                  hash: (prevHash) => prevHash!,
+                }),
             }),
-          }))}
+          )}
         >
           <label>
             <div className="label">{t("Nombre")}</div>
@@ -63,14 +66,19 @@ function ContactNew() {
 
           {fields.map((field, idx) => (
             <label key={field.id}>
-              <div className="label">{t("Teléfono")} {idx + 1}</div>
+              <div className="label">
+                {t("Teléfono")} {idx + 1}
+              </div>
               <div className="flex items-center gap-2">
                 <input
                   type="tel"
                   className={`text ${errors.addresses?.[idx]?.address ? "border-destructive" : ""}`}
                   placeholder={t("+54 9 11 1234 5678")}
                   {...register(`addresses.${idx}.address`, {
-                    validate: (value) => !value || isValidPhoneNumber(value) || t("Número inválido")
+                    validate: (value) =>
+                      !value ||
+                      isValidPhoneNumber(value) ||
+                      t("Número inválido"),
                   })}
                 />
                 <button

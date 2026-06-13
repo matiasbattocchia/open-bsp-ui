@@ -3,7 +3,10 @@ import SectionHeader from "@/components/SectionHeader";
 import SectionFooter from "@/components/SectionFooter";
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "@/hooks/useTranslation";
-import { useCurrentOrganization, useUpdateCurrentOrganization } from "@/queries/useOrganizations";
+import {
+  useCurrentOrganization,
+  useUpdateCurrentOrganization,
+} from "@/queries/useOrganizations";
 import { useCurrentAgent } from "@/queries/useAgents";
 import Button from "@/components/Button";
 import SelectField from "@/components/SelectField";
@@ -13,9 +16,11 @@ import { type OrganizationUpdate } from "@/supabase/client";
 import { useForm, Controller } from "react-hook-form";
 import { useMemo } from "react";
 
-export const Route = createFileRoute("/_auth/integrations/media-preprocessing")({
-  component: MediaPreprocessingSettings,
-});
+export const Route = createFileRoute("/_auth/integrations/media-preprocessing")(
+  {
+    component: MediaPreprocessingSettings,
+  },
+);
 
 function MediaPreprocessingSettings() {
   const { translate: t } = useTranslation();
@@ -34,9 +39,9 @@ function MediaPreprocessingSettings() {
         media_preprocessing: {
           mode: "inactive" as "active" | "inactive",
           model: "gemini-2.5-flash" as "gemini-2.5-pro" | "gemini-2.5-flash",
-          ...org.extra?.media_preprocessing
-        }
-      }
+          ...org.extra?.media_preprocessing,
+        },
+      },
     };
   }, [org]);
 
@@ -100,8 +105,16 @@ function MediaPreprocessingSettings() {
 
           <div className="instructions">
             <p>
-              <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="underline">aistudio.google.com</a>
-              {" > "}Get API key {" > "} Create API key. {" — "}{t("Gratuito.")}
+              <a
+                href="https://aistudio.google.com/app/apikey"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+              >
+                aistudio.google.com
+              </a>
+              {" > "}Get API key {" > "} Create API key. {" — "}
+              {t("Gratuito.")}
             </p>
           </div>
 

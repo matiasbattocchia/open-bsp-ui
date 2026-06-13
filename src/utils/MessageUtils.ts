@@ -18,8 +18,7 @@ export function newMessage(
 ): MessageInsert {
   // If a file is provided, update the FilePart with file metadata
   if (file && content.type === "file") {
-    const fileUri =
-      `internal://media/organizations/${conv.organization_id}/attachments/${crypto.randomUUID()}`;
+    const fileUri = `internal://media/organizations/${conv.organization_id}/attachments/${crypto.randomUUID()}`;
 
     content.file = {
       ...content.file,

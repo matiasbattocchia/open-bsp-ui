@@ -217,7 +217,10 @@ export default function ImageMessage(message: MessageRow) {
       {/* Caption */}
       {content.text && (
         <div className="pl-[6px] pt-[6px] pb-[5px] pr-[4px]" style={{ width }}>
-          <Markdown content={content.text || ""} direction={message.direction} />
+          <Markdown
+            content={content.text || ""}
+            direction={message.direction}
+          />
         </div>
       )}
 
@@ -262,8 +265,8 @@ export default function ImageMessage(message: MessageRow) {
         className={
           "z-[2] text-[11px] absolute bottom-[0px] right-[7px] flex items-center" +
           (content.text ||
-            (content.artifacts && content.artifacts.length > 0) ||
-            !load.blob
+          (content.artifacts && content.artifacts.length > 0) ||
+          !load.blob
             ? " text-muted-foreground"
             : " text-white bottom-[3px]")
         }

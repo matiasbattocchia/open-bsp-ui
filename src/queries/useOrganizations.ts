@@ -70,11 +70,13 @@ export function useCreateOrganization() {
       return org;
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.organizations.all() });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.organizations.all(),
+      });
       queryClient.setQueryData(
         queryKeys.organizations.detail(data.id),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (old: any) => old ? { ...old, data } : { data, error: null },
+        (old: any) => (old ? { ...old, data } : { data, error: null }),
       );
     },
   });
@@ -99,11 +101,13 @@ export function useUpdateCurrentOrganization() {
       return org;
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.organizations.all() });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.organizations.all(),
+      });
       queryClient.setQueryData(
         queryKeys.organizations.detail(data.id),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (old: any) => old ? { ...old, data } : old,
+        (old: any) => (old ? { ...old, data } : old),
       );
     },
   });
@@ -117,11 +121,16 @@ export function useDeleteCurrentOrganization() {
     mutationFn: async () => {
       if (!orgId) throw new Error("No active organization");
 
-      await supabase.from("organizations").delete().eq("id", orgId)
+      await supabase
+        .from("organizations")
+        .delete()
+        .eq("id", orgId)
         .throwOnError();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.organizations.all() });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.organizations.all(),
+      });
     },
   });
 }
