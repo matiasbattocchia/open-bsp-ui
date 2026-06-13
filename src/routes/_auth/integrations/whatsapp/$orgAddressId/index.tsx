@@ -6,13 +6,15 @@ import { useWhatsAppDisconnect } from "@/queries/useWhatsAppSignup";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useCurrentAgent } from "@/queries/useAgents";
 import { formatPhoneNumber } from "@/utils/FormatUtils";
-import type { OrganizationAddressExtra } from "@/supabase/client";
+import type { WhatsAppOrganizationAddressExtra } from "@/supabase/client";
 import { useState } from "react";
 import Button from "@/components/Button";
 import SectionItem from "@/components/SectionItem";
 import { LayoutTemplate } from "lucide-react";
 
-export const Route = createFileRoute("/_auth/integrations/whatsapp/$orgAddressId/")({
+export const Route = createFileRoute(
+  "/_auth/integrations/whatsapp/$orgAddressId/",
+)({
   component: WhatsAppDetails,
 });
 
@@ -25,11 +27,13 @@ function WhatsAppDetails() {
   const { data: agent } = useCurrentAgent();
   const [showInstructions, setShowInstructions] = useState(false);
 
-  if (!integration) return
+  if (!integration) return;
 
   const isOwner = agent?.extra?.role === "owner";
 
-  const extra = integration.extra as OrganizationAddressExtra | undefined;
+  const extra = integration.extra as
+    | WhatsAppOrganizationAddressExtra
+    | undefined;
   const flowType = extra?.flow_type;
   const isCoexistence = flowType === "existing_phone_number";
 
@@ -51,13 +55,13 @@ function WhatsAppDetails() {
         onSuccess: () => {
           navigate({ to: "/integrations/whatsapp" });
         },
-      }
+      },
     );
   };
 
   return (
     <>
-      <SectionHeader title={integration.extra?.verified_name || t("Cuenta de WhatsApp")} />
+      <SectionHeader title={extra?.verified_name || t("Cuenta de WhatsApp")} />
 
       <SectionBody className="pb-[40px]">
         <SectionItem
@@ -121,7 +125,7 @@ function WhatsAppDetails() {
             <input
               type="text"
               className="text"
-              value={integration.extra?.waba_id}
+              value={extra?.waba_id}
               readOnly
             />
           </label>
@@ -131,7 +135,11 @@ function WhatsAppDetails() {
             <input
               type="text"
               className="text capitalize"
-              value={integration.status === "connected" ? t("Conectado") : t("Desconectado")}
+              value={
+                integration.status === "connected"
+                  ? t("Conectado")
+                  : t("Desconectado")
+              }
               readOnly
             />
           </label>
@@ -175,25 +183,33 @@ function WhatsAppDetails() {
           </label>
 
           {/* Disconnect button */}
-          {integration.status === "connected" && !showInstructions && <Button
-            type="button"
-            className="primary bg-destructive text-primary-foreground hover:bg-destructive/80 px-4 py-2 rounded-full font-medium transition-colors w-fit text-[14px]"
-            onClick={handleDisconnect}
-            disabled={!isOwner}
-            disabledReason={t("Requiere permisos de propietario")}
-            loading={disconnect.isPending}
-          >
-            {t("Desconectar")}
-          </Button>}
+          {integration.status === "connected" && !showInstructions && (
+            <Button
+              type="button"
+              className="primary bg-destructive text-primary-foreground hover:bg-destructive/80 px-4 py-2 rounded-full font-medium transition-colors w-fit text-[14px]"
+              onClick={handleDisconnect}
+              disabled={!isOwner}
+              disabledReason={t("Requiere permisos de propietario")}
+              loading={disconnect.isPending}
+            >
+              {t("Desconectar")}
+            </Button>
+          )}
 
           {/* Coexistence disconnect instructions */}
           {showInstructions && (
             <div className="instructions">
-              <p>{t("La cuenta debe ser desvinculada desde la aplicación móvil de WhatsApp Business:")}</p>
+              <p>
+                {t(
+                  "La cuenta debe ser desvinculada desde la aplicación móvil de WhatsApp Business:",
+                )}
+              </p>
               <ol>
                 <li>{t("Abrí la aplicación WhatsApp Business")}</li>
                 <li>{t("Andá a Ajustes > Cuenta > Plataforma de negocio")}</li>
-                <li>{t("Tocá la plataforma conectada y seleccioná \"Desconectar\"")}</li>
+                <li>
+                  {t('Tocá la plataforma conectada y seleccioná "Desconectar"')}
+                </li>
               </ol>
             </div>
           )}

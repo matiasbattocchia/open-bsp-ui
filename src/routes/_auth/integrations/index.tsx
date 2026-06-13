@@ -4,7 +4,7 @@ import SectionItem from "@/components/SectionItem";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { FileText } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
-import { WhatsAppOutlined } from "@ant-design/icons";
+import { InstagramOutlined, WhatsAppOutlined } from "@ant-design/icons";
 
 export const Route = createFileRoute("/_auth/integrations/")({
   component: IntegrationsIndex,
@@ -22,13 +22,31 @@ function IntegrationsIndex() {
           <SectionItem
             aside={
               <div className="p-[8px]">
-                <WhatsAppOutlined style={{ fontSize: "24px", color: "#25D366" }} />
+                <WhatsAppOutlined
+                  style={{ fontSize: "24px", color: "#25D366" }}
+                />
               </div>
             }
             title="WhatsApp"
             onClick={() =>
               navigate({
                 to: "/integrations/whatsapp",
+                hash: (prevHash) => prevHash!,
+              })
+            }
+          />
+          <SectionItem
+            aside={
+              <div className="p-[8px]">
+                <InstagramOutlined
+                  style={{ fontSize: "24px", color: "#E1306C" }}
+                />
+              </div>
+            }
+            title="Instagram"
+            onClick={() =>
+              navigate({
+                to: "/integrations/instagram",
                 hash: (prevHash) => prevHash!,
               })
             }

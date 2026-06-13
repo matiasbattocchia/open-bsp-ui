@@ -4,9 +4,11 @@ import { getHighestStatus, getStatusIcon } from "@/utils/MessageStatusUtils";
 import useBoundStore from "@/stores/useBoundStore";
 import {
   type Draft,
+  type InstagramContactAddressExtra,
   type MessageRow,
   type OutgoingStatus,
 } from "@/supabase/client";
+import { InstagramOutlined, WhatsAppOutlined } from "@ant-design/icons";
 import ItemActions from "./ItemActions";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
@@ -17,7 +19,7 @@ import { TickContext } from "@/contexts/useTick";
 import { useTranslation } from "@/hooks/useTranslation";
 import { AtSign, Pause } from "lucide-react";
 
-import { useCurrentAgents, useCurrentAgent } from "@/queries/useAgents";
+import { useCurrentAgent, useCurrentAgents } from "@/queries/useAgents";
 import { useContactByAddress } from "@/queries/useContacts";
 import { useContactAddress } from "@/queries/useContactsAddresses";
 import { nameInitials } from "@/utils/FormatUtils";
@@ -39,51 +41,73 @@ function mediaPreview(t: (content: string) => ReactNode, message?: MessageRow) {
   const type = message.content.kind;
   const status = getHighestStatus(message.status);
 
-  if (["audio", "document", "image", "sticker", "video"].includes(type)) {
-    switch (type) {
-      case "audio":
-        mediaIconClass += " h-[20px] w-[12px]";
+  const mime = message.content.file?.mime_type || "";
 
-        if (status === "read") {
-          mediaIconClass += " text-primary";
-        }
+  // Known kinds keep their own icon; the Instagram "native" kinds (and the
+  // generic file/media kinds) resolve to image/video/document via the MIME type.
+  const knownKinds = ["audio", "document", "image", "sticker", "video"];
+  const iconKind = knownKinds.includes(type)
+    ? type
+    : mime.startsWith("audio/")
+      ? "audio"
+      : mime.startsWith("video/")
+        ? "video"
+        : mime.startsWith("image/")
+          ? "image"
+          : "document";
 
-        // TODO: Should be the audio length - cabra 24/05/2024
-        mediaPreviewContent = t("Audio");
-        break;
-      case "document":
-        mediaIconClass += " h-[20px] w-[13px]";
-        mediaPreviewContent =
-          message.content.file?.name || (t("Documento"));
-        break;
-      case "image":
-        mediaIconClass += " h-[20px] w-[16px]";
-        mediaPreviewContent = t("Foto");
-        break;
-      case "sticker":
-        mediaIconClass += " h-[16px] w-[16px] mt-[4px]";
-        mediaPreviewContent = t("Pegatina");
-        break;
-      case "video":
-        mediaIconClass += " h-[20px] w-[16px]";
-        mediaPreviewContent =
-          message.content.file?.name || (t("Video"));
-        break;
-      // @ts-expect-error gif is not declared yet
-      case "gif":
-        mediaIconClass += " h-[20px] w-[20px]";
-        mediaPreviewContent = "GIF";
-        break;
-    }
+  // Instagram "native" share kinds get friendlier last-message labels.
+  const igLabels: Record<string, ReactNode> = {
+    ig_post: t("Publicación"),
+    ig_reel: t("Reel"),
+    reel: t("Reel"),
+    story: t("Historia"),
+    ig_story: t("Historia"),
+    story_mention: t("Mención de historia"),
+    story_reply: t("Respuesta a historia"),
+  };
 
-    mediaIcon = (
-      <div>
-        <svg className={mediaIconClass}>
-          <use href={`/icons.svg#chat-${type}`} />
-        </svg>
-      </div>
-    );
+  switch (iconKind) {
+    case "audio":
+      mediaIconClass += " h-[20px] w-[12px]";
+
+      if (status === "read") {
+        mediaIconClass += " text-primary";
+      }
+
+      // TODO: Should be the audio length - cabra 24/05/2024
+      mediaPreviewContent = t("Audio");
+      break;
+    case "document":
+      mediaIconClass += " h-[20px] w-[13px]";
+      mediaPreviewContent = message.content.file?.name || t("Documento");
+      break;
+    case "image":
+      mediaIconClass += " h-[20px] w-[16px]";
+      mediaPreviewContent = t("Foto");
+      break;
+    case "sticker":
+      mediaIconClass += " h-[16px] w-[16px] mt-[4px]";
+      mediaPreviewContent = t("Pegatina");
+      break;
+    case "video":
+      mediaIconClass += " h-[20px] w-[16px]";
+      mediaPreviewContent = message.content.file?.name || t("Video");
+      break;
   }
+
+  // Override the label for Instagram shares (icon stays image/video).
+  if (igLabels[type]) {
+    mediaPreviewContent = igLabels[type];
+  }
+
+  mediaIcon = (
+    <div>
+      <svg className={mediaIconClass}>
+        <use href={`/icons.svg#chat-${iconKind}`} />
+      </svg>
+    </div>
+  );
 
   return { mediaIcon, mediaPreviewContent };
 }
@@ -117,11 +141,7 @@ function severityClass(hours: number) {
   }
 }
 
-export default function ChatListItem({
-  itemId,
-}: {
-  itemId: string;
-}) {
+export default function ChatListItem({ itemId }: { itemId: string }) {
   const navigate = useNavigate();
   const activeConvId = useBoundStore((state) => state.ui.activeConvId);
 
@@ -132,7 +152,9 @@ export default function ChatListItem({
   );
 
   const { data: contact } = useContactByAddress(conversation?.contact_address);
-  const { data: contactAddress } = useContactAddress(conversation?.contact_address);
+  const { data: contactAddress } = useContactAddress(
+    conversation?.contact_address,
+  );
 
   const { data: agent } = useCurrentAgent();
   const { data: agents } = useCurrentAgents();
@@ -140,7 +162,7 @@ export default function ChatListItem({
 
   const messages: MessageRow[] | undefined = Array.from(
     useBoundStore((state) => state.chat.messages.get(itemId || ""))?.values() ||
-    [],
+      [],
   );
 
   // If the role is not admin, then do not show internal messages.
@@ -154,16 +176,16 @@ export default function ChatListItem({
     +new Date(mostRecent?.timestamp || 0) >= +new Date(draft?.timestamp || 0)
       ? mostRecent
       : ({
-        direction: "incoming", // direction is not important, except that incoming does not display status icons, which is correct for drafts
-        content: {
-          version: "1",
-          type: "text",
-          kind: "text",
-          text: draft!.text,
-        },
-        timestamp: draft!.timestamp,
-        status: {},
-      } as MessageRow);
+          direction: "incoming", // direction is not important, except that incoming does not display status icons, which is correct for drafts
+          content: {
+            version: "1",
+            type: "text",
+            kind: "text",
+            text: draft!.text,
+          },
+          timestamp: draft!.timestamp,
+          status: {},
+        } as MessageRow);
 
   const unread = (() => {
     let count = 0;
@@ -207,10 +229,21 @@ export default function ChatListItem({
   const isPinned = conversation?.extra?.pinned;
 
   const isPaused =
-    +new Date(conversation?.extra?.paused || 0) > +new Date() - 12 * 60 * 60 * 1000; // Less than 12 hours ago.
+    +new Date(conversation?.extra?.paused || 0) >
+    +new Date() - 12 * 60 * 60 * 1000; // Less than 12 hours ago.
 
-  // Name fallback order: conversation.name → contact.name → contactAddress.extra?.name
-  const name = conversation?.name || contact?.name || contactAddress?.extra?.name;
+  const igExtra =
+    conversation?.service === "instagram"
+      ? (contactAddress?.extra as InstagramContactAddressExtra | null)
+      : null;
+
+  // Name fallback order: conversation.name → contact.name →
+  // contactAddress.extra?.name → @username (Instagram)
+  const name =
+    conversation?.name ||
+    contact?.name ||
+    contactAddress?.extra?.name ||
+    (igExtra?.username ? `@${igExtra.username}` : undefined);
 
   const { translate: t, currentLanguage } = useTranslation();
 
@@ -234,7 +267,9 @@ export default function ChatListItem({
   // `mostRecent` does not distinguish between incoming/outgoing. Nonetheless
   // `severity` is used when `unread` is greater than zero. This only happens
   // when the most recent messages are of the incoming type.
-  const severity = severityClass(tick.diff(mostRecent?.timestamp, "hours", true));
+  const severity = severityClass(
+    tick.diff(mostRecent?.timestamp, "hours", true),
+  );
 
   return (
     conversation && (
@@ -252,20 +287,40 @@ export default function ChatListItem({
           }}
         >
           <div className="profile-picture pl-[10px] pr-[15px] flex items-center">
-            <Avatar
-              fallback={nameInitials(name || "?")}
-              size={49}
-              className="bg-accent text-accent-foreground border border-border text-[16px]"
-            />
+            <div className="relative">
+              <Avatar
+                src={igExtra?.profile_picture_url}
+                fallback={nameInitials(name || "?")}
+                size={49}
+                className="bg-accent text-accent-foreground border border-border text-[16px]"
+              />
+              {conversation.service !== "local" && (
+                <div className="absolute -bottom-[1px] -right-[1px] rounded-full bg-background p-[1px] leading-none">
+                  {conversation.service === "instagram" ? (
+                    <InstagramOutlined
+                      style={{ fontSize: "14px", color: "#E1306C" }}
+                    />
+                  ) : (
+                    <WhatsAppOutlined
+                      style={{ fontSize: "14px", color: "#25D366" }}
+                    />
+                  )}
+                </div>
+              )}
+            </div>
           </div>
           <div className="info flex flex-col justify-center grow min-w-0 pr-[15px]">
             {/* Upper row */}
             <div className="flex justify-between items-baseline">
-              <div className="truncate text-foreground text-[16px]">{name || "?"}</div>
+              <div className="truncate text-foreground text-[16px]">
+                {name || "?"}
+              </div>
               <div
                 className={
                   "text-[12px] ml-[6px] capitalize" +
-                  (unread.count ? ` ${severity.text} font-bold` : " text-muted-foreground")
+                  (unread.count
+                    ? ` ${severity.text} font-bold`
+                    : " text-muted-foreground")
                 }
               >
                 {preview && formatTime(preview.timestamp)}
@@ -278,7 +333,9 @@ export default function ChatListItem({
                   statusIcon(preview.status)}
                 {preview?.agent_id && preview.agent_id !== agent?.id && (
                   <div className="text-primary text-[14px] mr-1 shrink-0">
-                    {agents?.find((a) => a.id === preview.agent_id)?.name || "?"}:
+                    {agents?.find((a) => a.id === preview.agent_id)?.name ||
+                      "?"}
+                    :
                   </div>
                 )}
                 {mediaIcon}
@@ -295,7 +352,8 @@ export default function ChatListItem({
                   )}
                 <div className="truncate text-[14px]">
                   {preview?.content.type === "text" && preview.content.text}
-                  {preview?.content.type === "data" && JSON.stringify(preview.content.data)}
+                  {preview?.content.type === "data" &&
+                    JSON.stringify(preview.content.data)}
                   {preview?.content.type === "file" && mediaPreviewContent}
                 </div>
               </div>
@@ -328,10 +386,7 @@ export default function ChatListItem({
                   </div>
                 )}
                 {/* Dropdown menu */}
-                <ItemActions
-                  trigger={["click"]}
-                  itemId={itemId}
-                >
+                <ItemActions trigger={["click"]} itemId={itemId}>
                   <svg
                     className="h-[20px] w-[19px] ml-[6px] text-muted-foreground hidden group-hover:block"
                     onClick={(e) => e.stopPropagation()}
@@ -347,4 +402,3 @@ export default function ChatListItem({
     )
   );
 }
-

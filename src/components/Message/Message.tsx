@@ -26,7 +26,9 @@ const md = new Remarkable({
 
 md.renderer.rules.link_open = function (tokens, idx) {
   const title = tokens[idx].title ? ` title="${tokens[idx].title}"` : "";
-  return `<a href="${tokens[idx].href}"${title} target="_blank" rel="noopener noreferrer">`;
+  return `<a href="${
+    tokens[idx].href
+  }"${title} target="_blank" rel="noopener noreferrer">`;
 };
 
 // Convert WhatsApp formatting to standard markdown for Remarkable rendering
@@ -34,25 +36,29 @@ md.renderer.rules.link_open = function (tokens, idx) {
 function whatsappToMarkdown(text: string): string {
   const parts = text.split(/(`{3}[\s\S]*?`{3})/);
 
-  return parts.map((part) => {
-    if (part.startsWith("```")) return part;
+  return parts
+    .map((part) => {
+      if (part.startsWith("```")) return part;
 
-    const subParts = part.split(/(`[^`]+`)/);
+      const subParts = part.split(/(`[^`]+`)/);
 
-    return subParts.map((subPart) => {
-      if (subPart.startsWith("`")) return subPart;
+      return subParts
+        .map((subPart) => {
+          if (subPart.startsWith("`")) return subPart;
 
-      let processed = subPart;
-      // Bold: *text* -> **text**
-      processed = processed.replace(/\*([^\*]+?)\*/g, "**$1**");
-      // Italic: _text_ -> *text*
-      processed = processed.replace(/_([^_]+?)_/g, "*$1*");
-      // Strikethrough: ~text~ -> ~~text~~
-      processed = processed.replace(/~([^~]+?)~/g, "~~$1~~");
+          let processed = subPart;
+          // Bold: *text* -> **text**
+          processed = processed.replace(/\*([^\*]+?)\*/g, "**$1**");
+          // Italic: _text_ -> *text*
+          processed = processed.replace(/_([^_]+?)_/g, "*$1*");
+          // Strikethrough: ~text~ -> ~~text~~
+          processed = processed.replace(/~([^~]+?)~/g, "~~$1~~");
 
-      return processed;
-    }).join("");
-  }).join("");
+          return processed;
+        })
+        .join("");
+    })
+    .join("");
 }
 
 export function Markdown({
@@ -114,13 +120,21 @@ export function TextMessage({
   const MAX_LENGTH = 500;
 
   // Calculate if content is "too long"
-  const isTooLong = type === "json" ? JSON.stringify(body).length > MAX_LENGTH : (body as string).length > MAX_LENGTH;
+  const isTooLong =
+    type === "json"
+      ? JSON.stringify(body).length > MAX_LENGTH
+      : (body as string).length > MAX_LENGTH;
 
   return (
     <>
       <div className="relative">
         {/* Content */}
-        <div className={"pl-[6px] pt-[6px] pb-[5px] pr-[4px]" + (fixedWidth ? " w-[320px]" : "")}>
+        <div
+          className={
+            "pl-[6px] pt-[6px] pb-[5px] pr-[4px]" +
+            (fixedWidth ? " w-[320px]" : "")
+          }
+        >
           {/* Header */}
           {header && (
             <div
@@ -133,7 +147,14 @@ export function TextMessage({
           {/* Body */}
           {type === "json" ? (
             <>
-              <div className={"scrollbar-hide overflow-x-auto " + (isTooLong && !expanded ? "max-h-[150px] overflow-y-hidden" : "")}>
+              <div
+                className={
+                  "scrollbar-hide overflow-x-auto " +
+                  (isTooLong && !expanded
+                    ? "max-h-[150px] overflow-y-hidden"
+                    : "")
+                }
+              >
                 <pre
                   dangerouslySetInnerHTML={{
                     __html: prettyPrintJson.toHtml(body as Json, {
@@ -144,15 +165,24 @@ export function TextMessage({
               </div>
 
               {/* This invisible inline element does not play well with Markdown block elements. */}
-              {!!footer && <span className="text-[11px] mx-[4px] invisible">
-                {dayjs(timestamp).format("HH:mm")}
-                {direction === "outgoing" && (
-                  <span className="px-[8px] ml-[3px]"></span>
-                )}
-              </span>}
+              {!!footer && (
+                <span className="text-[11px] mx-[4px] invisible">
+                  {dayjs(timestamp).format("HH:mm")}
+                  {direction === "outgoing" && (
+                    <span className="px-[8px] ml-[3px]"></span>
+                  )}
+                </span>
+              )}
             </>
           ) : (
-            <div className={"scrollbar-hide overflow-x-auto " + (isTooLong && !expanded ? "max-h-[150px] overflow-y-hidden" : "")}>
+            <div
+              className={
+                "scrollbar-hide overflow-x-auto " +
+                (isTooLong && !expanded
+                  ? "max-h-[150px] overflow-y-hidden"
+                  : "")
+              }
+            >
               <Markdown
                 content={body as string}
                 direction={direction}
@@ -223,7 +253,9 @@ function Avatar({
         fallback={agent?.name.charAt(0) || "A"}
         size={28}
         className={
-          `${(color && AVATAR_BG_COLORS[color]) || ""} absolute text-foreground border border-border -top-[0.25px]` +
+          `${
+            (color && AVATAR_BG_COLORS[color]) || ""
+          } absolute text-foreground border border-border -top-[0.25px]` +
           (display === "picture-left" ? " -left-[38px]" : " -right-[38px]")
         }
       />
@@ -233,7 +265,9 @@ function Avatar({
   if (display === "name") {
     return (
       <div
-        className={`text-[12.8px] p-[6px] pb-0 ${(color && AVATAR_TEXT_COLORS[color]) || ""}`}
+        className={`text-[12.8px] p-[6px] pb-0 ${
+          (color && AVATAR_TEXT_COLORS[color]) || ""
+        }`}
       >
         {agent?.name || "?"}
       </div>
@@ -279,7 +313,11 @@ export function InMessage({
         {first && (
           <>
             {avatar && <Avatar {...avatar} display="picture-left" />}
-            <svg className={msgTailClasses + " text-incoming-chat-bubble -left-[8px]"}>
+            <svg
+              className={
+                msgTailClasses + " text-incoming-chat-bubble -left-[8px]"
+              }
+            >
               <use href="/icons.svg#tail-in" />
             </svg>
           </>
@@ -297,7 +335,7 @@ export function OutMessage({
   last,
   children,
   avatar,
-  internal
+  internal,
 }: PropsWithChildren<UIMessage>) {
   return (
     <div
@@ -320,11 +358,14 @@ export function OutMessage({
         {first && (
           <>
             {!!avatar && <Avatar {...avatar} display="picture-right" />}
-            <svg className={
-              msgTailClasses +
-              " -right-[8px]" +
-              (internal ? " text-incoming-chat-bubble" : " text-outgoing-chat-bubble")
-            }
+            <svg
+              className={
+                msgTailClasses +
+                " -right-[8px]" +
+                (internal
+                  ? " text-incoming-chat-bubble"
+                  : " text-outgoing-chat-bubble")
+              }
             >
               <use href="/icons.svg#tail-out" />
             </svg>
@@ -360,8 +401,10 @@ export default function Message(props: UIMessage & { message: MessageRow }) {
 
     const toolName = [
       "label" in toolInfo && toolInfo.label,
-      "name" in toolInfo && toolInfo.name
-    ].filter(Boolean).join("__");
+      "name" in toolInfo && toolInfo.name,
+    ]
+      .filter(Boolean)
+      .join("__");
 
     if (toolInfo.event === "use") {
       headerText = `${t("Uso")}: ${toolName}`;
@@ -380,7 +423,11 @@ export default function Message(props: UIMessage & { message: MessageRow }) {
         type="markdown"
         direction={props.message.direction}
         timestamp={props.message.timestamp}
-        status={props.message.direction === "outgoing" ? props.message.status : undefined}
+        status={
+          props.message.direction === "outgoing"
+            ? props.message.status
+            : undefined
+        }
         fixedWidth={fixedWidth}
       />
     );
@@ -406,36 +453,43 @@ export default function Message(props: UIMessage & { message: MessageRow }) {
         type="json"
         direction={props.message.direction}
         timestamp={props.message.timestamp}
-        status={props.message.direction === "outgoing" ? props.message.status : undefined}
+        status={
+          props.message.direction === "outgoing"
+            ? props.message.status
+            : undefined
+        }
         fixedWidth={fixedWidth}
       />
     );
     text = true;
   } else if (props.message.content.type === "file") {
-    switch (props.message.content.kind) {
-      case "audio": {
-        content = (
-          <AudioMessage
-            {...{
-              message: props.message,
-              orgName: props.orgName || "",
-              convName: props.convName || "",
-            }}
-          />
-        );
-        break;
-      }
-      case "image":
-      case "sticker":
-      case "video": {
-        content = <ImageMessage {...props.message} />;
-        break;
-      }
-      case "document":
-      default: {
-        content = <DocumentMessage {...props.message} />;
-        break;
-      }
+    // Route by kind first, then fall back to the MIME type. The Instagram
+    // "native" kinds (ig_post/ig_reel/reel/story/ig_story/story_mention/
+    // story_reply) are images or videos, so they render via ImageMessage based
+    // on their MIME — no per-kind case needed.
+    const kind = props.message.content.kind;
+    const mime = props.message.content.file.mime_type || "";
+
+    if (kind === "audio" || mime.startsWith("audio/")) {
+      content = (
+        <AudioMessage
+          {...{
+            message: props.message,
+            orgName: props.orgName || "",
+            convName: props.convName || "",
+          }}
+        />
+      );
+    } else if (
+      kind === "image" ||
+      kind === "sticker" ||
+      kind === "video" ||
+      mime.startsWith("image/") ||
+      mime.startsWith("video/")
+    ) {
+      content = <ImageMessage {...props.message} />;
+    } else {
+      content = <DocumentMessage {...props.message} />;
     }
   }
 
@@ -444,8 +498,18 @@ export default function Message(props: UIMessage & { message: MessageRow }) {
       {props.message.direction === "incoming" && (
         <InMessage {...{ ...props, text, fixedWidth }}>{content}</InMessage>
       )}
-      {(props.message.direction === "outgoing" || props.message.direction === "internal") && (
-        <OutMessage {...{ ...props, text, internal: props.message.direction === "internal", fixedWidth }}>{content}</OutMessage>
+      {(props.message.direction === "outgoing" ||
+        props.message.direction === "internal") && (
+        <OutMessage
+          {...{
+            ...props,
+            text,
+            internal: props.message.direction === "internal",
+            fixedWidth,
+          }}
+        >
+          {content}
+        </OutMessage>
       )}
     </>
   );

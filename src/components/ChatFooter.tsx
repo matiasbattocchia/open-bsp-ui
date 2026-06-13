@@ -2,14 +2,11 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { Plus, X } from "lucide-react";
 import {
   newMessage,
-  pushMessageToStore,
   pushMessageToDb,
+  pushMessageToStore,
 } from "@/utils/MessageUtils";
 import useBoundStore from "@/stores/useBoundStore";
-import {
-  pushConversationToDb,
-  saveDraft,
-} from "@/utils/ConversationUtils";
+import { pushConversationToDb, saveDraft } from "@/utils/ConversationUtils";
 import { type FileDraft } from "@/stores/chatSlice";
 import {
   type Draft,
@@ -134,9 +131,11 @@ export default function ChatFooter() {
     }
   });
 
-  // Wether or not the user is allowed to send messages to the client
+  // Wether or not the user is allowed to send messages to the client.
+  // WhatsApp and Instagram both enforce a 24h customer-service window since the
+  // contact's last message; `local` (internal testing) has no window.
   const inCSWindow =
-    conv?.service !== "whatsapp" ||
+    (conv?.service !== "whatsapp" && conv?.service !== "instagram") ||
     tick.isBefore(dayjs(mostRecentIncoming?.timestamp || 0).add(1, "day"));
 
   // WhatsApp customer service window lasts 24 hours since the last contact's message
@@ -150,9 +149,15 @@ export default function ChatFooter() {
   const headVarValues = templateDraftEntry?.headVarValues || [];
 
   const templateBody = templateDraft?.components.find((c) => c.type === "BODY");
-  const templateHead = templateDraft?.components.find((c) => c.type === "HEADER");
-  const templateFoot = templateDraft?.components.find((c) => c.type === "FOOTER");
-  const templateButtons = templateDraft?.components.find((c) => c.type === "BUTTONS");
+  const templateHead = templateDraft?.components.find(
+    (c) => c.type === "HEADER",
+  );
+  const templateFoot = templateDraft?.components.find(
+    (c) => c.type === "FOOTER",
+  );
+  const templateButtons = templateDraft?.components.find(
+    (c) => c.type === "BUTTONS",
+  );
 
   const bodyExamples = templateBody?.example?.body_text[0] || [];
   const headExamples = templateHead?.example?.header_text || [];
@@ -188,7 +193,10 @@ export default function ChatFooter() {
     editableDiv.current.textContent = message || "";
 
     // do not steal the focus from the file previewer
-    if (!fileDrafts?.length && window.matchMedia("(min-width: 768px)").matches) {
+    if (
+      !fileDrafts?.length &&
+      window.matchMedia("(min-width: 768px)").matches
+    ) {
       moveCursorToEnd(editableDiv.current);
     }
 
@@ -239,13 +247,11 @@ export default function ChatFooter() {
     clearTimeout(timer);
 
     // If the conv has the `updated_at` unset, it means it has not been pushed to the DB yet.
-    !conv.updated_at && await pushConversationToDb(conv);
+    !conv.updated_at && (await pushConversationToDb(conv));
 
     const record = newMessage(
       conv,
-      sendAsContact
-        ? "incoming"
-        : "outgoing",
+      sendAsContact ? "incoming" : "outgoing",
       {
         version: "1",
         type: "text",
@@ -273,7 +279,7 @@ export default function ChatFooter() {
     }
 
     // If the conv has the `updated_at` unset, it means it has not been pushed to the DB yet.
-    !conv.updated_at && await pushConversationToDb(conv);
+    !conv.updated_at && (await pushConversationToDb(conv));
 
     // Build rendered text
     let bodyContent = templateBody.text;
@@ -288,7 +294,10 @@ export default function ChatFooter() {
       }
       components.push({
         type: "header",
-        parameters: headVarValues.slice(0, headVarCount).map((text) => ({ type: "text" as const, text })),
+        parameters: headVarValues.slice(0, headVarCount).map((text) => ({
+          type: "text" as const,
+          text,
+        })),
       });
     }
 
@@ -300,7 +309,10 @@ export default function ChatFooter() {
       }
       components.push({
         type: "body",
-        parameters: bodyVarValues.slice(0, bodyVarCount).map((text) => ({ type: "text" as const, text })),
+        parameters: bodyVarValues.slice(0, bodyVarCount).map((text) => ({
+          type: "text" as const,
+          text,
+        })),
       });
     }
 
@@ -437,7 +449,10 @@ export default function ChatFooter() {
                 }
               }}
               onEnter={() => {
-                if (allVarsFilled && window.matchMedia("(min-width: 768px)").matches) {
+                if (
+                  allVarsFilled &&
+                  window.matchMedia("(min-width: 768px)").matches
+                ) {
                   sendTemplateMessage();
                 }
               }}
@@ -454,7 +469,16 @@ export default function ChatFooter() {
     conv && (
       <div className="relative mx-[12px] mb-[12px] mt-[4px] lg:mt-[0px] z-10">
         {templatePicker && <TemplatePicker />}
-        <div className={"flex items-end text-foreground p-[5px] rounded-[24px] shadow-[0_0_4px_0px_rgba(0,0,0,0.1)]" + (templateDraft ? " bg-incoming-chat-bubble" : !inCSWindow ? " bg-background" : " bg-incoming-chat-bubble")}>
+        <div
+          className={
+            "flex items-end text-foreground p-[5px] rounded-[24px] shadow-[0_0_4px_0px_rgba(0,0,0,0.1)]" +
+            (templateDraft
+              ? " bg-incoming-chat-bubble"
+              : !inCSWindow
+                ? " bg-background"
+                : " bg-incoming-chat-bubble")
+          }
+        >
           <div className="shrink-0">
             {templateDraft ? (
               <button
@@ -467,7 +491,10 @@ export default function ChatFooter() {
             ) : (
               <button
                 disabled={!inCSWindow}
-                className={"p-[8px] rounded-full" + (!inCSWindow ? "" : " cursor-pointer hover:bg-accent")}
+                className={
+                  "p-[8px] rounded-full" +
+                  (!inCSWindow ? "" : " cursor-pointer hover:bg-accent")
+                }
                 onClick={() => fileInput.current?.click()}
                 title={t("Adjuntar")}
               >
@@ -503,130 +530,161 @@ export default function ChatFooter() {
           {/* Text input or template mode */}
           <div className="relative grow">
             {templateDraft ? (
-            renderTemplateBody()
-          ) : (
-            <>
-              <div
-                ref={editableDiv}
-                contentEditable={inCSWindow}
-                className={`${!inCSWindow ? "cursor-pointer" : ""} outline-none mx-[5px] py-[10px] min-h-[40px] max-h-40 overflow-y-auto text-[15px] leading-[20px] break-words`}
-                onInput={(event) => {
-                  if (!(event.target instanceof Element)) {
-                    return;
-                  }
-
-                  // Use secure utility to sanitize and convert HTML to Markdown
-                  const message = htmlToMarkdown(event.currentTarget.innerHTML);
-
-                  setMessage(message);
-
-                  if (conv.created_at !== conv.updated_at) {
-                    // no drafts for new convs, sorry!
-                    debounce(() => saveDraft(conv, message, sendAsContact), 3000); // milliseconds
-                  }
-                }}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" && event.ctrlKey) {
-                    // toggle("sendAsContact") is handled at window level, nonetheless this
-                    // no-op block prevents from sending the message when pressing ctrl+enter
-                  } else if (
-                    event.key === "Enter" &&
-                    !event.shiftKey &&
-                    window.matchMedia("(min-width: 768px)").matches
-                  ) {
-                    event.preventDefault();
-                    sendTextMessage();
-                  }
-                }}
-                onClick={() => !inCSWindow && toggle("templatePicker")}
-                title={
-                  inCSWindow
-                    ? undefined
-                    : (t(
-                      "WhatsApp cierra la conversación a las 24 horas del último mensaje recibido. Para abrir la conversación debes utilizar una plantilla.",
-                    ))
-                }
-              />
-              {!message && (
+              renderTemplateBody()
+            ) : (
+              <>
                 <div
-                  className={
-                    "absolute bottom-[1px] py-[10px] mx-[5px] max-h-[40px] text-[15px] text-muted-foreground" +
-                    (inCSWindow ? "" : " cursor-pointer")
-                  }
-                  onClick={() =>
-                    inCSWindow
-                      ? editableDiv.current?.focus()
-                      : toggle("templatePicker")
-                  }
-                >
-                  {!inCSWindow ? (
-                    <>
-                      <span className="lg:hidden">
-                        {t("Conversación cerrada")}
-                      </span>
-                      <span className="hidden lg:inline">
-                        {t("Conversación cerrada, abre la conversación con una plantilla")}
-                      </span>
-                    </>
-                  ) : sendAsContact ? (
-                    <>
-                      <span className="lg:hidden">
-                        {t("Mensaje entrante")}
-                      </span>
-                      <span className="hidden lg:inline">
-                        {t("Simula un mensaje entrante")}
-                      </span>
-                    </>
-                  ) : conv.service === "whatsapp" ? (
-                    <>
-                      <span className="lg:hidden">
-                        {t("Cerrará en")}
-                      </span>
-                      <span className="hidden lg:inline">
-                        {t("La conversación cerrará en")}
-                      </span>
-                      <span> {remaining}</span>
-                    </>
-                  ) : (
-                    <span>{t("Escribe un mensaje")}</span>
-                  )}
-                </div>
-              )}
-            </>
-          )}
-        </div>
+                  ref={editableDiv}
+                  contentEditable={inCSWindow}
+                  className={`${
+                    !inCSWindow ? "cursor-pointer" : ""
+                  } outline-none mx-[5px] py-[10px] min-h-[40px] max-h-40 overflow-y-auto text-[15px] leading-[20px] break-words`}
+                  onInput={(event) => {
+                    if (!(event.target instanceof Element)) {
+                      return;
+                    }
 
-        {/* Send button */}
-        <button
-          disabled={templateDraft ? !allVarsFilled : !inCSWindow}
-          className={"p-[8px] rounded-full bg-primary disabled:opacity-50" + (templateDraft ? (allVarsFilled ? " cursor-pointer" : "") : !inCSWindow ? "" : " cursor-pointer")}
-          onClick={() => {
-            if (templateDraft) {
-              allVarsFilled && sendTemplateMessage();
-            } else if (message) {
-              sendTextMessage();
-            } else if (conv.service === "local") {
-              // Only the internal service can simulate incoming messages
-              toggle("sendAsContact");
-            }
-          }}
-          title={
-            templateDraft
-              ? t("Enviar plantilla")
-              : (sendAsContact
-                ? t("Recibir mensaje")
-                : t("Enviar mensaje"))
-          }
-        >
-          <svg
+                    // Use secure utility to sanitize and convert HTML to Markdown
+                    const message = htmlToMarkdown(
+                      event.currentTarget.innerHTML,
+                    );
+
+                    setMessage(message);
+
+                    if (conv.created_at !== conv.updated_at) {
+                      // no drafts for new convs, sorry!
+                      debounce(
+                        () => saveDraft(conv, message, sendAsContact),
+                        3000,
+                      ); // milliseconds
+                    }
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" && event.ctrlKey) {
+                      // toggle("sendAsContact") is handled at window level, nonetheless this
+                      // no-op block prevents from sending the message when pressing ctrl+enter
+                    } else if (
+                      event.key === "Enter" &&
+                      !event.shiftKey &&
+                      window.matchMedia("(min-width: 768px)").matches
+                    ) {
+                      event.preventDefault();
+                      sendTextMessage();
+                    }
+                  }}
+                  onClick={() =>
+                    !inCSWindow &&
+                    conv.service === "whatsapp" &&
+                    toggle("templatePicker")
+                  }
+                  title={
+                    inCSWindow
+                      ? undefined
+                      : conv.service === "whatsapp"
+                        ? t(
+                            "WhatsApp cierra la conversación a las 24 horas del último mensaje recibido. Para abrir la conversación debes utilizar una plantilla.",
+                          )
+                        : t(
+                            "La conversación se cerró 24 horas después del último mensaje del contacto. Esperá a que te escriba de nuevo para responder.",
+                          )
+                  }
+                />
+                {!message && (
+                  <div
+                    className={
+                      "absolute bottom-[1px] py-[10px] mx-[5px] max-h-[40px] text-[15px] text-muted-foreground" +
+                      (inCSWindow ? "" : " cursor-pointer")
+                    }
+                    onClick={() =>
+                      inCSWindow
+                        ? editableDiv.current?.focus()
+                        : conv.service === "whatsapp"
+                          ? toggle("templatePicker")
+                          : undefined
+                    }
+                  >
+                    {!inCSWindow ? (
+                      conv.service === "whatsapp" ? (
+                        <>
+                          <span className="lg:hidden">
+                            {t("Conversación cerrada")}
+                          </span>
+                          <span className="hidden lg:inline">
+                            {t(
+                              "Conversación cerrada, abre la conversación con una plantilla",
+                            )}
+                          </span>
+                        </>
+                      ) : (
+                        <span>{t("Conversación cerrada")}</span>
+                      )
+                    ) : sendAsContact ? (
+                      <>
+                        <span className="lg:hidden">
+                          {t("Mensaje entrante")}
+                        </span>
+                        <span className="hidden lg:inline">
+                          {t("Simula un mensaje entrante")}
+                        </span>
+                      </>
+                    ) : conv.service === "whatsapp" ||
+                      conv.service === "instagram" ? (
+                      <>
+                        <span className="lg:hidden">{t("Cerrará en")}</span>
+                        <span className="hidden lg:inline">
+                          {t("La conversación cerrará en")}
+                        </span>
+                        <span>{remaining}</span>
+                      </>
+                    ) : (
+                      <span>{t("Escribe un mensaje")}</span>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+
+          {/* Send button */}
+          <button
+            disabled={templateDraft ? !allVarsFilled : !inCSWindow}
             className={
-              "w-[24px] h-[24px] transition" +
-              (sendAsContact && !templateDraft ? " -scale-x-100" : "") +
-              " text-primary-foreground"
+              "p-[8px] rounded-full bg-primary disabled:opacity-50" +
+              (templateDraft
+                ? allVarsFilled
+                  ? " cursor-pointer"
+                  : ""
+                : !inCSWindow
+                  ? ""
+                  : " cursor-pointer")
+            }
+            onClick={() => {
+              if (templateDraft) {
+                allVarsFilled && sendTemplateMessage();
+              } else if (message) {
+                sendTextMessage();
+              } else if (conv.service === "local") {
+                // Only the internal service can simulate incoming messages
+                toggle("sendAsContact");
+              }
+            }}
+            title={
+              templateDraft
+                ? t("Enviar plantilla")
+                : sendAsContact
+                  ? t("Recibir mensaje")
+                  : t("Enviar mensaje")
             }
           >
-            <use href="/icons.svg#send" />
-          </svg>
+            <svg
+              className={
+                "w-[24px] h-[24px] transition" +
+                (sendAsContact && !templateDraft ? " -scale-x-100" : "") +
+                " text-primary-foreground"
+              }
+            >
+              <use href="/icons.svg#send" />
+            </svg>
           </button>
         </div>
       </div>
