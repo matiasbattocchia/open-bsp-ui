@@ -4,8 +4,8 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { useInstagramSignup } from "@/queries/useInstagramSignup";
 import { IG_INAPP_REDIRECT_PATH } from "@/routes/_auth/integrations/instagram/new";
 
-// Standalone (outside the `_auth` layout) so the popup renders a bare page
-// instead of booting the whole app shell.
+// Standalone (outside the `_auth` layout) so the return page is a bare
+// "connecting" screen instead of the whole app shell.
 export const Route = createFileRoute("/oauth/instagram")({
   validateSearch: (search: Record<string, unknown>) => ({
     code: typeof search.code === "string" ? search.code : undefined,
@@ -16,51 +16,31 @@ export const Route = createFileRoute("/oauth/instagram")({
   component: InstagramOAuthCallback,
 });
 
-type Status = "working" | "posted" | "error";
-
 function InstagramOAuthCallback() {
   const { translate: t } = useTranslation();
   const navigate = useNavigate();
   const { code, state, error } = Route.useSearch();
   const { mutate: signup } = useInstagramSignup();
-  const [status, setStatus] = useState<Status>("working");
+  const [failed, setFailed] = useState(false);
   const ran = useRef(false);
 
+  // The connect page redirected this same tab to Instagram and back, so the
+  // token exchange runs here, scoped to the (persisted) active org.
   useEffect(() => {
     if (ran.current) return;
     ran.current = true;
 
-    // New-tab mode (the default): hand the result to the opener tab and close.
-    // We can't use `window.opener` — Instagram's auth pages send
-    // Cross-Origin-Opener-Policy, which the browser uses to permanently sever
-    // the opener link (and to block `window.close()`, hence the "you can close
-    // this page" message). A BroadcastChannel is scoped to the origin, not the
-    // opener, so it crosses that boundary; the localStorage write is a fallback
-    // the opener also polls for.
-    if (sessionStorage.getItem("ig_oauth_same_tab") !== "1") {
-      const result = { code, state, error };
-      const channel = new BroadcastChannel("ig_oauth");
-      channel.postMessage({ type: "ig_oauth", ...result });
-      channel.close();
-      localStorage.setItem("ig_oauth_result", JSON.stringify(result));
-      setStatus("posted");
-      window.close(); // best effort; usually blocked after the COOP hop
-      return;
-    }
-
-    // Same-tab fallback (popup was blocked, so the flow ran in this tab via a
-    // full-page redirect): finish the exchange here.
-    sessionStorage.removeItem("ig_oauth_same_tab");
     const expected = localStorage.getItem("ig_oauth_state");
     localStorage.removeItem("ig_oauth_state");
 
-    // User canceled/denied, or the response is malformed.
+    // User canceled/denied: quietly return to the connect screen.
+    if (error === "access_denied") {
+      navigate({ to: "/integrations/instagram/new", hash: "" });
+      return;
+    }
+
     if (error || !code || !state || state !== expected) {
-      if (error === "access_denied") {
-        navigate({ to: "/integrations/instagram/new", hash: "" });
-      } else {
-        setStatus("error");
-      }
+      setFailed(true);
       return;
     }
 
@@ -75,7 +55,7 @@ function InstagramOAuthCallback() {
             // Drop the `#_=_` artifact Instagram appends to the redirect.
             hash: "",
           }),
-        onError: () => setStatus("error"),
+        onError: () => setFailed(true),
       },
     );
   }, [code, state, error, signup, navigate]);
@@ -86,20 +66,25 @@ function InstagramOAuthCallback() {
         Open BSP
       </div>
 
-      <div className="flex flex-col gap-2 w-[320px] text-center">
-        {status === "error" && (
-          <p className="text-destructive font-medium">
-            {t("No se pudo conectar la cuenta de Instagram.")}
-          </p>
-        )}
-        {status === "working" && (
+      <div className="flex flex-col items-center gap-4 w-[320px] text-center">
+        {failed ? (
+          <>
+            <p className="text-destructive font-medium">
+              {t("No se pudo conectar la cuenta de Instagram.")}
+            </p>
+            <button
+              type="button"
+              className="text-primary font-medium cursor-pointer"
+              onClick={() =>
+                navigate({ to: "/integrations/instagram/new", hash: "" })
+              }
+            >
+              {t("Reintentar")}
+            </button>
+          </>
+        ) : (
           <p className="text-muted-foreground">
             {t("Conectando tu cuenta de Instagram...")}
-          </p>
-        )}
-        {status === "posted" && (
-          <p className="text-muted-foreground text-[14px]">
-            {t("Podés cerrar esta página.")}
           </p>
         )}
       </div>
