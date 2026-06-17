@@ -18,6 +18,7 @@ dayjs.extend(localizedFormat);
 import { TickContext } from "@/contexts/useTick";
 import { useTranslation } from "@/hooks/useTranslation";
 import { AtSign, Pause } from "lucide-react";
+import { mediaCategory } from "./Message/media";
 
 import { useCurrentAgent, useCurrentAgents } from "@/queries/useAgents";
 import { useContactByAddress } from "@/queries/useContacts";
@@ -43,18 +44,11 @@ function mediaPreview(t: (content: string) => ReactNode, message?: MessageRow) {
 
   const mime = message.content.file?.mime_type || "";
 
-  // Known kinds keep their own icon; the Instagram "native" kinds (and the
-  // generic file/media kinds) resolve to image/video/document via the MIME type.
+  // Known kinds keep their own icon (incl. the distinct sticker icon); the
+  // Instagram "native" kinds and the generic file/media kinds resolve via the
+  // shared kind/MIME mapping (e.g. a shared reel gets the video icon).
   const knownKinds = ["audio", "document", "image", "sticker", "video"];
-  const iconKind = knownKinds.includes(type)
-    ? type
-    : mime.startsWith("audio/")
-      ? "audio"
-      : mime.startsWith("video/")
-        ? "video"
-        : mime.startsWith("image/")
-          ? "image"
-          : "document";
+  const iconKind = knownKinds.includes(type) ? type : mediaCategory(type, mime);
 
   // Instagram "native" share kinds get friendlier last-message labels.
   const igLabels: Record<string, ReactNode> = {

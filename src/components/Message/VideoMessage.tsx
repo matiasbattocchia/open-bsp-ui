@@ -3,16 +3,6 @@ import StatusIcon from "./StatusIcon";
 import { useMedia } from "@/hooks/useMedia";
 import { fileSize } from "./DocumentMessage";
 import dayjs from "dayjs";
-import { Image, Space } from "antd";
-import {
-  DownloadOutlined,
-  RotateLeftOutlined,
-  RotateRightOutlined,
-  SwapOutlined,
-  ZoomInOutlined,
-  ZoomOutOutlined,
-} from "@ant-design/icons";
-import styles from "./ImageMessagePreviewer.module.css";
 import { type MessageRow, type OutgoingStatus } from "@/supabase/client";
 import { Markdown } from "./Message";
 import { mediaCategory } from "./media";
@@ -23,7 +13,7 @@ const LANDSCAPE_WIDTH = 320;
 const MAX_PORTRAIT_HEIGHT = (PORTRAIT_WIDTH * 4) / 3;
 const MAX_LANDSCAPE_HEIGHT = (LANDSCAPE_WIDTH * 3) / 4;
 
-export default function ImageMessage(message: MessageRow) {
+export default function VideoMessage(message: MessageRow) {
   if (!(message.direction === "incoming" || message.direction === "outgoing")) {
     throw new Error(`Message with id ${message.id} is not a BaseMessage.`);
   }
@@ -32,16 +22,17 @@ export default function ImageMessage(message: MessageRow) {
 
   if (
     content.type !== "file" ||
-    mediaCategory(content.kind, content.file.mime_type || "") !== "image"
+    mediaCategory(content.kind, content.file.mime_type || "") !== "video"
   ) {
-    throw new Error(`Message with id ${message.id} is not an image message.`);
+    throw new Error(`Message with id ${message.id} is not a video message.`);
   }
 
   const media = content.file;
 
-  const { load, startLoad, cancelLoad, handleLoad } = useMedia(message);
+  const { load, startLoad, cancelLoad } = useMedia(message);
   const [width, setWidth] = useState(PORTRAIT_WIDTH);
   const [height, setHeight] = useState(MAX_PORTRAIT_HEIGHT);
+  const [src, setSrc] = useState<string>();
   const [showAnnotation, setShowAnnotation] = useState(false);
 
   const { translate: t } = useTranslation();
@@ -51,31 +42,39 @@ export default function ImageMessage(message: MessageRow) {
     if (load.type === "upload" && load.status === "pending") {
       startLoad();
     }
-
-    // Auto download if the message is recent.
-    if (
-      load.type === "download" &&
-      load.status === "pending" &&
-      dayjs(message.timestamp).isAfter(dayjs().subtract(1, "day"))
-    ) {
-      startLoad();
-    }
+    // Unlike images, videos are not auto-downloaded — they can be heavy, so the
+    // user opts in by clicking the load button.
   }, [load.blob]);
 
-  const imageDimensions: ReactEventHandler<HTMLImageElement> = (event) => {
-    if (!(event.target instanceof HTMLImageElement)) {
+  // Build a stable object URL per blob (and revoke it on change/unmount) so the
+  // <video> source is not recreated on every render, which would interrupt
+  // playback.
+  useEffect(() => {
+    if (!load.blob) {
+      setSrc(undefined);
       return;
     }
 
-    const img = event.target;
+    const url = URL.createObjectURL(load.blob);
+    setSrc(url);
 
-    const isPortrait = img.naturalHeight >= img.naturalWidth; // or squared
+    return () => URL.revokeObjectURL(url);
+  }, [load.blob]);
+
+  const videoDimensions: ReactEventHandler<HTMLVideoElement> = (event) => {
+    if (!(event.target instanceof HTMLVideoElement)) {
+      return;
+    }
+
+    const video = event.target;
+
+    const isPortrait = video.videoHeight >= video.videoWidth; // or squared
 
     const width = isPortrait ? PORTRAIT_WIDTH : LANDSCAPE_WIDTH;
     const maxHeight = isPortrait ? MAX_PORTRAIT_HEIGHT : MAX_LANDSCAPE_HEIGHT;
 
-    const factor = img.naturalWidth / width;
-    const height = img.naturalHeight / factor;
+    const factor = video.videoWidth / width;
+    const height = video.videoHeight / factor;
 
     setWidth(width);
     setHeight(Math.min(maxHeight, height));
@@ -85,7 +84,8 @@ export default function ImageMessage(message: MessageRow) {
     <>
       <div
         className={
-          "rounded-md flex items-center justify-center cursor-pointer relative"
+          "rounded-md flex items-center justify-center cursor-pointer relative" +
+          " bg-black/5 dark:bg-white/5"
         }
         style={{ height, width }}
         onClick={() => {
@@ -96,78 +96,19 @@ export default function ImageMessage(message: MessageRow) {
           }
         }}
       >
-        {/* Image */}
-        {load.blob && (
-          <>
-            <div className="absolute top-0">
-              {" "}
-              {/* antd.Image does not absolute, hence, absolute it in a parent div */}
-              <Image
-                src={URL.createObjectURL(load.blob)}
-                onLoad={imageDimensions}
-                className="rounded-md object-cover"
-                preview={{
-                  toolbarRender: (
-                    _,
-                    {
-                      transform: { scale },
-                      actions: {
-                        onFlipY,
-                        onFlipX,
-                        onRotateLeft,
-                        onRotateRight,
-                        onZoomOut,
-                        onZoomIn,
-                      },
-                    },
-                  ) => {
-                    return (
-                      <Space size={18} className={styles.toolbarWrapper}>
-                        <DownloadOutlined
-                          className={styles.anticon}
-                          onClick={() => handleLoad(media.name)}
-                        />
-                        <SwapOutlined
-                          className={styles.anticon}
-                          rotate={90}
-                          onClick={onFlipY}
-                        />
-                        <SwapOutlined
-                          className={styles.anticon}
-                          onClick={onFlipX}
-                        />
-                        <RotateLeftOutlined
-                          className={styles.anticon}
-                          onClick={onRotateLeft}
-                        />
-                        <RotateRightOutlined
-                          className={styles.anticon}
-                          onClick={onRotateRight}
-                        />
-                        <ZoomOutOutlined
-                          className={styles.anticon}
-                          disabled={scale === 1}
-                          onClick={onZoomOut}
-                        />
-                        <ZoomInOutlined
-                          className={styles.anticon}
-                          disabled={scale === 50}
-                          onClick={onZoomIn}
-                        />
-                      </Space>
-                    );
-                  },
-                }}
-                height={height}
-                width={width}
-              />
-            </div>
-
-            {/* Shadow */}
-            {!content.text && (
-              <div className="absolute rounded-md z-[1] h-[30px] bottom-0 w-full shadow-[inset_0_-30px_10px_-10px_rgba(0,0,0,0.4)]" />
-            )}
-          </>
+        {/* Video */}
+        {src && (
+          <video
+            src={src}
+            controls
+            onLoadedMetadata={videoDimensions}
+            className="rounded-md object-cover"
+            height={height}
+            width={width}
+            // The element renders its own controls; let clicks reach it instead
+            // of the wrapper's load/cancel handler.
+            onClick={(event) => event.stopPropagation()}
+          />
         )}
 
         {/* Load button */}
@@ -213,10 +154,7 @@ export default function ImageMessage(message: MessageRow) {
       {/* Caption */}
       {content.text && (
         <div className="pl-[6px] pt-[6px] pb-[5px] pr-[4px]" style={{ width }}>
-          <Markdown
-            content={content.text || ""}
-            direction={message.direction}
-          />
+          <Markdown content={content.text || ""} direction={message.direction} />
         </div>
       )}
 
@@ -262,7 +200,7 @@ export default function ImageMessage(message: MessageRow) {
           "z-[2] text-[11px] absolute bottom-[0px] right-[7px] flex items-center" +
           (content.text ||
           (content.artifacts && content.artifacts.length > 0) ||
-          !load.blob
+          !src
             ? " text-muted-foreground"
             : " text-white bottom-[3px]")
         }

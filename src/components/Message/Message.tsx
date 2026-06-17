@@ -6,6 +6,8 @@ import {
 import AudioMessage from "./AudioMessage";
 import DocumentMessage from "./DocumentMessage";
 import ImageMessage from "./ImageMessage";
+import VideoMessage from "./VideoMessage";
+import { mediaCategory } from "./media";
 import StatusIcon from "./StatusIcon";
 import dayjs from "dayjs";
 import { Remarkable } from "remarkable";
@@ -470,14 +472,16 @@ export default function Message(props: UIMessage & { message: MessageRow }) {
     );
     text = true;
   } else if (props.message.content.type === "file") {
-    // Route by kind first, then fall back to the MIME type. The Instagram
-    // "native" kinds (ig_post/ig_reel/reel/story/ig_story/story_mention/
-    // story_reply) are images or videos, so they render via ImageMessage based
-    // on their MIME — no per-kind case needed.
-    const kind = props.message.content.kind;
-    const mime = props.message.content.file.mime_type || "";
+    // Resolve the renderer by kind first, falling back to MIME (see
+    // mediaCategory). This keeps the Instagram "native" kinds — a shared reel
+    // (ig_reel/reel) is a video, a post/story is decided by MIME — rendering
+    // correctly even when the stored MIME is wrong.
+    const category = mediaCategory(
+      props.message.content.kind,
+      props.message.content.file.mime_type || "",
+    );
 
-    if (kind === "audio" || mime.startsWith("audio/")) {
+    if (category === "audio") {
       content = (
         <AudioMessage
           {...{
@@ -487,13 +491,9 @@ export default function Message(props: UIMessage & { message: MessageRow }) {
           }}
         />
       );
-    } else if (
-      kind === "image" ||
-      kind === "sticker" ||
-      kind === "video" ||
-      mime.startsWith("image/") ||
-      mime.startsWith("video/")
-    ) {
+    } else if (category === "video") {
+      content = <VideoMessage {...props.message} />;
+    } else if (category === "image") {
       content = <ImageMessage {...props.message} />;
     } else {
       content = <DocumentMessage {...props.message} />;

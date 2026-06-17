@@ -69,8 +69,12 @@ export default function DocumentMessage(message: MessageRow) {
 
   const content = message.content;
 
-  if (content.type !== "file" || content.kind !== "document") {
-    throw new Error(`Message with id ${message.id} is not a document message.`);
+  // DocumentMessage is the catch-all renderer for any file part that isn't
+  // audio/image/video (see Message.tsx routing). That includes "document" as
+  // well as Instagram native kinds delivered as non-media files — e.g. a shared
+  // reel ("ig_reel") that arrives as a text/html link rather than a video.
+  if (content.type !== "file") {
+    throw new Error(`Message with id ${message.id} is not a file message.`);
   }
 
   const media = content.file;
