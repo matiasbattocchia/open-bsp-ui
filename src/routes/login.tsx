@@ -7,6 +7,10 @@ import { GoogleOutlined, GithubOutlined } from "@ant-design/icons";
 type OAuthProvider = "google" | "github";
 
 export const Route = createFileRoute("/login")({
+  validateSearch: (search): { redirect?: string; email?: boolean } => ({
+    redirect: (search.redirect as string) || undefined,
+    email: "email" in search || undefined,
+  }),
   component: Login,
 });
 
@@ -14,7 +18,7 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
-  const { redirect } = Route.useSearch();
+  const { redirect, email: showEmail } = Route.useSearch();
 
   const { translate: t } = useTranslation();
 
@@ -67,12 +71,12 @@ function Login() {
         </button>
 
         <div
-          className={`border-b border-border w-full ${import.meta.env.DEV ? "" : "hidden"}`}
+          className={`border-b border-border w-full ${showEmail ? "" : "hidden"}`}
         />
 
         <form
           onSubmit={handleLogInWithEmail}
-          className={`login-form ${import.meta.env.DEV ? "" : "hidden"}`}
+          className={`login-form ${showEmail ? "" : "hidden"}`}
         >
           <label>
             <div className="label">{t("Correo electrónico")}</div>
