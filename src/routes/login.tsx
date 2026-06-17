@@ -7,9 +7,9 @@ import { GoogleOutlined, GithubOutlined } from "@ant-design/icons";
 type OAuthProvider = "google" | "github";
 
 export const Route = createFileRoute("/login")({
-  validateSearch: (search): { redirect?: string; email?: boolean } => ({
+  validateSearch: (search): { redirect?: string; email?: string } => ({
     redirect: (search.redirect as string) || undefined,
-    email: "email" in search || undefined,
+    email: (search.email as string) || undefined,
   }),
   component: Login,
 });
