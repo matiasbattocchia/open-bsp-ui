@@ -19,11 +19,10 @@ import type {
   ContactExtra,
   ConversationExtra,
   HumanAgentExtra,
-  HumanAgentExtraInsert,
-  HumanAgentExtraUpdate,
   OrganizationAddressExtra,
   OrganizationExtra,
 } from "./extra_types";
+import type { HumanAgentExtraInsert, HumanAgentExtraUpdate } from "./ui_types";
 
 export type { Json, Tables };
 

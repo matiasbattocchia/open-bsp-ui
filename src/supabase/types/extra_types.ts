@@ -1,13 +1,13 @@
 //===================================
-// Ported from open-bsp-api/.../_shared/types/extra_types.ts
-// UI divergences preserved:
-// - ConversationExtra: `draft` + nullable paused/archived/pinned
-// - AIAgentExtra: `protocol` includes "assistants" + `assistant_id`
-// - LocalMCPToolConfig.config.product includes "openbsp"
-// - LocalSQLToolConfig.config is Json (the UI does not vendor SQLToolConfig)
-// - HumanAgentExtraInsert / HumanAgentExtraUpdate are UI-only
+// Mirrored from open-bsp-api/.../_shared/types/extra_types.ts
+//
+// To re-sync: paste the API file over this one, then re-apply each line tagged
+// `// @ui-divergence` below (run `scripts/check-type-sync.sh` to list them).
+// Pure UI-only additions (no API counterpart) live in ./ui_types.ts.
 //===================================
 
+// @ui-divergence: import Json instead of the API's DatabaseGenerated +
+// SQLToolConfig (server-only deps the UI does not vendor).
 import type { Json } from "../db_types";
 
 export type Memory = {
@@ -55,17 +55,19 @@ export type InstagramOrganizationAddressExtra = {
 };
 
 // Union — the column accepts either shape; consumers narrow via the row's
-// `service` column.
+// `service` column (or via a cast at WA-/IG-specific read sites).
 export type OrganizationAddressExtra =
   | WhatsAppOrganizationAddressExtra
   | InstagramOrganizationAddressExtra;
 
 export type ConversationExtra = {
   memory?: Memory;
+  // @ui-divergence: paused/archived/pinned are `string | null` (API: `string`).
   paused?: string | null;
   archived?: string | null;
   pinned?: string | null;
   default_agent_id?: string;
+  // @ui-divergence: `draft` is UI-only (API has a commented-out `test_run`).
   draft?: {
     text: string;
     origin: string;
@@ -77,6 +79,10 @@ export type ContactExtra = Record<PropertyKey, never>;
 
 export type WhatsAppContactAddressExtra = {
   name?: string;
+  username?: string;
+  phone_number?: string;
+  bsuid?: string;
+  address_type?: "phone" | "bsuid";
   synced?: {
     // if the contact address was synced from WhatsApp
     name: string;
@@ -97,7 +103,7 @@ export type InstagramContactAddressExtra = {
 };
 
 // Union — the column accepts either shape; consumers narrow via the row's
-// `service` column.
+// `service` column (or via the per-service Row/Insert aliases below).
 export type ContactAddressExtra =
   | WhatsAppContactAddressExtra
   | InstagramContactAddressExtra;
@@ -126,6 +132,7 @@ export type LocalMCPToolConfig = {
   label: string; // server label
   config: {
     url: string;
+    // @ui-divergence: `product` includes "openbsp" (API: "calendar" | "sheets").
     product?: "calendar" | "sheets" | "openbsp";
     headers?: Record<string, string>;
     allowed_tools?: string[];
@@ -138,7 +145,8 @@ export type LocalSQLToolConfig = {
   provider: "local";
   type: "sql";
   label: string; // database label
-  config: Json; // SQLToolConfig (not vendored UI-side)
+  // @ui-divergence: `config` is Json (API: SQLToolConfig, not vendored UI-side).
+  config: Json;
 };
 
 export type LocalHTTPToolConfig = {
@@ -160,6 +168,7 @@ export type ToolConfig =
   | LocalMCPToolConfig;
 
 export type HumanAgentExtra = {
+  // @ui-divergence: role enum inlined (API: DatabaseGenerated[...]["Enums"]["role"]).
   role: "member" | "admin" | "owner";
   invitation?: {
     organization_name: string;
@@ -168,23 +177,7 @@ export type HumanAgentExtra = {
   };
 };
 
-export type HumanAgentExtraInsert = {
-  role: "member" | "admin" | "owner";
-  invitation?: {
-    organization_name: string;
-    email: string;
-    status: "pending";
-  };
-};
-
-export type HumanAgentExtraUpdate = {
-  role?: "member" | "admin" | "owner";
-  invitation?: {
-    organization_name?: string;
-    email?: string;
-    status?: "pending" | "accepted" | "rejected";
-  };
-};
+// HumanAgentExtraInsert / HumanAgentExtraUpdate moved to ./ui_types.ts (UI-only).
 
 export type AIAgentExtra = {
   mode?: "active" | "draft" | "inactive";

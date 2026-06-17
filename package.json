@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "types:sync-check": "bash scripts/check-type-sync.sh"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.81.1",

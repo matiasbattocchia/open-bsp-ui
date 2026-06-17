@@ -1,9 +1,12 @@
 //===================================
-// Ported from open-bsp-api/.../_shared/types/message_types.ts
-// UI divergence preserved: TaskInfo.task.status is `string` (the UI does not
-// vendor the a2a TaskState type).
+// Mirrored from open-bsp-api/.../_shared/types/message_types.ts
+//
+// To re-sync: paste the API file over this one, then re-apply each line tagged
+// `// @ui-divergence` below (run `scripts/check-type-sync.sh` to list them).
 //===================================
 
+// @ui-divergence: the API also imports TaskState from ../a2a_types (not vendored
+// UI-side); see TaskInfo.task.status below.
 import type { Json } from "../db_types";
 import type {
   ButtonMessage,
@@ -25,6 +28,7 @@ import type { InstagramReferral } from "./instagram_webhook_payload_types";
 export type TaskInfo = {
   task?: {
     id: string;
+    // @ui-divergence: `status` is `string` (API: TaskState from a2a_types).
     status?: string;
     session_id?: string;
   };

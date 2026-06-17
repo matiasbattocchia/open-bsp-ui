@@ -1,6 +1,8 @@
 //===================================
-// Ported from open-bsp-api/.../_shared/types/whatsapp_template_types.ts
-// UI divergence preserved: TemplateData.category keeps "MARKETING" | "UTILITY".
+// Mirrored from open-bsp-api/.../_shared/types/whatsapp_template_types.ts
+//
+// To re-sync: paste the API file over this one, then re-apply each line tagged
+// `// @ui-divergence` below (run `scripts/check-type-sync.sh` to list them).
 //===================================
 
 import type {
@@ -24,6 +26,7 @@ export type TemplateData = {
     | "DISABLED"
     | "PAUSED"
     | "LIMIT_EXCEEDED";
+  // @ui-divergence: category includes "UTILITY" (API: only "MARKETING").
   category: "MARKETING" | "UTILITY"; // TODO: service and auth categories - cabra 2024/09/12
   language: string;
   components: (

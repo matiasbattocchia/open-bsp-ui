@@ -16,6 +16,7 @@ export * from "./types/instagram_webhook_payload_types";
 export * from "./types/status_types";
 export * from "./types/message_types";
 export * from "./types/extra_types";
+export * from "./types/ui_types";
 export * from "./types/database_types";
 
 //===================================
