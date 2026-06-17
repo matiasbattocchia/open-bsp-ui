@@ -343,5 +343,22 @@
   "ver más...": "ona zaidi...",
   "¡Credenciales inválidas!": "Stakabadhi batili!",
   "Últimos 12 meses": "Miezi 12 iliyopita",
-  "Últimos 14 días": "Siku 14 zilizopita"
+  "Últimos 14 días": "Siku 14 zilizopita",
+  "Conectar cuenta": "Unganisha akaunti",
+  "Conectar Instagram": "Unganisha Instagram",
+  "Para conectar Instagram a la plataforma, iniciá sesión con la cuenta de Instagram profesional (empresa o creador) que querés conectar.": "Ili kuunganisha Instagram kwenye jukwaa, ingia kwa kutumia akaunti ya kitaalamu ya Instagram (biashara au mtayarishi) unayotaka kuunganisha.",
+  "La cuenta debe ser profesional (empresa o creador) y tener los mensajes habilitados.": "Akaunti lazima iwe ya kitaalamu (biashara au mtayarishi) na iwe na ujumbe umewashwa.",
+  "Vas a ser redirigido a Instagram para autorizar y luego volverás a la plataforma.": "Utaelekezwa kwenye Instagram ili kuidhinisha na kisha kurudi kwenye jukwaa.",
+  "Continuar con Instagram": "Endelea na Instagram",
+  "No se pudo conectar la cuenta de Instagram.": "Akaunti ya Instagram haikuweza kuunganishwa.",
+  "Conectando tu cuenta de Instagram...": "Inaunganisha akaunti yako ya Instagram...",
+  "Cuenta de Instagram": "Akaunti ya Instagram",
+  "ID de cuenta": "Kitambulisho cha akaunti",
+  "El acceso expira": "Ufikiaji unaisha",
+  "La conexión expiró o fue revocada. Volvé a conectar la cuenta.": "Muunganisho umeisha au umebatilishwa. Unganisha akaunti tena.",
+  "Generá un enlace para que un tercero conecte su cuenta de Instagram a tu organización. No necesita tener cuenta en Open BSP ni ser miembro de tu organización.": "Tengeneza kiungo ili mtu wa tatu aweze kuunganisha akaunti yake ya Instagram kwenye shirika lako. Hahitaji kuwa na akaunti ya Open BSP wala kuwa mwanachama wa shirika lako.",
+  "Tu cuenta de Instagram fue conectada exitosamente.": "Akaunti yako ya Instagram imeunganishwa kwa mafanikio.",
+  "Conectá tu cuenta de Instagram a": "Unganisha akaunti yako ya Instagram kwa",
+  "Iniciá sesión con la cuenta de Instagram profesional (empresa o creador) que querés conectar. Vas a ser redirigido a Instagram para autorizar.": "Ingia kwa kutumia akaunti ya kitaalamu ya Instagram (biashara au mtayarishi) unayotaka kuunganisha. Utaelekezwa kwenye Instagram ili kuidhinisha.",
+  "nombre_de_plantilla": "jina_la_kiolezo"
 }

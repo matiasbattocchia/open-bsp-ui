@@ -343,5 +343,22 @@
   "ver más...": "ver mais...",
   "¡Credenciales inválidas!": "Credenciais inválidas!",
   "Últimos 12 meses": "Últimos 12 meses",
-  "Últimos 14 días": "Últimos 14 dias"
+  "Últimos 14 días": "Últimos 14 dias",
+  "Conectar cuenta": "Conectar conta",
+  "Conectar Instagram": "Conectar Instagram",
+  "Para conectar Instagram a la plataforma, iniciá sesión con la cuenta de Instagram profesional (empresa o creador) que querés conectar.": "Para conectar o Instagram à plataforma, faça login com a conta profissional do Instagram (empresa ou criador) que deseja conectar.",
+  "La cuenta debe ser profesional (empresa o creador) y tener los mensajes habilitados.": "A conta deve ser profissional (empresa ou criador) e ter as mensagens habilitadas.",
+  "Vas a ser redirigido a Instagram para autorizar y luego volverás a la plataforma.": "Você será redirecionado ao Instagram para autorizar e depois voltará à plataforma.",
+  "Continuar con Instagram": "Continuar com o Instagram",
+  "No se pudo conectar la cuenta de Instagram.": "Não foi possível conectar a conta do Instagram.",
+  "Conectando tu cuenta de Instagram...": "Conectando sua conta do Instagram...",
+  "Cuenta de Instagram": "Conta do Instagram",
+  "ID de cuenta": "ID da conta",
+  "El acceso expira": "O acesso expira",
+  "La conexión expiró o fue revocada. Volvé a conectar la cuenta.": "A conexão expirou ou foi revogada. Reconecte a conta.",
+  "Generá un enlace para que un tercero conecte su cuenta de Instagram a tu organización. No necesita tener cuenta en Open BSP ni ser miembro de tu organización.": "Gere um link para que um terceiro conecte a conta do Instagram dele à sua organização. Ele não precisa ter uma conta no Open BSP nem ser membro da sua organização.",
+  "Tu cuenta de Instagram fue conectada exitosamente.": "Sua conta do Instagram foi conectada com sucesso.",
+  "Conectá tu cuenta de Instagram a": "Conecte sua conta do Instagram a",
+  "Iniciá sesión con la cuenta de Instagram profesional (empresa o creador) que querés conectar. Vas a ser redirigido a Instagram para autorizar.": "Faça login com a conta profissional do Instagram (empresa ou criador) que deseja conectar. Você será redirecionado ao Instagram para autorizar.",
+  "nombre_de_plantilla": "nome_do_modelo"
 }

@@ -19,7 +19,7 @@ function InstagramCallback() {
   const { translate: t } = useTranslation();
   const navigate = useNavigate();
   const { code, state } = Route.useSearch();
-  const signup = useInstagramSignup();
+  const { mutate: signup } = useInstagramSignup();
   const [error, setError] = useState(false);
   const ran = useRef(false);
 
@@ -27,7 +27,21 @@ function InstagramCallback() {
     if (ran.current) return;
     ran.current = true;
 
-    // Shared across tabs (the authorize flow may run in a new tab).
+    // Normal path: we were opened as a popup by the connect page. Hand the code
+    // back to the opener, which finishes the exchange scoped to its active
+    // organization, then close. (Avoids running signup with the popup's default
+    // org and avoids leaving a second tab open.)
+    if (window.opener && window.opener !== window) {
+      window.opener.postMessage(
+        { type: "ig_oauth", code, state },
+        window.location.origin,
+      );
+      window.close();
+      return;
+    }
+
+    // Fallback path: the popup was blocked, so the authorize flow ran in this
+    // same tab via a full redirect. Finish the exchange here.
     const expected = localStorage.getItem("ig_oauth_state");
     localStorage.removeItem("ig_oauth_state");
 
@@ -37,15 +51,16 @@ function InstagramCallback() {
     }
 
     const redirect_uri = `${window.location.origin}${IG_INAPP_REDIRECT_PATH}`;
-
-    signup.mutate(
+    signup(
       { code, redirect_uri },
       {
         onSuccess: (data: { address?: string }) =>
           navigate({
             to: "/integrations/instagram/$orgAddressId",
             params: { orgAddressId: data.address ?? "" },
-            hash: (prevHash) => prevHash!,
+            // Drop the `#_=_` artifact Instagram appends to the redirect so it
+            // isn't read as an active conversation id.
+            hash: "",
           }),
         onError: () => setError(true),
       },

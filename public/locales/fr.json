@@ -343,5 +343,22 @@
   "ver más...": "voir plus...",
   "¡Credenciales inválidas!": "Identifiants invalides !",
   "Últimos 12 meses": "12 derniers mois",
-  "Últimos 14 días": "14 derniers jours"
+  "Últimos 14 días": "14 derniers jours",
+  "Conectar cuenta": "Connecter un compte",
+  "Conectar Instagram": "Connecter Instagram",
+  "Para conectar Instagram a la plataforma, iniciá sesión con la cuenta de Instagram profesional (empresa o creador) que querés conectar.": "Pour connecter Instagram à la plateforme, connectez-vous avec le compte Instagram professionnel (entreprise ou créateur) que vous souhaitez connecter.",
+  "La cuenta debe ser profesional (empresa o creador) y tener los mensajes habilitados.": "Le compte doit être professionnel (entreprise ou créateur) et avoir la messagerie activée.",
+  "Vas a ser redirigido a Instagram para autorizar y luego volverás a la plataforma.": "Vous serez redirigé vers Instagram pour autoriser, puis vous reviendrez sur la plateforme.",
+  "Continuar con Instagram": "Continuer avec Instagram",
+  "No se pudo conectar la cuenta de Instagram.": "Impossible de connecter le compte Instagram.",
+  "Conectando tu cuenta de Instagram...": "Connexion de votre compte Instagram...",
+  "Cuenta de Instagram": "Compte Instagram",
+  "ID de cuenta": "ID du compte",
+  "El acceso expira": "L'accès expire",
+  "La conexión expiró o fue revocada. Volvé a conectar la cuenta.": "La connexion a expiré ou a été révoquée. Reconnectez le compte.",
+  "Generá un enlace para que un tercero conecte su cuenta de Instagram a tu organización. No necesita tener cuenta en Open BSP ni ser miembro de tu organización.": "Générez un lien pour qu'un tiers connecte son compte Instagram à votre organisation. Il n'a pas besoin d'un compte Open BSP ni d'être membre de votre organisation.",
+  "Tu cuenta de Instagram fue conectada exitosamente.": "Votre compte Instagram a été connecté avec succès.",
+  "Conectá tu cuenta de Instagram a": "Connectez votre compte Instagram à",
+  "Iniciá sesión con la cuenta de Instagram profesional (empresa o creador) que querés conectar. Vas a ser redirigido a Instagram para autorizar.": "Connectez-vous avec le compte Instagram professionnel (entreprise ou créateur) que vous souhaitez connecter. Vous serez redirigé vers Instagram pour autoriser.",
+  "nombre_de_plantilla": "nom_du_modele"
 }

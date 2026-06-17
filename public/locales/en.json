@@ -343,5 +343,22 @@
   "ver más...": "show more...",
   "¡Credenciales inválidas!": "Invalid credentials!",
   "Últimos 12 meses": "Last 12 months",
-  "Últimos 14 días": "Last 14 days"
+  "Últimos 14 días": "Last 14 days",
+  "Conectar cuenta": "Connect account",
+  "Conectar Instagram": "Connect Instagram",
+  "Para conectar Instagram a la plataforma, iniciá sesión con la cuenta de Instagram profesional (empresa o creador) que querés conectar.": "To connect Instagram to the platform, log in with the professional Instagram account (business or creator) you want to connect.",
+  "La cuenta debe ser profesional (empresa o creador) y tener los mensajes habilitados.": "The account must be professional (business or creator) and have messaging enabled.",
+  "Vas a ser redirigido a Instagram para autorizar y luego volverás a la plataforma.": "You will be redirected to Instagram to authorize and then return to the platform.",
+  "Continuar con Instagram": "Continue with Instagram",
+  "No se pudo conectar la cuenta de Instagram.": "The Instagram account could not be connected.",
+  "Conectando tu cuenta de Instagram...": "Connecting your Instagram account...",
+  "Cuenta de Instagram": "Instagram account",
+  "ID de cuenta": "Account ID",
+  "El acceso expira": "Access expires",
+  "La conexión expiró o fue revocada. Volvé a conectar la cuenta.": "The connection expired or was revoked. Reconnect the account.",
+  "Generá un enlace para que un tercero conecte su cuenta de Instagram a tu organización. No necesita tener cuenta en Open BSP ni ser miembro de tu organización.": "Generate a link so a third party can connect their Instagram account to your organization. They don't need an Open BSP account or to be a member of your organization.",
+  "Tu cuenta de Instagram fue conectada exitosamente.": "Your Instagram account was connected successfully.",
+  "Conectá tu cuenta de Instagram a": "Connect your Instagram account to",
+  "Iniciá sesión con la cuenta de Instagram profesional (empresa o creador) que querés conectar. Vas a ser redirigido a Instagram para autorizar.": "Log in with the professional Instagram account (business or creator) you want to connect. You will be redirected to Instagram to authorize.",
+  "nombre_de_plantilla": "template_name"
 }
