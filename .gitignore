@@ -12,8 +12,11 @@ node_modules
 .vscode
 .zed
 
-# Claude
-.claude
+# Claude — share project hooks/settings; keep personal local overrides out.
+.claude/*
+!.claude/settings.json
+!.claude/hooks/
+.claude/settings.local.json
 
 mise.toml
 
