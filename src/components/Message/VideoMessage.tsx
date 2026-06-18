@@ -80,35 +80,59 @@ export default function VideoMessage(message: MessageRow) {
     setHeight(Math.min(maxHeight, height));
   };
 
+  // When the video is loaded and there is no caption/description below it, the
+  // timestamp overlays the video itself (as in ImageMessage). The native player
+  // puts its controls along the bottom, so — unlike an image — the overlay goes
+  // at the top to stay clear of them.
+  const overlayTimestamp =
+    !!src &&
+    !content.text &&
+    !(content.artifacts && content.artifacts.length > 0);
+
   return (
     <>
       <div
         className={
-          "rounded-md flex items-center justify-center cursor-pointer relative" +
-          " bg-black/5 dark:bg-white/5"
+          "rounded-md relative overflow-hidden" +
+          // Before load: a clickable placeholder. Once loaded, the native
+          // <video> owns the whole frame, so the wrapper adds no
+          // cursor/click-target/background that would interfere with its
+          // controls (those caused the play button to dim and the cursor to
+          // drop back to the default arrow over the controls).
+          (src
+            ? ""
+            : " flex items-center justify-center cursor-pointer" +
+              " bg-black/5 dark:bg-white/5")
         }
         style={{ height, width }}
-        onClick={() => {
-          if (load.status === "pending" || load.status === "error") {
-            startLoad();
-          } else if (load.status === "loading") {
-            cancelLoad();
-          }
-        }}
+        onClick={
+          src
+            ? undefined
+            : () => {
+                if (load.status === "pending" || load.status === "error") {
+                  startLoad();
+                } else if (load.status === "loading") {
+                  cancelLoad();
+                }
+              }
+        }
       >
-        {/* Video */}
+        {/* Video — fills the frame, which is itself sized to the video's aspect
+            ratio (see videoDimensions) so it adapts like an image does. */}
         {src && (
           <video
             src={src}
             controls
             onLoadedMetadata={videoDimensions}
-            className="rounded-md object-cover"
-            height={height}
-            width={width}
-            // The element renders its own controls; let clicks reach it instead
-            // of the wrapper's load/cancel handler.
-            onClick={(event) => event.stopPropagation()}
+            className="absolute inset-0 h-full w-full rounded-md bg-black object-cover"
           />
+        )}
+
+        {/* Top shadow — keeps the overlaid timestamp legible (mirrors the
+            bottom shadow in ImageMessage, flipped to the top to clear the
+            native controls). pointer-events-none so it never blocks the player. */}
+        {overlayTimestamp && (
+          <div className="pointer-events-none absolute top-0 z-[1] h-[30px] w-full rounded-md shadow-[inset_0_30px_10px_-10px_rgba(0,0,0,0.4)]" />
         )}
 
         {/* Load button */}
@@ -200,12 +224,10 @@ export default function VideoMessage(message: MessageRow) {
       {/* Timestamp */}
       <div
         className={
-          "z-[2] text-[11px] absolute bottom-[0px] right-[7px] flex items-center" +
-          (content.text ||
-          (content.artifacts && content.artifacts.length > 0) ||
-          !src
-            ? " text-muted-foreground"
-            : " text-white bottom-[3px]")
+          "z-[2] text-[11px] absolute right-[7px] flex items-center" +
+          (overlayTimestamp
+            ? " text-white top-[3px]"
+            : " text-muted-foreground bottom-[0px]")
         }
       >
         {dayjs(message.timestamp).format("HH:mm")}
