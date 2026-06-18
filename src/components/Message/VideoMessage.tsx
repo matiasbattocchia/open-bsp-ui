@@ -1,4 +1,5 @@
-import { type ReactEventHandler, useEffect, useState } from "react";
+import { type ReactEventHandler, useEffect, useRef, useState } from "react";
+import { Play } from "lucide-react";
 import StatusIcon from "./StatusIcon";
 import { useMedia } from "@/hooks/useMedia";
 import { fileSize } from "./DocumentMessage";
@@ -33,7 +34,9 @@ export default function VideoMessage(message: MessageRow) {
   const [width, setWidth] = useState(PORTRAIT_WIDTH);
   const [height, setHeight] = useState(MAX_PORTRAIT_HEIGHT);
   const [src, setSrc] = useState<string>();
+  const [started, setStarted] = useState(false);
   const [showAnnotation, setShowAnnotation] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const { translate: t } = useTranslation();
 
@@ -121,11 +124,36 @@ export default function VideoMessage(message: MessageRow) {
             ratio (see videoDimensions) so it adapts like an image does. */}
         {src && (
           <video
+            ref={videoRef}
             src={src}
             controls
             onLoadedMetadata={videoDimensions}
-            className="absolute inset-0 h-full w-full rounded-md bg-black object-cover"
+            className="message-video absolute inset-0 h-full w-full cursor-pointer rounded-md bg-black object-cover"
           />
+        )}
+
+        {/* Custom play button shown until playback starts. It is a real,
+            full-frame button: it covers the video and owns all hovering/clicks,
+            so Chrome's native overlay play button underneath (which dims on
+            hover and shows the default cursor, and whose internal state cannot
+            be restyled) is never the hover target. Clicking it starts playback,
+            after which the native controls take over. */}
+        {src && !started && (
+          <button
+            type="button"
+            onClick={() => {
+              void videoRef.current?.play();
+              setStarted(true);
+            }}
+            className="absolute inset-0 z-[1] flex cursor-pointer items-center justify-center"
+          >
+            <div className="flex h-[44px] w-[44px] items-center justify-center rounded-full bg-[rgba(11,20,26,.35)] text-white">
+              <Play
+                className="h-[22px] w-[22px] translate-x-[1px]"
+                fill="currentColor"
+              />
+            </div>
+          </button>
         )}
 
         {/* Top shadow — keeps the overlaid timestamp legible (mirrors the

@@ -426,3 +426,10 @@ input[type="range"]::-moz-range-track {
 .json-null {
   color: var(--muted-foreground);
 }
+
+/* Message video: hide Chrome's native central overlay play button. It dims on
+   hover and its internal hover state cannot be restyled, so VideoMessage hides
+   it and renders its own static central play button instead. */
+.message-video::-webkit-media-controls-overlay-play-button {
+  display: none !important;
+}
