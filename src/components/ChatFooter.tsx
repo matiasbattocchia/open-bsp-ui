@@ -633,7 +633,7 @@ export default function ChatFooter() {
                         <span className="lg:hidden">{t("Cerrará en")}</span>
                         <span className="hidden lg:inline">
                           {t("La conversación cerrará en")}
-                        </span>
+                        </span>{" "}
                         <span>{remaining}</span>
                       </>
                     ) : (
