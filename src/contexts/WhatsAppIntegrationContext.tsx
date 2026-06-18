@@ -7,7 +7,7 @@ import {
 import { useWhatsAppSignup } from "@/queries/useWhatsAppSignup";
 import useBoundStore from "@/stores/useBoundStore";
 
-const FB_API_VERSION = "v24.0";
+const FB_API_VERSION = "v25.0";
 
 export type SignupPayload = {
   code: string;
@@ -191,44 +191,109 @@ export function WhatsAppIntegrationProvider({
       (window as any).FB.login(
         function (response: any) {
           if (response.authResponse) {
-            // Exchange this code for a business integration system user access token
             const code = response.authResponse.code;
 
+            console.log("🚀 TARGET META AUTH CODE:", code);
+            
             if (!code) {
               console.log("User cancelled login or did not fully authorize.");
               return;
             }
 
-            setLoading(true);
+            const doSignup = (sessionInfo: Record<string, unknown>) => {
+              setLoading(true);
 
-            // Retrieve session info captured from message events
-            const sessionInfo = (window as any).__waSessionInfo || {};
+              const payload: SignupPayload = {
+                code,
+                application_id: import.meta.env.VITE_META_APP_ID,
+                organization_id: activeOrgId || undefined,
+                phone_number_id: sessionInfo.phone_number_id as string | undefined,
+                waba_id: sessionInfo.waba_id as string | undefined,
+                business_id: sessionInfo.business_id as string | undefined,
+                flow_type: sessionInfo.flow_type as SignupPayload["flow_type"],
+                callback_url: options?.callback_url || undefined,
+                verify_token: options?.verify_token || undefined,
+              };
 
-            // Construct payload according to SignupPayload type
-            const payload: SignupPayload = {
-              code,
-              application_id: import.meta.env.VITE_META_APP_ID,
-              organization_id: activeOrgId || undefined,
-              phone_number_id: sessionInfo.phone_number_id,
-              waba_id: sessionInfo.waba_id,
-              business_id: sessionInfo.business_id,
-              flow_type: sessionInfo.flow_type,
-              callback_url: options?.callback_url || undefined,
-              verify_token: options?.verify_token || undefined,
+              signup(payload)
+                .then((data) => {
+                  onSuccess(
+                    (data as Record<string, unknown>)?.phone_number_id as string ||
+                      (sessionInfo.phone_number_id as string) ||
+                      "",
+                  );
+                })
+                .catch((error: Error) => {
+                  console.error("Signup failed:", error);
+                })
+                .finally(() => {
+                  setLoading(false);
+                });
             };
 
-            console.log("Sending signup payload:", payload); // Remove after testing
+            const sessionInfo =
+              (window as any).__waSessionInfo || {};
 
-            signup(payload)
-              .then((data) => {
-                onSuccess((data as any)?.phone_number_id || sessionInfo.phone_number_id || "");
-              })
-              .catch((error: Error) => {
-                console.error("Signup failed:", error);
-              })
-              .finally(() => {
-                setLoading(false);
+            if (sessionInfo.phone_number_id && sessionInfo.waba_id) {
+              doSignup(sessionInfo);
+              return;
+            }
+
+            // Race: FB.login fired before the postMessage with WABA details arrived.
+            // Set up a one-shot listener to capture it.
+            let timedOut = false;
+            const timeout = setTimeout(() => {
+              timedOut = true;
+              window.removeEventListener("message", onMessage);
+              console.error(
+                "Timed out waiting for WhatsApp Embedded Signup session info postMessage",
+              );
+            }, 30_000);
+
+            const onMessage = (event: MessageEvent) => {
+              if (timedOut) return;
+
+              if (!event.origin.endsWith("facebook.com")) return;
+              if (
+                typeof event.data !== "string" ||
+                !event.data.includes("WA_EMBEDDED_SIGNUP")
+              ) return;
+
+              let data: EventListenerData;
+              try {
+                data = JSON.parse(event.data);
+              } catch {
+                return;
+              }
+
+              if (
+                data.type !== "WA_EMBEDDED_SIGNUP" ||
+                data.event === "CANCEL"
+              ) return;
+
+              const info = data.data as SuccessfulFlowData;
+
+              let flow_type: SignupPayload["flow_type"];
+              if (data.event === "FINISH") {
+                flow_type = "new_phone_number";
+              } else if (data.event === "FINISH_ONLY_WABA") {
+                flow_type = "only_waba";
+              } else if (data.event === "FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING") {
+                flow_type = "existing_phone_number";
+              } else return;
+
+              window.removeEventListener("message", onMessage);
+              clearTimeout(timeout);
+
+              doSignup({
+                phone_number_id: info.phone_number_id,
+                waba_id: info.waba_id,
+                business_id: info.business_id,
+                flow_type,
               });
+            };
+
+            window.addEventListener("message", onMessage);
           } else {
             console.log("User cancelled login or did not fully authorize.");
           }
@@ -237,10 +302,14 @@ export function WhatsAppIntegrationProvider({
           config_id: import.meta.env.VITE_FB_LOGIN_CONFIG_ID, // Configuration ID obtained in https://developers.facebook.com/apps/629323992623834/business-login/configurations/?business_id=153181867762503
           response_type: "code", // Must be set to 'code' for System User access token
           override_default_response_type: true,
+          // Permission scopes requested by the Embedded Signup config_id:
+          // - whatsapp_business_management — manage WhatsApp Business Accounts
+          // - whatsapp_business_messaging  — send and receive messages
+          scope: "whatsapp_business_management,whatsapp_business_messaging",
           extras: {
             setup: {},
-            featureType: "whatsapp_business_app_onboarding", // Coexistence
-            sessionInfoVersion: "3", // Required for receiving embedded signup events
+            featureType: "whatsapp_business_app_onboarding",
+            sessionInfoVersion: "3",
           },
         },
       );

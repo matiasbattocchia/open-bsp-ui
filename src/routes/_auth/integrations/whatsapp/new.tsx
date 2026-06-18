@@ -4,14 +4,12 @@ import SectionHeader from "@/components/SectionHeader";
 import SectionBody from "@/components/SectionBody";
 import SectionFooter from "@/components/SectionFooter";
 import WhatsAppIntegration from "@/components/WhatsAppIntegration";
-import { useTranslation } from "@/hooks/useTranslation";
 
 export const Route = createFileRoute("/_auth/integrations/whatsapp/new")({
   component: WhatsAppNew,
 });
 
 function WhatsAppNew() {
-  const { translate: t } = useTranslation();
   const navigate = useNavigate();
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [callbackUrl, setCallbackUrl] = useState("");
@@ -27,17 +25,28 @@ function WhatsAppNew() {
 
   return (
     <>
-      <SectionHeader title={t("Conectar WhatsApp")} />
+      <SectionHeader title="Connect WhatsApp" />
 
       <SectionBody>
         <form>
           <div className="instructions">
-            <p>{t("Para conectar WhatsApp a la plataforma, iniciá sesión en tu cuenta de Meta y seguí el proceso de registro.")}</p>
+            <p>
+              To connect WhatsApp to the platform, sign in to your Meta account
+              and follow the registration process.
+            </p>
 
-            <p><strong>{t("Requisitos importantes")}</strong></p>
+            <p>
+              <strong>Important Requirements</strong>
+            </p>
             <ul>
-              <li>{t("Si usás la app WhatsApp Business, podés conectar tu número actual y seguir usando la app.")}</li>
-              <li>{t("Si no usás la app, el número a conectar no debe estar activo en otra cuenta de WhatsApp.")}</li>
+              <li>
+                If you use the WhatsApp Business app, you can connect your
+                current number and keep using the app.
+              </li>
+              <li>
+                If you do not use the app, the number to connect must not be
+                active in another WhatsApp account.
+              </li>
             </ul>
           </div>
 
@@ -46,17 +55,22 @@ function WhatsAppNew() {
             className="text-primary text-sm font-medium cursor-pointer self-start"
             onClick={() => setShowAdvanced((v) => !v)}
           >
-            {showAdvanced ? t("Ocultar opciones avanzadas") : t("Opciones avanzadas")}
+            {showAdvanced ? "Hide advanced options" : "Advanced options"}
           </button>
 
           {showAdvanced && (
             <>
               <div className="instructions">
-                <p>{t("Sobrescribir la URL de callback es útil para evadir OpenBSP y recibir los webhooks crudos en el endpoint que indiques. OpenBSP seguirá recibiendo los eventos de cuenta y plantillas (no se pueden redirigir), pero no recibirá los mensajes.")}</p>
+                <p>
+                  Overriding the callback URL is useful to bypass OpenBSP and
+                  receive raw webhooks at the endpoint you specify. OpenBSP will
+                  continue to receive account and template events (which cannot be
+                  redirected), but will not receive messages.
+                </p>
               </div>
 
               <label>
-                <div className="label">{t("URL de callback")} ({t("opcional")})</div>
+                <div className="label">Callback URL (optional)</div>
                 <input
                   type="url"
                   className="text"
@@ -67,7 +81,7 @@ function WhatsAppNew() {
               </label>
 
               <label>
-                <div className="label">{t("Verify token")} ({t("opcional")})</div>
+                <div className="label">Verify Token (optional)</div>
                 <input
                   type="text"
                   className="text"

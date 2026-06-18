@@ -82,6 +82,90 @@ function TemplatesIndex() {
           </div>
         )}
       </SectionBody>
+
+      <div className="mt-[24px]">
+        <SectionHeader title={t("API Reference")} />
+        <SectionBody>
+          <div className="overflow-x-auto">
+            <table className="w-full text-[13px] border-collapse">
+              <thead>
+                <tr className="text-muted-foreground border-b border-border">
+                  <th className="text-left font-medium py-[8px] pr-[16px]">
+                    {t("Method")}
+                  </th>
+                  <th className="text-left font-medium py-[8px] pr-[16px]">
+                    {t("Endpoint")}
+                  </th>
+                  <th className="text-left font-medium py-[8px]">
+                    {t("Action")}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b border-border">
+                  <td className="py-[8px] pr-[16px]">
+                    <span className="rounded bg-primary/10 text-primary font-mono text-[11px] px-[6px] py-[2px]">
+                      PUT
+                    </span>
+                  </td>
+                  <td className="py-[8px] pr-[16px] font-mono text-[11px]">
+                    /whatsapp-management/templates
+                  </td>
+                  <td className="py-[8px]">{t("List all templates")}</td>
+                </tr>
+                <tr className="border-b border-border">
+                  <td className="py-[8px] pr-[16px]">
+                    <span className="rounded bg-primary/10 text-primary font-mono text-[11px] px-[6px] py-[2px]">
+                      PUT
+                    </span>
+                  </td>
+                  <td className="py-[8px] pr-[16px] font-mono text-[11px]">
+                    /whatsapp-management/templates
+                    <br />
+                    <span className="text-muted-foreground">
+                      body: &#123; template &#125;
+                    </span>
+                  </td>
+                  <td className="py-[8px]">{t("Fetch single template")}</td>
+                </tr>
+                <tr className="border-b border-border">
+                  <td className="py-[8px] pr-[16px]">
+                    <span className="rounded bg-primary/10 text-primary font-mono text-[11px] px-[6px] py-[2px]">
+                      POST
+                    </span>
+                  </td>
+                  <td className="py-[8px] pr-[16px] font-mono text-[11px]">
+                    /whatsapp-management/templates
+                  </td>
+                  <td className="py-[8px]">{t("Create template")}</td>
+                </tr>
+                <tr className="border-b border-border">
+                  <td className="py-[8px] pr-[16px]">
+                    <span className="rounded bg-primary/10 text-primary font-mono text-[11px] px-[6px] py-[2px]">
+                      PATCH
+                    </span>
+                  </td>
+                  <td className="py-[8px] pr-[16px] font-mono text-[11px]">
+                    /whatsapp-management/templates
+                  </td>
+                  <td className="py-[8px]">{t("Edit template")}</td>
+                </tr>
+                <tr>
+                  <td className="py-[8px] pr-[16px]">
+                    <span className="rounded bg-destructive/10 text-destructive font-mono text-[11px] px-[6px] py-[2px]">
+                      DELETE
+                    </span>
+                  </td>
+                  <td className="py-[8px] pr-[16px] font-mono text-[11px]">
+                    /whatsapp-management/templates
+                  </td>
+                  <td className="py-[8px]">{t("Delete template")}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </SectionBody>
+      </div>
     </>
   );
 }

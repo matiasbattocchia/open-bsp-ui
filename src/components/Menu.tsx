@@ -9,6 +9,9 @@ import {
   BarChart3,
   Languages,
   Plus,
+  PlugZap,
+  Smartphone,
+  Webhook,
 } from "lucide-react";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import { LinkButton } from "./LinkButton";
@@ -33,6 +36,8 @@ export default function Menu() {
   const navigate = useNavigate();
   const pathname = location.pathname;
 
+  const isWhatsAppActive = pathname.startsWith("/whatsapp") || pathname.startsWith("/integrations/whatsapp");
+
   return (
     <div
       className={
@@ -45,19 +50,62 @@ export default function Menu() {
         {/* Conversations button */}
         <LinkButton
           to="/conversations"
-          title={t("Mensajes")}
+          title={t("Messages")}
           isActive={pathname.startsWith("/conversations")}
           className="mt-[10px]"
         >
           <MessageSquareText className="w-[24px] h-[24px] stroke-[2]" />
         </LinkButton>
 
+        {/* ── WhatsApp Workspace group ───────────────────── */}
+        <div className="w-full mt-[16px] flex flex-col items-center gap-[2px]">
+          <div className="text-[9px] uppercase tracking-wider text-muted-foreground pb-[4px]">
+            WhatsApp Workspace
+          </div>
+
+          <LinkButton
+            to="/whatsapp/connect"
+            title="Connect Channel"
+            isActive={pathname.startsWith("/whatsapp/connect")}
+            className="w-[56px] h-[56px] flex-col gap-[2px]"
+          >
+            <PlugZap className="w-[20px] h-[20px] stroke-[1.8]" />
+            <span className="text-[9px] leading-none text-muted-foreground group-hover:text-sidebar-foreground transition-colors">
+              Connect
+            </span>
+          </LinkButton>
+
+          <LinkButton
+            to="/whatsapp/channels"
+            title="Active Channels"
+            isActive={pathname.startsWith("/whatsapp/channels") || isWhatsAppActive && !pathname.startsWith("/whatsapp/connect") && !pathname.startsWith("/whatsapp/webhooks")}
+            className="w-[56px] h-[56px] flex-col gap-[2px]"
+          >
+            <Smartphone className="w-[20px] h-[20px] stroke-[1.8]" />
+            <span className="text-[9px] leading-none text-muted-foreground group-hover:text-sidebar-foreground transition-colors">
+              Channels
+            </span>
+          </LinkButton>
+
+          <LinkButton
+            to="/whatsapp/webhooks"
+            title="Webhooks"
+            isActive={pathname.startsWith("/whatsapp/webhooks")}
+            className="w-[56px] h-[56px] flex-col gap-[2px]"
+          >
+            <Webhook className="w-[20px] h-[20px] stroke-[1.8]" />
+            <span className="text-[9px] leading-none text-muted-foreground group-hover:text-sidebar-foreground transition-colors">
+              Webhooks
+            </span>
+          </LinkButton>
+        </div>
+
         {/* Stats button */}
         <LinkButton
           to="/stats"
-          title={t("Estadísticas")}
+          title={t("Stats")}
           isActive={pathname.startsWith("/stats")}
-          className="mt-[10px]"
+          className="mt-[16px]"
         >
           <BarChart3 className="w-[24px] h-[24px] stroke-[2]" />
         </LinkButton>
@@ -69,7 +117,7 @@ export default function Menu() {
         {/* Settings button */}
         <LinkButton
           to="/settings"
-          title={t("Preferencias")}
+          title={t("Preferences")}
           isActive={pathname.startsWith("/settings")}
           className="mt-[10px]"
         >
@@ -88,7 +136,7 @@ export default function Menu() {
               {
                 key: "orgs",
                 type: "group",
-                label: "Organizaciones",
+                label: "Organizations",
                 children: [
                   ...(organizations?.map((org) => ({
                     key: org.id,
@@ -100,7 +148,7 @@ export default function Menu() {
                   })) || []),
                   {
                     key: "new_org",
-                    label: t("Nueva organización"),
+                    label: t("New organization"),
                     icon: <Plus className="w-[16px] h-[16px]" />,
                     onClick: () => navigate({ to: "/settings/organization/new", hash: (prevHash) => prevHash! }),
                   },
@@ -109,7 +157,7 @@ export default function Menu() {
               { type: "divider" },
               {
                 key: "lang",
-                label: t("Idioma"),
+                label: t("Language"),
                 icon: <Languages className="w-[16px] h-[16px]" />,
                 children: (["es", "en", "pt", "sw", "fr"] as const).map((lang) => ({
                   key: lang,
@@ -121,7 +169,7 @@ export default function Menu() {
               { type: "divider" },
               {
                 key: "logout",
-                label: t("Cerrar sesión"),
+                label: t("Sign out"),
                 icon: <LogOut className="w-[16px] h-[16px]" />,
                 onClick: () => {
                   supabase.auth.signOut();

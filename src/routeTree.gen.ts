@@ -21,6 +21,9 @@ import { Route as AuthIntegrationsIndexRouteImport } from './routes/_auth/integr
 import { Route as AuthConversationsIndexRouteImport } from './routes/_auth/conversations/index'
 import { Route as AuthContactsIndexRouteImport } from './routes/_auth/contacts/index'
 import { Route as AuthAgentsIndexRouteImport } from './routes/_auth/agents/index'
+import { Route as AuthWhatsappWebhooksRouteImport } from './routes/_auth/whatsapp/webhooks'
+import { Route as AuthWhatsappConnectRouteImport } from './routes/_auth/whatsapp/connect'
+import { Route as AuthWhatsappChannelsRouteImport } from './routes/_auth/whatsapp/channels'
 import { Route as AuthStatsUsageRouteImport } from './routes/_auth/stats/usage'
 import { Route as AuthStatsQuotasRouteImport } from './routes/_auth/stats/quotas'
 import { Route as AuthIntegrationsMediaPreprocessingRouteImport } from './routes/_auth/integrations/media-preprocessing'
@@ -107,6 +110,21 @@ const AuthContactsIndexRoute = AuthContactsIndexRouteImport.update({
 const AuthAgentsIndexRoute = AuthAgentsIndexRouteImport.update({
   id: '/agents/',
   path: '/agents/',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthWhatsappWebhooksRoute = AuthWhatsappWebhooksRouteImport.update({
+  id: '/whatsapp/webhooks',
+  path: '/whatsapp/webhooks',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthWhatsappConnectRoute = AuthWhatsappConnectRouteImport.update({
+  id: '/whatsapp/connect',
+  path: '/whatsapp/connect',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthWhatsappChannelsRoute = AuthWhatsappChannelsRouteImport.update({
+  id: '/whatsapp/channels',
+  path: '/whatsapp/channels',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthStatsUsageRoute = AuthStatsUsageRouteImport.update({
@@ -282,6 +300,9 @@ export interface FileRoutesByFullPath {
   '/integrations/media-preprocessing': typeof AuthIntegrationsMediaPreprocessingRoute
   '/stats/quotas': typeof AuthStatsQuotasRoute
   '/stats/usage': typeof AuthStatsUsageRoute
+  '/whatsapp/channels': typeof AuthWhatsappChannelsRoute
+  '/whatsapp/connect': typeof AuthWhatsappConnectRoute
+  '/whatsapp/webhooks': typeof AuthWhatsappWebhooksRoute
   '/agents/': typeof AuthAgentsIndexRoute
   '/contacts/': typeof AuthContactsIndexRoute
   '/conversations/': typeof AuthConversationsIndexRoute
@@ -322,6 +343,9 @@ export interface FileRoutesByTo {
   '/integrations/media-preprocessing': typeof AuthIntegrationsMediaPreprocessingRoute
   '/stats/quotas': typeof AuthStatsQuotasRoute
   '/stats/usage': typeof AuthStatsUsageRoute
+  '/whatsapp/channels': typeof AuthWhatsappChannelsRoute
+  '/whatsapp/connect': typeof AuthWhatsappConnectRoute
+  '/whatsapp/webhooks': typeof AuthWhatsappWebhooksRoute
   '/agents': typeof AuthAgentsIndexRoute
   '/contacts': typeof AuthContactsIndexRoute
   '/conversations': typeof AuthConversationsIndexRoute
@@ -365,6 +389,9 @@ export interface FileRoutesById {
   '/_auth/integrations/media-preprocessing': typeof AuthIntegrationsMediaPreprocessingRoute
   '/_auth/stats/quotas': typeof AuthStatsQuotasRoute
   '/_auth/stats/usage': typeof AuthStatsUsageRoute
+  '/_auth/whatsapp/channels': typeof AuthWhatsappChannelsRoute
+  '/_auth/whatsapp/connect': typeof AuthWhatsappConnectRoute
+  '/_auth/whatsapp/webhooks': typeof AuthWhatsappWebhooksRoute
   '/_auth/agents/': typeof AuthAgentsIndexRoute
   '/_auth/contacts/': typeof AuthContactsIndexRoute
   '/_auth/conversations/': typeof AuthConversationsIndexRoute
@@ -408,6 +435,9 @@ export interface FileRouteTypes {
     | '/integrations/media-preprocessing'
     | '/stats/quotas'
     | '/stats/usage'
+    | '/whatsapp/channels'
+    | '/whatsapp/connect'
+    | '/whatsapp/webhooks'
     | '/agents/'
     | '/contacts/'
     | '/conversations/'
@@ -448,6 +478,9 @@ export interface FileRouteTypes {
     | '/integrations/media-preprocessing'
     | '/stats/quotas'
     | '/stats/usage'
+    | '/whatsapp/channels'
+    | '/whatsapp/connect'
+    | '/whatsapp/webhooks'
     | '/agents'
     | '/contacts'
     | '/conversations'
@@ -490,6 +523,9 @@ export interface FileRouteTypes {
     | '/_auth/integrations/media-preprocessing'
     | '/_auth/stats/quotas'
     | '/_auth/stats/usage'
+    | '/_auth/whatsapp/channels'
+    | '/_auth/whatsapp/connect'
+    | '/_auth/whatsapp/webhooks'
     | '/_auth/agents/'
     | '/_auth/contacts/'
     | '/_auth/conversations/'
@@ -609,6 +645,27 @@ declare module '@tanstack/react-router' {
       path: '/agents'
       fullPath: '/agents/'
       preLoaderRoute: typeof AuthAgentsIndexRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/whatsapp/webhooks': {
+      id: '/_auth/whatsapp/webhooks'
+      path: '/whatsapp/webhooks'
+      fullPath: '/whatsapp/webhooks'
+      preLoaderRoute: typeof AuthWhatsappWebhooksRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/whatsapp/connect': {
+      id: '/_auth/whatsapp/connect'
+      path: '/whatsapp/connect'
+      fullPath: '/whatsapp/connect'
+      preLoaderRoute: typeof AuthWhatsappConnectRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/whatsapp/channels': {
+      id: '/_auth/whatsapp/channels'
+      path: '/whatsapp/channels'
+      fullPath: '/whatsapp/channels'
+      preLoaderRoute: typeof AuthWhatsappChannelsRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_auth/stats/usage': {
@@ -835,6 +892,9 @@ interface AuthRouteChildren {
   AuthContactsNewRoute: typeof AuthContactsNewRoute
   AuthConversationsNewRoute: typeof AuthConversationsNewRoute
   AuthIntegrationsMediaPreprocessingRoute: typeof AuthIntegrationsMediaPreprocessingRoute
+  AuthWhatsappChannelsRoute: typeof AuthWhatsappChannelsRoute
+  AuthWhatsappConnectRoute: typeof AuthWhatsappConnectRoute
+  AuthWhatsappWebhooksRoute: typeof AuthWhatsappWebhooksRoute
   AuthAgentsIndexRoute: typeof AuthAgentsIndexRoute
   AuthContactsIndexRoute: typeof AuthContactsIndexRoute
   AuthConversationsIndexRoute: typeof AuthConversationsIndexRoute
@@ -872,6 +932,9 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthConversationsNewRoute: AuthConversationsNewRoute,
   AuthIntegrationsMediaPreprocessingRoute:
     AuthIntegrationsMediaPreprocessingRoute,
+  AuthWhatsappChannelsRoute: AuthWhatsappChannelsRoute,
+  AuthWhatsappConnectRoute: AuthWhatsappConnectRoute,
+  AuthWhatsappWebhooksRoute: AuthWhatsappWebhooksRoute,
   AuthAgentsIndexRoute: AuthAgentsIndexRoute,
   AuthContactsIndexRoute: AuthContactsIndexRoute,
   AuthConversationsIndexRoute: AuthConversationsIndexRoute,

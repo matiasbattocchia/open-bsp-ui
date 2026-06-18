@@ -107,9 +107,13 @@ function Onboard() {
         }
       },
       {
-        config_id: import.meta.env.VITE_FB_LOGIN_CONFIG_ID,
-        response_type: "code",
+        config_id: import.meta.env.VITE_FB_LOGIN_CONFIG_ID, // Configuration ID obtained in Meta Business Login configurations
+        response_type: "code", // Must be set to 'code' for System User access token
         override_default_response_type: true,
+        // Permission scopes requested by the Embedded Signup config_id:
+        // - whatsapp_business_management — manage WhatsApp Business Accounts
+        // - whatsapp_business_messaging  — send and receive messages
+        scope: "whatsapp_business_management,whatsapp_business_messaging",
         extras: {
           setup: {},
           featureType: "whatsapp_business_app_onboarding",

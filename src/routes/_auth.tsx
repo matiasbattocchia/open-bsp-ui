@@ -9,8 +9,8 @@ import { useLocation } from "@tanstack/react-router";
 import FilePicker from "@/components/FileUploader/FilePicker";
 import FilePreviewer from "@/components/FilePreviewer";
 import { useResizable } from "@/hooks/useResizable";
+import { MessageSquareText } from "lucide-react";
 import StatsCenter from "@/components/stats/StatsCenter";
-import TenantDashboard from "@/components/TenantDashboard";
 
 export const Route = createFileRoute("/_auth")({
   component: AppLayout,
@@ -19,11 +19,10 @@ export const Route = createFileRoute("/_auth")({
 const MIN_PANEL_WIDTH = 300;
 
 function getMenuWidth() {
-  return window.innerWidth >= 1024 ? 64 : 48;
+  return window.innerWidth >= 1024 ? 88 : 48;
 }
 
 function getMaxPanelWidth() {
-  // Max is 1/2 of available space (equal to chat panel)
   const availableSpace = window.innerWidth - getMenuWidth();
   return Math.floor(availableSpace / 2);
 }
@@ -34,6 +33,9 @@ function AppLayout() {
   const location = useLocation();
   const pathname = location.pathname;
   const isStatsRoute = pathname.startsWith("/stats");
+  const isWhatsAppRoute =
+    pathname.startsWith("/whatsapp") ||
+    pathname.startsWith("/integrations/whatsapp");
 
   const [isHoveringFiles, setIsHoveringFiles] = useState(false);
 
@@ -42,14 +44,36 @@ function AppLayout() {
     getMaxWidth: getMaxPanelWidth,
   });
 
-  // Sync fragment identifier with activeConvId
-  // i.e. /conversations#1234
   useEffect(() => {
     const convId = location.hash;
     setActiveConv(convId);
   }, [location.hash]);
 
   const showCenterPanel = activeConvId || isStatsRoute;
+
+  // ── WhatsApp Workspace: full-width single-pane ──────────────
+  if (isWhatsAppRoute) {
+    const menuW = getMenuWidth();
+
+    return (
+      <div
+        className="app-grid"
+        style={{ gridTemplateColumns: `${menuW}px 1fr` }}
+      >
+        {/* Menu */}
+        <div className="flex">
+          <Menu />
+        </div>
+
+        {/* Full-width content */}
+        <div className="flex-col overflow-hidden bg-background text-foreground relative flex">
+          <Outlet />
+        </div>
+      </div>
+    );
+  }
+
+  // ── Inbox / Stats: dual-pane layout ────────────────────────
 
   return (
     <div
@@ -104,7 +128,10 @@ function AppLayout() {
             <ChatFooter />
           </>
         ) : (
-          <TenantDashboard />
+          <div className="flex items-center justify-center h-full text-muted-foreground text-[15px] select-none gap-2 flex-col">
+            <MessageSquareText className="w-12 h-12 opacity-20" />
+            <span>Please select a conversation from the list to begin.</span>
+          </div>
         )}
       </div>
     </div>

@@ -3,8 +3,6 @@ import SectionHeader from "@/components/SectionHeader";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useOrganizationAddress } from "@/queries/useOrganizationsAddresses";
 import { useWhatsAppDisconnect } from "@/queries/useWhatsAppSignup";
-import { useTranslation } from "@/hooks/useTranslation";
-import { useCurrentAgent } from "@/queries/useAgents";
 import { formatPhoneNumber } from "@/utils/FormatUtils";
 import type { OrganizationAddressExtra } from "@/supabase/client";
 import { useState } from "react";
@@ -18,25 +16,21 @@ export const Route = createFileRoute("/_auth/integrations/whatsapp/$orgAddressId
 
 function WhatsAppDetails() {
   const { orgAddressId } = Route.useParams();
-  const { translate: t } = useTranslation();
   const navigate = useNavigate();
   const { data: integration } = useOrganizationAddress(orgAddressId);
   const disconnect = useWhatsAppDisconnect();
-  const { data: agent } = useCurrentAgent();
   const [showInstructions, setShowInstructions] = useState(false);
 
-  if (!integration) return
-
-  const isOwner = agent?.extra?.role === "owner";
+  if (!integration) return;
 
   const extra = integration.extra as OrganizationAddressExtra | undefined;
   const flowType = extra?.flow_type;
   const isCoexistence = flowType === "existing_phone_number";
 
   const flowTypeLabels: Record<string, string> = {
-    new_phone_number: t("Nuevo número de WhatsApp"),
-    existing_phone_number: t("Cuenta de WhatsApp Business existente"),
-    only_waba: t("Solo WABA"),
+    new_phone_number: "New WhatsApp number",
+    existing_phone_number: "Existing WhatsApp Business account",
+    only_waba: "WABA only",
   };
 
   const handleDisconnect = () => {
@@ -49,7 +43,7 @@ function WhatsAppDetails() {
       { phone_number_id: integration.address },
       {
         onSuccess: () => {
-          navigate({ to: "/integrations/whatsapp" });
+          navigate({ to: "/whatsapp/channels" });
         },
       }
     );
@@ -57,11 +51,11 @@ function WhatsAppDetails() {
 
   return (
     <>
-      <SectionHeader title={integration.extra?.verified_name || t("Cuenta de WhatsApp")} />
+      <SectionHeader title={extra?.verified_name || "WhatsApp Account"} />
 
       <SectionBody className="pb-[40px]">
         <SectionItem
-          title={t("Plantillas de mensajes")}
+          title="Message Templates"
           aside={
             <div className="p-[8px]">
               <LayoutTemplate className="w-[24px] h-[24px] text-muted-foreground" />
@@ -77,17 +71,17 @@ function WhatsAppDetails() {
         />
         <form>
           <label>
-            <div className="label">{t("Nombre verificado")}</div>
+            <div className="label">Verified Name</div>
             <input
               type="text"
               className="text"
-              value={extra?.verified_name || t("Sin nombre")}
+              value={extra?.verified_name || "Unnamed"}
               readOnly
             />
           </label>
 
           <label>
-            <div className="label">{t("Número de teléfono")}</div>
+            <div className="label">Phone Number</div>
             <input
               type="tel"
               className="text"
@@ -97,7 +91,7 @@ function WhatsAppDetails() {
           </label>
 
           <label>
-            <div className="label">{t("Tipo de integración")}</div>
+            <div className="label">Integration Type</div>
             <input
               type="text"
               className="text"
@@ -107,7 +101,7 @@ function WhatsAppDetails() {
           </label>
 
           <label>
-            <div className="label">{t("ID de número")}</div>
+            <div className="label">Phone Number ID</div>
             <input
               type="text"
               className="text"
@@ -117,28 +111,28 @@ function WhatsAppDetails() {
           </label>
 
           <label>
-            <div className="label">{t("ID de WABA")}</div>
+            <div className="label">WABA ID</div>
             <input
               type="text"
               className="text"
-              value={integration.extra?.waba_id}
+              value={extra?.waba_id || ""}
               readOnly
             />
           </label>
 
           <label>
-            <div className="label">{t("Estado")}</div>
+            <div className="label">Status</div>
             <input
               type="text"
               className="text capitalize"
-              value={integration.status === "connected" ? t("Conectado") : t("Desconectado")}
+              value={integration.status === "connected" ? "Connected" : "Disconnected"}
               readOnly
             />
           </label>
 
           {extra?.access_token && (
             <label>
-              <div className="label">{t("Token de acceso de WABA")}</div>
+              <div className="label">WABA Access Token</div>
               <input
                 type="text"
                 className="text font-mono text-xs"
@@ -149,51 +143,59 @@ function WhatsAppDetails() {
           )}
 
           <div className="instructions">
-            <p>{t("Sobrescribir la URL de callback es útil para evadir OpenBSP y recibir los webhooks crudos en el endpoint que indiques. OpenBSP seguirá recibiendo los eventos de cuenta y plantillas (no se pueden redirigir), pero no recibirá los mensajes.")}</p>
+            <p>
+              Overriding the callback URL is useful to bypass OpenBSP and
+              receive raw webhooks at the endpoint you specify. OpenBSP will
+              continue to receive account and template events (which cannot be
+              redirected), but will not receive messages.
+            </p>
           </div>
 
           <label>
-            <div className="label">{t("URL de callback")}</div>
+            <div className="label">Callback URL</div>
             <input
               type="text"
               className="text"
               value={extra?.callback_url || ""}
-              placeholder={t("Sin sobrescribir")}
+              placeholder="Not overridden"
               readOnly
             />
           </label>
 
           <label>
-            <div className="label">{t("Verify token")}</div>
+            <div className="label">Verify Token</div>
             <input
               type="text"
               className="text"
               value={extra?.verify_token || ""}
-              placeholder={t("Sin sobrescribir")}
+              placeholder="Not overridden"
               readOnly
             />
           </label>
 
           {/* Disconnect button */}
-          {integration.status === "connected" && !showInstructions && <Button
-            type="button"
-            className="primary bg-destructive text-primary-foreground hover:bg-destructive/80 px-4 py-2 rounded-full font-medium transition-colors w-fit text-[14px]"
-            onClick={handleDisconnect}
-            disabled={!isOwner}
-            disabledReason={t("Requiere permisos de propietario")}
-            loading={disconnect.isPending}
-          >
-            {t("Desconectar")}
-          </Button>}
+          {integration.status === "connected" && !showInstructions && (
+            <Button
+              type="button"
+              className="primary bg-destructive text-primary-foreground hover:bg-destructive/80 px-4 py-2 rounded-full font-medium transition-colors w-fit text-[14px]"
+              onClick={handleDisconnect}
+              loading={disconnect.isPending}
+            >
+              Disconnect
+            </Button>
+          )}
 
           {/* Coexistence disconnect instructions */}
           {showInstructions && (
             <div className="instructions">
-              <p>{t("La cuenta debe ser desvinculada desde la aplicación móvil de WhatsApp Business:")}</p>
+              <p>
+                This account must be unlinked from the WhatsApp Business
+                mobile app:
+              </p>
               <ol>
-                <li>{t("Abrí la aplicación WhatsApp Business")}</li>
-                <li>{t("Andá a Ajustes > Cuenta > Plataforma de negocio")}</li>
-                <li>{t("Tocá la plataforma conectada y seleccioná \"Desconectar\"")}</li>
+                <li>Open the WhatsApp Business app</li>
+                <li>Go to Settings &gt; Account &gt; Business Platform</li>
+                <li>Tap the connected platform and select &quot;Disconnect&quot;</li>
               </ol>
             </div>
           )}
