@@ -7,8 +7,6 @@ import {
 } from "@/queries/useBilling";
 import QuotaBar from "./QuotaBar";
 
-const AI_CREDITS_BUDGET = 20;
-
 export default function StatsQuotas() {
   const { translate: t } = useTranslation();
   const { data: products } = useProducts();
@@ -57,7 +55,6 @@ export default function StatsQuotas() {
             used={used}
             included={plan?.included ?? null}
             cap={tier.cap}
-            budget={product.kind === "balance" ? AI_CREDITS_BUDGET : undefined}
           />
         );
       })}

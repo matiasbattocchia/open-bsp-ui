@@ -8,7 +8,6 @@ type QuotaBarProps = {
   used: number;
   included: number | null;
   cap: number | null;
-  budget?: number;
 };
 
 function translateProductName(name: string, t: (s: string) => string) {
@@ -48,15 +47,18 @@ export default function QuotaBar({
   used,
   included,
   cap,
-  budget,
 }: QuotaBarProps) {
   const { translate: t } = useTranslation();
   const isBalance = kind === "balance";
   const periodLabel = interval === "month" ? " " + t("por mes") : "";
 
   if (isBalance) {
-    const total = budget ?? 0;
     const remaining = used;
+    // Show available credit against the granted entitlement (cap when capped,
+    // otherwise the plan's included grant). max() keeps the bar within 100% if
+    // the balance was ever topped up beyond the entitlement.
+    const entitlement = cap && cap > 0 ? cap : (included ?? 0);
+    const total = Math.max(entitlement, remaining);
     const pct = total > 0 ? Math.min((remaining / total) * 100, 100) : 0;
 
     return (
