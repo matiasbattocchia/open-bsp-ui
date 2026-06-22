@@ -160,6 +160,14 @@ export function WhatsAppIntegrationProvider({
       const js = d.createElement(s) as any;
       js.id = id;
       js.src = "https://connect.facebook.net/en_US/sdk.js";
+      // The SDK is served from connect.facebook.net, which tracking protection
+      // (e.g. Firefox ETP) and ad/privacy blockers commonly block. Flag the
+      // failure so the onboarding page can show the error up front instead of
+      // letting the user click a button that is bound to fail.
+      js.onerror = function () {
+        (window as any).__fbSdkFailed = true;
+        window.dispatchEvent(new Event("fb-sdk-failed"));
+      };
       fjs.parentNode?.insertBefore(js, fjs);
     })(document, "script", "facebook-jssdk");
 

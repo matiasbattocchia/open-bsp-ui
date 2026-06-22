@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
-import { IG_ONBOARD_REDIRECT_PATH } from "./onboard-instagram.$token";
+import { IG_ONBOARD_REDIRECT_PATH } from "./onboard.instagram.$token";
 
-export const Route = createFileRoute("/onboard-instagram/callback")({
+export const Route = createFileRoute("/onboard/instagram/callback")({
   validateSearch: (search: Record<string, unknown>) => ({
     code: typeof search.code === "string" ? search.code : undefined,
     state: typeof search.state === "string" ? search.state : undefined,

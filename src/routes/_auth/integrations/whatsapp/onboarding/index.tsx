@@ -17,7 +17,7 @@ export const Route = createFileRoute(
 function OnboardingIndex() {
   const { translate: t } = useTranslation();
   const navigate = useNavigate();
-  const { data: tokens } = useOnboardingTokens();
+  const { data: tokens } = useOnboardingTokens("whatsapp");
   const { data: currentAgent } = useCurrentAgent();
   const isOwner = currentAgent?.extra?.role === "owner";
 

@@ -1,30 +1,30 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/supabase/client";
+import { type Database, supabase } from "@/supabase/client";
 import useBoundStore from "@/stores/useBoundStore";
 import { queryKeys } from "./queryKeys";
 
-export type OnboardingTokenRow = {
-  id: string;
-  name: string;
-  organization_id: string;
-  created_by: string;
-  created_at: string;
-  expires_at: string;
-  used_at: string | null;
-  status: "active" | "used" | "expired";
-};
+export type OnboardingTokenRow =
+  Database["public"]["Tables"]["onboarding_tokens"]["Row"];
 
-export function useOnboardingTokens() {
+// The `service` enum also includes "local"; onboarding links only target the
+// two external channels.
+export type OnboardingService = Extract<
+  Database["public"]["Enums"]["service"],
+  "whatsapp" | "instagram"
+>;
+
+export function useOnboardingTokens(service: OnboardingService) {
   const userId = useBoundStore((state) => state.ui.user?.id);
   const orgId = useBoundStore((state) => state.ui.activeOrgId);
 
   return useQuery({
-    queryKey: queryKeys.onboardingTokens.all(orgId),
+    queryKey: queryKeys.onboardingTokens.all(orgId, service),
     queryFn: async () =>
       await supabase
         .from("onboarding_tokens")
         .select()
         .eq("organization_id", orgId!)
+        .eq("service", service)
         .order("created_at", { ascending: false })
         .throwOnError(),
     enabled: !!userId && !!orgId,
@@ -32,7 +32,7 @@ export function useOnboardingTokens() {
   });
 }
 
-export function useCreateOnboardingToken() {
+export function useCreateOnboardingToken(service: OnboardingService) {
   const queryClient = useQueryClient();
   const orgId = useBoundStore((state) => state.ui.activeOrgId);
   const userId = useBoundStore((state) => state.ui.user?.id);
@@ -59,6 +59,7 @@ export function useCreateOnboardingToken() {
           organization_id: orgId,
           created_by: userId,
           expires_at,
+          service,
         })
         .select()
         .single()
@@ -68,13 +69,13 @@ export function useCreateOnboardingToken() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: queryKeys.onboardingTokens.all(orgId),
+        queryKey: queryKeys.onboardingTokens.all(orgId, service),
       });
     },
   });
 }
 
-export function useDeleteOnboardingToken() {
+export function useDeleteOnboardingToken(service: OnboardingService) {
   const queryClient = useQueryClient();
   const orgId = useBoundStore((state) => state.ui.activeOrgId);
 
@@ -90,7 +91,7 @@ export function useDeleteOnboardingToken() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: queryKeys.onboardingTokens.all(orgId),
+        queryKey: queryKeys.onboardingTokens.all(orgId, service),
       });
     },
   });

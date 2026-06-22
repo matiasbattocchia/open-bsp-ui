@@ -140,7 +140,7 @@
   "Expira": "Expires",
   "Expiración": "Expiration",
   "Expirado": "Expired",
-  "Facebook SDK no disponible. Recargá la página.": "Facebook SDK not available. Reload the page.",
+  "No se pudo cargar el SDK de Facebook. Desactivá la protección contra rastreo o el bloqueador de anuncios para este sitio, o probá con otro navegador.": "Couldn't load the Facebook SDK. Disable tracking protection or your ad blocker for this site, or try another browser.",
   "Feb": "Feb",
   "Fijar chat": "Pin chat",
   "Foto": "Photo",

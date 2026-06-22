@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   WhatsAppIntegrationContext,
   type SignupOptions,
@@ -21,8 +21,30 @@ export default function WhatsAppIntegration({
   const [loading, setLoading] = useState(false);
   const { data: agent } = useCurrentAgent();
   const isOwner = agent?.extra?.role === "owner";
+  // The Facebook SDK loads asynchronously from connect.facebook.net, which is
+  // commonly blocked by tracking protection / ad blockers. If it fails to load,
+  // show the error up front instead of a button that cannot work.
+  const [sdkFailed, setSdkFailed] = useState(
+    () => !!(window as any).__fbSdkFailed,
+  );
+
+  useEffect(() => {
+    const onFail = () => setSdkFailed(true);
+    window.addEventListener("fb-sdk-failed", onFail);
+    return () => window.removeEventListener("fb-sdk-failed", onFail);
+  }, []);
 
   if (!context?.launchWhatsAppSignup) return null;
+
+  if (sdkFailed) {
+    return (
+      <p className="text-destructive font-medium">
+        {t(
+          "No se pudo cargar el SDK de Facebook. Desactivá la protección contra rastreo o el bloqueador de anuncios para este sitio, o probá con otro navegador.",
+        )}
+      </p>
+    );
+  }
 
   return (
     <Button

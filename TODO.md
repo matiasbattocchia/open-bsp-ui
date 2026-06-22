@@ -14,7 +14,7 @@
 
 - [x] (feat) Users onboard their own clients flow (add org address without giving access to org)
 
-- [ ] (enhancement) Free AI providers API keys instructions (in the UI)
+- [x] (enhancement) Free AI providers API keys instructions (in the UI)
 
 - [ ] (enhancement) Auth headers / tokens
   - Webhooks -> token, the back prepends Bearer
@@ -66,3 +66,5 @@ If redirected to organizations/new from this URL, the cancel button returns to S
 - [ ] (enhancement) Display email in member view (should be made available at extra so we don't need RLS to read auth.users)
 
 - [ ] (enhancement) Show more... could improve (it counts chars but many new lines can make it show more than expected)
+
+- [x] (feat) Video messages

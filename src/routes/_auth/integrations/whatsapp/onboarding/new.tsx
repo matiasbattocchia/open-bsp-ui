@@ -23,7 +23,7 @@ type FormValues = {
 function NewOnboardingToken() {
   const { translate: t } = useTranslation();
   const navigate = useNavigate();
-  const createToken = useCreateOnboardingToken();
+  const createToken = useCreateOnboardingToken("whatsapp");
   const { data: currentAgent } = useCurrentAgent();
   const isOwner = currentAgent?.extra?.role === "owner";
 

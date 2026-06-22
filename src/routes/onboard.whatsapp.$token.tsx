@@ -4,7 +4,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import Button from "@/components/Button";
 import type { SignupPayload } from "@/contexts/WhatsAppIntegrationContext";
 
-export const Route = createFileRoute("/onboard/$token")({
+export const Route = createFileRoute("/onboard/whatsapp/$token")({
   component: Onboard,
 });
 
@@ -20,6 +20,18 @@ function Onboard() {
   const { translate: t } = useTranslation();
   const [state, setState] = useState<TokenValidation>({ status: "loading" });
   const [loading, setLoading] = useState(false);
+  // The Facebook SDK loads asynchronously from connect.facebook.net, which is
+  // commonly blocked by tracking protection / ad blockers. If it fails to load,
+  // show the error up front instead of a button that cannot work.
+  const [sdkFailed, setSdkFailed] = useState(
+    () => !!(window as any).__fbSdkFailed,
+  );
+
+  useEffect(() => {
+    const onFail = () => setSdkFailed(true);
+    window.addEventListener("fb-sdk-failed", onFail);
+    return () => window.removeEventListener("fb-sdk-failed", onFail);
+  }, []);
 
   useEffect(() => {
     const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/whatsapp-management/onboard?token=${token}`;
@@ -48,9 +60,13 @@ function Onboard() {
     const FB = (window as any).FB;
 
     if (!FB) {
+      // The SDK is served from connect.facebook.net, which tracking protection
+      // (e.g. Firefox ETP) and ad/privacy blockers commonly block.
       setState({
         status: "error",
-        message: t("Facebook SDK no disponible. Recargá la página."),
+        message: t(
+          "No se pudo cargar el SDK de Facebook. Desactivá la protección contra rastreo o el bloqueador de anuncios para este sitio, o probá con otro navegador.",
+        ),
       });
       return;
     }
@@ -173,13 +189,21 @@ function Onboard() {
               </ul>
             </div>
 
-            <Button
-              loading={loading}
-              className="primary bg-[#4267b2] hover:bg-[#4267b2]/90 text-white w-full"
-              onClick={handleSignup}
-            >
-              {t("Continuar con Facebook")}
-            </Button>
+            {sdkFailed ? (
+              <p className="text-destructive font-medium">
+                {t(
+                  "No se pudo cargar el SDK de Facebook. Desactivá la protección contra rastreo o el bloqueador de anuncios para este sitio, o probá con otro navegador.",
+                )}
+              </p>
+            ) : (
+              <Button
+                loading={loading}
+                className="primary bg-[#4267b2] hover:bg-[#4267b2]/90 text-white w-full"
+                onClick={handleSignup}
+              >
+                {t("Continuar con Facebook")}
+              </Button>
+            )}
           </div>
         )}
 

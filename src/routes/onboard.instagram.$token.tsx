@@ -4,13 +4,13 @@ import { useTranslation } from "@/hooks/useTranslation";
 import Button from "@/components/Button";
 import { getInstagramAuthorizeUrl } from "@/queries/useInstagramSignup";
 
-export const Route = createFileRoute("/onboard-instagram/$token")({
+export const Route = createFileRoute("/onboard/instagram/$token")({
   component: OnboardInstagram,
 });
 
 // Fixed public callback (must be registered in the Meta app dashboard); the
 // onboarding token rides in `state`, not the path.
-export const IG_ONBOARD_REDIRECT_PATH = "/onboard-instagram/callback";
+export const IG_ONBOARD_REDIRECT_PATH = "/onboard/instagram/callback";
 
 type TokenValidation =
   | { status: "loading" }

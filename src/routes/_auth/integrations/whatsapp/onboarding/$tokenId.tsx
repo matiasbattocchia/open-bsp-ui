@@ -20,9 +20,9 @@ function OnboardingTokenDetail() {
   const { translate: t } = useTranslation();
   const navigate = useNavigate();
   const { tokenId } = Route.useParams();
-  const { data: tokens } = useOnboardingTokens();
+  const { data: tokens } = useOnboardingTokens("whatsapp");
   const { data: currentAgent } = useCurrentAgent();
-  const deleteToken = useDeleteOnboardingToken();
+  const deleteToken = useDeleteOnboardingToken("whatsapp");
   const isOwner = currentAgent?.extra?.role === "owner";
   const [copied, setCopied] = useState(false);
 
@@ -31,7 +31,7 @@ function OnboardingTokenDetail() {
     token &&
     token.status === "active" &&
     new Date(token.expires_at) > new Date();
-  const onboardUrl = `${window.location.origin}/onboard/${tokenId}`;
+  const onboardUrl = `${window.location.origin}/onboard/whatsapp/${tokenId}`;
 
   function getStatusLabel() {
     if (!token) return "";

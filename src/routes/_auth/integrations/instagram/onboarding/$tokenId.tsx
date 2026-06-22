@@ -20,9 +20,9 @@ function OnboardingTokenDetail() {
   const { translate: t } = useTranslation();
   const navigate = useNavigate();
   const { tokenId } = Route.useParams();
-  const { data: tokens } = useOnboardingTokens();
+  const { data: tokens } = useOnboardingTokens("instagram");
   const { data: currentAgent } = useCurrentAgent();
-  const deleteToken = useDeleteOnboardingToken();
+  const deleteToken = useDeleteOnboardingToken("instagram");
   const isOwner = currentAgent?.extra?.role === "owner";
   const [copied, setCopied] = useState(false);
 
@@ -31,7 +31,7 @@ function OnboardingTokenDetail() {
     token &&
     token.status === "active" &&
     new Date(token.expires_at) > new Date();
-  const onboardUrl = `${window.location.origin}/onboard-instagram/${tokenId}`;
+  const onboardUrl = `${window.location.origin}/onboard/instagram/${tokenId}`;
 
   function getStatusLabel() {
     if (!token) return "";
