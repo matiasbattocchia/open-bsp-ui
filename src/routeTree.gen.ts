@@ -35,6 +35,7 @@ import { Route as AuthAgentsAgentIdRouteImport } from './routes/_auth/agents/$ag
 import { Route as AuthSettingsWebhooksIndexRouteImport } from './routes/_auth/settings/webhooks/index'
 import { Route as AuthSettingsOrganizationIndexRouteImport } from './routes/_auth/settings/organization/index'
 import { Route as AuthSettingsMembersIndexRouteImport } from './routes/_auth/settings/members/index'
+import { Route as AuthSettingsLabelsIndexRouteImport } from './routes/_auth/settings/labels/index'
 import { Route as AuthSettingsApiKeysIndexRouteImport } from './routes/_auth/settings/api-keys/index'
 import { Route as AuthIntegrationsWhatsappIndexRouteImport } from './routes/_auth/integrations/whatsapp/index'
 import { Route as AuthIntegrationsInstagramIndexRouteImport } from './routes/_auth/integrations/instagram/index'
@@ -193,6 +194,11 @@ const AuthSettingsMembersIndexRoute =
     path: '/settings/members/',
     getParentRoute: () => AuthRoute,
   } as any)
+const AuthSettingsLabelsIndexRoute = AuthSettingsLabelsIndexRouteImport.update({
+  id: '/settings/labels/',
+  path: '/settings/labels/',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthSettingsApiKeysIndexRoute =
   AuthSettingsApiKeysIndexRouteImport.update({
     id: '/settings/api-keys/',
@@ -364,6 +370,7 @@ export interface FileRoutesByFullPath {
   '/integrations/instagram': typeof AuthIntegrationsInstagramIndexRoute
   '/integrations/whatsapp': typeof AuthIntegrationsWhatsappIndexRoute
   '/settings/api-keys': typeof AuthSettingsApiKeysIndexRoute
+  '/settings/labels': typeof AuthSettingsLabelsIndexRoute
   '/settings/members': typeof AuthSettingsMembersIndexRoute
   '/settings/organization': typeof AuthSettingsOrganizationIndexRoute
   '/settings/webhooks': typeof AuthSettingsWebhooksIndexRoute
@@ -413,6 +420,7 @@ export interface FileRoutesByTo {
   '/integrations/instagram': typeof AuthIntegrationsInstagramIndexRoute
   '/integrations/whatsapp': typeof AuthIntegrationsWhatsappIndexRoute
   '/settings/api-keys': typeof AuthSettingsApiKeysIndexRoute
+  '/settings/labels': typeof AuthSettingsLabelsIndexRoute
   '/settings/members': typeof AuthSettingsMembersIndexRoute
   '/settings/organization': typeof AuthSettingsOrganizationIndexRoute
   '/settings/webhooks': typeof AuthSettingsWebhooksIndexRoute
@@ -465,6 +473,7 @@ export interface FileRoutesById {
   '/_auth/integrations/instagram/': typeof AuthIntegrationsInstagramIndexRoute
   '/_auth/integrations/whatsapp/': typeof AuthIntegrationsWhatsappIndexRoute
   '/_auth/settings/api-keys/': typeof AuthSettingsApiKeysIndexRoute
+  '/_auth/settings/labels/': typeof AuthSettingsLabelsIndexRoute
   '/_auth/settings/members/': typeof AuthSettingsMembersIndexRoute
   '/_auth/settings/organization/': typeof AuthSettingsOrganizationIndexRoute
   '/_auth/settings/webhooks/': typeof AuthSettingsWebhooksIndexRoute
@@ -517,6 +526,7 @@ export interface FileRouteTypes {
     | '/integrations/instagram'
     | '/integrations/whatsapp'
     | '/settings/api-keys'
+    | '/settings/labels'
     | '/settings/members'
     | '/settings/organization'
     | '/settings/webhooks'
@@ -566,6 +576,7 @@ export interface FileRouteTypes {
     | '/integrations/instagram'
     | '/integrations/whatsapp'
     | '/settings/api-keys'
+    | '/settings/labels'
     | '/settings/members'
     | '/settings/organization'
     | '/settings/webhooks'
@@ -617,6 +628,7 @@ export interface FileRouteTypes {
     | '/_auth/integrations/instagram/'
     | '/_auth/integrations/whatsapp/'
     | '/_auth/settings/api-keys/'
+    | '/_auth/settings/labels/'
     | '/_auth/settings/members/'
     | '/_auth/settings/organization/'
     | '/_auth/settings/webhooks/'
@@ -827,6 +839,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSettingsMembersIndexRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/settings/labels/': {
+      id: '/_auth/settings/labels/'
+      path: '/settings/labels'
+      fullPath: '/settings/labels'
+      preLoaderRoute: typeof AuthSettingsLabelsIndexRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/settings/api-keys/': {
       id: '/_auth/settings/api-keys/'
       path: '/settings/api-keys'
@@ -1033,6 +1052,7 @@ interface AuthRouteChildren {
   AuthIntegrationsInstagramIndexRoute: typeof AuthIntegrationsInstagramIndexRoute
   AuthIntegrationsWhatsappIndexRoute: typeof AuthIntegrationsWhatsappIndexRoute
   AuthSettingsApiKeysIndexRoute: typeof AuthSettingsApiKeysIndexRoute
+  AuthSettingsLabelsIndexRoute: typeof AuthSettingsLabelsIndexRoute
   AuthSettingsMembersIndexRoute: typeof AuthSettingsMembersIndexRoute
   AuthSettingsOrganizationIndexRoute: typeof AuthSettingsOrganizationIndexRoute
   AuthSettingsWebhooksIndexRoute: typeof AuthSettingsWebhooksIndexRoute
@@ -1076,6 +1096,7 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthIntegrationsInstagramIndexRoute: AuthIntegrationsInstagramIndexRoute,
   AuthIntegrationsWhatsappIndexRoute: AuthIntegrationsWhatsappIndexRoute,
   AuthSettingsApiKeysIndexRoute: AuthSettingsApiKeysIndexRoute,
+  AuthSettingsLabelsIndexRoute: AuthSettingsLabelsIndexRoute,
   AuthSettingsMembersIndexRoute: AuthSettingsMembersIndexRoute,
   AuthSettingsOrganizationIndexRoute: AuthSettingsOrganizationIndexRoute,
   AuthSettingsWebhooksIndexRoute: AuthSettingsWebhooksIndexRoute,

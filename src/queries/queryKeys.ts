@@ -52,4 +52,13 @@ export const queryKeys = {
     planProducts: (orgId: NullableId) =>
       [orgId, "billing", "plan_products"] as const,
   },
+  labels: {
+    all: (orgId: NullableId) => [orgId, "labels"] as const,
+    detail: (orgId: NullableId, name: NullableId) =>
+      [orgId, "labels", name] as const,
+  },
+  conversationLabels: {
+    all: (orgId: NullableId, conversationId: NullableId) =>
+      [orgId, "conversation_labels", conversationId] as const,
+  },
 };

@@ -1117,6 +1117,74 @@ export type Database = {
           },
         ]
       }
+      labels: {
+        Row: {
+          name: string
+          organization_id: string
+          color: string | null
+          created_at: string
+        }
+        Insert: {
+          name: string
+          organization_id: string
+          color?: string | null
+          created_at?: string
+        }
+        Update: {
+          name?: string
+          organization_id?: string
+          color?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "labels_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversation_labels: {
+        Row: {
+          conversation_id: string
+          label_name: string
+          organization_id: string
+          applied_at: string
+          applied_by: string | null
+        }
+        Insert: {
+          conversation_id: string
+          label_name: string
+          organization_id: string
+          applied_at?: string
+          applied_by?: string | null
+        }
+        Update: {
+          conversation_id?: string
+          label_name?: string
+          organization_id?: string
+          applied_at?: string
+          applied_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_labels_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversation_labels_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
