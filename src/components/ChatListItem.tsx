@@ -23,7 +23,7 @@ import { mediaCategory } from "./Message/media";
 import { useCurrentAgent, useCurrentAgents } from "@/queries/useAgents";
 import { useContactByAddress } from "@/queries/useContacts";
 import { useContactAddress } from "@/queries/useContactsAddresses";
-import { nameInitials } from "@/utils/FormatUtils";
+import { formatPhoneNumber, nameInitials } from "@/utils/FormatUtils";
 import { useNavigate } from "@tanstack/react-router";
 
 function mediaPreview(t: (content: string) => ReactNode, message?: MessageRow) {
@@ -239,6 +239,17 @@ export default function ChatListItem({ itemId }: { itemId: string }) {
     contactAddress?.extra?.name ||
     (igExtra?.username ? `@${igExtra.username}` : undefined);
 
+  // When there is no name, show the (formatted) contact address instead of "?".
+  // WhatsApp addresses are phone numbers; Instagram addresses need no formatting.
+  const address = conversation?.contact_address;
+  const displayName =
+    name ||
+    (address
+      ? conversation?.service === "whatsapp"
+        ? formatPhoneNumber(address)
+        : address
+      : "?");
+
   const { translate: t, currentLanguage } = useTranslation();
 
   function formatTime(timestamp: string): string {
@@ -307,7 +318,7 @@ export default function ChatListItem({ itemId }: { itemId: string }) {
             {/* Upper row */}
             <div className="flex justify-between items-baseline">
               <div className="truncate text-foreground text-[16px]">
-                {name || "?"}
+                {displayName}
               </div>
               <div
                 className={

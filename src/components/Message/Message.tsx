@@ -454,6 +454,26 @@ export default function Message(props: UIMessage & { message: MessageRow }) {
       />
     );
     text = true;
+  } else if (
+    props.message.content.type === "data" &&
+    props.message.content.kind === "media_placeholder"
+  ) {
+    content = (
+      <TextMessage
+        header={headerText}
+        body={`_${t("Contenido multimedia no disponible")}_`}
+        type="markdown"
+        direction={props.message.direction}
+        timestamp={props.message.timestamp}
+        status={
+          props.message.direction === "outgoing"
+            ? props.message.status
+            : undefined
+        }
+        fixedWidth={fixedWidth}
+      />
+    );
+    text = true;
   } else if (props.message.content.type === "data") {
     content = (
       <TextMessage

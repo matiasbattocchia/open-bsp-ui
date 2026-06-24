@@ -35,12 +35,21 @@ export default function Header() {
     conversation?.name ||
     contact?.name ||
     contactAddress?.extra?.name ||
-    (igExtra?.username ? `@${igExtra.username}` : undefined) ||
-    "?";
+    (igExtra?.username ? `@${igExtra.username}` : undefined);
 
   const address = conversation?.contact_address;
 
-  const convInitials = nameInitials(convName);
+  // When there is no name, show the (formatted) contact address instead of "?".
+  // WhatsApp addresses are phone numbers; Instagram addresses need no formatting.
+  const displayName =
+    convName ||
+    (address
+      ? service === "whatsapp"
+        ? formatPhoneNumber(address)
+        : address
+      : "?");
+
+  const convInitials = nameInitials(convName || "?");
 
   const { translate: t } = useTranslation();
 
@@ -69,7 +78,9 @@ export default function Header() {
         />
       </div>
       <div className="info flex flex-col justify-center mr-[12px] truncate">
-        <div className="text-[16px] text-foreground truncate">{convName}</div>
+        <div className="text-[16px] text-foreground truncate">
+          {displayName}
+        </div>
         <div className="text-[13px] text-muted-foreground truncate">
           {service === "local" && t("Contacto de prueba")}
           {service === "whatsapp" && address && formatPhoneNumber(address)}
