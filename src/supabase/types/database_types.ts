@@ -209,3 +209,14 @@ export type ApiKeyInsert = Database["public"]["Tables"]["api_keys"]["Insert"];
 export type ApiKeyUpdate = Database["public"]["Tables"]["api_keys"]["Update"];
 
 export type Role = Database["public"]["Enums"]["role"];
+
+export type LabelRow = Database["public"]["Tables"]["labels"]["Row"];
+export type LabelInsert = Database["public"]["Tables"]["labels"]["Insert"];
+export type LabelUpdate = Database["public"]["Tables"]["labels"]["Update"];
+
+export type ConversationLabelRow =
+  Database["public"]["Tables"]["conversation_labels"]["Row"];
+export type ConversationLabelInsert =
+  Database["public"]["Tables"]["conversation_labels"]["Insert"];
+export type ConversationLabelUpdate =
+  Database["public"]["Tables"]["conversation_labels"]["Update"];

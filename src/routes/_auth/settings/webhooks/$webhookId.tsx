@@ -80,6 +80,10 @@ function EditWebhook() {
               options={[
                 { value: "messages", label: t("Mensajes") },
                 { value: "conversations", label: t("Conversaciones") },
+                {
+                  value: "conversation_labels",
+                  label: t("Etiquetas de conversación"),
+                },
               ]}
               required
             />
@@ -92,6 +96,7 @@ function EditWebhook() {
               options={[
                 { value: "insert", label: t("Insertar") },
                 { value: "update", label: t("Actualizar") },
+                { value: "delete", label: t("Eliminar") },
               ]}
             />
 

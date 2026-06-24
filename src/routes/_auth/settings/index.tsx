@@ -3,7 +3,7 @@ import SectionHeader from "@/components/SectionHeader";
 import SectionItem from "@/components/SectionItem";
 import { useTranslation } from "@/hooks/useTranslation";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Building2, Users, Webhook, Key } from "lucide-react";
+import { Building2, Users, Webhook, Key, Tag } from "lucide-react";
 
 export const Route = createFileRoute("/_auth/settings/")({
   component: SettingsIndex,
@@ -71,6 +71,20 @@ function SettingsIndex() {
             onClick={() =>
               navigate({
                 to: "/settings/api-keys",
+                hash: (prevHash) => prevHash!,
+              })
+            }
+          />
+          <SectionItem
+            title={t("Etiquetas")}
+            aside={
+              <div className="p-[8px]">
+                <Tag className="w-[24px] h-[24px] text-muted-foreground" />
+              </div>
+            }
+            onClick={() =>
+              navigate({
+                to: "/settings/labels",
                 hash: (prevHash) => prevHash!,
               })
             }
