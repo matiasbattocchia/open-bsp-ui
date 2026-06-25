@@ -57,24 +57,22 @@ function Onboard() {
 
     FB.login(
       function (response: any) {
-        if (response.authResponse) {
-          const code = response.authResponse.code;
+        if (!response.authResponse?.code) {
+          return;
+        }
 
-          if (!code) {
-            return;
-          }
+        const code = response.authResponse.code;
 
+        const doSignup = (sessionInfo: Record<string, unknown>) => {
           setLoading(true);
-
-          const sessionInfo = (window as any).__waSessionInfo || {};
 
           const payload: SignupPayload = {
             code,
             application_id: import.meta.env.VITE_META_APP_ID,
-            phone_number_id: sessionInfo.phone_number_id,
-            waba_id: sessionInfo.waba_id,
-            business_id: sessionInfo.business_id,
-            flow_type: sessionInfo.flow_type,
+            phone_number_id: sessionInfo.phone_number_id as string | undefined,
+            waba_id: sessionInfo.waba_id as string | undefined,
+            business_id: sessionInfo.business_id as string | undefined,
+            flow_type: sessionInfo.flow_type as SignupPayload["flow_type"],
           };
 
           const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/whatsapp-management/onboard`;
@@ -104,21 +102,70 @@ function Onboard() {
             .finally(() => {
               setLoading(false);
             });
+        };
+
+        const sessionInfo = (window as any).__waSessionInfo || {};
+
+        if (sessionInfo.phone_number_id && sessionInfo.waba_id) {
+          doSignup(sessionInfo);
+          return;
         }
+
+        // Race guard: FB.login may fire before Meta's postMessage with WABA details arrives.
+        let timedOut = false;
+        const timeout = setTimeout(() => {
+          timedOut = true;
+          window.removeEventListener("message", onMessage);
+          setState({
+            status: "error",
+            message: t("Error al conectar. Intentá de nuevo o contactá al proveedor."),
+          });
+        }, 30_000);
+
+        const onMessage = (event: MessageEvent) => {
+          if (timedOut) return;
+
+          if (!event.origin.endsWith("facebook.com")) return;
+          if (
+            typeof event.data !== "string" ||
+            !event.data.includes("WA_EMBEDDED_SIGNUP")
+          ) return;
+
+          let data: Record<string, unknown>;
+          try { data = JSON.parse(event.data); } catch { return; }
+
+          if (data.type !== "WA_EMBEDDED_SIGNUP" || data.event === "CANCEL") return;
+
+          const info = data.data as Record<string, unknown>;
+          if (!info?.phone_number_id || !info?.waba_id) return;
+
+          window.removeEventListener("message", onMessage);
+          clearTimeout(timeout);
+
+          let flow_type: SignupPayload["flow_type"];
+          if (data.event === "FINISH") {
+            flow_type = "new_phone_number";
+          } else if (data.event === "FINISH_ONLY_WABA") {
+            flow_type = "only_waba";
+          } else if (data.event === "FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING") {
+            flow_type = "existing_phone_number";
+          } else return;
+
+          doSignup({
+            phone_number_id: info.phone_number_id,
+            waba_id: info.waba_id,
+            business_id: info.business_id,
+            flow_type,
+          });
+        };
+
+        window.addEventListener("message", onMessage);
       },
       {
-        config_id: import.meta.env.VITE_FB_LOGIN_CONFIG_ID, // Configuration ID obtained in Meta Business Login configurations
-        response_type: "code", // Must be set to 'code' for System User access token
+        config_id: import.meta.env.VITE_FB_LOGIN_CONFIG_ID,
+        response_type: "code",
         override_default_response_type: true,
-        // Permission scopes requested by the Embedded Signup config_id:
-        // - whatsapp_business_management — manage WhatsApp Business Accounts
-        // - whatsapp_business_messaging  — send and receive messages
-        scope: "whatsapp_business_management,whatsapp_business_messaging",
-        extras: {
-          setup: {},
-          featureType: "whatsapp_business_app_onboarding",
-          sessionInfoVersion: "3",
-        },
+        extras: {},
       },
     );
   }, [token, t]);

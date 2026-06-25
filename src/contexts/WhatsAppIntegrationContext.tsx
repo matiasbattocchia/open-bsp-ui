@@ -7,7 +7,7 @@ import {
 import { useWhatsAppSignup } from "@/queries/useWhatsAppSignup";
 import useBoundStore from "@/stores/useBoundStore";
 
-const FB_API_VERSION = "v25.0";
+const FB_API_VERSION = "v24.0";
 
 export type SignupPayload = {
   code: string;
@@ -302,14 +302,10 @@ export function WhatsAppIntegrationProvider({
           config_id: import.meta.env.VITE_FB_LOGIN_CONFIG_ID, // Configuration ID obtained in https://developers.facebook.com/apps/629323992623834/business-login/configurations/?business_id=153181867762503
           response_type: "code", // Must be set to 'code' for System User access token
           override_default_response_type: true,
-          // Permission scopes requested by the Embedded Signup config_id:
-          // - whatsapp_business_management — manage WhatsApp Business Accounts
-          // - whatsapp_business_messaging  — send and receive messages
-          scope: "whatsapp_business_management,whatsapp_business_messaging",
-          extras: {
-            setup: {},
-            featureType: "whatsapp_business_app_onboarding",
-            sessionInfoVersion: "3",
+          extras: {version: 'v3',
+                featureType: 'whatsapp_business_app_onboarding',
+                sessionInfoVersion: '3',
+                setup: {}
           },
         },
       );

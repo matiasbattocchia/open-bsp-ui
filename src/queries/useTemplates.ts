@@ -21,6 +21,7 @@ export function useTemplates(organizationAddress?: string) {
       return (data.data as TemplateData[]) || [];
     },
     enabled: !!activeOrgId && !!organizationAddress,
+    retry: false,
   });
 }
 

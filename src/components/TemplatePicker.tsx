@@ -17,7 +17,7 @@ export default function TemplatePicker() {
 
   const orgAddress = conv?.organization_address;
   const { data: templates, isLoading } = useTemplates(orgAddress);
-  const approved = templates?.filter((t) => t.status === "APPROVED");
+  // const approved = templates?.filter((t) => t.status === "APPROVED");
 
   const [search, setSearch] = useState("");
   const ref = useRef<HTMLDivElement>(null);
@@ -28,7 +28,7 @@ export default function TemplatePicker() {
     ? approved?.filter((tpl) =>
         tpl.name.toLowerCase().includes(search.toLowerCase()),
       )
-    : approved;
+    : templates;
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
