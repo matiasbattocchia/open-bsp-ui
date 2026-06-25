@@ -33,9 +33,29 @@ function mediaPreview(t: (content: string) => ReactNode, message?: MessageRow) {
 
   if (
     !message ||
-    !(message.direction === "incoming" || message.direction === "outgoing") ||
-    message.content.type !== "file"
+    !(message.direction === "incoming" || message.direction === "outgoing")
   ) {
+    return { mediaIcon, mediaPreviewContent };
+  }
+
+  // Media that could not be ingested arrives as an empty data placeholder.
+  // Show a media icon and a friendly label instead of an empty "{}".
+  if (
+    message.content.type === "data" &&
+    message.content.kind === "media_placeholder"
+  ) {
+    mediaIcon = (
+      <div>
+        <svg className={`${mediaIconClass} h-[20px] w-[16px]`}>
+          <use href="/icons.svg#chat-image" />
+        </svg>
+      </div>
+    );
+    mediaPreviewContent = t("Contenido multimedia no disponible");
+    return { mediaIcon, mediaPreviewContent };
+  }
+
+  if (message.content.type !== "file") {
     return { mediaIcon, mediaPreviewContent };
   }
 
@@ -358,8 +378,12 @@ export default function ChatListItem({ itemId }: { itemId: string }) {
                 <div className="truncate text-[14px]">
                   {preview?.content.type === "text" && preview.content.text}
                   {preview?.content.type === "data" &&
+                    preview.content.kind !== "media_placeholder" &&
                     JSON.stringify(preview.content.data)}
-                  {preview?.content.type === "file" && mediaPreviewContent}
+                  {(preview?.content.type === "file" ||
+                    (preview?.content.type === "data" &&
+                      preview.content.kind === "media_placeholder")) &&
+                    mediaPreviewContent}
                 </div>
               </div>
 

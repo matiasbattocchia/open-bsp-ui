@@ -36,33 +36,36 @@ export default function WhatsAppIntegration({
 
   if (!context?.launchWhatsAppSignup) return null;
 
-  if (sdkFailed) {
-    return (
-      <p className="text-destructive font-medium">
-        {t(
-          "No se pudo cargar el SDK de Facebook. Desactivá la protección contra rastreo o el bloqueador de anuncios para este sitio, o probá con otro navegador.",
-        )}
-      </p>
-    );
-  }
+  const sdkErrorMessage = t(
+    "No se pudo cargar el SDK de Facebook. Desactivá la protección contra rastreo o el bloqueador de anuncios para este sitio, o probá con otro navegador.",
+  );
 
   return (
-    <Button
-      disabled={!orgId || !isOwner}
-      disabledReason={
-        !isOwner ? t("Requiere permisos de propietario") : undefined
-      }
-      loading={loading}
-      className="primary bg-[#4267b2] hover:bg-[#4267b2]/90 text-white w-full"
-      onClick={() =>
-        context.launchWhatsAppSignup(
-          onSuccess || (() => {}),
-          setLoading,
-          signupOptions,
-        )
-      }
-    >
-      {t("Continuar con Facebook")}
-    </Button>
+    <div className="flex flex-col gap-2">
+      {sdkFailed && (
+        <p className="text-destructive font-medium">{sdkErrorMessage}</p>
+      )}
+      <Button
+        disabled={!orgId || !isOwner || sdkFailed}
+        disabledReason={
+          sdkFailed
+            ? sdkErrorMessage
+            : !isOwner
+              ? t("Requiere permisos de propietario")
+              : undefined
+        }
+        loading={loading}
+        className="primary bg-[#4267b2] hover:bg-[#4267b2]/90 text-white w-full"
+        onClick={() =>
+          context.launchWhatsAppSignup(
+            onSuccess || (() => {}),
+            setLoading,
+            signupOptions,
+          )
+        }
+      >
+        {t("Continuar con Facebook")}
+      </Button>
+    </div>
   );
 }

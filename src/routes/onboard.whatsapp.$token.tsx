@@ -189,21 +189,30 @@ function Onboard() {
               </ul>
             </div>
 
-            {sdkFailed ? (
-              <p className="text-destructive font-medium">
-                {t(
-                  "No se pudo cargar el SDK de Facebook. Desactivá la protección contra rastreo o el bloqueador de anuncios para este sitio, o probá con otro navegador.",
-                )}
-              </p>
-            ) : (
+            <div className="flex flex-col gap-2">
+              {sdkFailed && (
+                <p className="text-destructive font-medium">
+                  {t(
+                    "No se pudo cargar el SDK de Facebook. Desactivá la protección contra rastreo o el bloqueador de anuncios para este sitio, o probá con otro navegador.",
+                  )}
+                </p>
+              )}
               <Button
+                disabled={sdkFailed}
+                disabledReason={
+                  sdkFailed
+                    ? t(
+                        "No se pudo cargar el SDK de Facebook. Desactivá la protección contra rastreo o el bloqueador de anuncios para este sitio, o probá con otro navegador.",
+                      )
+                    : undefined
+                }
                 loading={loading}
                 className="primary bg-[#4267b2] hover:bg-[#4267b2]/90 text-white w-full"
                 onClick={handleSignup}
               >
                 {t("Continuar con Facebook")}
               </Button>
-            )}
+            </div>
           </div>
         )}
 

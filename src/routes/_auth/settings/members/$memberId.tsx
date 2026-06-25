@@ -48,7 +48,7 @@ function EditMember() {
     deleteAgent.mutate(memberId, {
       onSuccess: () => {
         if (isMe) {
-          // If the user deletes themselves, invalidate organizations and redirect to conversations
+          // If the user deletes themself, invalidate organizations and redirect to conversations
           queryClient.invalidateQueries({
             queryKey: queryKeys.organizations.all(),
           });
