@@ -18,6 +18,8 @@ export const Route = createFileRoute(
 type FormValues = {
   name: string;
   expires_in_days: string;
+  callback_url: string;
+  verify_token: string;
 };
 
 function NewOnboardingToken() {
@@ -31,6 +33,8 @@ function NewOnboardingToken() {
     defaultValues: {
       name: "",
       expires_in_days: "7",
+      callback_url: "",
+      verify_token: "",
     },
   });
 
@@ -43,7 +47,12 @@ function NewOnboardingToken() {
           id="create-onboarding-token-form"
           onSubmit={handleSubmit((data) =>
             createToken.mutate(
-              { name: data.name, expiresInDays: Number(data.expires_in_days) },
+              {
+                name: data.name,
+                expiresInDays: Number(data.expires_in_days),
+                callbackUrl: data.callback_url,
+                verifyToken: data.verify_token,
+              },
               {
                 onSuccess: (token) =>
                   navigate({
@@ -84,6 +93,31 @@ function NewOnboardingToken() {
               ]}
               required
             />
+
+            <label>
+              <div className="label">{t("URL de webhook (opcional)")}</div>
+              <input
+                type="url"
+                className="text"
+                placeholder="https://example.com/webhook"
+                {...register("callback_url")}
+              />
+              <div className="text-muted-foreground text-[12px] mt-[4px]">
+                {t(
+                  "Si la configurás, los webhooks de mensajes de esta cuenta se envían directo a tu app en vez de a OpenBSP.",
+                )}
+              </div>
+            </label>
+
+            <label>
+              <div className="label">{t("Token de verificación")}</div>
+              <input
+                type="text"
+                className="text"
+                placeholder={t("Secreto para validar el webhook")}
+                {...register("verify_token")}
+              />
+            </label>
           </fieldset>
         </form>
       </SectionBody>

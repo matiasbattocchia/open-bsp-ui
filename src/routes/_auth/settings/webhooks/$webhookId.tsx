@@ -80,6 +80,13 @@ function EditWebhook() {
               options={[
                 { value: "messages", label: t("Mensajes") },
                 { value: "conversations", label: t("Conversaciones") },
+                { value: "organizations_addresses", label: t("Cuentas") },
+                { value: "contacts", label: t("Contactos") },
+                {
+                  value: "contacts_addresses",
+                  label: t("Direcciones de contacto"),
+                },
+                { value: "logs", label: t("Registros") },
               ]}
               required
             />

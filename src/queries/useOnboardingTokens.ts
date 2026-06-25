@@ -41,9 +41,13 @@ export function useCreateOnboardingToken(service: OnboardingService) {
     mutationFn: async ({
       name,
       expiresInDays,
+      callbackUrl,
+      verifyToken,
     }: {
       name: string;
       expiresInDays: number;
+      callbackUrl?: string;
+      verifyToken?: string;
     }) => {
       if (!orgId) throw new Error("No active organization");
       if (!userId) throw new Error("No authenticated user");
@@ -57,9 +61,10 @@ export function useCreateOnboardingToken(service: OnboardingService) {
         .insert({
           name,
           organization_id: orgId,
-          created_by: userId,
           expires_at,
           service,
+          callback_url: callbackUrl || null,
+          verify_token: verifyToken || null,
         })
         .select()
         .single()
