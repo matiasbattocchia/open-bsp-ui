@@ -1,15 +1,67 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase, type TemplateData } from "@/supabase/client";
+import { supabase, type TemplateData, type SyncedTemplate } from "@/supabase/client";
 import useBoundStore from "@/stores/useBoundStore";
+import { queryKeys } from "./queryKeys";
 
 export function useTemplates(organizationAddress?: string) {
   const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
 
   return useQuery({
-    queryKey: ["templates", activeOrgId, organizationAddress],
+    queryKey: queryKeys.templates.list(activeOrgId, organizationAddress),
     queryFn: async () => {
       if (!organizationAddress) return [];
 
+      const { data } = await supabase
+        .from("organizations_addresses")
+        .select("extra")
+        .eq("organization_id", activeOrgId!)
+        .eq("address", organizationAddress)
+        .single();
+
+      const extra = (data?.extra as Record<string, unknown> & { templates?: SyncedTemplate[] } | null) ?? {};
+      return extra.templates ?? [];
+    },
+    enabled: !!activeOrgId && !!organizationAddress,
+    retry: false,
+  });
+}
+
+export function useTemplateDetail(
+  organizationAddress?: string,
+  templateId?: string,
+) {
+  const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
+
+  return useQuery({
+    queryKey: queryKeys.templates.detail(activeOrgId, organizationAddress, templateId),
+    queryFn: async () => {
+      if (!organizationAddress || !templateId) return null;
+
+      const { data } = await supabase.functions.invoke(
+        "whatsapp-management/templates",
+        {
+          method: "PUT",
+          body: {
+            organization_id: activeOrgId,
+            organization_address: organizationAddress,
+            template: { id: templateId },
+          },
+        },
+      );
+
+      return data as TemplateData;
+    },
+    enabled: !!activeOrgId && !!organizationAddress && !!templateId,
+    retry: false,
+  });
+}
+
+export function useSyncTemplates() {
+  const queryClient = useQueryClient();
+  const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
+
+  return useMutation({
+    mutationFn: async (organizationAddress: string) => {
       const { data } = await supabase.functions.invoke(
         "whatsapp-management/templates",
         {
@@ -18,10 +70,16 @@ export function useTemplates(organizationAddress?: string) {
         },
       );
 
-      return (data.data as TemplateData[]) || [];
+      return (data as TemplateData[]) || [];
     },
-    enabled: !!activeOrgId && !!organizationAddress,
-    retry: false,
+    onSuccess: (_, organizationAddress) => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.templates.list(activeOrgId, organizationAddress),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.organizations.addresses(activeOrgId),
+      });
+    },
   });
 }
 
@@ -49,7 +107,10 @@ export function useCreateTemplate() {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["templates", activeOrgId, variables.organizationAddress],
+        queryKey: queryKeys.templates.list(activeOrgId, variables.organizationAddress),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.organizations.addresses(activeOrgId),
       });
     },
   });
@@ -79,7 +140,13 @@ export function useUpdateTemplate() {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["templates", activeOrgId, variables.organizationAddress],
+        queryKey: queryKeys.templates.detail(activeOrgId, variables.organizationAddress, variables.template.id),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.templates.list(activeOrgId, variables.organizationAddress),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.organizations.addresses(activeOrgId),
       });
     },
   });
@@ -109,7 +176,10 @@ export function useDeleteTemplate() {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["templates", activeOrgId, variables.organizationAddress],
+        queryKey: queryKeys.templates.list(activeOrgId, variables.organizationAddress),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.organizations.addresses(activeOrgId),
       });
     },
   });

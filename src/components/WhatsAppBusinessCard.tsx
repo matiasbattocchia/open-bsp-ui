@@ -1,6 +1,6 @@
 import { WhatsAppOutlined } from "@ant-design/icons";
 import { formatPhoneNumber } from "@/utils/FormatUtils";
-import { MessageSquareText } from "lucide-react";
+import { MessageSquareText, RefreshCw } from "lucide-react";
 
 type CardExtra = Record<string, unknown> & {
   waba_id?: string;
@@ -18,6 +18,8 @@ type WhatsAppBusinessCardProps = {
   templateCount?: number;
   onClick: () => void;
   onTestOutbound?: () => void;
+  onSyncTemplates?: () => void;
+  syncing?: boolean;
 };
 
 function qualityLabel(rating: string): { label: string; color: string } {
@@ -37,6 +39,8 @@ export default function WhatsAppBusinessCard({
   templateCount = 0,
   onClick,
   onTestOutbound,
+  onSyncTemplates,
+  syncing = false,
 }: WhatsAppBusinessCardProps) {
   const ex = extra ?? {};
 
@@ -122,7 +126,7 @@ export default function WhatsAppBusinessCard({
       {/* ── Separator ────────────────────────────────────────── */}
       <div className="border-t border-border" />
 
-      {/* ── Footer: templates count + test outbound ──────────── */}
+      {/* ── Footer: templates count + sync + test outbound ──────── */}
       <div className="px-4 py-2.5 flex items-center gap-2 text-[12px]">
         <div className="flex items-center gap-1.5 text-muted-foreground">
           <MessageSquareText className="w-3.5 h-3.5" />
@@ -131,6 +135,21 @@ export default function WhatsAppBusinessCard({
           </span>
         </div>
         <div className="flex-1" />
+        {onSyncTemplates && (
+          <button
+            type="button"
+            className="shrink-0 px-3 py-1 rounded-full text-[12px] bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors disabled:opacity-50 flex items-center gap-1.5"
+            onClick={(e) => {
+              e.stopPropagation();
+              onSyncTemplates();
+            }}
+            disabled={syncing}
+            title="Sync templates from Meta"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${syncing ? "animate-spin" : ""}`} />
+            Sync
+          </button>
+        )}
         {onTestOutbound && (
           <button
             type="button"

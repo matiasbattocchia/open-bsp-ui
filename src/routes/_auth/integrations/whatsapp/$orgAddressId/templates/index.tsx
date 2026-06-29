@@ -3,8 +3,8 @@ import SectionHeader from "@/components/SectionHeader";
 import SectionBody from "@/components/SectionBody";
 import SectionItem from "@/components/SectionItem";
 import { useTranslation } from "@/hooks/useTranslation";
-import { Plus, LayoutTemplate, LoaderCircle } from "lucide-react";
-import { useTemplates } from "@/queries/useTemplates";
+import { Plus, LayoutTemplate, LoaderCircle, RefreshCw } from "lucide-react";
+import { useTemplates, useSyncTemplates } from "@/queries/useTemplates";
 
 export const Route = createFileRoute(
   "/_auth/integrations/whatsapp/$orgAddressId/templates/",
@@ -18,10 +18,27 @@ function TemplatesIndex() {
   const { orgAddressId } = Route.useParams();
 
   const { data: templates, isLoading } = useTemplates(orgAddressId);
+  const syncTemplates = useSyncTemplates();
+
+  const handleSync = () => {
+    syncTemplates.mutate(orgAddressId);
+  };
 
   return (
     <>
-      <SectionHeader title={t("Plantillas")} />
+      <div className="header items-center gap-2">
+        <div className="text-[22px]">{t("Plantillas")}</div>
+        <div className="flex-1" />
+        <button
+          className="px-3 py-1.5 rounded-full text-[13px] bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors disabled:opacity-50 flex items-center gap-1.5"
+          onClick={handleSync}
+          disabled={syncTemplates.isPending}
+          title="Sync templates from Meta"
+        >
+          <RefreshCw className={`w-4 h-4 ${syncTemplates.isPending ? "animate-spin" : ""}`} />
+          Sync from Meta
+        </button>
+      </div>
       <SectionBody>
         <SectionItem
           title={t("Crear plantilla")}

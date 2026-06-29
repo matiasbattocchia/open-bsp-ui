@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useCallback } from "react";
 import { useOrganizationsAddresses } from "@/queries/useOrganizationsAddresses";
+import useBoundStore from "@/stores/useBoundStore";
 import { supabase } from "@/supabase/client";
 import WhatsAppBusinessCard from "@/components/WhatsAppBusinessCard";
 import Spinner from "@/components/Spinner";
@@ -12,6 +13,7 @@ export const Route = createFileRoute("/_auth/whatsapp/channels")({
 
 function ActiveChannels() {
   const navigate = useNavigate();
+  const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
   const { data: integrations, isLoading, refetch } = useOrganizationsAddresses();
 
   const [modalChannel, setModalChannel] = useState<{ address: string; extra: Record<string, unknown> | null } | null>(null);
@@ -20,14 +22,49 @@ function ActiveChannels() {
   const [submitting, setSubmitting] = useState(false);
   const [resultState, setResultState] = useState<"idle" | "success" | "error">("idle");
   const [errorText, setErrorText] = useState("");
+  const [syncingAddresses, setSyncingAddresses] = useState<Set<string>>(new Set());
 
   const whatsappIntegrations = integrations?.filter(
     (integration) => integration.service === "whatsapp",
   );
 
+  const syncTemplates = useCallback(async () => {
+    if (!whatsappIntegrations?.length) return;
+    const addresses = whatsappIntegrations.map((i) => i.address);
+    setSyncingAddresses((prev) => new Set([...prev, ...addresses]));
+    await Promise.allSettled(
+      whatsappIntegrations.map((integration) =>
+        supabase.functions.invoke("whatsapp-management/templates", {
+          method: "PUT",
+          body: { organization_id: activeOrgId, organization_address: integration.address },
+        })
+      ),
+    );
+    await refetch();
+    setSyncingAddresses((prev) => {
+      const next = new Set(prev);
+      addresses.forEach((a) => next.delete(a));
+      return next;
+    });
+  }, [whatsappIntegrations, activeOrgId, refetch]);
+
+  const syncTemplatesForCard = useCallback(async (address: string) => {
+    setSyncingAddresses((prev) => new Set(prev).add(address));
+    await supabase.functions.invoke("whatsapp-management/templates", {
+      method: "PUT",
+      body: { organization_id: activeOrgId, organization_address: address },
+    });
+    await refetch();
+    setSyncingAddresses((prev) => {
+      const next = new Set(prev);
+      next.delete(address);
+      return next;
+    });
+  }, [activeOrgId, refetch]);
+
   const handleRefresh = useCallback(() => {
-    refetch();
-  }, [refetch]);
+    syncTemplates();
+  }, [syncTemplates]);
 
   const openModal = useCallback((integration: { address: string; extra: Record<string, unknown> | null }) => {
     setModalChannel(integration);
@@ -107,11 +144,12 @@ function ActiveChannels() {
         <h1 className="text-[17px] font-medium">Active Channels Grid</h1>
         <div className="flex-1" />
         <button
-          className="p-1.5 rounded-full hover:bg-muted text-muted-foreground"
-          title="Refresh"
+          className="p-1.5 rounded-full hover:bg-muted text-muted-foreground disabled:opacity-50"
+          title="Refresh templates from Meta"
           onClick={handleRefresh}
+          disabled={syncingAddresses.size > 0}
         >
-          <RefreshCw className="w-4 h-4" />
+          <RefreshCw className={`w-4 h-4 ${syncingAddresses.size > 0 ? "animate-spin" : ""}`} />
         </button>
       </div>
 
@@ -126,30 +164,36 @@ function ActiveChannels() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {whatsappIntegrations.map((integration) => (
+            {whatsappIntegrations.map((integration) => {
+              const extra = (integration.extra as Record<string, unknown> & {
+                waba_id?: string;
+                business_name?: string;
+                display_phone_number?: string;
+                phone_number?: string;
+                quality_rating?: string;
+                verified_name?: string;
+                templates?: { id: string; name: string; status: string; category: string; language: string }[];
+              }) ?? {};
+
+              return (
               <WhatsAppBusinessCard
                 key={integration.address}
                 address={integration.address}
                 status={integration.status}
-                extra={
-                  (integration.extra as Record<string, unknown> & {
-                    waba_id?: string;
-                    business_name?: string;
-                    display_phone_number?: string;
-                    phone_number?: string;
-                    quality_rating?: string;
-                    verified_name?: string;
-                  }) ?? {}
-                }
+                extra={extra}
+                templateCount={extra.templates?.length ?? 0}
                 onClick={() =>
                   navigate({
                     to: "/integrations/whatsapp/$orgAddressId",
                     params: { orgAddressId: integration.address },
                   })
                 }
+                onSyncTemplates={() => syncTemplatesForCard(integration.address)}
+                syncing={syncingAddresses.has(integration.address)}
                 onTestOutbound={() => openModal(integration)}
               />
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

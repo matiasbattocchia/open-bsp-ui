@@ -31,6 +31,10 @@ export const queryKeys = {
   onboardingTokens: {
     all: (orgId: NullableId) => [orgId, "onboarding_tokens"] as const,
   },
+  templates: {
+    list: (orgId: NullableId, address: NullableId) => [orgId, "templates", address] as const,
+    detail: (orgId: NullableId, address: NullableId, templateId: NullableId) => [orgId, "templates", address, templateId] as const,
+  },
   billing: {
     products: () => ["billing", "products"] as const,
     usage: (orgId: NullableId, interval: string) => [orgId, "billing", "usage", interval] as const,

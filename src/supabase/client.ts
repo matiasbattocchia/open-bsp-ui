@@ -507,15 +507,27 @@ export type OrganizationExtra = {
   error_messages_direction?: "internal" | "outgoing";
 };
 
+export type SyncedTemplate = {
+  id: string;
+  name: string;
+  status: string;
+  category: string;
+  language: string;
+  body?: string;
+  headerExample?: string[];
+};
+
 export type OrganizationAddressExtra = {
   waba_id?: string;
   business_id?: string;
   phone_number?: string;
   verified_name?: string;
+  quality_rating?: string;
   access_token?: string;
   flow_type?: "only_waba" | "new_phone_number" | "existing_phone_number";
   callback_url?: string | null;
   verify_token?: string | null;
+  templates?: SyncedTemplate[];
 };
 
 export type ConversationExtra = {

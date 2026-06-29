@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import SectionHeader from "@/components/SectionHeader";
 import { useTranslation } from "@/hooks/useTranslation";
 import TemplateEditor from "@/components/TemplateEditor";
-import { useTemplates, useDeleteTemplate } from "@/queries/useTemplates";
+import { useTemplateDetail, useDeleteTemplate } from "@/queries/useTemplates";
 import { LoaderCircle } from "lucide-react";
 
 export const Route = createFileRoute(
@@ -16,7 +16,7 @@ function EditTemplate() {
   const navigate = useNavigate();
   const { orgAddressId, templateId } = Route.useParams();
 
-  const { data: templates, isLoading } = useTemplates(orgAddressId);
+  const { data: template, isLoading } = useTemplateDetail(orgAddressId, templateId);
   const deleteTemplate = useDeleteTemplate();
 
   if (isLoading) {
@@ -26,8 +26,6 @@ function EditTemplate() {
       </div>
     );
   }
-
-  const template = templates?.find((t) => t.id === templateId);
 
   if (!template) {
     return (

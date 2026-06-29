@@ -4,8 +4,9 @@ import useBoundStore from "@/stores/useBoundStore";
 import SearchBar from "@/components/SearchBar";
 import { useTemplates } from "@/queries/useTemplates";
 import { useTranslation } from "@/hooks/useTranslation";
-import type { TemplateData } from "@/supabase/client";
+import { supabase, type SyncedTemplate } from "@/supabase/client";
 import { useNavigate } from "@tanstack/react-router";
+import Spinner from "@/components/Spinner";
 
 export default function TemplatePicker() {
   const activeConvId = useBoundStore((store) => store.ui.activeConvId);
@@ -17,18 +18,21 @@ export default function TemplatePicker() {
 
   const orgAddress = conv?.organization_address;
   const { data: templates, isLoading } = useTemplates(orgAddress);
-  // const approved = templates?.filter((t) => t.status === "APPROVED");
+  const approved = templates?.filter((t) => t.status === "APPROVED");
 
   const [search, setSearch] = useState("");
+  const [fetchingTemplateId, setFetchingTemplateId] = useState<string | null>(null);
   const ref = useRef<HTMLDivElement>(null);
   const { translate: t } = useTranslation();
   const navigate = useNavigate();
+
+  const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
 
   const filtered = search
     ? approved?.filter((tpl) =>
         tpl.name.toLowerCase().includes(search.toLowerCase()),
       )
-    : templates;
+    : approved;
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -47,14 +51,35 @@ export default function TemplatePicker() {
     };
   }, [toggle]);
 
-  function select(template: TemplateData) {
+  async function select(template: SyncedTemplate) {
     if (!activeConvId) return;
 
-    const bodyExamples = template.components.find((c) => c.type === "BODY")?.example?.body_text[0] || [];
-    const headExamples = template.components.find((c) => c.type === "HEADER")?.example?.header_text || [];
+    setFetchingTemplateId(template.id);
+
+    const { data } = await supabase.functions.invoke(
+      "whatsapp-management/templates",
+      {
+        method: "PUT",
+        body: {
+          organization_id: activeOrgId,
+          organization_address: orgAddress,
+          template: { id: template.id },
+        },
+      },
+    );
+
+    setFetchingTemplateId(null);
+
+    if (!data) return;
+
+    const fullTemplate = data as any;
+    const bodyExamples =
+      fullTemplate.components?.find((c: any) => c.type === "BODY")?.example?.body_text?.[0] ?? [];
+    const headExamples =
+      fullTemplate.components?.find((c: any) => c.type === "HEADER")?.example?.header_text ?? [];
 
     setTemplateDraft(activeConvId, {
-      template,
+      template: fullTemplate,
       bodyVarValues: bodyExamples.map(() => ""),
       headVarValues: headExamples.map(() => ""),
     });
@@ -89,18 +114,22 @@ export default function TemplatePicker() {
             </div>
           ) : (
             filtered.map((tpl) => {
-              const body = tpl.components.find((c) => c.type === "BODY")?.text || "";
+              const isFetching = fetchingTemplateId === tpl.id;
               return (
-                <button
-                  key={tpl.id}
-                  className="w-full text-left px-[10px] py-[8px] rounded-xl hover:bg-accent cursor-pointer"
-                  onClick={() => select(tpl)}
-                >
-                  <div className="font-medium text-[14px] truncate">{tpl.name}</div>
-                  <div className="text-[13px] text-muted-foreground truncate">
-                    {body}
-                  </div>
-                </button>
+              <button
+                key={tpl.id}
+                className="w-full text-left px-[10px] py-[8px] rounded-xl hover:bg-accent cursor-pointer disabled:opacity-50"
+                onClick={() => select(tpl)}
+                disabled={!!fetchingTemplateId}
+              >
+                <div className="font-medium text-[14px] truncate flex items-center gap-2">
+                  {tpl.name}
+                  {isFetching && <Spinner size={12} />}
+                </div>
+                <div className="text-[13px] text-muted-foreground truncate">
+                  {tpl.body ?? ""}
+                </div>
+              </button>
               );
             })
           )}
