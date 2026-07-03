@@ -13,6 +13,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AuthIndexRouteImport } from './routes/_auth/index'
 import { Route as OauthInstagramRouteImport } from './routes/oauth/instagram'
+import { Route as OauthConsentRouteImport } from './routes/oauth/consent'
 import { Route as OauthCallbackRouteImport } from './routes/oauth/callback'
 import { Route as AuthStatsRouteImport } from './routes/_auth/stats'
 import { Route as AuthStatsIndexRouteImport } from './routes/_auth/stats/index'
@@ -76,6 +77,11 @@ const AuthIndexRoute = AuthIndexRouteImport.update({
 const OauthInstagramRoute = OauthInstagramRouteImport.update({
   id: '/oauth/instagram',
   path: '/oauth/instagram',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OauthConsentRoute = OauthConsentRouteImport.update({
+  id: '/oauth/consent',
+  path: '/oauth/consent',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OauthCallbackRoute = OauthCallbackRouteImport.update({
@@ -333,6 +339,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/stats': typeof AuthStatsRouteWithChildren
   '/oauth/callback': typeof OauthCallbackRoute
+  '/oauth/consent': typeof OauthConsentRoute
   '/oauth/instagram': typeof OauthInstagramRoute
   '/': typeof AuthIndexRoute
   '/agents/$agentId': typeof AuthAgentsAgentIdRoute
@@ -382,6 +389,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/oauth/callback': typeof OauthCallbackRoute
+  '/oauth/consent': typeof OauthConsentRoute
   '/oauth/instagram': typeof OauthInstagramRoute
   '/': typeof AuthIndexRoute
   '/agents/$agentId': typeof AuthAgentsAgentIdRoute
@@ -434,6 +442,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/_auth/stats': typeof AuthStatsRouteWithChildren
   '/oauth/callback': typeof OauthCallbackRoute
+  '/oauth/consent': typeof OauthConsentRoute
   '/oauth/instagram': typeof OauthInstagramRoute
   '/_auth/': typeof AuthIndexRoute
   '/_auth/agents/$agentId': typeof AuthAgentsAgentIdRoute
@@ -486,6 +495,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/stats'
     | '/oauth/callback'
+    | '/oauth/consent'
     | '/oauth/instagram'
     | '/'
     | '/agents/$agentId'
@@ -535,6 +545,7 @@ export interface FileRouteTypes {
   to:
     | '/login'
     | '/oauth/callback'
+    | '/oauth/consent'
     | '/oauth/instagram'
     | '/'
     | '/agents/$agentId'
@@ -586,6 +597,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/_auth/stats'
     | '/oauth/callback'
+    | '/oauth/consent'
     | '/oauth/instagram'
     | '/_auth/'
     | '/_auth/agents/$agentId'
@@ -637,6 +649,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRouteWithChildren
   LoginRoute: typeof LoginRoute
   OauthCallbackRoute: typeof OauthCallbackRoute
+  OauthConsentRoute: typeof OauthConsentRoute
   OauthInstagramRoute: typeof OauthInstagramRoute
   OnboardInstagramTokenRoute: typeof OnboardInstagramTokenRoute
   OnboardInstagramCallbackRoute: typeof OnboardInstagramCallbackRoute
@@ -671,6 +684,13 @@ declare module '@tanstack/react-router' {
       path: '/oauth/instagram'
       fullPath: '/oauth/instagram'
       preLoaderRoute: typeof OauthInstagramRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/oauth/consent': {
+      id: '/oauth/consent'
+      path: '/oauth/consent'
+      fullPath: '/oauth/consent'
+      preLoaderRoute: typeof OauthConsentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/oauth/callback': {
@@ -1109,6 +1129,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRouteWithChildren,
   LoginRoute: LoginRoute,
   OauthCallbackRoute: OauthCallbackRoute,
+  OauthConsentRoute: OauthConsentRoute,
   OauthInstagramRoute: OauthInstagramRoute,
   OnboardInstagramTokenRoute: OnboardInstagramTokenRoute,
   OnboardInstagramCallbackRoute: OnboardInstagramCallbackRoute,

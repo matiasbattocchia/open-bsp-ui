@@ -365,5 +365,14 @@
   "Tu cuenta de Instagram fue conectada exitosamente.": "Sua conta do Instagram foi conectada com sucesso.",
   "Conectá tu cuenta de Instagram a": "Conecte sua conta do Instagram a",
   "Iniciá sesión con la cuenta de Instagram profesional (empresa o creador) que querés conectar. Vas a ser redirigido a Instagram para autorizar.": "Faça login com a conta profissional do Instagram (empresa ou criador) que deseja conectar. Você será redirecionado ao Instagram para autorizar.",
-  "nombre_de_plantilla": "nome_do_modelo"
+  "nombre_de_plantilla": "nome_do_modelo",
+  "Algo salió mal. La autorización puede haber expirado — inicia la conexión nuevamente desde tu cliente de IA.": "Algo deu errado. A autorização pode ter expirado — inicie a conexão novamente a partir do seu cliente de IA.",
+  "Este enlace de autorización no es válido o expiró — inicia la conexión nuevamente desde tu cliente de IA.": "Este link de autorização é inválido ou expirou — inicie a conexão novamente a partir do seu cliente de IA.",
+  "quiere conectarse a OpenBSP como tú. Podrá actuar en tu nombre, dentro de tus permisos.": "quer se conectar ao OpenBSP como você. Poderá agir em seu nome, dentro das suas permissões.",
+  "Al permitir, volverás a": "Ao permitir, você voltará para",
+  "⚠️ Aplicación no reconocida. Continúa solo si tú iniciaste esta conexión": "⚠️ Aplicativo não reconhecido. Continue apenas se você mesmo iniciou esta conexão",
+  "Si no fue así, elige Denegar.": "Se não foi você, escolha Negar.",
+  "Permitir": "Permitir",
+  "Denegar": "Negar",
+  "Conectado como": "Conectado como"
 }
