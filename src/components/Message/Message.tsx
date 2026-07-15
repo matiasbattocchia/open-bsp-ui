@@ -480,13 +480,23 @@ export default function Message(props: UIMessage & { message: MessageRow }) {
     );
     text = true;
   } else if (
-    props.message.content.type === "data" &&
-    props.message.content.kind === "media_placeholder"
+    (props.message.content.type === "data" &&
+      props.message.content.kind === "media_placeholder") ||
+    (props.message.content.type === "file" && !props.message.content.file?.uri)
   ) {
+    // media_placeholder data parts, and history-imported media (whatsapp-web)
+    // that arrived without a stored file — missing file.uri is the signal, as
+    // history media carries no status.errors unlike live failures. Render as
+    // unavailable media, keeping any caption.
     content = (
       <TextMessage
         header={headerText}
-        body={`_${t("Contenido multimedia no disponible")}_`}
+        body={
+          `_${t("Contenido multimedia no disponible")}_` +
+          (props.message.content.text
+            ? `\n\n${props.message.content.text}`
+            : "")
+        }
         type="markdown"
         direction={props.message.direction}
         timestamp={props.message.timestamp}
