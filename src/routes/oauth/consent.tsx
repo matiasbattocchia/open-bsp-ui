@@ -64,9 +64,10 @@ function OAuthConsent() {
     setSubmitting(true);
     setMessage("");
 
-    const { data, error } = action === "approve"
-      ? await supabase.auth.oauth.approveAuthorization(authorization_id)
-      : await supabase.auth.oauth.denyAuthorization(authorization_id);
+    const { data, error } =
+      action === "approve"
+        ? await supabase.auth.oauth.approveAuthorization(authorization_id)
+        : await supabase.auth.oauth.denyAuthorization(authorization_id);
 
     if (error || !data?.redirect_url) {
       setSubmitting(false);
@@ -109,8 +110,7 @@ function OAuthConsent() {
         {!invalid && details && (
           <>
             <div className="text-center">
-              <span className="font-bold">{details.client.client_name}</span>
-              {" "}
+              <span className="font-bold">{details.client.client_name}</span>{" "}
               {t(
                 "quiere conectarse a OpenBSP como tú. Podrá actuar en tu nombre, dentro de tus permisos.",
               )}
