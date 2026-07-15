@@ -385,7 +385,6 @@
   "Generar código QR": "Generate QR code",
   "La sesión se cerró (logout o baneo). Volvé a vincular el dispositivo para seguir enviando y recibiendo mensajes.": "The session ended (logout or ban). Re-link the device to keep sending and receiving messages.",
   "No se pudo contactar el puente. Intentá de nuevo.": "Couldn't reach the bridge. Try again.",
-  "Número no oficial vía WhatsApp Web": "Unofficial number via WhatsApp Web",
   "Obtener código": "Get code",
   "Reconectando...": "Reconnecting...",
   "Requiere re-vincular": "Needs re-linking",
@@ -393,5 +392,8 @@
   "Vincular con número": "Link with number",
   "Vincular dispositivo": "Link device",
   "Volver a vincular": "Re-link",
-  "Grupo": "Group"
+  "Grupo": "Group",
+  "Conexión no oficial vía WhatsApp Web": "Unofficial connection via WhatsApp Web",
+  "Conexión oficial vía API de Meta": "Official connection via Meta API",
+  "El uso de este método de conexión infringe los términos y condiciones de WhatsApp y tu cuenta podría ser baneada.": "Using this connection method breaks WhatsApp terms and conditions and your account could be banned."
 }

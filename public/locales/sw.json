@@ -385,7 +385,6 @@
   "Generar código QR": "Zalisha msimbo QR",
   "La sesión se cerró (logout o baneo). Volvé a vincular el dispositivo para seguir enviando y recibiendo mensajes.": "Kipindi kilifungwa (kutoka au marufuku). Unganisha kifaa tena ili kuendelea kutuma na kupokea ujumbe.",
   "No se pudo contactar el puente. Intentá de nuevo.": "Imeshindwa kufikia daraja. Jaribu tena.",
-  "Número no oficial vía WhatsApp Web": "Nambari isiyo rasmi kupitia WhatsApp Web",
   "Obtener código": "Pata msimbo",
   "Reconectando...": "Inaunganisha tena...",
   "Requiere re-vincular": "Inahitaji kuunganishwa upya",
@@ -393,5 +392,8 @@
   "Vincular con número": "Unganisha kwa nambari",
   "Vincular dispositivo": "Unganisha kifaa",
   "Volver a vincular": "Unganisha tena",
-  "Grupo": "Kikundi"
+  "Grupo": "Kikundi",
+  "Conexión no oficial vía WhatsApp Web": "Muunganisho usio rasmi kupitia WhatsApp Web",
+  "Conexión oficial vía API de Meta": "Muunganisho rasmi kupitia API ya Meta",
+  "El uso de este método de conexión infringe los términos y condiciones de WhatsApp y tu cuenta podría ser baneada.": "Matumizi ya njia hii ya muunganisho yanakiuka sheria na masharti ya WhatsApp na akaunti yako inaweza kufungiwa."
 }

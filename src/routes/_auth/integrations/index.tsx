@@ -29,6 +29,7 @@ function IntegrationsIndex() {
               </div>
             }
             title="WhatsApp"
+            description={t("Conexión oficial vía API de Meta")}
             onClick={() =>
               navigate({
                 to: "/integrations/whatsapp",
@@ -43,7 +44,7 @@ function IntegrationsIndex() {
               </div>
             }
             title="WhatsApp Web"
-            description={t("Número no oficial vía WhatsApp Web")}
+            description={t("Conexión no oficial vía WhatsApp Web")}
             onClick={() =>
               navigate({
                 to: "/integrations/whatsapp-web",
@@ -60,6 +61,7 @@ function IntegrationsIndex() {
               </div>
             }
             title="Instagram"
+            description={t("Conexión oficial vía API de Meta")}
             onClick={() =>
               navigate({
                 to: "/integrations/instagram",

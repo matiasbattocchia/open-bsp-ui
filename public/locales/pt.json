@@ -385,7 +385,6 @@
   "Generar código QR": "Gerar código QR",
   "La sesión se cerró (logout o baneo). Volvé a vincular el dispositivo para seguir enviando y recibiendo mensajes.": "A sessão foi encerrada (logout ou banimento). Vincule o aparelho novamente para continuar enviando e recebendo mensagens.",
   "No se pudo contactar el puente. Intentá de nuevo.": "Não foi possível contatar a ponte. Tente novamente.",
-  "Número no oficial vía WhatsApp Web": "Número não oficial via WhatsApp Web",
   "Obtener código": "Obter código",
   "Reconectando...": "Reconectando...",
   "Requiere re-vincular": "Requer nova vinculação",
@@ -393,5 +392,8 @@
   "Vincular con número": "Vincular com número",
   "Vincular dispositivo": "Vincular aparelho",
   "Volver a vincular": "Vincular novamente",
-  "Grupo": "Grupo"
+  "Grupo": "Grupo",
+  "Conexión no oficial vía WhatsApp Web": "Conexão não oficial via WhatsApp Web",
+  "Conexión oficial vía API de Meta": "Conexão oficial via API da Meta",
+  "El uso de este método de conexión infringe los términos y condiciones de WhatsApp y tu cuenta podría ser baneada.": "O uso deste método de conexão viola os termos e condições do WhatsApp e sua conta pode ser banida."
 }
