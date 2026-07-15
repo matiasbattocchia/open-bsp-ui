@@ -10,22 +10,31 @@ import {
 import useBoundStore from "@/stores/useBoundStore";
 import { normalizePhoneNumber } from "@/utils/FormatUtils";
 import { queryKeys } from "./queryKeys";
+import type { Database } from "@/supabase/db_types";
 
-export function useContactByAddress(address: string | null | undefined) {
+type Service = Database["public"]["Enums"]["service"];
+
+// contacts_addresses PK is (organization_id, service, address) — the same
+// digits can exist under whatsapp AND whatsapp-web, so lookups key by service.
+export function useContactByAddress(
+  address: string | null | undefined,
+  service: Service | null | undefined,
+) {
   const userId = useBoundStore((state) => state.ui.user?.id);
   const orgId = useBoundStore((state) => state.ui.activeOrgId);
 
   return useQuery({
-    queryKey: queryKeys.contacts.byAddress(orgId, address),
+    queryKey: queryKeys.contacts.byAddress(orgId, service, address),
     queryFn: async () =>
       await supabase
         .from("contacts_addresses")
         .select("*, contact:contacts(*)")
         .eq("organization_id", orgId!)
+        .eq("service", service!)
         .eq("address", address!)
         .single()
         .throwOnError(),
-    enabled: !!userId && !!orgId && !!address,
+    enabled: !!userId && !!orgId && !!service && !!address,
     select: (data) => data.data.contact,
     experimental_prefetchInRender: true,
   });
@@ -134,7 +143,11 @@ export function useCreateContact() {
                   contact_id: contact.id,
                 }) as ContactAddressInsert,
             ),
-            { onConflict: "organization_id, address", defaultToNull: false },
+            {
+              // PK is (organization_id, service, address)
+              onConflict: "organization_id, service, address",
+              defaultToNull: false,
+            },
           )
           .throwOnError());
 
@@ -236,7 +249,8 @@ export function useUpdateContact() {
           supabase
             .from("contacts_addresses")
             .upsert(toUpsert, {
-              onConflict: "organization_id, address",
+              // PK is (organization_id, service, address)
+              onConflict: "organization_id, service, address",
               defaultToNull: false,
             })
             .throwOnError(),
@@ -246,6 +260,7 @@ export function useUpdateContact() {
             .from("contacts_addresses")
             .update(a)
             .eq("organization_id", a.organization_id)
+            .eq("service", a.service)
             .eq("address", a.address)
             .throwOnError(),
         ),

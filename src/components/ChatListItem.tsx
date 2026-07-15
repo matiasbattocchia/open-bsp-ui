@@ -8,7 +8,7 @@ import {
   type MessageRow,
   type OutgoingStatus,
 } from "@/supabase/client";
-import { InstagramOutlined, WhatsAppOutlined } from "@ant-design/icons";
+import ServiceIcon from "./ServiceIcon";
 import ItemActions from "./ItemActions";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
@@ -165,9 +165,13 @@ export default function ChatListItem({ itemId }: { itemId: string }) {
     state.chat.conversations.get(itemId),
   );
 
-  const { data: contact } = useContactByAddress(conversation?.contact_address);
+  const { data: contact } = useContactByAddress(
+    conversation?.contact_address,
+    conversation?.service,
+  );
   const { data: contactAddress } = useContactAddress(
     conversation?.contact_address,
+    conversation?.service,
   );
 
   const { data: agent } = useCurrentAgent();
@@ -182,6 +186,18 @@ export default function ChatListItem({ itemId }: { itemId: string }) {
   // If the role is not admin, then do not show internal messages.
   const mostRecent = messages?.find(
     (m) => isAdmin || m.direction !== "internal",
+  );
+
+  // Group previews are prefixed with the sender name, as in WhatsApp Web.
+  const previewSenderAddress =
+    conversation?.group_address &&
+    mostRecent?.direction === "incoming" &&
+    mostRecent.contact_address
+      ? mostRecent.contact_address
+      : undefined;
+  const { data: previewSender } = useContactByAddress(
+    previewSenderAddress,
+    conversation?.service,
   );
 
   const draft: Draft | null | undefined = conversation?.extra?.draft;
@@ -260,15 +276,21 @@ export default function ChatListItem({ itemId }: { itemId: string }) {
     (igExtra?.username ? `@${igExtra.username}` : undefined);
 
   // When there is no name, show the (formatted) contact address instead of "?".
-  // WhatsApp addresses are phone numbers; Instagram addresses need no formatting.
+  // WhatsApp addresses are phone numbers; Instagram addresses need no
+  // formatting. Groups (whatsapp-web) have no contact_address — the name
+  // carries the group subject, falling back to the opaque group JID.
   const address = conversation?.contact_address;
   const displayName =
     name ||
-    (address
-      ? conversation?.service === "whatsapp"
-        ? formatPhoneNumber(address)
-        : address
-      : "?");
+    (conversation?.group_address
+      ? conversation.group_address
+      : address
+        ? conversation?.service === "whatsapp" ||
+          conversation?.service === "whatsapp-web"
+          ? formatPhoneNumber(address)
+          : address
+        : undefined) ||
+    "?";
 
   const { translate: t, currentLanguage } = useTranslation();
 
@@ -321,15 +343,7 @@ export default function ChatListItem({ itemId }: { itemId: string }) {
               />
               {conversation.service !== "local" && (
                 <div className="absolute -bottom-[1px] -right-[1px] rounded-full bg-background p-[1px] leading-none">
-                  {conversation.service === "instagram" ? (
-                    <InstagramOutlined
-                      style={{ fontSize: "14px", color: "#E1306C" }}
-                    />
-                  ) : (
-                    <WhatsAppOutlined
-                      style={{ fontSize: "14px", color: "#25D366" }}
-                    />
-                  )}
+                  <ServiceIcon service={conversation.service} size={14} />
                 </div>
               )}
             </div>
@@ -360,6 +374,14 @@ export default function ChatListItem({ itemId }: { itemId: string }) {
                   <div className="text-primary text-[14px] mr-1 shrink-0">
                     {agents?.find((a) => a.id === preview.agent_id)?.name ||
                       "?"}
+                    :
+                  </div>
+                )}
+                {/* Group sender prefix, as in WhatsApp Web */}
+                {previewSenderAddress && preview === mostRecent && (
+                  <div className="text-[14px] mr-1 shrink-0 max-w-[45%] truncate">
+                    {previewSender?.name ||
+                      formatPhoneNumber(previewSenderAddress)}
                     :
                   </div>
                 )}

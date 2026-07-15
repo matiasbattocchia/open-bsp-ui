@@ -17,12 +17,17 @@ export const queryKeys = {
     all: (orgId: NullableId) => [orgId, "contacts"] as const,
     detail: (orgId: NullableId, id: NullableId) =>
       [orgId, "contacts", id] as const,
-    byAddress: (orgId: NullableId, address: NullableId) =>
-      [orgId, "contacts_addresses", address, "contact"] as const,
+    // contacts_addresses PK is (organization_id, service, address): the same
+    // phone digits may exist under whatsapp AND whatsapp-web as separate rows.
+    byAddress: (orgId: NullableId, service: NullableId, address: NullableId) =>
+      [orgId, "contacts_addresses", service, address, "contact"] as const,
     addresses: (orgId: NullableId, contactId: NullableId) =>
       [orgId, "contacts", contactId, "addresses"] as const,
-    addressDetail: (orgId: NullableId, address: NullableId) =>
-      [orgId, "contacts_addresses", address] as const,
+    addressDetail: (
+      orgId: NullableId,
+      service: NullableId,
+      address: NullableId,
+    ) => [orgId, "contacts_addresses", service, address] as const,
   },
   organizations: {
     all: () => ["organizations"] as const,
@@ -40,6 +45,12 @@ export const queryKeys = {
   onboardingTokens: {
     all: (orgId: NullableId, service: string) =>
       [orgId, "onboarding_tokens", service] as const,
+  },
+  whatsappWeb: {
+    pendingSession: (orgId: NullableId, sessionId: NullableId) =>
+      [orgId, "whatsapp_web", "pending_session", sessionId] as const,
+    health: (orgId: NullableId, address: NullableId) =>
+      [orgId, "whatsapp_web", "health", address] as const,
   },
   billing: {
     products: () => ["billing", "products"] as const,

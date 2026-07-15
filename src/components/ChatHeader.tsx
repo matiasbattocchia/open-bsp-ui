@@ -17,12 +17,19 @@ export default function Header() {
     state.chat.conversations.get(state.ui.activeConvId || ""),
   );
 
-  const { data: contact } = useContactByAddress(conversation?.contact_address);
+  const { data: contact } = useContactByAddress(
+    conversation?.contact_address,
+    conversation?.service,
+  );
   const { data: contactAddress } = useContactAddress(
     conversation?.contact_address,
+    conversation?.service,
   );
 
   const service = conversation?.service;
+  // Group conversations (whatsapp-web) have group_address set and no
+  // contact_address; the conversation name carries the group subject.
+  const isGroup = !!conversation?.group_address;
 
   const igExtra =
     service === "instagram"
@@ -40,14 +47,18 @@ export default function Header() {
   const address = conversation?.contact_address;
 
   // When there is no name, show the (formatted) contact address instead of "?".
-  // WhatsApp addresses are phone numbers; Instagram addresses need no formatting.
+  // WhatsApp addresses are phone numbers; Instagram addresses need no
+  // formatting. Groups fall back to their opaque JID.
   const displayName =
     convName ||
-    (address
-      ? service === "whatsapp"
-        ? formatPhoneNumber(address)
-        : address
-      : "?");
+    (isGroup
+      ? conversation?.group_address
+      : address
+        ? service === "whatsapp" || service === "whatsapp-web"
+          ? formatPhoneNumber(address)
+          : address
+        : undefined) ||
+    "?";
 
   const convInitials = nameInitials(convName || "?");
 
@@ -82,8 +93,11 @@ export default function Header() {
           {displayName}
         </div>
         <div className="text-[13px] text-muted-foreground truncate">
+          {isGroup && t("Grupo")}
           {service === "local" && t("Contacto de prueba")}
-          {service === "whatsapp" && address && formatPhoneNumber(address)}
+          {(service === "whatsapp" || service === "whatsapp-web") &&
+            address &&
+            formatPhoneNumber(address)}
           {service === "instagram" &&
             igExtra?.username &&
             `@${igExtra.username}`}

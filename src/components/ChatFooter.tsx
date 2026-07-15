@@ -132,8 +132,9 @@ export default function ChatFooter() {
   });
 
   // Wether or not the user is allowed to send messages to the client.
-  // WhatsApp and Instagram both enforce a 24h customer-service window since the
-  // contact's last message; `local` (internal testing) has no window.
+  // WhatsApp (Cloud API) and Instagram both enforce a 24h customer-service
+  // window since the contact's last message; `local` (internal testing) and
+  // `whatsapp-web` (unofficial bridge) have no window.
   const inCSWindow =
     (conv?.service !== "whatsapp" && conv?.service !== "instagram") ||
     tick.isBefore(dayjs(mostRecentIncoming?.timestamp || 0).add(1, "day"));

@@ -68,3 +68,5 @@ If redirected to organizations/new from this URL, the cancel button returns to S
 - [ ] (enhancement) Show more... could improve (it counts chars but many new lines can make it show more than expected)
 
 - [x] (feat) Video messages
+
+- [ ] (enhancement) Manual contact creation hardcodes `service: "whatsapp"` for new addresses (useCreateContact / useUpdateContact). A manually created contact won't auto-link to a `whatsapp-web` conversation row — add a service selector or infer it. "Same human" linking across services is the backend's `contacts.contact_id` job.

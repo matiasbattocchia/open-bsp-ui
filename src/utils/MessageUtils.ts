@@ -38,6 +38,9 @@ export function newMessage(
     service: conv.service,
     organization_address: conv.organization_address,
     contact_address: conv.contact_address,
+    // Group conversations (whatsapp-web) route outgoing messages by the group
+    // JID; contact_address stays null (it carries the sender on incoming rows).
+    group_address: conv.group_address,
     direction,
     content,
     agent_id: agentId || null,

@@ -5,6 +5,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { FileText } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { InstagramOutlined, WhatsAppOutlined } from "@ant-design/icons";
+import ServiceIcon from "@/components/ServiceIcon";
 
 export const Route = createFileRoute("/_auth/integrations/")({
   component: IntegrationsIndex,
@@ -31,6 +32,21 @@ function IntegrationsIndex() {
             onClick={() =>
               navigate({
                 to: "/integrations/whatsapp",
+                hash: (prevHash) => prevHash!,
+              })
+            }
+          />
+          <SectionItem
+            aside={
+              <div className="p-[8px]">
+                <ServiceIcon service="whatsapp-web" size={24} />
+              </div>
+            }
+            title="WhatsApp Web"
+            description={t("Número no oficial vía WhatsApp Web")}
+            onClick={() =>
+              navigate({
+                to: "/integrations/whatsapp-web",
                 hash: (prevHash) => prevHash!,
               })
             }

@@ -137,13 +137,15 @@ export default function Chat() {
         env.last = true;
       } else if (
         prevMsg.message.agent_id === env.message.agent_id &&
-        prevMsg.message.direction === env.message.direction
+        prevMsg.message.direction === env.message.direction &&
+        prevMsg.message.contact_address === env.message.contact_address
       ) {
         prevMsg.last = false;
         env.last = true;
       } else if (
         prevMsg.message.agent_id !== env.message.agent_id ||
-        prevMsg.message.direction !== env.message.direction
+        prevMsg.message.direction !== env.message.direction ||
+        prevMsg.message.contact_address !== env.message.contact_address
       ) {
         prevMsg.last = true;
         env.first = true;

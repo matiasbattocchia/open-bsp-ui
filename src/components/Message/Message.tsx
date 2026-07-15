@@ -16,6 +16,8 @@ import { prettyPrintJson } from "pretty-print-json";
 import { useTranslation } from "@/hooks/useTranslation";
 import AvatarComponent from "@/components/Avatar";
 import { useAgent } from "@/queries/useAgents";
+import { useContactByAddress } from "@/queries/useContacts";
+import { formatPhoneNumber } from "@/utils/FormatUtils";
 import { AVATAR_BG_COLORS, AVATAR_TEXT_COLORS } from "@/utils/colors";
 import type { Json } from "@/supabase/db_types";
 
@@ -293,6 +295,7 @@ export function InMessage({
   first,
   last,
   avatar,
+  senderName,
   children,
 }: PropsWithChildren<UIMessage>) {
   return (
@@ -325,6 +328,11 @@ export function InMessage({
           </>
         )}
         {avatar && first && <Avatar {...avatar} display="name" />}
+        {first && senderName && (
+          <div className="text-[12.8px] p-[6px] pb-0 text-primary font-medium">
+            {senderName}
+          </div>
+        )}
         {children}
       </div>
     </div>
@@ -388,10 +396,27 @@ type UIMessage = {
   convName?: string;
   avatar?: { agentId: string; color: string };
   internal?: boolean;
+  // Sender label for incoming messages in group conversations (whatsapp-web).
+  senderName?: string;
 };
 
 export default function Message(props: UIMessage & { message: MessageRow }) {
   const { translate: t } = useTranslation();
+
+  // Group conversations (whatsapp-web): incoming rows carry the actual sender in
+  // contact_address. Resolve a friendly label to attribute each message.
+  const isGroupIncoming =
+    !!props.message.group_address &&
+    props.message.direction === "incoming" &&
+    !!props.message.contact_address;
+  const { data: senderContact } = useContactByAddress(
+    isGroupIncoming ? props.message.contact_address : undefined,
+    props.message.service,
+  );
+  const senderName = isGroupIncoming
+    ? senderContact?.name || formatPhoneNumber(props.message.contact_address!)
+    : undefined;
+
   let content;
   let text = false;
   let fixedWidth = false;
@@ -523,7 +548,9 @@ export default function Message(props: UIMessage & { message: MessageRow }) {
   return (
     <>
       {props.message.direction === "incoming" && (
-        <InMessage {...{ ...props, text, fixedWidth }}>{content}</InMessage>
+        <InMessage {...{ ...props, text, fixedWidth, senderName }}>
+          {content}
+        </InMessage>
       )}
       {(props.message.direction === "outgoing" ||
         props.message.direction === "internal") && (
