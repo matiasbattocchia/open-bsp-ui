@@ -395,5 +395,6 @@
   "Grupo": "Group",
   "Conexión no oficial vía WhatsApp Web": "Unofficial connection via WhatsApp Web",
   "Conexión oficial vía API de Meta": "Official connection via Meta API",
-  "El uso de este método de conexión infringe los términos y condiciones de WhatsApp y tu cuenta podría ser baneada.": "Using this connection method breaks WhatsApp terms and conditions and your account could be banned."
+  "El uso de este método de conexión infringe los términos y condiciones de WhatsApp y tu cuenta podría ser baneada.": "Using this connection method breaks WhatsApp terms and conditions and your account could be banned.",
+  "Importante": "Important"
 }

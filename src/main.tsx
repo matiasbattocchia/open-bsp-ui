@@ -23,6 +23,20 @@ declare module "@tanstack/react-router" {
 
 const queryClient = new QueryClient();
 
+// After a deploy, an open tab may still reference hashed chunks that no longer
+// exist ("Failed to fetch dynamically imported module"). Vite surfaces this as
+// vite:preloadError — reload once to pick up the new build. The timestamp
+// guard avoids a reload loop if the fresh build also fails to load.
+window.addEventListener("vite:preloadError", (event) => {
+  const KEY = "chunk-reload-at";
+  const last = Number(sessionStorage.getItem(KEY) || 0);
+  if (Date.now() - last < 10_000) return; // let the error surface
+
+  sessionStorage.setItem(KEY, String(Date.now()));
+  event.preventDefault();
+  window.location.reload();
+});
+
 // Dark mode detection
 const darkModeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 

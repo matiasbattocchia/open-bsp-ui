@@ -90,6 +90,9 @@ function WhatsAppWebNew() {
                 "Vinculá tu número escaneando un código QR o ingresando un código en tu teléfono, como un dispositivo más de WhatsApp.",
               )}
             </p>
+            <p>
+              <strong>{t("Importante")}</strong>
+            </p>
             <p className="text-destructive font-medium">
               {t(
                 "El uso de este método de conexión infringe los términos y condiciones de WhatsApp y tu cuenta podría ser baneada.",
@@ -97,27 +100,31 @@ function WhatsAppWebNew() {
             </p>
           </div>
 
-          {/* Method toggle */}
-          <div className="flex gap-[8px]">
-            {(["qr", "code"] as const).map((m) => (
-              <button
-                key={m}
-                type="button"
-                onClick={() => switchMethod(m)}
-                className={
-                  "px-[12px] py-[6px] rounded-full text-[14px] " +
-                  (method === m
-                    ? "bg-accent text-primary"
-                    : "text-muted-foreground hover:bg-accent")
-                }
-              >
-                {m === "qr" ? t("Código QR") : t("Vincular con número")}
-              </button>
-            ))}
-          </div>
+          {/* Method toggle - hidden while a pairing session is in progress */}
+          {!pairedPending && !start.isPending && (
+            <div className="flex gap-[8px]">
+              {(["qr", "code"] as const).map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => switchMethod(m)}
+                  className={
+                    "px-[12px] py-[6px] rounded-full text-[14px] " +
+                    (method === m
+                      ? "bg-accent text-primary"
+                      : "text-muted-foreground hover:bg-accent")
+                  }
+                >
+                  {m === "qr" ? t("Código QR") : t("Vincular con número")}
+                </button>
+              ))}
+            </div>
+          )}
 
           {errorMessage && (
-            <p className="text-destructive font-medium">{errorMessage}</p>
+            <div className="instructions">
+              <p className="text-destructive font-medium">{errorMessage}</p>
+            </div>
           )}
 
           {/* Phone input (code method, before start) */}
@@ -167,6 +174,14 @@ function WhatsAppWebNew() {
               {t("Generando...")}
             </div>
           )}
+
+          {/* Waiting indicator, under the QR / pairing code */}
+          {pairedPending && (qrCode || pairingCode) && (
+            <div className="flex items-center justify-center gap-[8px] text-muted-foreground text-[14px]">
+              <Spinner size={16} />
+              {t("Esperando vinculación...")}
+            </div>
+          )}
         </form>
       </SectionBody>
 
@@ -187,19 +202,9 @@ function WhatsAppWebNew() {
             {method === "qr" ? t("Generar código QR") : t("Obtener código")}
           </Button>
         ) : (
-          <div className="flex items-center justify-between w-full">
-            <div className="flex items-center gap-[8px] text-muted-foreground text-[14px]">
-              <Spinner size={16} />
-              {t("Esperando vinculación...")}
-            </div>
-            <button
-              type="button"
-              className="text-[14px] text-muted-foreground hover:text-foreground"
-              onClick={reset}
-            >
-              {t("Cancelar")}
-            </button>
-          </div>
+          <Button type="button" className="destructive w-full" onClick={reset}>
+            {t("Cancelar")}
+          </Button>
         )}
       </SectionFooter>
     </>
