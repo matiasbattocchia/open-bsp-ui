@@ -185,8 +185,8 @@ export type AIAgentExtra = {
   api_url?: string;
   api_key?: string;
   model?: string;
-  // TODO: Add responses (openai), messages (anthropic), generate-content (google).
-  protocol?: "a2a" | "chat_completions";
+  // TODO: Add messages (anthropic), generate-content (google).
+  protocol?: "chat_completions" | "responses";
   max_messages?: number;
   temperature?: number;
   max_tokens?: number;

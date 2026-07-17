@@ -21,11 +21,14 @@ export const protocols: Record<
   string,
   NonNullable<AIAgentExtra["protocol"]>[]
 > = {
-  openai: ["chat_completions"],
+  // Responses API support: OpenAI (native), Groq (stateless), and any
+  // conforming custom endpoint. Google's OpenAI-compat layer 404s on /responses
+  // and Anthropic uses its own Messages API — chat_completions only.
+  openai: ["chat_completions", "responses"],
   google: ["chat_completions"],
   anthropic: ["chat_completions"],
-  groq: ["chat_completions"],
-  custom: ["chat_completions", "a2a"],
+  groq: ["chat_completions", "responses"],
+  custom: ["chat_completions", "responses"],
 };
 
 export const protocolLabels: Record<
@@ -33,7 +36,7 @@ export const protocolLabels: Record<
   string
 > = {
   chat_completions: "Chat Completions",
-  a2a: "A2A",
+  responses: "Responses",
 };
 
 export const defaultModels: Record<string, string> = {

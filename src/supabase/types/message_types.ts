@@ -5,8 +5,6 @@
 // `// @ui-divergence` below (run `scripts/check-type-sync.sh` to list them).
 //===================================
 
-// @ui-divergence: the API also imports TaskState from ../a2a_types (not vendored
-// UI-side); see TaskInfo.task.status below.
 import type { Json } from "../db_types";
 import type {
   ButtonMessage,
@@ -28,7 +26,7 @@ import type { InstagramReferral } from "./instagram_webhook_payload_types";
 export type TaskInfo = {
   task?: {
     id: string;
-    // @ui-divergence: `status` is `string` (API: TaskState from a2a_types).
+    // @ui-divergence: `status` is `string` (API: a TaskState union).
     status?: string;
     session_id?: string;
   };
