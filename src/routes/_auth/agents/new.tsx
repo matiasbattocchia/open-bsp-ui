@@ -57,23 +57,23 @@ export const apiKeyInstructions: Record<
   openai: {
     url: "https://platform.openai.com/api-keys",
     label: "platform.openai.com",
-    steps: "API Keys > Create new secret key.",
+    steps: "API Keys > Create new secret key",
   },
   anthropic: {
     url: "https://console.anthropic.com/settings/keys",
     label: "console.anthropic.com",
-    steps: "Settings > API Keys > Create Key.",
+    steps: "Settings > API Keys > Create Key",
   },
   google: {
     url: "https://aistudio.google.com/app/apikey",
     label: "aistudio.google.com",
-    steps: "Get API key > Create API key.",
+    steps: "Get API key > Create API key",
     free: true,
   },
   groq: {
     url: "https://console.groq.com/keys",
     label: "console.groq.com",
-    steps: "API Keys > Create API Key.",
+    steps: "API Keys > Create API Key",
     free: true,
   },
 };
@@ -244,6 +244,11 @@ function AddAgent() {
                     )}
                   </p>
                   <p>
+                    <strong>
+                      {apiKeyInstructions[provider].free
+                        ? t("Obtené una clave gratuita:")
+                        : t("Obtené una clave:")}
+                    </strong>{" "}
                     <a
                       href={apiKeyInstructions[provider].url}
                       target="_blank"
@@ -254,8 +259,6 @@ function AddAgent() {
                     </a>
                     {" > "}
                     {apiKeyInstructions[provider].steps}
-                    {apiKeyInstructions[provider].free &&
-                      ` — ${t("Gratuito.")}`}
                   </p>
                 </div>
               )}

@@ -147,7 +147,6 @@
   "Feb": "févr.",
   "Fijar chat": "Épingler la discussion",
   "Foto": "Photo",
-  "Gratuito.": "Gratuit.",
   "Generar": "Générer",
   "Generar clave API": "Générer une clé API",
   "Generar enlace": "Générer un lien",
@@ -396,5 +395,7 @@
   "Conexión no oficial vía WhatsApp Web": "Connexion non officielle via WhatsApp Web",
   "Conexión oficial vía API de Meta": "Connexion officielle via l'API Meta",
   "El uso de este método de conexión infringe los términos y condiciones de WhatsApp y tu cuenta podría ser baneada.": "L'utilisation de cette méthode de connexion enfreint les conditions d'utilisation de WhatsApp et votre compte pourrait être banni.",
-  "Importante": "Important"
+  "Importante": "Important",
+  "Obtené una clave gratuita:": "Obtenez une clé gratuite :",
+  "Obtené una clave:": "Obtenez une clé :"
 }

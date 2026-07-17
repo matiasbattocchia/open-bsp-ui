@@ -105,6 +105,7 @@ function MediaPreprocessingSettings() {
 
           <div className="instructions">
             <p>
+              <strong>{t("Obtené una clave gratuita:")}</strong>{" "}
               <a
                 href="https://aistudio.google.com/app/apikey"
                 target="_blank"
@@ -113,8 +114,7 @@ function MediaPreprocessingSettings() {
               >
                 aistudio.google.com
               </a>
-              {" > "}Get API key {" > "} Create API key. {" — "}
-              {t("Gratuito.")}
+              {" > "}Get API key {" > "} Create API key
             </p>
           </div>
 

@@ -225,6 +225,11 @@ function AgentDetail() {
                     )}
                   </p>
                   <p>
+                    <strong>
+                      {apiKeyInstructions[provider].free
+                        ? t("Obtené una clave gratuita:")
+                        : t("Obtené una clave:")}
+                    </strong>{" "}
                     <a
                       href={apiKeyInstructions[provider].url}
                       target="_blank"
@@ -235,8 +240,6 @@ function AgentDetail() {
                     </a>
                     {" > "}
                     {apiKeyInstructions[provider].steps}
-                    {apiKeyInstructions[provider].free &&
-                      ` — ${t("Gratuito.")}`}
                   </p>
                 </div>
               )}
