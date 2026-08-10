@@ -6,6 +6,8 @@ import useBoundStore from "@/stores/useBoundStore";
 import { type FileDraft } from "@/stores/chatSlice";
 import {
   isImage,
+  isVideo,
+  mediaKindFromMime,
   extension,
   iconName,
   fileSize,
@@ -155,15 +157,13 @@ const FilePreviewer = () => {
     !conv.updated_at && (await pushConversationToDb(conv));
 
     for (const draft of drafts) {
-      const fileKind = isImage(draft.file.type) ? "image" : "document";
-
       const record = newMessage(
         conv,
         sendAsContact ? "incoming" : "outgoing",
         {
           version: "1",
           type: "file",
-          kind: fileKind,
+          kind: mediaKindFromMime(draft.file.type),
           file: {
             uri: "", // Will be set by newMessage
             mime_type: draft.file.type,
@@ -232,6 +232,12 @@ const FilePreviewer = () => {
               src={URL.createObjectURL(previewDraft.file)}
               className="max-h-[25vw] max-w-[25hw] shadow"
             /> // TODO: not to memoize URL.createObjectURL could be potentially *stupid* - cabra 30/05/2024
+          ) : isVideo(previewDraft.file.type) ? (
+            <video
+              src={URL.createObjectURL(previewDraft.file)}
+              controls
+              className="max-h-[40vh] max-w-full shadow"
+            />
           ) : (
             <>
               <img
@@ -332,6 +338,12 @@ const FilePreviewer = () => {
                     {isImage(draft.file.type) ? (
                       <img
                         src={URL.createObjectURL(draft.file)} // TODO: this is potentially *stupid* - cabra 30/05/2024
+                        className="object-cover w-[50px] h-[50px] rounded-sm"
+                      />
+                    ) : isVideo(draft.file.type) ? (
+                      <video
+                        src={URL.createObjectURL(draft.file)}
+                        muted
                         className="object-cover w-[50px] h-[50px] rounded-sm"
                       />
                     ) : (

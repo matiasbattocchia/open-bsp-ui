@@ -17,6 +17,12 @@ export default function Header() {
     state.chat.conversations.get(state.ui.activeConvId || ""),
   );
 
+  const alias = useBoundStore((state) =>
+    state.ui.activeConvId
+      ? state.ui.conversationAliases[state.ui.activeConvId]
+      : undefined,
+  );
+
   const { data: contact } = useContactByAddress(
     conversation?.contact_address,
     conversation?.service,
@@ -36,9 +42,10 @@ export default function Header() {
       ? (contactAddress?.extra as InstagramContactAddressExtra | null)
       : null;
 
-  // Name fallback order: conversation.name → contact.name →
+  // Name fallback order: local alias → conversation.name → contact.name →
   // contactAddress.extra?.name → @username (Instagram) → "?"
   const convName =
+    alias ||
     conversation?.name ||
     contact?.name ||
     contactAddress?.extra?.name ||

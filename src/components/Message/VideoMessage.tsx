@@ -89,27 +89,28 @@ export default function VideoMessage(message: MessageRow) {
   // at the top to stay clear of them.
   const overlayTimestamp =
     !!src &&
+    load.status === "done" &&
     !content.text &&
     !(content.artifacts && content.artifacts.length > 0);
+
+  // Preview blob is available during upload before storage finishes — keep the
+  // load/spinner overlay visible on top (same pattern as ImageMessage).
+  const mediaBusy = load.status !== "done";
+  const canPlay = !!src && !mediaBusy;
 
   return (
     <>
       <div
         className={
-          "rounded-md relative overflow-hidden" +
-          // Before load: a clickable placeholder. Once loaded, the native
-          // <video> owns the whole frame, so the wrapper adds no
-          // cursor/click-target/background that would interfere with its
-          // controls (those caused the play button to dim and the cursor to
-          // drop back to the default arrow over the controls).
-          (src
-            ? ""
-            : " flex items-center justify-center cursor-pointer" +
-              " bg-black/5 dark:bg-white/5")
+          "rounded-md relative overflow-hidden flex items-center justify-center" +
+          // Before load: a clickable placeholder. Once ready to play, the native
+          // <video> owns the frame — no extra cursor/background that would
+          // interfere with its controls.
+          (canPlay ? "" : " cursor-pointer bg-black/5 dark:bg-white/5")
         }
         style={{ height, width }}
         onClick={
-          src
+          canPlay
             ? undefined
             : () => {
                 if (load.status === "pending" || load.status === "error") {
@@ -126,9 +127,12 @@ export default function VideoMessage(message: MessageRow) {
           <video
             ref={videoRef}
             src={src}
-            controls
+            controls={canPlay}
             onLoadedMetadata={videoDimensions}
-            className="message-video absolute inset-0 h-full w-full cursor-pointer rounded-md bg-black object-cover"
+            className={
+              "message-video absolute inset-0 h-full w-full rounded-md bg-black object-cover" +
+              (canPlay ? " cursor-pointer" : "")
+            }
           />
         )}
 
@@ -137,8 +141,9 @@ export default function VideoMessage(message: MessageRow) {
             so Chrome's native overlay play button underneath (which dims on
             hover and shows the default cursor, and whose internal state cannot
             be restyled) is never the hover target. Clicking it starts playback,
-            after which the native controls take over. */}
-        {src && !started && (
+            after which the native controls take over. Hidden while uploading /
+            downloading so the spinner stays visible. */}
+        {canPlay && !started && (
           <button
             type="button"
             onClick={() => {
@@ -163,10 +168,10 @@ export default function VideoMessage(message: MessageRow) {
           <div className="pointer-events-none absolute top-0 z-[1] h-[30px] w-full rounded-md shadow-[inset_0_30px_10px_-10px_rgba(0,0,0,0.4)]" />
         )}
 
-        {/* Load button */}
+        {/* Load button — z above the video preview so uploads show progress. */}
         {(load.status === "pending" || load.status === "error") &&
           !isNaN(media.size) && (
-            <div className="z-[1] rounded-full h-[44px] pl-[13px] pr-[18px] flex items-center text-white bg-[rgba(11,20,26,.35)] text-[13px]">
+            <div className="relative z-[2] rounded-full h-[44px] pl-[13px] pr-[18px] flex items-center text-white bg-[rgba(11,20,26,.35)] text-[13px]">
               <svg
                 className={
                   "w-[24px] h-[24px] transition" +
@@ -182,7 +187,7 @@ export default function VideoMessage(message: MessageRow) {
         {/* Alternative load button for when file size is missing, just in case */}
         {(load.status === "pending" || load.status === "error") &&
           isNaN(media.size) && (
-            <div className="z-[1] rounded-full flex items-center justify-center text-white bg-[rgba(11,20,26,.35)] w-[44px] h-[44px]">
+            <div className="relative z-[2] rounded-full flex items-center justify-center text-white bg-[rgba(11,20,26,.35)] w-[44px] h-[44px]">
               <svg
                 className={
                   "w-[24px] h-[24px] transition" +
@@ -194,7 +199,7 @@ export default function VideoMessage(message: MessageRow) {
             </div>
           )}
         {load.status === "loading" && (
-          <div className="z-[1] rounded-full text-white bg-[rgba(11,20,26,.35)]">
+          <div className="relative z-[2] rounded-full text-white bg-[rgba(11,20,26,.35)]">
             <svg className="w-[44px] h-[44px]">
               <use href="/icons.svg#image-cancel" />
               <use className="text-white spin" href="/icons.svg#image-spin" />

@@ -26,6 +26,12 @@ export default function ItemActions({
         ?.values()
         .next().value,
   );
+  const alias = useBoundStore(
+    (state) => state.ui.conversationAliases[itemId] || "",
+  );
+  const setConversationAlias = useBoundStore(
+    (state) => state.ui.setConversationAlias,
+  );
 
   const { translate: t } = useTranslation();
 
@@ -68,6 +74,27 @@ export default function ItemActions({
           pinned: isPinned ? null : new Date().toISOString(),
         }),
     },
+    {
+      label: t("Renombrar chat"),
+      key: "3",
+      onClick: () => {
+        const next = window.prompt(
+          t("Apodo (solo en este dispositivo)"),
+          alias,
+        );
+        if (next === null) return;
+        setConversationAlias(itemId, next);
+      },
+    },
+    ...(alias
+      ? [
+          {
+            label: t("Quitar apodo"),
+            key: "4",
+            onClick: () => setConversationAlias(itemId, null),
+          },
+        ]
+      : []),
     /*{
       label: t("Marcar como no leído"),
       key: "2",

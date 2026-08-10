@@ -40,6 +40,7 @@ const useBoundStore = create<AppState>()(
             ...createUISlice,
             ...prev.ui,
             ...state.ui,
+            conversationAliases: state.ui.conversationAliases || {},
           };
           if (state.ui.language && state.ui.language !== "es") {
             loadTranslations(state.ui.language);
@@ -53,6 +54,7 @@ const useBoundStore = create<AppState>()(
           filter: state.ui.filter,
           activeOrgId: state.ui.activeOrgId,
           language: state.ui.language,
+          conversationAliases: state.ui.conversationAliases,
         },
       }),
     },
