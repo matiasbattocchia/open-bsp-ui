@@ -165,6 +165,7 @@ export default function ChatListItem({ itemId }: { itemId: string }) {
   const conversation = useBoundStore((state) =>
     state.chat.conversations.get(itemId),
   );
+  const alias = useBoundStore((state) => state.ui.conversationAliases[itemId]);
 
   const { data: contact } = useContactByAddress(
     conversation?.contact_address,
@@ -272,9 +273,10 @@ export default function ChatListItem({ itemId }: { itemId: string }) {
       ? (contactAddress?.extra as InstagramContactAddressExtra | null)
       : null;
 
-  // Name fallback order: conversation.name → contact.name →
+  // Name fallback order: local alias → conversation.name → contact.name →
   // contactAddress.extra?.name → @username (Instagram)
   const name =
+    alias ||
     conversation?.name ||
     contact?.name ||
     contactAddress?.extra?.name ||

@@ -62,6 +62,19 @@ export function isImage(type: string) {
   return type.split("/")[0] === "image";
 }
 
+export function isVideo(type: string) {
+  return type.split("/")[0] === "video";
+}
+
+/** Maps a browser MIME type to the file-part kind used when sending. */
+export function mediaKindFromMime(
+  type: string,
+): "image" | "video" | "document" {
+  if (isImage(type)) return "image";
+  if (isVideo(type)) return "video";
+  return "document";
+}
+
 export default function DocumentMessage(message: MessageRow) {
   if (!(message.direction === "incoming" || message.direction === "outgoing")) {
     throw new Error(`Message with id ${message.id} is not a BaseMessage.`);

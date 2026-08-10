@@ -9,6 +9,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 export type ConvMetadata = {
   convId: string;
   conv: ConversationRow;
+  alias?: string;
   mostRecentMsg?: MessageRow;
 };
 
@@ -36,6 +37,9 @@ const ChatList = () => {
   const setFilterName = useBoundStore((state) => state.ui.setFilter);
   const searchPattern = useBoundStore((state) => state.ui.searchPattern);
   const setSearchPattern = useBoundStore((state) => state.ui.setSearchPattern);
+  const conversationAliases = useBoundStore(
+    (state) => state.ui.conversationAliases || {},
+  );
 
   function getMostRecentMsg(convId: string): MessageRow | undefined {
     return messages.get(convId)?.values().next().value;
@@ -49,6 +53,7 @@ const ChatList = () => {
     .map(([convId, conv]) => ({
       convId,
       conv,
+      alias: conversationAliases[convId],
       mostRecentMsg: getMostRecentMsg(convId),
     }))
     .filter(
@@ -61,7 +66,7 @@ const ChatList = () => {
   if (searchPattern) {
     const fuse = new Fuse(items, {
       threshold: 0.4,
-      keys: ["conv.name", "conv.contact_address"],
+      keys: ["alias", "conv.name", "conv.contact_address"],
     });
     items = fuse.search(searchPattern).map((r) => r.item);
   } else {
