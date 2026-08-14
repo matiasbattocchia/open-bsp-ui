@@ -12,6 +12,7 @@ import StatusIcon from "./StatusIcon";
 import dayjs from "dayjs";
 import { Remarkable } from "remarkable";
 import { type FormEventHandler, type PropsWithChildren, useState } from "react";
+import { Forward } from "lucide-react";
 import { prettyPrintJson } from "pretty-print-json";
 import { useTranslation } from "@/hooks/useTranslation";
 import AvatarComponent from "@/components/Avatar";
@@ -691,8 +692,16 @@ export default function Message(
     />
   ) : null;
 
+  const forwardedLabel = props.message.content.forwarded ? (
+    <div className="flex items-center gap-[4px] px-[6px] pt-[6px] pb-[2px] text-[12.5px] italic text-muted-foreground">
+      <Forward className="h-[12px] w-[12px] shrink-0" />
+      {t("Reenviado")}
+    </div>
+  ) : null;
+
   const bubbleBody = (
     <>
+      {forwardedLabel}
       {quote}
       {content}
       {reactionPicker}
