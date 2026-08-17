@@ -122,6 +122,14 @@ p a,
   color: var(--primary) !important;
 }
 
+.markdown strong {
+  font-weight: 700;
+}
+
+.markdown em {
+  font-style: italic;
+}
+
 button {
   cursor: pointer;
 }

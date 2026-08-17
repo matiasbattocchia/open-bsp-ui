@@ -26,6 +26,7 @@ import { useContactByAddress } from "@/queries/useContacts";
 import { useContactAddress } from "@/queries/useContactsAddresses";
 import { formatPhoneNumber, nameInitials } from "@/utils/FormatUtils";
 import { useNavigate } from "@tanstack/react-router";
+import { getDataMessageDisplay } from "@/utils/dataMessageDisplay";
 
 function mediaPreview(t: (content: string) => ReactNode, message?: MessageRow) {
   let mediaIcon = null;
@@ -408,7 +409,9 @@ export default function ChatListItem({ itemId }: { itemId: string }) {
                   {preview?.content.type === "text" && preview.content.text}
                   {preview?.content.type === "data" &&
                     preview.content.kind !== "media_placeholder" &&
-                    JSON.stringify(preview.content.data)}
+                    (getDataMessageDisplay(preview.content)?.body ||
+                      preview.content.text ||
+                      JSON.stringify(preview.content.data))}
                   {(preview?.content.type === "file" ||
                     (preview?.content.type === "data" &&
                       preview.content.kind === "media_placeholder")) &&

@@ -1,6 +1,7 @@
 import TurndownService from "turndown";
 import DOMPurify from "isomorphic-dompurify";
 import he from "he";
+import { Remarkable } from "remarkable";
 
 const turndownService = new TurndownService({
   headingStyle: "atx",
@@ -31,18 +32,111 @@ turndownService.addRule("contentEditableLine", {
   },
 });
 
+function isBoldFontWeight(weight: string): boolean {
+  const w = weight.trim().toLowerCase();
+  if (w === "bold" || w === "bolder") return true;
+  const n = parseInt(w, 10);
+  return !Number.isNaN(n) && n >= 600;
+}
+
+/** Strip outer ** / __ so re-bolding a draft can't stack into ****text****. */
+function unwrapOuterBoldMarkers(content: string): string {
+  let s = content.trim();
+  for (;;) {
+    const next = s
+      .replace(/^\*\*(?![\s*])([\s\S]*?)(?<![\s*])\*\*$/, "$1")
+      .replace(/^__(?![\s_])([\s\S]*?)(?<![\s_])__$/, "$1");
+    if (next === s) break;
+    s = next.trim();
+  }
+  return s;
+}
+
+function wrapBold(content: string): string {
+  const inner = unwrapOuterBoldMarkers(content);
+  return inner ? `**${inner}**` : content;
+}
+
+turndownService.addRule("strong", {
+  filter: ["strong", "b"],
+  replacement: (content) => wrapBold(content),
+});
+
+// Pastes often use font-weight spans instead of <b>/<strong>. Those look
+// bold in the editor but Turndown would otherwise emit plain text.
+turndownService.addRule("boldFontWeight", {
+  filter(node) {
+    if (node.nodeName !== "SPAN" && node.nodeName !== "FONT") return false;
+    return isBoldFontWeight(
+      (node as HTMLElement).style?.fontWeight ||
+        node.getAttribute("style")?.match(/font-weight:\s*([^;]+)/i)?.[1] ||
+        "",
+    );
+  },
+  replacement: (content) => wrapBold(content),
+});
+
+function wrapBoldPerLine(inner: string): string {
+  return inner
+    .split("\n")
+    .map((line) => {
+      const match = line.match(/^(\s*)(.*?)(\s*)$/);
+      if (!match) return line;
+      const [, lead, mid, trail] = match;
+      const core = unwrapOuterBoldMarkers(mid);
+      if (!core) return line;
+      return `${lead}**${core}**${trail}`;
+    })
+    .join("\n");
+}
+
+/** Collapse stacked/unbalanced markers and split multiline ** so WhatsApp
+ * (same-line bold only) gets a valid *bold* per line. */
+function normalizeComposerMarkdown(text: string): string {
+  let s = text.replace(/\*{3,}(?![\s*])([\s\S]*?)(?<![\s*])\*{3,}/g, "**$1**");
+  s = s.replace(
+    /(^|[^*])\*(?!\*)(?![\s*])([^*]+?)(?<![\s*])\*\*/g,
+    (_, pre, inner) => `${pre}**${inner}**`,
+  );
+  s = s.replace(/\*\*(?![\s*])([^*]+?)(?<![\s*])\*(?!\*)/g, "**$1**");
+  return s.replace(
+    /\*\*(?![\s*])([\s\S]+?)(?<![\s*])\*\*/g,
+    (_match, inner: string) =>
+      inner.includes("\n") ? wrapBoldPerLine(inner) : `**${inner}**`,
+  );
+}
+
 /**
  * Sanitizes HTML to prevent XSS and converts it to Markdown.
  * Useful for converting contenteditable HTML input to safe Markdown for storage/sending.
  */
 export function htmlToMarkdown(html: string): string {
-  // 1. Decode HTML entities (e.g. &lt;h1&gt; -> <h1>)
-  // This allows pasting HTML source code to be converted, and ensures we sanitize the actual tags.
   const decoded = he.decode(html);
-
-  // 2. Sanitize HTML
   const cleanHtml = DOMPurify.sanitize(decoded);
+  return normalizeComposerMarkdown(turndownService.turndown(cleanHtml));
+}
 
-  // 3. Convert to Markdown (plain newlines for line breaks — see br / div rules above)
-  return turndownService.turndown(cleanHtml);
+const editableMd = new Remarkable({
+  breaks: true,
+  html: false,
+});
+
+/**
+ * CommonMark → HTML for the contenteditable composer.
+ * Drafts are stored as markdown (`**bold**`); restoring via textContent shows
+ * literal asterisks and re-applying bold stacks them. Restore as HTML instead.
+ */
+export function markdownToEditableHtml(markdown: string): string {
+  if (!markdown) return "";
+
+  const rendered = editableMd
+    .render(normalizeComposerMarkdown(markdown))
+    .trim()
+    .replace(/<p>/g, "<div>")
+    .replace(/<\/p>/g, "</div>");
+
+  return DOMPurify.sanitize(rendered, {
+    ALLOWED_TAGS: ["div", "br", "strong", "em", "del", "s", "code", "pre", "a"],
+    ALLOWED_ATTR: ["href"],
+  });
 }

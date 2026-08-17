@@ -1,6 +1,7 @@
 import type { MessageRow } from "@/supabase/client";
 import { isReactionMessage } from "@/utils/ReactionUtils";
 import { mediaCategory } from "@/components/Message/media";
+import { getDataMessageDisplay } from "@/utils/dataMessageDisplay";
 
 export function isReplyMessage(message: MessageRow): boolean {
   return (
@@ -50,6 +51,11 @@ export function getMessagePreviewText(
   if (content.type === "data") {
     if (content.kind === "media_placeholder") {
       return content.text?.trim() || t("Contenido multimedia no disponible");
+    }
+
+    const display = getDataMessageDisplay(content);
+    if (display?.body.trim()) {
+      return display.body.trim();
     }
 
     if (content.text?.trim()) {
