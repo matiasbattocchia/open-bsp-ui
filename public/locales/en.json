@@ -263,6 +263,7 @@
   "Ninguna": "None",
   "Ninguno": "None",
   "No hay plantillas disponibles.": "No templates available.",
+  "No se pudieron cargar las plantillas.": "Couldn't load templates.",
   "No se pudo cargar el SDK de Facebook. Desactivá la protección contra rastreo o el bloqueador de anuncios para este sitio, o probá con otro navegador.": "Couldn't load the Facebook SDK. Disable tracking protection or your ad blocker for this site, or try another browser.",
   "No se pudo conectar la cuenta de Instagram.": "The Instagram account could not be connected.",
   "No se pudo contactar el puente. Intentá de nuevo.": "Couldn't reach the bridge. Try again.",

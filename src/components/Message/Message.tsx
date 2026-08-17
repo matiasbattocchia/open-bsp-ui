@@ -10,7 +10,6 @@ import VideoMessage from "./VideoMessage";
 import { mediaCategory } from "./media";
 import StatusIcon from "./StatusIcon";
 import dayjs from "dayjs";
-import { Remarkable } from "remarkable";
 import { type FormEventHandler, type PropsWithChildren, useState } from "react";
 import { Forward } from "lucide-react";
 import { prettyPrintJson } from "pretty-print-json";
@@ -29,50 +28,15 @@ import { useMessageActionTray } from "./useMessageActionTray";
 import { type AggregatedReaction } from "@/utils/ReactionUtils";
 import { canReplyToMessage, isReplyMessage } from "@/utils/ReplyUtils";
 import useBoundStore from "@/stores/useBoundStore";
-
-const md = new Remarkable({
-  breaks: true,
-  html: false, // Security: Disabled to prevent XSS from untrusted WhatsApp messages
-  linkify: true,
-  typographer: true,
-});
-
-md.renderer.rules.link_open = function (tokens, idx) {
-  const title = tokens[idx].title ? ` title="${tokens[idx].title}"` : "";
-  return `<a href="${
-    tokens[idx].href
-  }"${title} target="_blank" rel="noopener noreferrer">`;
-};
-
-// Convert WhatsApp formatting to standard markdown for Remarkable rendering
-// Mirrors whatsappToMarkdown from open-bsp-api/_shared/markdown.ts
-function whatsappToMarkdown(text: string): string {
-  const parts = text.split(/(`{3}[\s\S]*?`{3})/);
-
-  return parts
-    .map((part) => {
-      if (part.startsWith("```")) return part;
-
-      const subParts = part.split(/(`[^`]+`)/);
-
-      return subParts
-        .map((subPart) => {
-          if (subPart.startsWith("`")) return subPart;
-
-          let processed = subPart;
-          // Bold: *text* -> **text**
-          processed = processed.replace(/\*([^*]+?)\*/g, "**$1**");
-          // Italic: _text_ -> *text*
-          processed = processed.replace(/_([^_]+?)_/g, "*$1*");
-          // Strikethrough: ~text~ -> ~~text~~
-          processed = processed.replace(/~([^~]+?)~/g, "~~$1~~");
-
-          return processed;
-        })
-        .join("");
-    })
-    .join("");
-}
+import {
+  chatMarkdownToHtml,
+  chatTextDirection,
+} from "@/utils/whatsappMarkdown";
+import {
+  getDataMessageDisplay,
+  isTemplateMessageContent,
+} from "@/utils/dataMessageDisplay";
+import { useTemplates } from "@/queries/useTemplates";
 
 export function Markdown({
   content,
@@ -85,21 +49,21 @@ export function Markdown({
   onInput?: FormEventHandler<HTMLDivElement>;
   withoutEndingSpace?: boolean;
 }) {
-  // Hack to induce some space to not to overwrite the timestamp.
-  if (!withoutEndingSpace) {
-    content += "&emsp;&emsp;&emsp;";
+  const html = chatMarkdownToHtml(content);
 
-    if (direction === "outgoing") {
-      content += "&emsp;";
-    }
-  }
-
-  const renderedHTML = md.render(whatsappToMarkdown(content));
+  // Padding instead of trailing &emsp; — LTR spaces reorder Hebrew punctuation.
+  const timestampPad = withoutEndingSpace
+    ? undefined
+    : direction === "outgoing"
+      ? "4.5em"
+      : "3.5em";
 
   return (
     <div
       className="markdown"
-      dangerouslySetInnerHTML={{ __html: renderedHTML }}
+      dir={chatTextDirection(content)}
+      style={timestampPad ? { paddingInlineEnd: timestampPad } : undefined}
+      dangerouslySetInnerHTML={{ __html: html }}
       onInput={onInput}
     />
   );
@@ -450,6 +414,12 @@ export default function Message(
   );
   const { rootRef, actionsOpen, closeActions, rowHandlers } =
     useMessageActionTray();
+  const { data: templates } = useTemplates(
+    isTemplateMessageContent(props.message.content)
+      ? props.message.organization_address ||
+          props.conversation?.organization_address
+      : undefined,
+  );
 
   // Group conversations (whatsapp-web): incoming rows carry the actual sender in
   // contact_address. Resolve a friendly label to attribute each message.
@@ -543,26 +513,6 @@ export default function Message(
     );
     text = true;
   } else if (
-    props.message.content.type === "data" &&
-    props.message.content.text
-  ) {
-    content = (
-      <TextMessage
-        header={headerText}
-        body={props.message.content.text}
-        type="markdown"
-        direction={props.message.direction}
-        timestamp={props.message.timestamp}
-        status={
-          props.message.direction === "outgoing"
-            ? props.message.status
-            : undefined
-        }
-        fixedWidth={fixedWidth}
-      />
-    );
-    text = true;
-  } else if (
     (props.message.content.type === "data" &&
       props.message.content.kind === "media_placeholder") ||
     (props.message.content.type === "file" && !props.message.content.file?.uri)
@@ -593,7 +543,27 @@ export default function Message(
     );
     text = true;
   } else if (props.message.content.type === "data") {
-    content = (
+    const display = getDataMessageDisplay(props.message.content, templates);
+    content = display ? (
+      <TextMessage
+        header={
+          headerText ||
+          (display.header ? chatMarkdownToHtml(display.header) : undefined)
+        }
+        body={display.body}
+        footer={display.footer}
+        buttons={display.buttons}
+        type="markdown"
+        direction={props.message.direction}
+        timestamp={props.message.timestamp}
+        status={
+          props.message.direction === "outgoing"
+            ? props.message.status
+            : undefined
+        }
+        fixedWidth={fixedWidth}
+      />
+    ) : (
       <TextMessage
         header={headerText}
         body={props.message.content.data}

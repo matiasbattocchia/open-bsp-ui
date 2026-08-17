@@ -22,6 +22,7 @@ import {
 import { buildExternalIdIndex, replyTargetId } from "@/utils/ReplyUtils";
 import { TickContext } from "@/contexts/useTick";
 import Spinner from "./Spinner";
+import { useTemplates } from "@/queries/useTemplates";
 
 type EnvelopeType = { message: MessageRow; first: boolean; last: boolean };
 type SeparatorType = { text: string; first: true; last: true };
@@ -72,6 +73,12 @@ export default function Chat() {
   const { data: agent } = useCurrentAgent();
   const activeAgentId = agent?.id;
   const isAdmin = ["admin", "owner"].includes(agent?.extra?.role || "");
+
+  // Prefetch WhatsApp templates so template bubbles can fill {{1}} / {{2}}
+  // from the definition instead of showing raw variables.
+  useTemplates(
+    conv?.service === "whatsapp" ? conv.organization_address : undefined,
+  );
 
   const tick = useContext(TickContext);
 

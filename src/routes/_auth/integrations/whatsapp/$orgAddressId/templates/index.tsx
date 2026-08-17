@@ -17,7 +17,7 @@ function TemplatesIndex() {
   const navigate = useNavigate();
   const { orgAddressId } = Route.useParams();
 
-  const { data: templates, isLoading } = useTemplates(orgAddressId);
+  const { data: templates, isLoading, error } = useTemplates(orgAddressId);
 
   return (
     <>
@@ -45,6 +45,13 @@ function TemplatesIndex() {
           </div>
         )}
 
+        {error && (
+          <div className="p-8 text-center text-destructive text-sm break-words">
+            {t("No se pudieron cargar las plantillas.")}
+            <div className="mt-2 text-muted-foreground">{error.message}</div>
+          </div>
+        )}
+
         {templates?.map((template) => (
           <SectionItem
             key={template.id}
@@ -52,11 +59,11 @@ function TemplatesIndex() {
             description={
               <div className="flex gap-2 items-center">
                 <span className="capitalize">
-                  {template.category.toLowerCase()}
+                  {(template.category || "").toLowerCase()}
                 </span>
                 {template.status !== "APPROVED" && (
                   <span className="text-xs bg-destructive/20 text-destructive px-2 py-0.5 rounded-full capitalize">
-                    {template.status.toLowerCase()}
+                    {(template.status || "").toLowerCase()}
                   </span>
                 )}
               </div>
@@ -76,7 +83,7 @@ function TemplatesIndex() {
           />
         ))}
 
-        {!isLoading && templates?.length === 0 && (
+        {!isLoading && !error && templates?.length === 0 && (
           <div className="p-8 text-center text-muted-foreground text-sm">
             {t("No hay plantillas disponibles.")}
           </div>

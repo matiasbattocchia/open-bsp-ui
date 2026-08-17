@@ -17,7 +17,7 @@ import { saveDraft } from "@/utils/ConversationUtils";
 import { pushConversationToDb } from "@/utils/ConversationUtils";
 import { useCurrentAgent } from "@/queries/useAgents";
 import { moveCursorToEnd } from "@/utils/UtilityFunctions";
-import { htmlToMarkdown } from "@/utils/htmlToMarkdown";
+import { htmlToMarkdown, markdownToEditableHtml } from "@/utils/htmlToMarkdown";
 import ReplyQuote from "@/components/Message/ReplyQuote";
 import { useReplyDraft } from "@/hooks/useReplyDraft";
 
@@ -62,7 +62,9 @@ const FilePreviewer = () => {
       return;
     }
 
-    editableDiv.current.textContent = drafts[previewIndex].caption || "";
+    editableDiv.current.innerHTML = markdownToEditableHtml(
+      drafts[previewIndex].caption || "",
+    );
     moveCursorToEnd(editableDiv.current);
     editableDiv.current.focus();
   }, [drafts?.length, previewIndex]);

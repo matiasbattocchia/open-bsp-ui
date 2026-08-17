@@ -20,7 +20,7 @@ import "dayjs/locale/pt";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useCurrentAgent } from "@/queries/useAgents";
 import { moveCursorToEnd } from "@/utils/UtilityFunctions";
-import { htmlToMarkdown } from "@/utils/htmlToMarkdown";
+import { htmlToMarkdown, markdownToEditableHtml } from "@/utils/htmlToMarkdown";
 import TemplatePicker from "./TemplatePicker";
 import ReplyQuote from "./Message/ReplyQuote";
 import { useReplyDraft } from "@/hooks/useReplyDraft";
@@ -195,7 +195,9 @@ export default function ChatFooter() {
       return;
     }
 
-    editableDiv.current.textContent = message || "";
+    // Drafts are markdown (`**bold**`); restore as HTML so bold stays visual
+    // and re-applying Cmd/Ctrl+B does not stack asterisks (****bold****).
+    editableDiv.current.innerHTML = markdownToEditableHtml(message || "");
 
     // do not steal the focus from the file previewer
     if (
@@ -234,7 +236,7 @@ export default function ChatFooter() {
       setMessage(draft.text);
 
       if (editableDiv.current) {
-        editableDiv.current.textContent = draft.text;
+        editableDiv.current.innerHTML = markdownToEditableHtml(draft.text);
         if (window.matchMedia("(min-width: 768px)").matches) {
           moveCursorToEnd(editableDiv.current);
         }
