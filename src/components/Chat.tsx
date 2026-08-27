@@ -107,16 +107,17 @@ export default function Chat() {
 
   function formatDate(timestamp: string): string {
     const dayjsTs = dayjs(timestamp).locale(currentLanguage);
+    const date = dayjsTs.format("l"); // 9/9/2024
 
     const days = dayjs().diff(dayjsTs.startOf("day"), "day", true);
 
-    if (days < 1) return t("hoy");
+    if (days < 1) return `${t("hoy")} · ${date}`;
 
-    if (days < 2) return t("ayer");
+    if (days < 2) return `${t("ayer")} · ${date}`;
 
-    if (days < 7) return dayjsTs.format("dddd"); // Jueves
+    if (days < 7) return `${dayjsTs.format("dddd")} · ${date}`; // Jueves · 9/9/2024
 
-    return dayjsTs.format("l"); // 9/9/2024
+    return date;
   }
 
   function getUniqueAgentIds(messages: MessageRow[] | undefined): Set<string> {

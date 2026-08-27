@@ -13,7 +13,19 @@ type ScrollSession = {
   hasMore: boolean;
   loading: boolean;
   stickToBottom: boolean;
-  pendingRestore: { height: number; top: number } | null;
+  /**
+   * Snapshot for anchoring the viewport across a history prepend.
+   * `ready` is set only immediately before `pushMessages` so realtime/media
+   * count bumps during the fetch cannot consume the snapshot early. Zustand
+   * may re-render synchronously on push, so restore must be eligible in that
+   * same turn (not gated on a `loading` flag cleared in `finally`).
+   */
+  pendingRestore: {
+    height: number;
+    top: number;
+    baselineCount: number;
+    ready: boolean;
+  } | null;
 };
 
 /**
@@ -64,12 +76,17 @@ export function useChatScroll(
         [],
     );
     const oldest = messages[messages.length - 1];
-    if (!oldest?.timestamp) return;
+    if (!oldest?.timestamp || !oldest.created_at || !oldest.id) return;
 
-    // Pin viewport only when reading history; keep stick-to-bottom for autofill.
+    // Reserve a restore slot while reading history (not during autofill).
     session.pendingRestore = session.stickToBottom
       ? null
-      : { height: el.scrollHeight, top: el.scrollTop };
+      : {
+          height: el.scrollHeight,
+          top: el.scrollTop,
+          baselineCount: messages.length,
+          ready: false,
+        };
 
     const epoch = session.epoch;
     session.loading = true;
@@ -78,7 +95,11 @@ export function useChatScroll(
     try {
       const older = await fetchConversationMessages(
         conversationId,
-        oldest.timestamp,
+        {
+          timestamp: oldest.timestamp,
+          created_at: oldest.created_at,
+          id: oldest.id,
+        },
         OLDER_PAGE_SIZE,
       );
 
@@ -92,7 +113,32 @@ export function useChatScroll(
         return;
       }
 
+      const sizeBefore =
+        useBoundStore.getState().chat.messages.get(conversationId)?.size ?? 0;
+
+      // Mark ready + re-snapshot immediately before prepend so: (1) realtime
+      // bumps during the fetch cannot consume the slot early, (2) the delta
+      // excludes those bumps, (3) a sync zustand re-render can restore.
+      if (session.pendingRestore && el.isConnected) {
+        session.pendingRestore = {
+          height: el.scrollHeight,
+          top: el.scrollTop,
+          baselineCount: sizeBefore,
+          ready: true,
+        };
+      }
+
       pushMessages(older);
+
+      const sizeAfter =
+        useBoundStore.getState().chat.messages.get(conversationId)?.size ?? 0;
+
+      // Rows returned but none applied (e.g. all scheduled) — don't leave a
+      // dangling restore or retry the same cursor forever.
+      if (sizeAfter <= sizeBefore) {
+        session.pendingRestore = null;
+        session.hasMore = false;
+      }
     } catch (err) {
       console.error(err);
       if (epoch === sessionRef.current.epoch) {
@@ -125,6 +171,9 @@ export function useChatScroll(
 
     const pending = session.pendingRestore;
     if (pending) {
+      // Slot reserved but history not prepended yet (fetch in flight / realtime).
+      if (!pending.ready || messageCount <= pending.baselineCount) return;
+
       el.scrollTop = el.scrollHeight - pending.height + pending.top;
       session.pendingRestore = null;
     } else if (session.stickToBottom) {
