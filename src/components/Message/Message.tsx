@@ -40,29 +40,18 @@ import { useTemplates } from "@/queries/useTemplates";
 
 export function Markdown({
   content,
-  direction,
   onInput,
-  withoutEndingSpace,
 }: {
   content: string;
-  direction: MessageRow["direction"];
+  direction?: MessageRow["direction"];
   onInput?: FormEventHandler<HTMLDivElement>;
-  withoutEndingSpace?: boolean;
 }) {
   const html = chatMarkdownToHtml(content);
-
-  // Padding instead of trailing &emsp; — LTR spaces reorder Hebrew punctuation.
-  const timestampPad = withoutEndingSpace
-    ? undefined
-    : direction === "outgoing"
-      ? "4.5em"
-      : "3.5em";
 
   return (
     <div
       className="markdown"
       dir={chatTextDirection(content)}
-      style={timestampPad ? { paddingInlineEnd: timestampPad } : undefined}
       dangerouslySetInnerHTML={{ __html: html }}
       onInput={onInput}
     />
@@ -104,96 +93,64 @@ export function TextMessage({
 
   return (
     <>
-      <div className="relative">
-        {/* Content */}
-        <div
-          className={
-            "pl-[6px] pt-[6px] pb-[5px] pr-[4px]" +
-            (fixedWidth ? " w-[320px]" : "")
-          }
-        >
-          {/* Header */}
-          {header && (
-            <div
-              className="text-[15px] mb-3 font-semibold"
-              dangerouslySetInnerHTML={{ __html: header }}
-              onInput={onInput}
+      <div
+        className={
+          "pl-[6px] pt-[6px] pb-[5px] pr-[4px]" +
+          (fixedWidth ? " w-[320px]" : "")
+        }
+      >
+        {/* Header */}
+        {header && (
+          <div
+            className="text-[15px] mb-3 font-semibold"
+            dangerouslySetInnerHTML={{ __html: header }}
+            onInput={onInput}
+          />
+        )}
+
+        {/* Body */}
+        {type === "json" ? (
+          <div
+            className={
+              "scrollbar-hide overflow-x-auto " +
+              (isTooLong && !expanded ? "max-h-[150px] overflow-y-hidden" : "")
+            }
+          >
+            <pre
+              dangerouslySetInnerHTML={{
+                __html: prettyPrintJson.toHtml(body as Json, {
+                  indent: 2,
+                }),
+              }}
             />
-          )}
+          </div>
+        ) : (
+          <div
+            className={
+              "scrollbar-hide overflow-x-auto " +
+              (isTooLong && !expanded ? "max-h-[150px] overflow-y-hidden" : "")
+            }
+          >
+            <Markdown content={body as string} onInput={onInput} />
+          </div>
+        )}
 
-          {/* Body */}
-          {type === "json" ? (
-            <>
-              <div
-                className={
-                  "scrollbar-hide overflow-x-auto " +
-                  (isTooLong && !expanded
-                    ? "max-h-[150px] overflow-y-hidden"
-                    : "")
-                }
-              >
-                <pre
-                  dangerouslySetInnerHTML={{
-                    __html: prettyPrintJson.toHtml(body as Json, {
-                      indent: 2,
-                    }),
-                  }}
-                />
-              </div>
+        {isTooLong && (
+          <div
+            className="text-primary cursor-pointer mt-1"
+            onClick={() => setExpanded(!expanded)}
+          >
+            {expanded ? t("ver menos...") : t("ver más...")}
+          </div>
+        )}
 
-              {/* This invisible inline element does not play well with Markdown block elements. */}
-              {!!footer && (
-                <span className="text-[11px] mx-[4px] invisible">
-                  {dayjs(timestamp).format("HH:mm")}
-                  {direction === "outgoing" && (
-                    <span className="px-[8px] ml-[3px]"></span>
-                  )}
-                </span>
-              )}
-            </>
-          ) : (
-            <div
-              className={
-                "scrollbar-hide overflow-x-auto " +
-                (isTooLong && !expanded
-                  ? "max-h-[150px] overflow-y-hidden"
-                  : "")
-              }
-            >
-              <Markdown
-                content={body as string}
-                direction={direction}
-                onInput={onInput}
-                withoutEndingSpace={!!footer}
-              />
-            </div>
-          )}
+        {/* Footer */}
+        {footer && (
+          <div className="text-[13px] text-muted-foreground mt-1">{footer}</div>
+        )}
 
-          {isTooLong && (
-            <div
-              className="text-primary cursor-pointer mt-1"
-              onClick={() => setExpanded(!expanded)}
-            >
-              {expanded ? t("ver menos...") : t("ver más...")}
-            </div>
-          )}
-
-          {/* Footer */}
-          {footer && (
-            <div className="text-[13px] text-muted-foreground mt-1">
-              {footer}
-              <span className="text-[11px] mx-[4px] invisible">
-                {dayjs(timestamp).format("HH:mm")}
-                {direction === "outgoing" && !!status && (
-                  <span className="px-[8px] ml-[3px]"></span>
-                )}
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* Timestamp */}
-        <div className="text-[11px] text-muted-foreground absolute bottom-[0px] right-[7px] flex items-center">
+        {/* Timestamp — below the text, not overlaid */}
+        <div className="mt-[2px] flex items-center justify-end gap-[2px] text-[11px] text-muted-foreground">
           {dayjs(timestamp).format("HH:mm")}
           {direction === "outgoing" && !!status && <StatusIcon {...status} />}
         </div>

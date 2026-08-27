@@ -74,18 +74,39 @@ export const fetchMessagesFromBackend = async (
   return messagesResponse;
 };
 
+/** Keyset cursor for older-history pagination (matches chatSlice sort). */
+export type MessageHistoryCursor = Pick<
+  MessageRow,
+  "timestamp" | "created_at" | "id"
+>;
+
 // Fetch older messages for a conversation (infinite scroll).
+// Keyset must match timestampDescending: a bare .lt("timestamp") permanently
+// skips same-second siblings (common with WhatsApp whole-second timestamps)
+// whenever a page boundary lands inside a tied batch.
 export const fetchConversationMessages = async (
   conversationId: string,
-  beforeTimestamp: string,
+  before: MessageHistoryCursor,
   limit: number = 30,
 ): Promise<MessageRow[]> => {
+  const ts = before.timestamp;
+  const ca = before.created_at;
+  const id = before.id;
+
   const { data, error } = await supabase
     .from("messages")
     .select()
     .eq("conversation_id", conversationId)
-    .lt("timestamp", beforeTimestamp)
+    .or(
+      [
+        `timestamp.lt."${ts}"`,
+        `and(timestamp.eq."${ts}",created_at.lt."${ca}")`,
+        `and(timestamp.eq."${ts}",created_at.eq."${ca}",id.lt."${id}")`,
+      ].join(","),
+    )
     .order("timestamp", { ascending: false })
+    .order("created_at", { ascending: false })
+    .order("id", { ascending: false })
     .limit(limit);
 
   if (error) {
