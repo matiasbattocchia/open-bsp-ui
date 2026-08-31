@@ -1,4 +1,4 @@
-import { type ReactNode, useContext } from "react";
+import { type ReactNode, startTransition, useContext } from "react";
 import Avatar from "./Avatar";
 import { getHighestStatus, getStatusIcon } from "@/utils/MessageStatusUtils";
 import useBoundStore from "@/stores/useBoundStore";
@@ -159,9 +159,9 @@ function severityClass(hours: number) {
 
 export default function ChatListItem({ itemId }: { itemId: string }) {
   const navigate = useNavigate();
-  const activeConvId = useBoundStore((state) => state.ui.activeConvId);
-
-  const active = itemId === activeConvId;
+  // Select a boolean so only the previously/newly active items re-render on
+  // conversation switch (selecting the id string re-renders every list item).
+  const active = useBoundStore((state) => state.ui.activeConvId === itemId);
 
   const conversation = useBoundStore((state) =>
     state.chat.conversations.get(itemId),
@@ -181,15 +181,22 @@ export default function ChatListItem({ itemId }: { itemId: string }) {
   const { data: agents } = useCurrentAgents();
   const isAdmin = ["admin", "owner"].includes(agent?.extra?.role || "");
 
-  const messages: MessageRow[] | undefined = Array.from(
-    useBoundStore((state) => state.chat.messages.get(itemId || ""))?.values() ||
-      [],
+  // Keep the Map reference stable across unrelated store updates. Selecting
+  // `.values()` returns a new iterator every time and forces a re-render.
+  const messageMap = useBoundStore((state) =>
+    state.chat.messages.get(itemId || ""),
   );
 
   // If the role is not admin, then do not show internal messages.
-  const mostRecent = messages?.find(
-    (m) => (isAdmin || m.direction !== "internal") && !isReactionMessage(m),
-  );
+  let mostRecent: MessageRow | undefined;
+  if (messageMap) {
+    for (const m of messageMap.values()) {
+      if ((isAdmin || m.direction !== "internal") && !isReactionMessage(m)) {
+        mostRecent = m;
+        break;
+      }
+    }
+  }
 
   // Group previews are prefixed with the sender name, as in WhatsApp Web.
   const previewSenderAddress =
@@ -225,12 +232,12 @@ export default function ChatListItem({ itemId }: { itemId: string }) {
     let notification = false;
     let countBreak = false;
 
-    if (!messages) {
+    if (!messageMap) {
       return { count, notification };
     }
 
     // Messages are sorted by most recent first.
-    for (const msg of messages) {
+    for (const msg of messageMap.values()) {
       if (isReactionMessage(msg)) {
         continue;
       }
@@ -337,8 +344,10 @@ export default function ChatListItem({ itemId }: { itemId: string }) {
           onClick={(e) => {
             e.stopPropagation();
             e.preventDefault();
-            // setActiveConv(itemId);
-            navigate({ to: "/conversations", hash: itemId });
+            // Defer the heavy chat-panel render so the click can paint first (INP).
+            startTransition(() => {
+              navigate({ to: "/conversations", hash: itemId });
+            });
           }}
         >
           <div className="profile-picture pl-[10px] pr-[15px] flex items-center">

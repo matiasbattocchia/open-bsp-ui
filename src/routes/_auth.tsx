@@ -4,7 +4,7 @@ import Menu from "@/components/Menu";
 import Chat from "@/components/Chat";
 import ChatHeader from "@/components/ChatHeader";
 import ChatFooter from "@/components/ChatFooter";
-import { useEffect, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 import { useLocation } from "@tanstack/react-router";
 import FilePicker from "@/components/FileUploader/FilePicker";
 import FilePreviewer from "@/components/FilePreviewer";
@@ -57,7 +57,10 @@ function AppLayout() {
   // i.e. /conversations#1234
   useEffect(() => {
     const convId = location.hash;
-    setActiveConv(convId);
+    // Defer mounting/switching the chat panel so list-item clicks stay responsive.
+    startTransition(() => {
+      setActiveConv(convId);
+    });
   }, [location.hash]);
 
   console.log("--------");
