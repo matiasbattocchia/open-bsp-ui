@@ -118,6 +118,16 @@ export default function ChatFooter() {
 
   const editableDiv = useRef<HTMLDivElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
+  // After send, ignore draft rehydration until the DB draft is actually gone
+  // (pause-on-send realtime can re-push the old draft before saveDraft("") lands).
+  const skipDraftLoad = useRef(false);
+  // Latest composer values for flush-on-refresh (pagehide can't close over stale state).
+  const messageRef = useRef(message);
+  const convRef = useRef(conv);
+  const sendAsContactRef = useRef(sendAsContact);
+  messageRef.current = message;
+  convRef.current = conv;
+  sendAsContactRef.current = sendAsContact;
 
   const tick = useContext(TickContext); // one-minute ticks
 
@@ -210,6 +220,34 @@ export default function ChatFooter() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeConvId, fileDrafts]);
 
+  // Reset send-time draft skip when switching conversations so a real draft can load.
+  useEffect(() => {
+    skipDraftLoad.current = false;
+  }, [activeConvId]);
+
+  // Once the persisted draft is gone, allow future draft loads (e.g. bot drafts).
+  useEffect(() => {
+    if (!draft?.text) {
+      skipDraftLoad.current = false;
+    }
+  }, [draft]);
+
+  // Persist in-progress text on refresh/close so drafts survive without waiting
+  // for the 3s debounce. Cleared only on send (see sendTextMessage).
+  useEffect(() => {
+    const flushDraft = () => {
+      const c = convRef.current;
+      const text = messageRef.current;
+      if (!c || !text || c.created_at === c.updated_at) {
+        return;
+      }
+      void saveDraft(c, text, sendAsContactRef.current);
+    };
+
+    window.addEventListener("pagehide", flushDraft);
+    return () => window.removeEventListener("pagehide", flushDraft);
+  }, []);
+
   // Set send as contact
   useEffect(() => {
     if (!activeConvId || !conv) {
@@ -217,7 +255,11 @@ export default function ChatFooter() {
     }
 
     // Note: conv.extra.draft is a DB stored draft; message (textDraft) is just an UI buffer
-    const shouldLoadDraft = inCSWindow && draft?.text && !message; // do not overwrite a current message
+    const shouldLoadDraft =
+      inCSWindow &&
+      draft?.text &&
+      !message && // do not overwrite a current message
+      !skipDraftLoad.current; // do not revive a draft we just cleared on send
 
     if (draft?.origin === "bot" || draft?.origin === "human-as-organization") {
       // Draft defaults to send as organization
@@ -265,6 +307,22 @@ export default function ChatFooter() {
 
     clearTimeout(timer);
 
+    const textToSend = message;
+
+    // Clear composer immediately (match FilePreviewer). Waiting on DB left the
+    // text visible, and pause-on-send realtime could rehydrate conv.extra.draft
+    // into the empty buffer via the draft-load effect.
+    skipDraftLoad.current = true;
+    setMessage("");
+    clearReply();
+    if (editableDiv.current) {
+      editableDiv.current.textContent = "";
+    }
+    // TODO: optimization: combine with the updateConvExtra call - cabra 2025-01-16
+    // Always clear the DB draft on send (autosave/pagehide may have written one
+    // even if `draft` hasn't landed in local state yet).
+    void saveDraft(conv, "", sendAsContact);
+
     // If the conv has the `updated_at` unset, it means it has not been pushed to the DB yet.
     !conv.updated_at && (await pushConversationToDb(conv));
 
@@ -275,7 +333,7 @@ export default function ChatFooter() {
         version: "1",
         type: "text",
         kind: "text",
-        text: message,
+        text: textToSend,
         ...(replyToMessage?.external_id
           ? { re_message_id: replyToMessage.external_id }
           : {}),
@@ -285,15 +343,6 @@ export default function ChatFooter() {
 
     pushMessageToStore(record);
     await pushMessageToDb(record);
-
-    setMessage("");
-    clearReply();
-    // TODO: optimization: combine with the updateConvExtra call - cabra 2025-01-16
-    draft && saveDraft(conv, "", sendAsContact);
-
-    if (editableDiv.current) {
-      editableDiv.current.textContent = "";
-    }
   };
 
   const sendTemplateMessage = async () => {
