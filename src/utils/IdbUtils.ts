@@ -1,6 +1,7 @@
 import { type MessageRow, supabase } from "@/supabase/client";
 import dayjs from "dayjs";
 import { del, get, set } from "idb-keyval";
+import { type MessageHistoryCursor } from "@/utils/messageHistory";
 
 interface MessageCache {
   messages: MessageRow[];
@@ -74,11 +75,26 @@ export const fetchMessagesFromBackend = async (
   return messagesResponse;
 };
 
-/** Keyset cursor for older-history pagination (matches chatSlice sort). */
-export type MessageHistoryCursor = Pick<
-  MessageRow,
-  "timestamp" | "created_at" | "id"
->;
+/** Latest contiguous page for a conversation (fills init_data holes). */
+export const fetchLatestConversationMessages = async (
+  conversationId: string,
+  limit: number = 30,
+): Promise<MessageRow[]> => {
+  const { data, error } = await supabase
+    .from("messages")
+    .select()
+    .eq("conversation_id", conversationId)
+    .order("timestamp", { ascending: false })
+    .order("created_at", { ascending: false })
+    .order("id", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    throw error;
+  }
+
+  return data ?? [];
+};
 
 // Fetch older messages for a conversation (infinite scroll).
 // Keyset must match timestampDescending: a bare .lt("timestamp") permanently

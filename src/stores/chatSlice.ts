@@ -4,25 +4,19 @@ import type { StateCreator } from "zustand";
 // @ts-expect-error no type declarations for the core-js-pure submodule
 import groupBy from "core-js-pure/actual/object/group-by";
 import { type MessageRowV0, toV1 } from "@/supabase/messages-v0";
+import {
+  isOlderThanCursor,
+  timestampDescending,
+  toHistoryCursor,
+  type MessageHistoryCursor,
+} from "@/utils/messageHistory";
 
-export function timestampDescending(a?: MessageRow, b?: MessageRow) {
-  // Valid comparator: returns a signed number and 0 on ties. The previous
-  // version returned only -1/1 (never 0), which is non-antisymmetric for equal
-  // timestamps and makes V8's sort produce engine-dependent, unstable order.
-  const ta = +new Date(a?.timestamp || 0);
-  const tb = +new Date(b?.timestamp || 0);
-  if (ta !== tb) return tb - ta;
-
-  // Ties are common: WhatsApp delivers whole-second timestamps, and echoed
-  // outgoing messages get their ms-disambiguated timestamp overwritten by
-  // Meta's second-resolution one. created_at preserves the true insertion
-  // order in those cases; id is the final, fully deterministic fallback.
-  const ca = +new Date(a?.created_at || 0);
-  const cb = +new Date(b?.created_at || 0);
-  if (ca !== cb) return cb - ca;
-
-  return (b?.id || "").localeCompare(a?.id || "");
-}
+export {
+  isOlderThanCursor,
+  timestampDescending,
+  toHistoryCursor,
+  type MessageHistoryCursor,
+} from "@/utils/messageHistory";
 
 export type FileDraft = {
   file: File;
@@ -50,6 +44,23 @@ export type ChatState = {
 export type ChatActions = {
   pushConversations: (convs: ConversationRow[]) => void;
   pushMessages: (msgs: MessageRow[]) => void;
+  /**
+   * Drop messages strictly older than `cursor` for a conversation. Used after
+   * seeding a contiguous latest window so orphaned init previews cannot sit
+   * above a hole and make scroll-up jump from today to the distant past.
+   */
+  trimMessagesOlderThan: (
+    conversationId: string,
+    cursor: MessageHistoryCursor,
+  ) => void;
+  /**
+   * Keep only the newest `limit` messages for a conversation (map is newest-first).
+   * Returns the new oldest cursor when anything was dropped, else null.
+   */
+  retainNewestMessages: (
+    conversationId: string,
+    limit: number,
+  ) => MessageHistoryCursor | null;
   setMediaLoad: (messageId: string, mediaLoad: MediaLoad) => void;
   setConversationTextDraft: (convId: string, textDraft: string) => void;
   setConversationFileDrafts: (convId: string, drafts: FileDraft[]) => void;
@@ -154,6 +165,57 @@ export const createChatSlice: StateCreator<Partial<AppState>> = (
         },
       };
     }),
+  trimMessagesOlderThan: (
+    conversationId: string,
+    cursor: MessageHistoryCursor,
+  ) =>
+    set((state) => {
+      const existing = state.chat.messages.get(conversationId);
+      if (!existing?.size) return {};
+
+      let removed = false;
+      const next = new Map<string, MessageRow>();
+      for (const [id, msg] of existing) {
+        if (isOlderThanCursor(msg, cursor)) {
+          removed = true;
+          continue;
+        }
+        next.set(id, msg);
+      }
+      if (!removed) return {};
+
+      const messages = new Map(state.chat.messages);
+      messages.set(conversationId, next);
+      return {
+        chat: {
+          ...state.chat,
+          messages,
+        },
+      };
+    }),
+  retainNewestMessages: (conversationId: string, limit: number) => {
+    let newOldest: MessageHistoryCursor | null = null;
+
+    set((state) => {
+      const existing = state.chat.messages.get(conversationId);
+      if (!existing || existing.size <= limit) return {};
+
+      // Map iteration order is newest-first (see pushMessages sort).
+      const kept = Array.from(existing.entries()).slice(0, limit);
+      newOldest = toHistoryCursor(kept[kept.length - 1]?.[1]);
+
+      const messages = new Map(state.chat.messages);
+      messages.set(conversationId, new Map(kept));
+      return {
+        chat: {
+          ...state.chat,
+          messages,
+        },
+      };
+    });
+
+    return newOldest;
+  },
   setMediaLoad: (messageId: string, mediaLoad: MediaLoad) => {
     set((state) => {
       const mediaLoads = new Map(state.chat.mediaLoads);

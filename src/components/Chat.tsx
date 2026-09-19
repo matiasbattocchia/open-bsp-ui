@@ -12,6 +12,7 @@ import { useCurrentOrganization } from "@/queries/useOrganizations";
 import { useCurrentAgent } from "@/queries/useAgents";
 import { useChatScroll } from "@/hooks/useChatScroll";
 import { AVATAR_COLORS } from "@/utils/colors";
+import { isOlderThanCursor } from "@/utils/messageHistory";
 import {
   buildReactionIndex,
   getAggregatedReactions,
@@ -98,10 +99,8 @@ export default function Chat() {
     [messages],
   );
 
-  const { scrollerRef, isLoadingOlder, onScroll } = useChatScroll(
-    activeConvId,
-    messages.length,
-  );
+  const { scrollerRef, isLoadingOlder, onScroll, historyCursor } =
+    useChatScroll(activeConvId, messages.length);
 
   const { translate: t, currentLanguage } = useTranslation();
 
@@ -221,9 +220,14 @@ export default function Chat() {
   }
 
   // If the role is not admin, then do not show internal messages (tool calls, etc).
+  // Also hide rows older than the contiguous history window — init can leave
+  // orphaned previews months back, which made scroll-up jump from today to the
+  // distant past and skip yesterday.
   const envelopesAndSeparators = insertDateSeparators(
     messages
       .filter((m, idx) => {
+        if (historyCursor && isOlderThanCursor(m, historyCursor)) return false;
+
         if (isReactionMessage(m)) return false;
 
         if (isAdmin) return true;
@@ -244,7 +248,7 @@ export default function Chat() {
       <div
         ref={scrollerRef}
         onScroll={onScroll}
-        className="grow min-h-0 pb-[8px] overflow-y-auto [scrollbar-gutter:stable]"
+        className="grow min-h-0 pb-[8px] overflow-y-auto [overflow-anchor:none] [scrollbar-gutter:stable]"
       >
         <div className="min-h-[12px] flex justify-center items-center py-1">
           {isLoadingOlder && <Spinner size={16} />}
