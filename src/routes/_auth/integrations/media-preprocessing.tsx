@@ -12,7 +12,10 @@ import Button from "@/components/Button";
 import SelectField from "@/components/SelectField";
 import TextAreaField from "@/components/TextAreaField";
 import Switch from "@/components/Switch";
-import { type OrganizationUpdate } from "@/supabase/client";
+import {
+  type OrganizationUpdate,
+  type PreprocessingConfig,
+} from "@/supabase/client";
 import { useForm, Controller } from "react-hook-form";
 import { useMemo } from "react";
 
@@ -38,7 +41,9 @@ function MediaPreprocessingSettings() {
         ...org.extra,
         media_preprocessing: {
           mode: "inactive" as "active" | "inactive",
-          model: "gemini-2.5-flash" as "gemini-2.5-pro" | "gemini-2.5-flash",
+          model: "gemini-2.5-flash" as NonNullable<
+            PreprocessingConfig["model"]
+          >,
           ...org.extra?.media_preprocessing,
         },
       },
@@ -87,7 +92,9 @@ function MediaPreprocessingSettings() {
             label={t("Modelo")}
             options={[
               { value: "gemini-2.5-flash", label: "Gemini 2.5 Flash" },
-              { value: "gemini-2.5-pro", label: "Gemini 2.5 Pro" },
+              { value: "gemini-3-flash-preview", label: "Gemini 3 Flash" },
+              { value: "gemini-3.8-flash", label: "Gemini 3.8 Flash" },
+              { value: "gemini-3.1-pro-preview", label: "Gemini 3.1 Pro" },
             ]}
             disabled={!isAdmin}
           />
