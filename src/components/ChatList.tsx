@@ -5,6 +5,8 @@ import { timestampDescending } from "@/stores/chatSlice";
 import { filters, Filters } from "@/stores/uiSlice";
 import Fuse from "fuse.js";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useConversationListScroll } from "@/hooks/useConversationListScroll";
+import Spinner from "./Spinner";
 
 export type ConvMetadata = {
   convId: string;
@@ -79,13 +81,26 @@ const ChatList = () => {
 
   const itemIds = items.map((a) => a.convId);
 
+  const { scrollerRef, isLoadingOlder, onScroll } = useConversationListScroll(
+    itemIds.length,
+  );
+
   return (
-    <div className="flex-1 min-h-0 w-full overflow-y-auto [overflow-anchor:none] [scrollbar-gutter:stable] pt-[10px] px-[10px]">
+    <div
+      ref={scrollerRef}
+      onScroll={onScroll}
+      className="flex-1 min-h-0 w-full overflow-y-auto [overflow-anchor:none] [scrollbar-gutter:stable] pt-[10px] px-[10px]"
+    >
       {itemIds.length ? (
         <div className="flex flex-col gap-[4px]">
           {itemIds.map((key) => (
             <ChatListItem key={key} itemId={key} />
           ))}
+          {isLoadingOlder && (
+            <div className="flex justify-center py-2">
+              <Spinner size={16} />
+            </div>
+          )}
         </div>
       ) : (
         <div className="h-full flex items-center justify-center flex-col text-foreground text-[15px] mt-[-24px]">

@@ -1,12 +1,10 @@
 import { supabase } from "@/supabase/client";
-import type { ConversationRow, MessageRow } from "@/supabase/client";
 import useBoundStore from "@/stores/useBoundStore";
 import { useEffect, useRef } from "react";
-
-type InitDataResponse = {
-  conversations: ConversationRow[];
-  messages: MessageRow[];
-};
+import {
+  applyInitDataPage,
+  type InitDataResponse,
+} from "@/utils/initDataUtils";
 
 export const useInitialDataFetch = () => {
   const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
@@ -34,8 +32,7 @@ export const useInitialDataFetch = () => {
       .throwOnError();
 
     const p1 = phase1 as unknown as InitDataResponse;
-    pushConversations(p1.conversations);
-    pushMessages(p1.messages);
+    applyInitDataPage(p1);
 
     // Phase 2: older conversations with preview messages
     // Skip if phase 1 returned fewer than the limit (all messages fit)
@@ -53,19 +50,8 @@ export const useInitialDataFetch = () => {
         .throwOnError();
 
       const p2 = phase2 as unknown as InitDataResponse;
-      pushConversations(p2.conversations);
-
-      // Phase 1 already seeded up to 10 recent msgs for these convs. Pushing
-      // phase-2 rows for the same ids inserts a much older preview window and
-      // leaves a hole in the middle — scroll-up then keysets from the orphan
-      // oldest and permanently skips the gap. Only attach previews for convs
-      // that were not in phase 1.
-      const phase1ConvIds = new Set(
-        p1.messages.map((m) => m.conversation_id),
-      );
-      pushMessages(
-        p2.messages.filter((m) => !phase1ConvIds.has(m.conversation_id)),
-      );
+      const phase1ConvIds = new Set(p1.messages.map((m) => m.conversation_id));
+      applyInitDataPage(p2, { excludeConversationIds: phase1ConvIds });
     }
   };
 
