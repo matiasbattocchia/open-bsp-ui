@@ -90,7 +90,9 @@ function AppLayout() {
           (showCenterPanel ? "hidden md:flex" : "flex")
         }
       >
-        <Outlet />
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+          <Outlet />
+        </div>
         {/* Resize Handle */}
         <div className="resize-handle z-[60]" onMouseDown={handleMouseDown} />
       </div>

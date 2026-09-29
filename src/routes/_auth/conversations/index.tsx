@@ -59,7 +59,7 @@ function Conversations() {
       <ChatSearch /> {/* height: 49 px */}
       <ChatFilter /> {/* height: 43 px */}
       {invitations && invitations.length > 0 && (
-        <div className="pt-[10px] pb-[5px] pl-[10px] pr-[20px] flex flex-col gap-[4px]">
+        <div className="shrink-0 pt-[10px] pb-[5px] pl-[10px] pr-[20px] flex flex-col gap-[4px]">
           {invitations.map((invitation) => (
             <div key={invitation.id} className="bg-primary/10 rounded-lg">
               <SectionItem
