@@ -80,7 +80,7 @@ const ChatList = () => {
   const itemIds = items.map((a) => a.convId);
 
   return (
-    <div className="overflow-y-auto [scrollbar-gutter:stable] w-full h-full pt-[10px] px-[10px]">
+    <div className="overflow-y-auto [scrollbar-gutter:stable] w-full grow min-h-0 pt-[10px] px-[10px]">
       {itemIds.length ? (
         <div className="flex flex-col gap-[4px]">
           {itemIds.map((key) => (
