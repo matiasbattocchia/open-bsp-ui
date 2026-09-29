@@ -86,7 +86,7 @@ function AppLayout() {
       <div
         ref={panelRef}
         className={
-          "flex-col overflow-hidden md:border-r border-border bg-background text-foreground col-span-2 md:col-span-1 relative " +
+          "flex flex-col min-h-0 overflow-hidden md:border-r border-border bg-background text-foreground col-span-2 md:col-span-1 relative " +
           (showCenterPanel ? "hidden md:flex" : "flex")
         }
       >
@@ -98,7 +98,7 @@ function AppLayout() {
       {/* Center Panel */}
       <div
         className={
-          "flex-col min-w-0 relative overflow-hidden col-span-full md:col-span-1" +
+          "flex flex-col min-h-0 min-w-0 relative overflow-hidden col-span-full md:col-span-1" +
           (isStatsRoute
             ? " flex bg-muted"
             : activeConvId
@@ -113,13 +113,13 @@ function AppLayout() {
             <StatsCenter />
           </div>
         ) : activeConvId ? (
-          <>
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
             {isHoveringFiles && <FilePicker setHovering={setIsHoveringFiles} />}
             <FilePreviewer />
             <ChatHeader />
             <Chat />
             <ChatFooter />
-          </>
+          </div>
         ) : (
           <div className="flex gap-[32px] items-center justify-center h-full">
             {!activeOrgId && (

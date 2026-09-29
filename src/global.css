@@ -250,6 +250,11 @@ button:disabled {
     overflow: hidden;
   }
 
+  /* Let flex children with overflow-y-auto shrink inside the fixed viewport grid */
+  .app-grid > * {
+    min-height: 0;
+  }
+
   @media (min-width: 1024px) {
     .app-grid {
       grid-template-columns: 64px minmax(300px, 1fr) 2fr;

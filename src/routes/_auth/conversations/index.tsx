@@ -54,7 +54,7 @@ function Conversations() {
   };
 
   return (
-    <>
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
       <Header /> {/* height: 59 px */}
       <ChatSearch /> {/* height: 49 px */}
       <ChatFilter /> {/* height: 43 px */}
@@ -108,6 +108,6 @@ function Conversations() {
         </div>
       )}
       <ChatList />
-    </>
+    </div>
   );
 }
