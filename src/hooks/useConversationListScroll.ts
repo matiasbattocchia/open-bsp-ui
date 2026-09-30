@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { supabase } from "@/supabase/client";
 import useBoundStore from "@/stores/useBoundStore";
 import {
   applyInitDataPage,
+  fetchInitDataPage,
   oldestLoadedConversationPreview,
   oldestTimestampInPage,
-  type InitDataResponse,
 } from "@/utils/initDataUtils";
 
 const PAGE_LIMIT = 100;
@@ -57,18 +56,13 @@ export function useConversationListScroll(itemCount: number) {
     setIsLoadingOlder(true);
 
     try {
-      const { data } = await supabase
-        .rpc("init_data", {
-          p_organization_id: activeOrgId,
-          p_limit: PAGE_LIMIT,
-          p_per_conversation: PER_CONVERSATION,
-          p_until: until,
-        })
-        .throwOnError();
+      const page = await fetchInitDataPage(activeOrgId, {
+        limit: PAGE_LIMIT,
+        perConversation: PER_CONVERSATION,
+        until,
+      });
 
       if (epoch !== epochRef.current) return;
-
-      const page = data as unknown as InitDataResponse;
       if (!page.messages?.length) {
         hasMoreRef.current = false;
         return;

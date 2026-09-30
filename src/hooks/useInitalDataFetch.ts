@@ -2,8 +2,8 @@ import { supabase } from "@/supabase/client";
 import useBoundStore from "@/stores/useBoundStore";
 import { useEffect, useRef } from "react";
 import {
-  applyInitDataPage,
-  type InitDataResponse,
+  applyInitBootstrapPage,
+  fetchInitDataPage,
 } from "@/utils/initDataUtils";
 
 export const useInitialDataFetch = () => {
@@ -22,37 +22,11 @@ export const useInitialDataFetch = () => {
   const initData = async () => {
     if (!activeOrgId) return;
 
-    // Phase 1: recent messages with chat context
-    const { data: phase1 } = await supabase
-      .rpc("init_data", {
-        p_organization_id: activeOrgId,
-        p_limit: PHASE1_LIMIT,
-        p_per_conversation: 10,
-      })
-      .throwOnError();
-
-    const p1 = phase1 as unknown as InitDataResponse;
-    applyInitDataPage(p1);
-
-    // Phase 2: older conversations with preview messages
-    // Skip if phase 1 returned fewer than the limit (all messages fit)
-    if (p1.messages.length >= PHASE1_LIMIT) {
-      // json_agg has no ORDER BY, so this is only an approximate cutoff — not
-      // necessarily the oldest phase-1 timestamp.
-      const oldest = p1.messages[p1.messages.length - 1].timestamp;
-      const { data: phase2 } = await supabase
-        .rpc("init_data", {
-          p_organization_id: activeOrgId,
-          p_limit: 100,
-          p_per_conversation: 5,
-          p_until: oldest,
-        })
-        .throwOnError();
-
-      const p2 = phase2 as unknown as InitDataResponse;
-      const phase1ConvIds = new Set(p1.messages.map((m) => m.conversation_id));
-      applyInitDataPage(p2, { excludeConversationIds: phase1ConvIds });
-    }
+    const page = await fetchInitDataPage(activeOrgId, {
+      limit: PHASE1_LIMIT,
+      perConversation: 10,
+    });
+    applyInitBootstrapPage(page);
   };
 
   // Tab-visibility recovery: flat queries (updated_at-based)

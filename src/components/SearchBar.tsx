@@ -22,7 +22,7 @@ export default function SearchBar({
   const isSmall = size === "small";
 
   return (
-    <div className={className ?? "px-[20px] pb-[12px] flex"}>
+    <div className={className ?? "px-[20px] pb-[12px] flex shrink-0"}>
       <div
         className={`flex items-center w-full bg-incoming-chat-bubble rounded-full hover:ring ring-border px-[12px] text-foreground ${isSmall ? "h-[32px]" : "h-[40px]"}`}
       >
