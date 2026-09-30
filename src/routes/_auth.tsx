@@ -82,13 +82,11 @@ function AppLayout() {
       <div
         ref={panelRef}
         className={
-          "flex flex-col min-h-0 overflow-hidden md:border-r border-border bg-background text-foreground col-span-2 md:col-span-1 relative " +
+          "flex-col overflow-hidden md:border-r border-border bg-background text-foreground col-span-2 md:col-span-1 relative " +
           (showCenterPanel ? "hidden md:flex" : "flex")
         }
       >
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-          <Outlet />
-        </div>
+        <Outlet />
         {/* Resize Handle */}
         <div className="resize-handle z-[60]" onMouseDown={handleMouseDown} />
       </div>
@@ -96,7 +94,7 @@ function AppLayout() {
       {/* Center Panel */}
       <div
         className={
-          "flex flex-col min-h-0 min-w-0 relative overflow-hidden col-span-full md:col-span-1" +
+          "flex-col min-w-0 relative overflow-hidden col-span-full md:col-span-1" +
           (isStatsRoute
             ? " flex bg-muted"
             : activeConvId
