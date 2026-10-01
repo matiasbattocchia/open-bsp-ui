@@ -41,6 +41,12 @@ type ScrollSession = {
   /** Contiguous-window cursor — never the absolute oldest store orphan. */
   cursor: MessageHistoryCursor | null;
   pendingRestore: PendingRestore | null;
+  /**
+   * While > 0, ignore scroll events for stickToBottom. Programmatic pin/restore
+   * can fire `scroll` before layout settles; without this, open-chat briefly
+   * sees scrollTop≈0 and clears stickToBottom — leaving the viewport mid-history.
+   */
+  ignoreStickUpdates: number;
 };
 
 /**
@@ -48,7 +54,7 @@ type ScrollSession = {
  *
  * Flow:
  * 1. Open chat → seed one latest page (or restore session cache) and trim orphans.
- * 2. Near top / short thread → fetch older keyset pages of HISTORY_PAGE_SIZE.
+ * 2. Near top (user scrolled up) / short thread → fetch older keyset pages.
  * 3. Prepend → restore scrollTop from pendingRestore snapshot.
  * 4. At bottom → cap memory to MAX_MESSAGES_PER_CONVERSATION.
  */
@@ -81,11 +87,24 @@ export function useChatScroll(
     seeded: false,
     cursor: null,
     pendingRestore: null,
+    ignoreStickUpdates: 0,
   });
 
   const seedRef = useRef<() => Promise<void>>(async () => {});
   const loadOlderRef = useRef<() => Promise<void>>(async () => {});
   const capIfAtBottomRef = useRef<(convId: string) => void>(() => {});
+
+  const pinToBottom = (el: HTMLDivElement) => {
+    const session = sessionRef.current;
+    session.ignoreStickUpdates += 1;
+    // Assign scrollTop directly — more reliable than scrollTo({ behavior:"instant" })
+    // across Safari / older Chromium when opening a chat.
+    el.scrollTop = el.scrollHeight;
+    // Release after the scroll event from this assignment has been delivered.
+    requestAnimationFrame(() => {
+      session.ignoreStickUpdates = Math.max(0, session.ignoreStickUpdates - 1);
+    });
+  };
 
   const applyWindow = (convId: string, window: HistoryWindow) => {
     const session = sessionRef.current;
@@ -183,9 +202,16 @@ export function useChatScroll(
       useBoundStore.getState().chat.messages.get(conversationId)?.size ?? 0;
     if (loaded >= MAX_MESSAGES_PER_CONVERSATION) return;
 
-    const needsPage =
-      el.scrollHeight <= el.clientHeight + 1 ||
-      el.scrollTop < SCROLL_TOP_LOAD_THRESHOLD_PX;
+    const contentFits = el.scrollHeight <= el.clientHeight + 1;
+    const nearTop = el.scrollTop < SCROLL_TOP_LOAD_THRESHOLD_PX;
+
+    // Autofill only when the thread is shorter than the viewport (open chat with
+    // a handful of init/seed rows). When stickToBottom, do NOT treat scrollTop≈0
+    // as "user scrolled up" — that is also the initial/pre-pin position and was
+    // paging older history on open, jumping the viewport away from the latest.
+    const needsPage = session.stickToBottom
+      ? contentFits
+      : nearTop || contentFits;
     if (!needsPage) return;
 
     const before = session.cursor ?? storeOldestCursor(conversationId);
@@ -272,6 +298,7 @@ export function useChatScroll(
       session.cursor = null;
       session.seeded = false;
       session.pendingRestore = null;
+      session.ignoreStickUpdates = 0;
       setHistoryCursor(null);
       setIsLoadingOlder(false);
       if (conversationId) capIfAtBottomRef.current(conversationId);
@@ -282,15 +309,27 @@ export function useChatScroll(
     const pending = session.pendingRestore;
     if (pending) {
       if (!pending.ready || messageCount <= pending.baselineCount) return;
+      session.ignoreStickUpdates += 1;
       el.scrollTop = el.scrollHeight - pending.height + pending.top;
       session.pendingRestore = null;
+      requestAnimationFrame(() => {
+        session.ignoreStickUpdates = Math.max(
+          0,
+          session.ignoreStickUpdates - 1,
+        );
+      });
     } else if (session.stickToBottom) {
-      el.scrollTo({ top: el.scrollHeight, behavior: "instant" });
+      pinToBottom(el);
     }
   }, [conversationId, messageCount]);
 
   useEffect(() => {
-    void seedRef.current().then(() => loadOlderRef.current());
+    void seedRef.current().then(() => {
+      const el = scrollerRef.current;
+      // Seed/trim can change layout after the conversationId layout pass.
+      if (sessionRef.current.stickToBottom && el) pinToBottom(el);
+      void loadOlderRef.current();
+    });
   }, [conversationId]);
 
   useEffect(() => {
@@ -298,20 +337,39 @@ export function useChatScroll(
   }, [messageCount, isLoadingOlder]);
 
   useEffect(() => {
-    const onResize = () => {
-      const el = scrollerRef.current;
-      if (sessionRef.current.stickToBottom && el) {
-        el.scrollTo({ top: el.scrollHeight, behavior: "instant" });
-      }
+    const el = scrollerRef.current;
+    if (!el) return;
+
+    const onViewportResize = () => {
+      if (sessionRef.current.stickToBottom) pinToBottom(el);
       void loadOlderRef.current();
     };
-    window.visualViewport?.addEventListener("resize", onResize);
-    return () => window.visualViewport?.removeEventListener("resize", onResize);
-  }, []);
+
+    window.visualViewport?.addEventListener("resize", onViewportResize);
+
+    // Media/images expanding after open would leave the viewport above the
+    // latest bubble if we only pin on messageCount changes. Observe content
+    // children — the scrollport's own box stays fixed when overflow grows.
+    const onContentResize = () => {
+      if (sessionRef.current.stickToBottom) pinToBottom(el);
+    };
+    const ro = new ResizeObserver(onContentResize);
+    for (const child of Array.from(el.children)) ro.observe(child);
+
+    return () => {
+      window.visualViewport?.removeEventListener("resize", onViewportResize);
+      ro.disconnect();
+    };
+  }, [conversationId, messageCount]);
 
   const onScroll = () => {
     const el = scrollerRef.current;
     if (!el) return;
+
+    if (sessionRef.current.ignoreStickUpdates > 0) {
+      void loadOlderRef.current();
+      return;
+    }
 
     const wasAtBottom = sessionRef.current.stickToBottom;
     sessionRef.current.stickToBottom =
