@@ -54,12 +54,12 @@ function Conversations() {
   };
 
   return (
-    <>
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
       <Header /> {/* height: 59 px */}
       <ChatSearch /> {/* height: 49 px */}
       <ChatFilter /> {/* height: 43 px */}
       {invitations && invitations.length > 0 && (
-        <div className="pt-[10px] pb-[5px] pl-[10px] pr-[20px] flex flex-col gap-[4px]">
+        <div className="shrink-0 pt-[10px] pb-[5px] pl-[10px] pr-[20px] flex flex-col gap-[4px]">
           {invitations.map((invitation) => (
             <div key={invitation.id} className="bg-primary/10 rounded-lg">
               <SectionItem
@@ -108,6 +108,6 @@ function Conversations() {
         </div>
       )}
       <ChatList />
-    </>
+    </div>
   );
 }
