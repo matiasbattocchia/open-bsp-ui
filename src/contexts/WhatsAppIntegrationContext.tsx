@@ -23,9 +23,10 @@ export type SignupOptions = {
   agent_id?: string;
 };
 
-// Successful flow data
+// Successful flow data. A coexistence finish may name only the WABA; the
+// backend then finds the number on it.
 type SuccessfulFlowData = {
-  phone_number_id: string;
+  phone_number_id?: string;
   waba_id: string;
   business_id: string;
   ad_account_ids?: string[];
@@ -237,13 +238,16 @@ export function WhatsAppIntegrationProvider({
           }
         },
         {
-          config_id: import.meta.env.VITE_FB_LOGIN_CONFIG_ID, // Configuration ID obtained in https://developers.facebook.com/apps/629323992623834/business-login/configurations/?business_id=153181867762503
+          // A Facebook Login for Business configuration with products selected, which
+          // is what makes the flow Embedded Signup v4: https://developers.facebook.com/apps/629323992623834/business-login/configurations/?business_id=153181867762503
+          config_id: import.meta.env.VITE_FB_LOGIN_CONFIG_ID,
           response_type: "code", // Must be set to 'code' for System User access token
           override_default_response_type: true,
           extras: {
             setup: {},
-            featureType: "whatsapp_business_app_onboarding", // Coexistence
-            sessionInfoVersion: "3", // Required for receiving embedded signup events
+            // Coexistence: offers connecting an existing WhatsApp Business app
+            // number; the v4 configuration does not carry this on its own.
+            featureType: "whatsapp_business_app_onboarding",
           },
         },
       );
