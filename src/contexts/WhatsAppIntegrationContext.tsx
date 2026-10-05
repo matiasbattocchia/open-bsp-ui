@@ -248,6 +248,9 @@ export function WhatsAppIntegrationProvider({
             // Coexistence: offers connecting an existing WhatsApp Business app
             // number; the v4 configuration does not carry this on its own.
             featureType: "whatsapp_business_app_onboarding",
+            // Still in Meta's coexistence sample for v4; the
+            // FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING event is version 3.
+            sessionInfoVersion: "3",
           },
         },
       );
