@@ -112,7 +112,7 @@ export function TextMessage({
         {type === "json" ? (
           <div
             className={
-              "scrollbar-hide overflow-x-auto " +
+              "scrollbar-hide min-w-0 overflow-x-auto " +
               (isTooLong && !expanded ? "max-h-[150px] overflow-y-hidden" : "")
             }
           >
@@ -127,7 +127,7 @@ export function TextMessage({
         ) : (
           <div
             className={
-              "scrollbar-hide overflow-x-auto " +
+              "min-w-0 overflow-x-hidden " +
               (isTooLong && !expanded ? "max-h-[150px] overflow-y-hidden" : "")
             }
           >
@@ -210,11 +210,12 @@ function Avatar({
 }
 
 // Shared in/out message classes. I could not find a better way to do it. - cabra 15/05/2024
-const msgRowClasses = "lg:px-[63px] px-[24px] flex";
-const avatarMsgRowClasses = "lg:px-[calc(63px+38px)] px-[calc(24px+33px)] flex";
+const msgRowClasses = "lg:px-[63px] px-[24px] flex min-w-0 max-w-full";
+const avatarMsgRowClasses =
+  "lg:px-[calc(63px+38px)] px-[calc(24px+33px)] flex min-w-0 max-w-full";
 
 const msgBubbleClasses =
-  "relative rounded-lg shadow break-words text-[14.2px] leading-[19px] p-[3px]";
+  "relative min-w-0 rounded-lg shadow break-words overflow-x-hidden text-[14.2px] leading-[19px] p-[3px]";
 
 const textMsgMaxWidth = " max-w-[90%] lg:max-w-[65%]";
 
@@ -254,7 +255,7 @@ export function InMessage({
           msgBubbleClasses +
           " bg-incoming-chat-bubble text-foreground" +
           (first ? " rounded-tl-none" : "") +
-          (text ? textMsgMaxWidth : "")
+          (text ? textMsgMaxWidth : " max-w-full")
         }
       >
         {first && (
@@ -315,7 +316,7 @@ export function OutMessage({
           msgBubbleClasses +
           " text-foreground" +
           (first ? " rounded-tr-none" : "") +
-          (text ? textMsgMaxWidth : "") +
+          (text ? textMsgMaxWidth : " max-w-full") +
           (internal ? " bg-incoming-chat-bubble" : " bg-outgoing-chat-bubble")
         }
       >
@@ -639,7 +640,10 @@ export default function Message(
   const trayProps = { actionsOpen, rootRef, rowHandlers };
 
   return (
-    <div id={props.message.id ? `msg-${props.message.id}` : undefined}>
+    <div
+      id={props.message.id ? `msg-${props.message.id}` : undefined}
+      className="min-w-0"
+    >
       {props.message.direction === "incoming" && (
         <InMessage
           {...{ ...props, text, fixedWidth, senderName, ...trayProps }}

@@ -374,6 +374,11 @@ input[type="range"]::-moz-range-track {
 }
 
 /* Text messages */
+.markdown {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 .markdown p + p,
 .markdown p + ul,
 .markdown p + ol,

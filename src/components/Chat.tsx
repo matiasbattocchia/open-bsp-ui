@@ -248,12 +248,12 @@ export default function Chat() {
       <div
         ref={scrollerRef}
         onScroll={onScroll}
-        className="grow min-h-0 pb-[8px] overflow-y-auto [overflow-anchor:none] [scrollbar-gutter:stable]"
+        className="grow min-h-0 min-w-0 w-full pb-[8px] overflow-y-auto overflow-x-hidden overscroll-x-none [overflow-anchor:none] [scrollbar-gutter:stable]"
       >
         <div className="min-h-[12px] flex justify-center items-center py-1">
           {isLoadingOlder && <Spinner size={16} />}
         </div>
-        <div className="flex flex-col">
+        <div className="flex min-w-0 flex-col">
           {envelopesAndSeparators.map((envOrSep, index) =>
             "message" in envOrSep ? (
               <Message
