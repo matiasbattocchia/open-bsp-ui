@@ -1,11 +1,15 @@
+import { useMemo } from "react";
 import useBoundStore from "@/stores/useBoundStore";
 import ChatListItem from "./ChatListItem";
 import { type ConversationRow, type MessageRow } from "@/supabase/client";
+import type { ContactAddressExtra } from "@/supabase/client";
 import { timestampDescending } from "@/stores/chatSlice";
 import { filters, Filters } from "@/stores/uiSlice";
-import Fuse from "fuse.js";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useConversationListScroll } from "@/hooks/useConversationListScroll";
+import { useConversationSearch } from "@/hooks/useConversationSearch";
+import { useContacts } from "@/queries/useContacts";
+import { conversationMatchesSearch } from "@/utils/conversationSearch";
 import Spinner from "./Spinner";
 
 export type ConvMetadata = {
@@ -42,6 +46,35 @@ const ChatList = () => {
   const conversationAliases = useBoundStore(
     (state) => state.ui.conversationAliases || {},
   );
+  const { data: contacts } = useContacts();
+  const isSearching = Boolean(searchPattern.trim());
+
+  useConversationSearch(searchPattern);
+
+  const contactIndex = useMemo(() => {
+    const map = new Map<
+      string,
+      { name?: string; extraName?: string; username?: string }
+    >();
+
+    for (const contact of contacts ?? []) {
+      for (const addr of contact.addresses ?? []) {
+        const extra = addr.extra as ContactAddressExtra | null;
+        const key = `${addr.service}:${addr.address}`;
+        const prev = map.get(key);
+        map.set(key, {
+          name: contact.name || prev?.name,
+          extraName: extra?.name || prev?.extraName,
+          username:
+            extra && "username" in extra && extra.username
+              ? extra.username
+              : prev?.username,
+        });
+      }
+    }
+
+    return map;
+  }, [contacts]);
 
   function getMostRecentMsg(convId: string): MessageRow | undefined {
     return messages.get(convId)?.values().next().value;
@@ -65,12 +98,24 @@ const ChatList = () => {
         !!a.mostRecentMsg,
     );
 
-  if (searchPattern) {
-    const fuse = new Fuse(items, {
-      threshold: 0.4,
-      keys: ["alias", "conv.name", "conv.contact_address"],
+  if (isSearching) {
+    items = items.filter((item) => {
+      const info = item.conv.contact_address
+        ? contactIndex.get(`${item.conv.service}:${item.conv.contact_address}`)
+        : undefined;
+      return conversationMatchesSearch(
+        {
+          alias: item.alias,
+          name: item.conv.name,
+          contactName: info?.name,
+          extraName: info?.extraName,
+          username: info?.username,
+          contactAddress: item.conv.contact_address,
+          groupAddress: item.conv.group_address,
+        },
+        searchPattern,
+      );
     });
-    items = fuse.search(searchPattern).map((r) => r.item);
   } else {
     items.sort(
       (a, b) =>
@@ -83,6 +128,7 @@ const ChatList = () => {
 
   const { scrollerRef, isLoadingOlder, onScroll } = useConversationListScroll(
     itemIds.length,
+    { enabled: !isSearching },
   );
 
   return (

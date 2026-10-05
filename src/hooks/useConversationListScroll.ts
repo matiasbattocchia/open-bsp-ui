@@ -16,7 +16,11 @@ const SCROLL_BOTTOM_THRESHOLD_PX = 120;
  * bottom. Initial init_data only covers a recent message window; this pages
  * backward with init_data(p_until).
  */
-export function useConversationListScroll(itemCount: number) {
+export function useConversationListScroll(
+  itemCount: number,
+  options?: { enabled?: boolean },
+) {
+  const enabled = options?.enabled ?? true;
   const scrollerRef = useRef<HTMLDivElement>(null);
   const activeOrgId = useBoundStore((s) => s.ui.activeOrgId);
   const [isLoadingOlder, setIsLoadingOlder] = useState(false);
@@ -36,7 +40,9 @@ export function useConversationListScroll(itemCount: number) {
 
   const loadOlder = useCallback(async () => {
     const epoch = epochRef.current;
-    if (!activeOrgId || !hasMoreRef.current || loadingRef.current) return;
+    if (!enabled || !activeOrgId || !hasMoreRef.current || loadingRef.current) {
+      return;
+    }
 
     const el = scrollerRef.current;
     if (el) {
@@ -88,7 +94,7 @@ export function useConversationListScroll(itemCount: number) {
         setIsLoadingOlder(false);
       }
     }
-  }, [activeOrgId]);
+  }, [activeOrgId, enabled]);
 
   useEffect(() => {
     void loadOlder();
