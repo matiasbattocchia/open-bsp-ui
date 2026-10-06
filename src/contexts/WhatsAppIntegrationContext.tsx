@@ -1,5 +1,8 @@
 import { createContext, type ReactNode, useCallback, useEffect } from "react";
-import { useWhatsAppSignup } from "@/queries/useWhatsAppSignup";
+import {
+  useWhatsAppSignup,
+  useWhatsAppSignupEvent,
+} from "@/queries/useWhatsAppSignup";
 
 const FB_API_VERSION = "v24.0";
 
@@ -130,6 +133,7 @@ export function WhatsAppIntegrationProvider({
           // AbandonedFlowData
           console.log("User abandoned flow at step:", data.data.current_step);
         }
+        window.__waSignupReport?.(data.event, data.data);
         return;
       }
 
@@ -143,6 +147,8 @@ export function WhatsAppIntegrationProvider({
         flow_type = "existing_phone_number";
       } else {
         console.warn("Unhandled event", data);
+        const unhandled = data as { event: string; data?: unknown };
+        window.__waSignupReport?.(unhandled.event, unhandled.data);
         return;
       }
 
@@ -184,6 +190,7 @@ export function WhatsAppIntegrationProvider({
   }, []);
 
   const { mutateAsync: signup } = useWhatsAppSignup();
+  const { mutate: reportSignupEvent } = useWhatsAppSignupEvent();
 
   const launchWhatsAppSignup = useCallback(
     (
@@ -191,6 +198,9 @@ export function WhatsAppIntegrationProvider({
       setLoading: (loading: boolean) => void,
       options?: SignupOptions,
     ) => {
+      window.__waSignupReport = (event, data) =>
+        reportSignupEvent({ event, data });
+
       // Launch Facebook login
       window.FB?.login(
         function (response: FBLoginResponse) {
@@ -255,7 +265,7 @@ export function WhatsAppIntegrationProvider({
         },
       );
     },
-    [],
+    [signup, reportSignupEvent],
   );
 
   return (

@@ -69,6 +69,22 @@ function Onboard() {
       return;
     }
 
+    window.__waSignupReport = (event, data) => {
+      fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/whatsapp-management/onboard/events`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ token, event, data }),
+        },
+      ).catch((error: unknown) => {
+        console.error("Could not record signup event:", error);
+      });
+    };
+
     FB.login(
       function (response: FBLoginResponse) {
         if (response.authResponse) {

@@ -33,6 +33,25 @@ export function useWhatsAppSignup() {
   });
 }
 
+/** Records how the signup popup ended when no finish follows. */
+export function useWhatsAppSignupEvent() {
+  const organization_id = useBoundStore((state) => state.ui.activeOrgId);
+
+  return useMutation({
+    mutationFn: async (payload: { event: string; data: unknown }) => {
+      if (!organization_id) throw new Error("No active organization");
+
+      await invokeFunction("whatsapp-management/signup/events", {
+        method: "POST",
+        body: { organization_id, ...payload },
+      });
+    },
+    onError: (error) => {
+      console.error("Could not record signup event:", error);
+    },
+  });
+}
+
 export function useWhatsAppDisconnect() {
   const queryClient = useQueryClient();
   const organization_id = useBoundStore((state) => state.ui.activeOrgId);

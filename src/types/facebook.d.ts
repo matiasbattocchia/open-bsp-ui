@@ -44,6 +44,12 @@ declare global {
     FB?: FacebookSDK;
     fbAsyncInit?: () => void;
     __waSessionInfo?: WASessionInfo;
+    /**
+     * Set by whoever launches the signup; the message listener hands it the
+     * popup events no finish follows (an abandon, Meta's own error, an event
+     * name it does not know), so they reach public.logs.
+     */
+    __waSignupReport?: (event: string, data: unknown) => void;
     /** Set by the SDK <script>'s onerror handler; read by the onboard page. */
     __fbSdkFailed?: boolean;
   }
