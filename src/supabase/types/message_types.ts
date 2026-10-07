@@ -177,6 +177,20 @@ type ContactsPart = DataPart<"contacts", Contact[]>;
 
 type LocationPart = DataPart<"location", Location>;
 
+/**
+ * A poll as its author wrote it (whatsapp-web; the Cloud API has no polls).
+ * `selectable_count` is how many options one voter may pick, 0 meaning any
+ * number of them. Votes are not delivered.
+ */
+type PollPart = DataPart<
+  "poll",
+  {
+    question: string;
+    options: string[];
+    selectable_count: number;
+  }
+>;
+
 type OrderPart = DataPart<"order", Order>;
 
 type InteractivePart = DataPart<
@@ -276,6 +290,7 @@ export type IncomingMessage = {
     | FilePart
     | ContactsPart
     | LocationPart
+    | PollPart
     | OrderPart
     | InteractivePart
     | ButtonPart

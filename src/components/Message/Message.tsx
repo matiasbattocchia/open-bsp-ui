@@ -517,6 +517,31 @@ export default function Message(props: UIMessage & { message: MessageRow }) {
       />
     );
     text = true;
+  } else if (
+    props.message.content.type === "data" &&
+    props.message.content.kind === "poll"
+  ) {
+    const poll = props.message.content.data;
+    content = (
+      <TextMessage
+        header={headerText}
+        body={
+          `📊 *${poll.question}*\n\n` +
+          poll.options.map((option) => `- ${option}`).join("\n") +
+          `\n\n_${
+            poll.selectable_count === 1
+              ? t("Selecciona una opción")
+              : t("Selecciona una o más opciones")
+          }_`
+        }
+        type="markdown"
+        direction={direction}
+        timestamp={props.message.timestamp}
+        status={direction === "outgoing" ? props.message.status : undefined}
+        fixedWidth={fixedWidth}
+      />
+    );
+    text = true;
   } else if (props.message.content.type === "data") {
     content = (
       <TextMessage
