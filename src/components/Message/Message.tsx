@@ -542,6 +542,28 @@ export default function Message(props: UIMessage & { message: MessageRow }) {
       />
     );
     text = true;
+  } else if (
+    props.message.content.type === "data" &&
+    props.message.content.kind === "poll_vote"
+  ) {
+    const vote = props.message.content.data;
+    content = (
+      <TextMessage
+        header={headerText}
+        body={
+          `🗳️ ${vote.question}\n\n` +
+          (vote.selected.length
+            ? vote.selected.map((option) => `✓ *${option}*`).join("\n")
+            : `_${t("Voto retirado")}_`)
+        }
+        type="markdown"
+        direction={direction}
+        timestamp={props.message.timestamp}
+        status={direction === "outgoing" ? props.message.status : undefined}
+        fixedWidth={fixedWidth}
+      />
+    );
+    text = true;
   } else if (props.message.content.type === "data") {
     content = (
       <TextMessage

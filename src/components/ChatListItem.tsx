@@ -418,8 +418,15 @@ export default function ChatListItem({ itemId }: { itemId: string }) {
                     preview.content.kind === "poll" &&
                     `📊 ${preview.content.data.question}`}
                   {preview?.content.type === "data" &&
+                    preview.content.kind === "poll_vote" &&
+                    `🗳️ ${
+                      preview.content.data.selected.join(", ") ||
+                      t("Voto retirado")
+                    }`}
+                  {preview?.content.type === "data" &&
                     preview.content.kind !== "media_placeholder" &&
                     preview.content.kind !== "poll" &&
+                    preview.content.kind !== "poll_vote" &&
                     JSON.stringify(preview.content.data)}
                   {(preview?.content.type === "file" ||
                     (preview?.content.type === "data" &&
