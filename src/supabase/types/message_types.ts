@@ -186,6 +186,21 @@ type InteractivePart = DataPart<
 
 type ButtonPart = DataPart<"button", ButtonMessage["button"]>;
 
+// Reply buttons, OUTBOUND. `InteractivePart` above is the INBOUND shape (what
+// the user tapped); composing one to send takes the different shape below, so
+// the two cannot share a type.
+export type OutgoingInteractiveData = {
+  type: "button";
+  header?: { type: "text"; text: string };
+  body: { text: string };
+  footer?: { text: string };
+  action: {
+    buttons: { type: "reply"; reply: { id: string; title: string } }[];
+  };
+};
+
+type OutgoingInteractivePart = DataPart<"interactive", OutgoingInteractiveData>;
+
 type TemplatePart = DataPart<"template", Template>;
 
 type MediaPlaceholderPart = DataPart<
@@ -318,6 +333,7 @@ export type OutgoingMessage = {
     | LocationPart
     | TemplatePart
     | ReactionPart
+    | OutgoingInteractivePart
   );
 
 /**

@@ -23,6 +23,7 @@ import { useAgent } from "@/queries/useAgents";
 import useBoundStore from "@/stores/useBoundStore";
 import { useContactAddress } from "@/queries/useContactsAddresses";
 import { formatPhoneNumber } from "@/utils/FormatUtils";
+import { interactiveToMarkdown } from "@/components/Message/interactive";
 import { AVATAR_BG_COLORS, AVATAR_TEXT_COLORS } from "@/utils/colors";
 import type { Json } from "@/supabase/db_types";
 
@@ -509,6 +510,22 @@ export default function Message(props: UIMessage & { message: MessageRow }) {
             ? `\n\n${props.message.content.text}`
             : "")
         }
+        type="markdown"
+        direction={direction}
+        timestamp={props.message.timestamp}
+        status={direction === "outgoing" ? props.message.status : undefined}
+        fixedWidth={fixedWidth}
+      />
+    );
+    text = true;
+  } else if (
+    props.message.content.type === "data" &&
+    props.message.content.kind === "interactive"
+  ) {
+    content = (
+      <TextMessage
+        header={headerText}
+        body={interactiveToMarkdown(props.message.content.data)}
         type="markdown"
         direction={direction}
         timestamp={props.message.timestamp}
