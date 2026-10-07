@@ -554,7 +554,13 @@ export default function Message(props: UIMessage & { message: MessageRow }) {
           `🗳️ ${vote.question}\n\n` +
           (vote.selected.length
             ? vote.selected.map((option) => `✓ *${option}*`).join("\n")
-            : `_${t("Voto retirado")}_`)
+            : `_${t("Voto retirado")}_`) +
+          (vote.results?.length
+            ? "\n\n" +
+              vote.results
+                .map((result) => `${result.option} · ${result.votes}`)
+                .join("\n")
+            : "")
         }
         type="markdown"
         direction={direction}
