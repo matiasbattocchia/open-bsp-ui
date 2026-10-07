@@ -14,10 +14,6 @@
   <a href="https://chat.whatsapp.com/Ch6AwZizSDt5quzHodcYh5"><img src="https://img.shields.io/badge/Community-25D366?logo=whatsapp&logoColor=white" alt="Community"></a>
 </p>
 
-<p align="center">
-  <a href="https://www.producthunt.com/products/openbsp?launch=openbsp&utm_source=badge-follow&utm_medium=badge" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/follow.svg?product_id=1245331&theme=light" alt="OpenBSP | Product Hunt" width="250" height="54" /></a>
-</p>
-
 https://github.com/user-attachments/assets/1ef30dde-9de1-4f5a-856a-db34ca2e3063
 
 ## Features
