@@ -12,6 +12,8 @@ function translateProductName(name: string, t: (s: string) => string) {
       return t("Almacenamiento");
     case "AI Credits":
       return t("Créditos IA");
+    case "Connections":
+      return t("Conexiones");
     default:
       return name;
   }

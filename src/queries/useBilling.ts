@@ -92,3 +92,26 @@ export function usePlanProducts() {
     select: (data) => data.data,
   });
 }
+
+/**
+ * Whether the organization can connect one more account: its connected
+ * accounts against the tier's cap. No cap (billing not set up, or a null cap)
+ * is unlimited, the same rule billing.check_limit applies when the account is
+ * created. Optimistic while loading: the database has the final word.
+ */
+export function useCanConnectAccount() {
+  const { data: usage } = useUsage("lifetime");
+  const { data: tierLimits } = useTierLimits();
+
+  const cap = tierLimits?.find(
+    (tl) => tl.product_id === "organizations_addresses",
+  )?.cap;
+
+  if (cap == null) return true;
+
+  const used =
+    usage?.find((u) => u.product_id === "organizations_addresses")?.quantity ??
+    0;
+
+  return used + 1 <= cap;
+}

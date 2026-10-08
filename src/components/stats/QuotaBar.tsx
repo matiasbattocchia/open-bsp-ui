@@ -20,6 +20,8 @@ function translateProductName(name: string, t: (s: string) => string) {
       return t("Almacenamiento");
     case "AI Credits":
       return t("Créditos IA");
+    case "Connections":
+      return t("Conexiones");
     default:
       return name;
   }
@@ -98,7 +100,11 @@ export default function QuotaBar({
   const usedPct = total > 0 ? Math.min((used / total) * 100, 100) : 0;
   const incPct = total > 0 ? Math.min((inc / total) * 100, 100) : 0;
 
-  const rest = ` / ${fmt(total, unit)}${unitLabel(unit)}${periodLabel}`;
+  // A null cap is unlimited: there is no ceiling to draw the bar against.
+  const rest =
+    cap === null
+      ? ` / ${t("Ilimitado")}`
+      : ` / ${fmt(total, unit)}${unitLabel(unit)}${periodLabel}`;
 
   return (
     <div className="flex flex-col gap-[8px] p-[16px] rounded-xl bg-background border border-border">
