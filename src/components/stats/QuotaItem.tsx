@@ -16,7 +16,6 @@ import {
   quotaSegments,
   quotaStatus,
   quotaSummary,
-  statusColors,
   translateProductName,
 } from "./quota";
 
@@ -66,13 +65,17 @@ export default function QuotaItem({
     >
       {/* Left Pane: Icon */}
       <div className="pl-[10px] pr-[15px] flex items-center">
-        <div className="p-[8px] relative">
-          <ProductIcon productId={quota.id} />
-          {status !== "ok" && (
-            <TriangleAlert
-              className={`absolute top-[2px] right-[0px] w-[16px] h-[16px] rounded-full bg-background p-[1px] ${statusColors[status].icon}`}
-            />
-          )}
+        <div className="p-[8px]">
+          {/* The badge sits at the icon's bottom right, like the service
+              icon on a conversation's avatar. */}
+          <div className="relative">
+            <ProductIcon productId={quota.id} />
+            {status !== "ok" && (
+              <div className="absolute -bottom-[4px] -right-[6px] rounded-full bg-background p-[1px] leading-none">
+                <TriangleAlert className="w-[14px] h-[14px] text-amber-500" />
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

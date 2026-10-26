@@ -88,6 +88,8 @@ export function quotaRange({ kind, used, included, cap }: Quota) {
 /**
  * The bar's composition, left to right: usage within the allowance, usage
  * beyond it (what gets charged), usage beyond the cap, and the allowance left.
+ * All tones of primary: past the allowance it deepens toward the foreground
+ * (darker on light, lighter on dark), the allowance left is a pale tint.
  * Without an allowance all usage up to the cap counts as within it: there is
  * nothing to go over.
  */
@@ -109,12 +111,14 @@ export function quotaSegments(quota: Quota, t: Translate): Segment[] {
     {
       label: t("Excedente"),
       value: Math.max(Math.min(used, ceiling) - allowance, 0),
-      className: "bg-amber-500",
+      className:
+        "bg-[color-mix(in_oklab,var(--color-primary),var(--color-foreground)_30%)]",
     },
     {
       label: t("Sobre el límite"),
       value: Math.max(used - ceiling, 0),
-      className: "bg-red-500",
+      className:
+        "bg-[color-mix(in_oklab,var(--color-primary),var(--color-foreground)_60%)]",
     },
     {
       label: t("Incluido"),
@@ -131,8 +135,8 @@ export const statusColors: Record<
   Exclude<QuotaStatus, "ok">,
   { background: string; icon: string }
 > = {
-  near: { background: "bg-amber-500/10", icon: "text-amber-500" },
-  capped: { background: "bg-red-500/10", icon: "text-red-500" },
+  near: { background: "bg-destructive/10", icon: "text-destructive" },
+  capped: { background: "bg-destructive/10", icon: "text-destructive" },
 };
 
 /** The share of the cap past which a quota is about to meet it. */

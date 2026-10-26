@@ -41,9 +41,11 @@ function Conversations() {
       <Header /> {/* height: 59 px */}
       <ChatSearch /> {/* height: 49 px */}
       <ChatFilter /> {/* height: 43 px */}
-      {invitations && invitations.length > 0 && (
+      {/* Invitations and quota alerts share one stack, so cards of either
+          kind sit the same gap apart. */}
+      {(!!invitations?.length || !!alerts?.length) && (
         <div className="pt-[10px] pb-[5px] pl-[10px] pr-[20px] flex flex-col gap-[4px]">
-          {invitations.map((invitation) => (
+          {invitations?.map((invitation) => (
             <div key={invitation.id} className="bg-primary/10 rounded-lg">
               <SectionItem
                 // min-h, not h: it has to override SectionItem's own h-[72px],
@@ -92,11 +94,7 @@ function Conversations() {
               />
             </div>
           ))}
-        </div>
-      )}
-      {alerts && alerts.length > 0 && (
-        <div className="pt-[10px] pb-[5px] pl-[10px] pr-[20px] flex flex-col gap-[4px]">
-          {alerts.map((quota) => (
+          {alerts?.map((quota) => (
             <QuotaAlert
               key={quota.id}
               quota={quota}
