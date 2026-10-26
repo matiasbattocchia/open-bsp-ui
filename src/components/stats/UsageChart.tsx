@@ -59,7 +59,7 @@ export default function UsageChart({
             if (!active || !payload?.length) return null;
             const val = payload[0].value as number;
             return (
-              <div className="bg-background border border-border rounded-lg px-[10px] py-[6px] text-[12px] shadow-sm">
+              <div className="bg-background border border-border rounded-lg px-[10px] py-[6px] text-[12px] shadow-sm whitespace-nowrap">
                 {periodLabel}: {label}
                 <br />
                 <span className="font-medium">

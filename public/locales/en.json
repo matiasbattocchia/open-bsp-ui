@@ -402,5 +402,7 @@
   "Selecciona una o más opciones": "Select one or more options",
   "Voto retirado": "Vote withdrawn",
   "Conexiones": "Connections",
-  "Ilimitado": "Unlimited"
+  "Ilimitado": "Unlimited",
+  "Excedente": "Overage",
+  "Límite": "Limit"
 }

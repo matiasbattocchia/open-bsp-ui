@@ -13,7 +13,6 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { Bot, Building2, MessageSquarePlus, Settings } from "lucide-react";
 import { useResizable } from "@/hooks/useResizable";
 import { useCurrentAgents } from "@/queries/useAgents";
-import StatsCenter from "@/components/stats/StatsCenter";
 
 export const Route = createFileRoute("/_auth")({
   component: AppLayout,
@@ -39,8 +38,6 @@ function AppLayout() {
   const activeConvId = useBoundStore((state) => state.ui.activeConvId);
   const setActiveConv = useBoundStore((state) => state.ui.setActiveConv);
   const location = useLocation();
-  const pathname = location.pathname;
-  const isStatsRoute = pathname.startsWith("/stats");
 
   const [isHoveringFiles, setIsHoveringFiles] = useState(false);
 
@@ -64,7 +61,7 @@ function AppLayout() {
   console.log("active org ", activeOrgId);
   console.log("active conv", activeConvId);
 
-  const showCenterPanel = activeConvId || isStatsRoute;
+  const showCenterPanel = activeConvId;
 
   return (
     <div
@@ -96,20 +93,12 @@ function AppLayout() {
       <div
         className={
           "flex-col min-w-0 relative overflow-hidden col-span-full md:col-span-1" +
-          (isStatsRoute
-            ? " flex bg-muted"
-            : activeConvId
-              ? " flex bg-chat"
-              : " hidden md:flex bg-muted")
+          (activeConvId ? " flex bg-chat" : " hidden md:flex bg-muted")
         }
         onDragEnter={() => setIsHoveringFiles(true)}
         onDrop={() => setIsHoveringFiles(false)}
       >
-        {isStatsRoute ? (
-          <div className="overflow-y-auto h-full">
-            <StatsCenter />
-          </div>
-        ) : activeConvId ? (
+        {activeConvId ? (
           <>
             {isHoveringFiles && <FilePicker setHovering={setIsHoveringFiles} />}
             <FilePreviewer />

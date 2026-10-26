@@ -115,3 +115,40 @@ export function useCanConnectAccount() {
 
   return used + 1 <= cap;
 }
+
+/**
+ * One quota per product the tier limits, with what the organization used in
+ * the tier's interval, the plan's allowance and the tier's cap (null =
+ * unlimited). Products without a tier row have no quota and are left out.
+ */
+export function useQuotas() {
+  const { data: products } = useProducts();
+  const { data: monthUsage } = useUsage("month");
+  const { data: lifetimeUsage } = useUsage("lifetime");
+  const { data: tierLimits } = useTierLimits();
+  const { data: planProducts } = usePlanProducts();
+
+  if (!products || !tierLimits) return undefined;
+
+  return products.flatMap((product) => {
+    const tier = tierLimits.find((tl) => tl.product_id === product.id);
+    if (!tier) return [];
+
+    const usage = tier.interval === "lifetime" ? lifetimeUsage : monthUsage;
+
+    return {
+      id: product.id,
+      name: product.name,
+      kind: product.kind,
+      unit: product.unit,
+      interval: tier.interval,
+      used: usage?.find((u) => u.product_id === product.id)?.quantity ?? 0,
+      included:
+        planProducts?.find((pp) => pp.product_id === product.id)?.included ??
+        null,
+      cap: tier.cap,
+    };
+  });
+}
+
+export type Quota = NonNullable<ReturnType<typeof useQuotas>>[number];
