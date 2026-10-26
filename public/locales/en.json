@@ -409,5 +409,20 @@
   "12 meses": "12 months",
   "Por período": "Per period",
   "Acumulado": "Cumulative",
-  "Cada mes ya muestra su total": "Each month already shows its total"
+  "Cada mes ya muestra su total": "Each month already shows its total",
+  "Sobre el límite": "Over the limit",
+  "Límite alcanzado": "Limit reached",
+  "Cerca del límite": "Near the limit",
+  "Se renueva el": "Renews on",
+  "No se envían más mensajes; los recibidos siguen llegando.": "No more messages are sent; incoming ones still arrive.",
+  "No se crean conversaciones nuevas.": "No new conversations are created.",
+  "No se pueden subir más archivos.": "No more files can be uploaded.",
+  "No se pueden conectar más cuentas.": "No more accounts can be connected.",
+  "Los agentes de IA sin clave propia dejan de responder.": "AI agents without their own key stop replying.",
+  "No se puede usar más.": "It can't be used any further.",
+  "Cada mensaje enviado o recibido por cualquier canal, también los enviados desde el teléfono u otro dispositivo vinculado. Incluye reacciones, notas internas y los registros de los agentes de IA. No cuenta el historial importado.": "Every message sent or received on any channel, including those sent from the phone or another linked device. Reactions, internal notes and AI agent records count too. Imported history doesn't.",
+  "Cada conversación nueva: la primera vez que un contacto y una conexión intercambian un mensaje. El mismo contacto en dos conexiones son dos conversaciones. Cuentan también las que trae el historial importado.": "Every new conversation: the first time a contact and a connection exchange a message. The same contact on two connections is two conversations. Those brought in by imported history count too.",
+  "Lo que ocupan los archivos guardados: la media enviada o recibida y los archivos subidos. Al borrarse un archivo, se libera su espacio.": "The space taken by stored files: media sent or received and uploaded files. When a file is deleted, its space is freed.",
+  "Las cuentas conectadas de WhatsApp, WhatsApp Web e Instagram. Una cuenta desconectada deja de contar.": "Connected WhatsApp, WhatsApp Web and Instagram accounts. A disconnected account stops counting.",
+  "Lo que gastan los agentes de IA y el pre-procesamiento de media al usar los modelos de la plataforma. Un agente con clave API propia no consume créditos.": "What AI agents and media preprocessing spend when using the platform's models. An agent with its own API key doesn't consume credits."
 }

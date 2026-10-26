@@ -60,8 +60,8 @@ export const queryKeys = {
   },
   billing: {
     products: () => ["billing", "products"] as const,
-    usage: (orgId: NullableId, interval: string) =>
-      [orgId, "billing", "usage", interval] as const,
+    usage: (orgId: NullableId, interval: string, since?: string) =>
+      [orgId, "billing", "usage", interval, since] as const,
     subscription: (orgId: NullableId) =>
       [orgId, "billing", "subscription"] as const,
     tierLimits: (orgId: NullableId) =>

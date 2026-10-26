@@ -4,11 +4,13 @@ import SectionHeader from "@/components/SectionHeader";
 import SectionBody from "@/components/SectionBody";
 import PillToggle from "@/components/PillToggle";
 import { QuotaBar, QuotaLegend } from "@/components/stats/QuotaBar";
+import QuotaAlert from "@/components/stats/QuotaAlert";
 import UsageChart, { type Reference } from "@/components/stats/UsageChart";
 import {
   quotaAmount,
   quotaRange,
   quotaSegments,
+  productExplainer,
   translateProductName,
 } from "@/components/stats/quota";
 import {
@@ -80,7 +82,12 @@ function ProductStats() {
   const { translate: t } = useTranslation();
   const { productId } = Route.useParams();
   const quota = useQuotas()?.find((q) => q.id === productId);
-  const { data: dayUsage } = useUsage("day");
+  // The day rows any daily range can show: from the earlier of the month's
+  // first day and 30 days ago.
+  const { data: dayUsage } = useUsage(
+    "day",
+    [rangePeriods("month")[0], rangePeriods("30d")[0]].sort()[0],
+  );
   const { data: monthUsage } = useUsage("month");
   const [range, setRange] = useState<Range>("month");
   const [selectedView, setSelectedView] = useState<View>("period");
@@ -117,6 +124,7 @@ function ProductStats() {
     <>
       <SectionHeader title={translateProductName(quota.name, t)} />
       <SectionBody>
+        <QuotaAlert quota={quota} />
         <div className="flex flex-col gap-[24px] p-[10px]">
           <div className="flex flex-col gap-[8px]">
             <div className="text-[13px] text-muted-foreground">
@@ -127,6 +135,9 @@ function ProductStats() {
             </div>
             <QuotaBar segments={segments} range={quotaRange(quota)} />
             <QuotaLegend segments={segments} />
+            <p className="text-[13px] text-muted-foreground mt-[8px]">
+              {productExplainer(quota.id, t)}
+            </p>
           </div>
 
           <div className="flex flex-col gap-[16px]">

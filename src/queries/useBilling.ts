@@ -18,20 +18,26 @@ export function useProducts() {
   });
 }
 
-export function useUsage(interval: string) {
+/**
+ * The organization's usage rows for an interval, oldest first. `since` keeps
+ * only the periods from that date on: day rows pile up past the API's row
+ * limit, which would cut off the newest ones.
+ */
+export function useUsage(interval: string, since?: string) {
   const orgId = useBoundStore((state) => state.ui.activeOrgId);
 
   return useQuery({
-    queryKey: queryKeys.billing.usage(orgId, interval),
-    queryFn: async () =>
-      await supabase
+    queryKey: queryKeys.billing.usage(orgId, interval, since),
+    queryFn: async () => {
+      let query = supabase
         .schema("billing")
         .from("usage")
         .select()
         .eq("organization_id", orgId!)
-        .eq("interval", interval)
-        .order("period")
-        .throwOnError(),
+        .eq("interval", interval);
+      if (since) query = query.gte("period", since);
+      return await query.order("period").throwOnError();
+    },
     enabled: !!orgId,
     select: (data) => data.data,
   });

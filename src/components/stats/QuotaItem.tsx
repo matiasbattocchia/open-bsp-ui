@@ -1,4 +1,5 @@
 import {
+  TriangleAlert,
   Gauge,
   HardDrive,
   MessageSquare,
@@ -13,7 +14,9 @@ import {
   quotaAmount,
   quotaRange,
   quotaSegments,
+  quotaStatus,
   quotaSummary,
+  statusColors,
   translateProductName,
 } from "./quota";
 
@@ -38,7 +41,8 @@ export function ProductIcon({ productId }: { productId: string }) {
 /**
  * A SectionItem whose lower row is the quota's bar instead of a description,
  * with the figures at the end of the title row. The tooltip stands in for the
- * legend, which the row has no room for.
+ * legend, which the row has no room for. A quota about to meet its cap, or
+ * capped, gets a warning badge on its icon.
  */
 export default function QuotaItem({
   quota,
@@ -49,6 +53,7 @@ export default function QuotaItem({
 }) {
   const { translate: t } = useTranslation();
   const amount = quotaAmount(quota, t);
+  const status = quotaStatus(quota);
 
   return (
     <div
@@ -61,8 +66,13 @@ export default function QuotaItem({
     >
       {/* Left Pane: Icon */}
       <div className="pl-[10px] pr-[15px] flex items-center">
-        <div className="p-[8px]">
+        <div className="p-[8px] relative">
           <ProductIcon productId={quota.id} />
+          {status !== "ok" && (
+            <TriangleAlert
+              className={`absolute top-[2px] right-[0px] w-[16px] h-[16px] rounded-full bg-background p-[1px] ${statusColors[status].icon}`}
+            />
+          )}
         </div>
       </div>
 

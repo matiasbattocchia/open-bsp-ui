@@ -409,5 +409,20 @@
   "12 meses": "Miezi 12",
   "Por período": "Kwa kipindi",
   "Acumulado": "Jumla limbikizi",
-  "Cada mes ya muestra su total": "Kila mwezi tayari unaonyesha jumla yake"
+  "Cada mes ya muestra su total": "Kila mwezi tayari unaonyesha jumla yake",
+  "Sobre el límite": "Juu ya kikomo",
+  "Límite alcanzado": "Kikomo kimefikiwa",
+  "Cerca del límite": "Karibu na kikomo",
+  "Se renueva el": "Inasasishwa tarehe",
+  "No se envían más mensajes; los recibidos siguen llegando.": "Hakuna ujumbe zaidi unaotumwa; unaopokelewa unaendelea kufika.",
+  "No se crean conversaciones nuevas.": "Hakuna mazungumzo mapya yanayoundwa.",
+  "No se pueden subir más archivos.": "Haiwezekani kupakia faili zaidi.",
+  "No se pueden conectar más cuentas.": "Haiwezekani kuunganisha akaunti zaidi.",
+  "Los agentes de IA sin clave propia dejan de responder.": "Mawakala wa AI wasio na ufunguo wao wenyewe wanaacha kujibu.",
+  "No se puede usar más.": "Haiwezi kutumika tena.",
+  "Cada mensaje enviado o recibido por cualquier canal, también los enviados desde el teléfono u otro dispositivo vinculado. Incluye reacciones, notas internas y los registros de los agentes de IA. No cuenta el historial importado.": "Kila ujumbe uliotumwa au kupokelewa kupitia chaneli yoyote, pamoja na ile iliyotumwa kutoka kwenye simu au kifaa kingine kilichounganishwa. Inajumuisha miitikio, maelezo ya ndani na kumbukumbu za mawakala wa AI. Historia iliyoingizwa haihesabiwi.",
+  "Cada conversación nueva: la primera vez que un contacto y una conexión intercambian un mensaje. El mismo contacto en dos conexiones son dos conversaciones. Cuentan también las que trae el historial importado.": "Kila mazungumzo mapya: mara ya kwanza mwasiliani na muunganisho wanapobadilishana ujumbe. Mwasiliani mmoja kwenye miunganisho miwili ni mazungumzo mawili. Yanayoletwa na historia iliyoingizwa nayo yanahesabiwa.",
+  "Lo que ocupan los archivos guardados: la media enviada o recibida y los archivos subidos. Al borrarse un archivo, se libera su espacio.": "Nafasi inayochukuliwa na faili zilizohifadhiwa: media iliyotumwa au kupokelewa na faili zilizopakiwa. Faili inapofutwa, nafasi yake inaachiliwa.",
+  "Las cuentas conectadas de WhatsApp, WhatsApp Web e Instagram. Una cuenta desconectada deja de contar.": "Akaunti zilizounganishwa za WhatsApp, WhatsApp Web na Instagram. Akaunti iliyotenganishwa haihesabiwi tena.",
+  "Lo que gastan los agentes de IA y el pre-procesamiento de media al usar los modelos de la plataforma. Un agente con clave API propia no consume créditos.": "Kile ambacho mawakala wa AI na uchakataji wa awali wa media hutumia wanapotumia miundo ya jukwaa. Wakala mwenye ufunguo wake wa API hatumii salio."
 }

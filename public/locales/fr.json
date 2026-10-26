@@ -409,5 +409,20 @@
   "12 meses": "12 mois",
   "Por período": "Par période",
   "Acumulado": "Cumulé",
-  "Cada mes ya muestra su total": "Chaque mois affiche déjà son total"
+  "Cada mes ya muestra su total": "Chaque mois affiche déjà son total",
+  "Sobre el límite": "Au-delà de la limite",
+  "Límite alcanzado": "Limite atteinte",
+  "Cerca del límite": "Proche de la limite",
+  "Se renueva el": "Se renouvelle le",
+  "No se envían más mensajes; los recibidos siguen llegando.": "Plus aucun message n'est envoyé ; les messages reçus continuent d'arriver.",
+  "No se crean conversaciones nuevas.": "Aucune nouvelle conversation n'est créée.",
+  "No se pueden subir más archivos.": "Impossible de téléverser d'autres fichiers.",
+  "No se pueden conectar más cuentas.": "Impossible de connecter d'autres comptes.",
+  "Los agentes de IA sin clave propia dejan de responder.": "Les agents IA sans clé propre cessent de répondre.",
+  "No se puede usar más.": "Il ne peut plus être utilisé.",
+  "Cada mensaje enviado o recibido por cualquier canal, también los enviados desde el teléfono u otro dispositivo vinculado. Incluye reacciones, notas internas y los registros de los agentes de IA. No cuenta el historial importado.": "Chaque message envoyé ou reçu sur n'importe quel canal, y compris ceux envoyés depuis le téléphone ou un autre appareil associé. Les réactions, les notes internes et les traces des agents IA comptent aussi. L'historique importé ne compte pas.",
+  "Cada conversación nueva: la primera vez que un contacto y una conexión intercambian un mensaje. El mismo contacto en dos conexiones son dos conversaciones. Cuentan también las que trae el historial importado.": "Chaque nouvelle conversation : la première fois qu'un contact et une connexion échangent un message. Le même contact sur deux connexions fait deux conversations. Celles apportées par l'historique importé comptent aussi.",
+  "Lo que ocupan los archivos guardados: la media enviada o recibida y los archivos subidos. Al borrarse un archivo, se libera su espacio.": "L'espace occupé par les fichiers stockés : les médias envoyés ou reçus et les fichiers téléversés. Quand un fichier est supprimé, son espace est libéré.",
+  "Las cuentas conectadas de WhatsApp, WhatsApp Web e Instagram. Una cuenta desconectada deja de contar.": "Les comptes WhatsApp, WhatsApp Web et Instagram connectés. Un compte déconnecté cesse de compter.",
+  "Lo que gastan los agentes de IA y el pre-procesamiento de media al usar los modelos de la plataforma. Un agente con clave API propia no consume créditos.": "Ce que dépensent les agents IA et le prétraitement des médias en utilisant les modèles de la plateforme. Un agent avec sa propre clé API ne consomme pas de crédits."
 }

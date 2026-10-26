@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import ChatList from "@/components/ChatList";
 import ChatSearch from "@/components/ChatSearch";
 import Header from "@/components/Header";
@@ -8,6 +8,9 @@ import Spinner from "@/components/Spinner";
 import { Bell } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useInvitations, useAnswerInvitation } from "@/queries/useAgents";
+import { useQuotas } from "@/queries/useBilling";
+import QuotaAlert from "@/components/stats/QuotaAlert";
+import { quotaStatus } from "@/components/stats/quota";
 
 export const Route = createFileRoute("/_auth/conversations/")({
   component: Conversations,
@@ -17,6 +20,8 @@ function Conversations() {
   const { translate: t } = useTranslation();
   const { data: invitations } = useInvitations();
   const answerInvitation = useAnswerInvitation();
+  const navigate = useNavigate();
+  const alerts = useQuotas()?.filter((q) => quotaStatus(q) !== "ok");
 
   const roles: Record<string, string> = {
     owner: t("Propietario"),
@@ -86,6 +91,23 @@ function Conversations() {
                 }
               />
             </div>
+          ))}
+        </div>
+      )}
+      {alerts && alerts.length > 0 && (
+        <div className="pt-[10px] pb-[5px] pl-[10px] pr-[20px] flex flex-col gap-[4px]">
+          {alerts.map((quota) => (
+            <QuotaAlert
+              key={quota.id}
+              quota={quota}
+              onClick={() =>
+                navigate({
+                  to: "/stats/$productId",
+                  params: { productId: quota.id },
+                  hash: (prevHash) => prevHash!,
+                })
+              }
+            />
           ))}
         </div>
       )}
