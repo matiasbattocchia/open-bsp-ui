@@ -318,7 +318,6 @@
   "Validando enlace...": "Inathibitisha kiungo...",
   "Variable de encabezado": "Kigezo cha kichwa",
   "Verificar disponibilidad": "Thibitisha upatikanaji",
-  "Verify token": "Verify token",
   "Video": "Video",
   "Visible desde WhatsApp": "Inaonekana kwenye WhatsApp",
   "Volver": "Rudi",
@@ -439,5 +438,6 @@
   "Todavía no hay pagos en línea: los cambios de plan se hacen a mano.": "Bado hakuna malipo ya mtandaoni: mabadiliko ya mpango hufanywa kwa mkono.",
   "Escribinos en la comunidad de WhatsApp y lo activamos.": "Tuandikie kwenye jumuiya ya WhatsApp na tutauwezesha.",
   "Ir a la comunidad": "Nenda kwenye jumuiya",
-  "mes": "mwezi"
+  "mes": "mwezi",
+  "Token de verificación": "Token ya uthibitisho"
 }

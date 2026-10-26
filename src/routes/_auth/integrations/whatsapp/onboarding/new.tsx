@@ -114,7 +114,7 @@ function NewOnboardingToken() {
               <input
                 type="text"
                 className="text"
-                placeholder={t("Secreto para validar el webhook")}
+                placeholder={t("Token de verificación")}
                 {...register("verify_token")}
               />
             </label>

@@ -180,7 +180,7 @@ function WhatsAppDetails() {
           </label>
 
           <label>
-            <div className="label">{t("Verify token")}</div>
+            <div className="label">{t("Token de verificación")}</div>
             <input
               type="text"
               className="text"

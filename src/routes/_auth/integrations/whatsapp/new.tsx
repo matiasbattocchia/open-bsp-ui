@@ -98,11 +98,12 @@ function WhatsAppNew() {
 
               <label>
                 <div className="label">
-                  {t("Verify token")} ({t("opcional")})
+                  {t("Token de verificación")} ({t("opcional")})
                 </div>
                 <input
                   type="text"
                   className="text"
+                  placeholder={t("Token de verificación")}
                   value={verifyToken}
                   onChange={(e) => setVerifyToken(e.target.value)}
                 />

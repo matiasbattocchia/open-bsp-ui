@@ -104,7 +104,7 @@ function MediaPreprocessingSettings() {
             <input
               type="password"
               className="text"
-              placeholder="sk-..."
+              placeholder="AIza..."
               disabled={!isAdmin}
               {...register("extra.media_preprocessing.api_key")}
             />

@@ -318,7 +318,6 @@
   "Validando enlace...": "Validation du lien...",
   "Variable de encabezado": "Variable d'en-tête",
   "Verificar disponibilidad": "Vérifier la disponibilité",
-  "Verify token": "Verify token",
   "Video": "Vidéo",
   "Visible desde WhatsApp": "Visible depuis WhatsApp",
   "Volver": "Retour",
@@ -439,5 +438,6 @@
   "Todavía no hay pagos en línea: los cambios de plan se hacen a mano.": "Il n'y a pas encore de paiement en ligne : les changements de forfait se font à la main.",
   "Escribinos en la comunidad de WhatsApp y lo activamos.": "Écrivez-nous dans la communauté WhatsApp et nous l'activerons.",
   "Ir a la comunidad": "Aller à la communauté",
-  "mes": "mois"
+  "mes": "mois",
+  "Token de verificación": "Token de vérification"
 }
