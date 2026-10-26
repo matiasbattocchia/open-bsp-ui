@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import SectionHeader from "@/components/SectionHeader";
 import SectionBody from "@/components/SectionBody";
 import PillToggle from "@/components/PillToggle";
@@ -81,6 +81,7 @@ function quotaReferences(
 function ProductStats() {
   const { translate: t } = useTranslation();
   const { productId } = Route.useParams();
+  const navigate = useNavigate();
   const quota = useQuotas()?.find((q) => q.id === productId);
   // The day rows any daily range can show: from the earlier of the month's
   // first day and 30 days ago.
@@ -124,7 +125,12 @@ function ProductStats() {
     <>
       <SectionHeader title={translateProductName(quota.name, t)} />
       <SectionBody>
-        <QuotaAlert quota={quota} />
+        <QuotaAlert
+          quota={quota}
+          onUpgrade={() =>
+            navigate({ to: "/settings/plans", hash: (prevHash) => prevHash! })
+          }
+        />
         <div className="flex flex-col gap-[24px] p-[10px]">
           <div className="flex flex-col gap-[8px]">
             <div className="text-[13px] text-muted-foreground">

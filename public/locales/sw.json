@@ -424,5 +424,19 @@
   "Cada conversación nueva: la primera vez que un contacto y una conexión intercambian un mensaje. El mismo contacto en dos conexiones son dos conversaciones. Cuentan también las que trae el historial importado.": "Kila mazungumzo mapya: mara ya kwanza mwasiliani na muunganisho wanapobadilishana ujumbe. Mwasiliani mmoja kwenye miunganisho miwili ni mazungumzo mawili. Yanayoletwa na historia iliyoingizwa nayo yanahesabiwa.",
   "Lo que ocupan los archivos guardados: la media enviada o recibida y los archivos subidos. Al borrarse un archivo, se libera su espacio.": "Nafasi inayochukuliwa na faili zilizohifadhiwa: media iliyotumwa au kupokelewa na faili zilizopakiwa. Faili inapofutwa, nafasi yake inaachiliwa.",
   "Las cuentas conectadas de WhatsApp, WhatsApp Web e Instagram. Una cuenta desconectada deja de contar.": "Akaunti zilizounganishwa za WhatsApp, WhatsApp Web na Instagram. Akaunti iliyotenganishwa haihesabiwi tena.",
-  "Lo que gastan los agentes de IA y el pre-procesamiento de media al usar los modelos de la plataforma. Un agente con clave API propia no consume créditos.": "Kile ambacho mawakala wa AI na uchakataji wa awali wa media hutumia wanapotumia miundo ya jukwaa. Wakala mwenye ufunguo wake wa API hatumii salio."
+  "Lo que gastan los agentes de IA y el pre-procesamiento de media al usar los modelos de la plataforma. Un agente con clave API propia no consume créditos.": "Kile ambacho mawakala wa AI na uchakataji wa awali wa media hutumia wanapotumia miundo ya jukwaa. Wakala mwenye ufunguo wake wa API hatumii salio.",
+  "Planes": "Mipango",
+  "Mejorar plan": "Boresha mpango",
+  "Plan actual": "Mpango wa sasa",
+  "Gratis": "Bure",
+  "de crédito, por única vez": "ya salio, mara moja",
+  "incluidos": "imejumuishwa",
+  "c/u": "kila moja",
+  "por": "kwa",
+  "Hasta": "Hadi",
+  "Mejorar a": "Boresha hadi",
+  "Cambiar a": "Badilisha hadi",
+  "Todavía no hay pagos en línea: los cambios de plan se hacen a mano.": "Bado hakuna malipo ya mtandaoni: mabadiliko ya mpango hufanywa kwa mkono.",
+  "Escribinos en la comunidad de WhatsApp y lo activamos.": "Tuandikie kwenye jumuiya ya WhatsApp na tutauwezesha.",
+  "Ir a la comunidad": "Nenda kwenye jumuiya"
 }

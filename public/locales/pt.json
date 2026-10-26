@@ -424,5 +424,19 @@
   "Cada conversación nueva: la primera vez que un contacto y una conexión intercambian un mensaje. El mismo contacto en dos conexiones son dos conversaciones. Cuentan también las que trae el historial importado.": "Cada conversa nova: a primeira vez que um contato e uma conexão trocam uma mensagem. O mesmo contato em duas conexões são duas conversas. As trazidas pelo histórico importado também contam.",
   "Lo que ocupan los archivos guardados: la media enviada o recibida y los archivos subidos. Al borrarse un archivo, se libera su espacio.": "O espaço ocupado pelos arquivos guardados: a mídia enviada ou recebida e os arquivos enviados. Quando um arquivo é apagado, seu espaço é liberado.",
   "Las cuentas conectadas de WhatsApp, WhatsApp Web e Instagram. Una cuenta desconectada deja de contar.": "As contas conectadas de WhatsApp, WhatsApp Web e Instagram. Uma conta desconectada deixa de contar.",
-  "Lo que gastan los agentes de IA y el pre-procesamiento de media al usar los modelos de la plataforma. Un agente con clave API propia no consume créditos.": "O que os agentes de IA e o pré-processamento de mídia gastam ao usar os modelos da plataforma. Um agente com chave de API própria não consome créditos."
+  "Lo que gastan los agentes de IA y el pre-procesamiento de media al usar los modelos de la plataforma. Un agente con clave API propia no consume créditos.": "O que os agentes de IA e o pré-processamento de mídia gastam ao usar os modelos da plataforma. Um agente com chave de API própria não consome créditos.",
+  "Planes": "Planos",
+  "Mejorar plan": "Melhorar plano",
+  "Plan actual": "Plano atual",
+  "Gratis": "Grátis",
+  "de crédito, por única vez": "de crédito, uma única vez",
+  "incluidos": "incluídos",
+  "c/u": "cada",
+  "por": "por",
+  "Hasta": "Até",
+  "Mejorar a": "Melhorar para",
+  "Cambiar a": "Mudar para",
+  "Todavía no hay pagos en línea: los cambios de plan se hacen a mano.": "Ainda não há pagamentos online: as mudanças de plano são feitas manualmente.",
+  "Escribinos en la comunidad de WhatsApp y lo activamos.": "Escreva para nós na comunidade do WhatsApp e nós ativamos.",
+  "Ir a la comunidad": "Ir para a comunidade"
 }

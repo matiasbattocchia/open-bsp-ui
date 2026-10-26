@@ -424,5 +424,19 @@
   "Cada conversación nueva: la primera vez que un contacto y una conexión intercambian un mensaje. El mismo contacto en dos conexiones son dos conversaciones. Cuentan también las que trae el historial importado.": "Every new conversation: the first time a contact and a connection exchange a message. The same contact on two connections is two conversations. Those brought in by imported history count too.",
   "Lo que ocupan los archivos guardados: la media enviada o recibida y los archivos subidos. Al borrarse un archivo, se libera su espacio.": "The space taken by stored files: media sent or received and uploaded files. When a file is deleted, its space is freed.",
   "Las cuentas conectadas de WhatsApp, WhatsApp Web e Instagram. Una cuenta desconectada deja de contar.": "Connected WhatsApp, WhatsApp Web and Instagram accounts. A disconnected account stops counting.",
-  "Lo que gastan los agentes de IA y el pre-procesamiento de media al usar los modelos de la plataforma. Un agente con clave API propia no consume créditos.": "What AI agents and media preprocessing spend when using the platform's models. An agent with its own API key doesn't consume credits."
+  "Lo que gastan los agentes de IA y el pre-procesamiento de media al usar los modelos de la plataforma. Un agente con clave API propia no consume créditos.": "What AI agents and media preprocessing spend when using the platform's models. An agent with its own API key doesn't consume credits.",
+  "Planes": "Plans",
+  "Mejorar plan": "Upgrade plan",
+  "Plan actual": "Current plan",
+  "Gratis": "Free",
+  "de crédito, por única vez": "of credit, one-time",
+  "incluidos": "included",
+  "c/u": "each",
+  "por": "per",
+  "Hasta": "Up to",
+  "Mejorar a": "Upgrade to",
+  "Cambiar a": "Switch to",
+  "Todavía no hay pagos en línea: los cambios de plan se hacen a mano.": "There are no online payments yet: plan changes are done by hand.",
+  "Escribinos en la comunidad de WhatsApp y lo activamos.": "Write to us in the WhatsApp community and we'll activate it.",
+  "Ir a la comunidad": "Go to the community"
 }

@@ -61,7 +61,7 @@ export function fmt(n: number, unit: string) {
   });
 }
 
-function unitLabel(unit: string) {
+export function unitLabel(unit: string) {
   if (unit === "usd" || unit === "count") return "";
   return ` ${unit.toUpperCase()}`;
 }

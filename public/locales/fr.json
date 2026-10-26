@@ -424,5 +424,19 @@
   "Cada conversación nueva: la primera vez que un contacto y una conexión intercambian un mensaje. El mismo contacto en dos conexiones son dos conversaciones. Cuentan también las que trae el historial importado.": "Chaque nouvelle conversation : la première fois qu'un contact et une connexion échangent un message. Le même contact sur deux connexions fait deux conversations. Celles apportées par l'historique importé comptent aussi.",
   "Lo que ocupan los archivos guardados: la media enviada o recibida y los archivos subidos. Al borrarse un archivo, se libera su espacio.": "L'espace occupé par les fichiers stockés : les médias envoyés ou reçus et les fichiers téléversés. Quand un fichier est supprimé, son espace est libéré.",
   "Las cuentas conectadas de WhatsApp, WhatsApp Web e Instagram. Una cuenta desconectada deja de contar.": "Les comptes WhatsApp, WhatsApp Web et Instagram connectés. Un compte déconnecté cesse de compter.",
-  "Lo que gastan los agentes de IA y el pre-procesamiento de media al usar los modelos de la plataforma. Un agente con clave API propia no consume créditos.": "Ce que dépensent les agents IA et le prétraitement des médias en utilisant les modèles de la plateforme. Un agent avec sa propre clé API ne consomme pas de crédits."
+  "Lo que gastan los agentes de IA y el pre-procesamiento de media al usar los modelos de la plataforma. Un agente con clave API propia no consume créditos.": "Ce que dépensent les agents IA et le prétraitement des médias en utilisant les modèles de la plateforme. Un agent avec sa propre clé API ne consomme pas de crédits.",
+  "Planes": "Forfaits",
+  "Mejorar plan": "Améliorer le forfait",
+  "Plan actual": "Forfait actuel",
+  "Gratis": "Gratuit",
+  "de crédito, por única vez": "de crédit, une seule fois",
+  "incluidos": "inclus",
+  "c/u": "l'unité",
+  "por": "par",
+  "Hasta": "Jusqu'à",
+  "Mejorar a": "Passer à",
+  "Cambiar a": "Changer pour",
+  "Todavía no hay pagos en línea: los cambios de plan se hacen a mano.": "Il n'y a pas encore de paiement en ligne : les changements de forfait se font à la main.",
+  "Escribinos en la comunidad de WhatsApp y lo activamos.": "Écrivez-nous dans la communauté WhatsApp et nous l'activerons.",
+  "Ir a la comunidad": "Aller à la communauté"
 }

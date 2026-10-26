@@ -18,6 +18,40 @@ export function useProducts() {
   });
 }
 
+/** The active plans with what each includes, cheapest first. */
+export function usePlans() {
+  return useQuery({
+    queryKey: queryKeys.billing.plans(),
+    queryFn: async () =>
+      await supabase
+        .schema("billing")
+        .from("plans")
+        .select("*, plans_products(*)")
+        .eq("active", true)
+        .order("price")
+        .throwOnError(),
+    staleTime: 1000 * 60 * 60,
+    select: (data) => data.data,
+  });
+}
+
+/** The active tiers with their caps, lowest level first. */
+export function useTiers() {
+  return useQuery({
+    queryKey: queryKeys.billing.tiers(),
+    queryFn: async () =>
+      await supabase
+        .schema("billing")
+        .from("tiers")
+        .select("*, tiers_products(*)")
+        .eq("active", true)
+        .order("level")
+        .throwOnError(),
+    staleTime: 1000 * 60 * 60,
+    select: (data) => data.data,
+  });
+}
+
 /**
  * The organization's usage rows for an interval, oldest first. `since` keeps
  * only the periods from that date on: day rows pile up past the API's row

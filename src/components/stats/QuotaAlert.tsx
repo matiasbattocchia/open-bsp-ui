@@ -43,15 +43,17 @@ function renewal(language: string, t: Translate) {
 /**
  * A warning card, shaped like the invitation card, for a quota about to meet
  * its cap or capped already. Near, it says how far along it is; capped, what
- * stopped working. A monthly quota also says when it starts over. Nothing for
- * a quota with room to spare.
+ * stopped working. A monthly quota also says when it starts over, and an
+ * `onUpgrade` adds a link to the plans. Nothing for a quota with room to spare.
  */
 export default function QuotaAlert({
   quota,
   onClick,
+  onUpgrade,
 }: {
   quota: Quota;
   onClick?: () => void;
+  onUpgrade?: () => void;
 }) {
   const { translate: t, currentLanguage } = useTranslation();
   const status = quotaStatus(quota);
@@ -77,6 +79,16 @@ export default function QuotaAlert({
                 : amount.used + amount.rest}
             </p>
             {quota.interval === "month" && <p>{renewal(currentLanguage, t)}</p>}
+            {onUpgrade && (
+              <div className="flex justify-end">
+                <button
+                  onClick={onUpgrade}
+                  className="font-bold text-primary/90 hover:text-primary cursor-pointer"
+                >
+                  {t("Mejorar plan")}
+                </button>
+              </div>
+            )}
           </div>
         }
         aside={
