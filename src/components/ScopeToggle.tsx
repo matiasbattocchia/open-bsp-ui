@@ -1,5 +1,6 @@
 import { useTranslation } from "@/hooks/useTranslation";
 import type { ConnectionScope } from "@/hooks/useConnectionScope";
+import PillToggle, { type PillOption } from "./PillToggle";
 
 /**
  * Whose account is being connected. The organization's option stays visible
@@ -19,43 +20,24 @@ export default function ScopeToggle({
 }) {
   const { translate: t } = useTranslation();
 
-  const options: { scope: ConnectionScope; label: string }[] = [
-    { scope: "organization", label: t("De la organización") },
-    { scope: "personal", label: t("Personal") },
+  const options: PillOption<ConnectionScope>[] = [
+    {
+      value: "organization",
+      label: t("De la organización"),
+      disabled: !isAdmin,
+      title: isAdmin ? undefined : t("Requiere permisos de administrador"),
+    },
+    { value: "personal", label: t("Personal") },
   ];
 
   return (
     <div className="flex flex-col gap-[6px]">
-      <div className="flex gap-[8px]">
-        {options.map(({ scope, label }) => {
-          const unavailable = scope === "organization" && !isAdmin;
-
-          return (
-            <button
-              key={scope}
-              type="button"
-              disabled={disabled || unavailable}
-              title={
-                unavailable
-                  ? t("Requiere permisos de administrador")
-                  : undefined
-              }
-              onClick={() => onChange(scope)}
-              className={
-                "px-[12px] py-[6px] rounded-full text-[14px] " +
-                (value === scope
-                  ? "bg-accent text-primary"
-                  : "text-muted-foreground hover:bg-accent") +
-                (disabled || unavailable
-                  ? " opacity-50 cursor-not-allowed hover:bg-transparent"
-                  : "")
-              }
-            >
-              {label}
-            </button>
-          );
-        })}
-      </div>
+      <PillToggle
+        value={value}
+        onChange={onChange}
+        disabled={disabled}
+        options={options}
+      />
       <p className="text-[13px] text-muted-foreground">
         {value === "organization"
           ? t("Sus conversaciones las ve todo el equipo.")

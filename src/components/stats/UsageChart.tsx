@@ -1,6 +1,8 @@
 import {
-  BarChart,
+  ComposedChart,
+  Area,
   Bar,
+  ReferenceLine,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -14,18 +16,35 @@ type UsageRow = {
   quantity: number;
 };
 
+/**
+ * A horizontal line at a quota figure. One that extends the domain is always
+ * in view; otherwise it shows only when the data reaches that far, so a far
+ * cap doesn't flatten the chart.
+ */
+export type Reference = {
+  value: number;
+  label: string;
+  color: string;
+  extendDomain: boolean;
+};
+
 export default function UsageChart({
   data,
   unit,
   periodLabel,
   color = "var(--color-primary)",
   formatLabel,
+  area = false,
+  references = [],
 }: {
   data: UsageRow[];
   unit: string;
   periodLabel: string;
   color?: string;
   formatLabel?: (period: string) => string;
+  /** A level (or a running total) draws as an area, not as bars. */
+  area?: boolean;
+  references?: Reference[];
 }) {
   const { translate: t } = useTranslation();
 
@@ -47,7 +66,7 @@ export default function UsageChart({
 
   return (
     <ResponsiveContainer width="100%" height={160}>
-      <BarChart
+      <ComposedChart
         data={chartData}
         margin={{ top: 4, right: 4, left: -20, bottom: 0 }}
       >
@@ -70,8 +89,34 @@ export default function UsageChart({
             );
           }}
         />
-        <Bar dataKey="quantity" fill={color} radius={[3, 3, 0, 0]} />
-      </BarChart>
+        {area ? (
+          <Area
+            dataKey="quantity"
+            type="linear"
+            stroke={color}
+            fill={color}
+            fillOpacity={0.2}
+            isAnimationActive={false}
+          />
+        ) : (
+          <Bar dataKey="quantity" fill={color} radius={[3, 3, 0, 0]} />
+        )}
+        {references.map((r) => (
+          <ReferenceLine
+            key={r.label}
+            y={r.value}
+            stroke={r.color}
+            strokeDasharray="4 4"
+            ifOverflow={r.extendDomain ? "extendDomain" : "discard"}
+            label={{
+              value: r.label,
+              position: "insideTopRight",
+              fontSize: 11,
+              fill: r.color,
+            }}
+          />
+        ))}
+      </ComposedChart>
     </ResponsiveContainer>
   );
 }

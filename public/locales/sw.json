@@ -404,5 +404,10 @@
   "Conexiones": "Miunganisho",
   "Ilimitado": "Bila kikomo",
   "Excedente": "Ziada",
-  "Límite": "Kikomo"
+  "Límite": "Kikomo",
+  "Este mes": "Mwezi huu",
+  "12 meses": "Miezi 12",
+  "Por período": "Kwa kipindi",
+  "Acumulado": "Jumla limbikizi",
+  "Cada mes ya muestra su total": "Kila mwezi tayari unaonyesha jumla yake"
 }

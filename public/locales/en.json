@@ -404,5 +404,10 @@
   "Conexiones": "Connections",
   "Ilimitado": "Unlimited",
   "Excedente": "Overage",
-  "Límite": "Limit"
+  "Límite": "Limit",
+  "Este mes": "This month",
+  "12 meses": "12 months",
+  "Por período": "Per period",
+  "Acumulado": "Cumulative",
+  "Cada mes ya muestra su total": "Each month already shows its total"
 }

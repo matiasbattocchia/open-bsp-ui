@@ -1,51 +1,79 @@
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import SectionHeader from "@/components/SectionHeader";
 import SectionBody from "@/components/SectionBody";
+import PillToggle from "@/components/PillToggle";
 import { QuotaBar, QuotaLegend } from "@/components/stats/QuotaBar";
-import UsageChart from "@/components/stats/UsageChart";
+import UsageChart, { type Reference } from "@/components/stats/UsageChart";
 import {
   quotaAmount,
   quotaRange,
   quotaSegments,
   translateProductName,
 } from "@/components/stats/quota";
+import {
+  accumulate,
+  fillSeries,
+  levelSeries,
+  rangePeriods,
+  type Range,
+} from "@/components/stats/series";
 import { useTranslation } from "@/hooks/useTranslation";
-import { useQuotas, useUsage } from "@/queries/useBilling";
+import { useQuotas, useUsage, type Quota } from "@/queries/useBilling";
 
 export const Route = createFileRoute("/_auth/stats/$productId")({
   component: ProductStats,
 });
 
-function last14Days(): string[] {
-  const days: string[] = [];
-  const d = new Date();
-  for (let i = 13; i >= 0; i--) {
-    const dt = new Date(d);
-    dt.setDate(d.getDate() - i);
-    days.push(dt.toISOString().slice(0, 10));
-  }
-  return days;
+type View = "period" | "cumulative";
+
+function formatMonth(period: string, t: (s: string) => string) {
+  const names = [
+    t("Ene"),
+    t("Feb"),
+    t("Mar"),
+    t("Abr"),
+    t("May"),
+    t("Jun"),
+    t("Jul"),
+    t("Ago"),
+    t("Sep"),
+    t("Oct"),
+    t("Nov"),
+    t("Dic"),
+  ];
+  const m = parseInt(period.slice(5, 7), 10);
+  return names[m - 1] || period.slice(5, 7);
 }
 
-function fillSeries(
-  periods: string[],
-  usage: { period: string; product_id: string; quantity: number }[] | undefined,
-  productId: string,
-  carry = false,
-): { period: string; quantity: number }[] {
-  const map = new Map<string, number>();
-  for (const row of usage ?? []) {
-    if (row.product_id === productId) map.set(row.period, row.quantity);
-  }
-  let last = 0;
-  return periods.map((p) => {
-    const val = map.get(p);
-    if (val != null) {
-      last = val;
-      return { period: p, quantity: val };
-    }
-    return { period: p, quantity: carry ? last : 0 };
-  });
+/**
+ * The quota's allowance and cap as lines, for a chart whose values measure up
+ * to them. The allowance is always in view; a cap above it shows only when the
+ * usage gets near. When both are the same figure, one line stands for both.
+ */
+function quotaReferences(
+  { kind, included, cap }: Quota,
+  t: (s: string) => string,
+): Reference[] {
+  // A balance's cap is a floor, not a ceiling to measure against.
+  if (kind === "balance") return [];
+
+  const references: Reference[] = [];
+  if (included !== null && included !== cap)
+    references.push({
+      value: included,
+      label: t("Incluido"),
+      color: "var(--color-primary)",
+      extendDomain: true,
+    });
+  if (cap !== null)
+    references.push({
+      value: cap,
+      label: t("Límite"),
+      color: "var(--color-muted-foreground)",
+      extendDomain: included === null || included === cap,
+    });
+  return references;
 }
 
 function ProductStats() {
@@ -53,6 +81,9 @@ function ProductStats() {
   const { productId } = Route.useParams();
   const quota = useQuotas()?.find((q) => q.id === productId);
   const { data: dayUsage } = useUsage("day");
+  const { data: monthUsage } = useUsage("month");
+  const [range, setRange] = useState<Range>("month");
+  const [selectedView, setSelectedView] = useState<View>("period");
 
   if (!quota) {
     return <SectionHeader title={t("Estadísticas")} />;
@@ -60,9 +91,27 @@ function ProductStats() {
 
   const segments = quotaSegments(quota, t);
   const amount = quotaAmount(quota, t, true);
-  // Balances and gauges are levels, not flows: a day without a row keeps the
-  // last known value instead of dropping to zero.
-  const carry = quota.kind === "balance" || quota.kind === "gauge";
+
+  // A monthly counter is the one that adds up toward its quota. Over 12 months
+  // each bar already is a month's total, so there is nothing left to add.
+  const isMonthlyCounter =
+    quota.kind === "counter" && quota.interval === "month";
+  const view = range === "12m" ? "period" : selectedView;
+
+  // A balance or gauge is a level (credit left, storage held), charted as
+  // such; a counter is a flow, charted as what each period used.
+  const isLevel = quota.kind === "balance" || quota.kind === "gauge";
+  const periods = rangePeriods(range);
+  const usage = range === "12m" ? monthUsage : dayUsage;
+  const series = isLevel
+    ? levelSeries(periods, usage, quota.id, quota.used)
+    : fillSeries(periods, usage, quota.id);
+
+  // Lines only where the values measure up to the quota: a level, a running
+  // total or a month's total; a single day's count would sit far below them.
+  const comparable =
+    quota.kind === "gauge" ||
+    (isMonthlyCounter && (view === "cumulative" || range === "12m"));
 
   return (
     <>
@@ -80,19 +129,51 @@ function ProductStats() {
             <QuotaLegend segments={segments} />
           </div>
 
-          <div className="flex flex-col gap-[8px]">
-            <div className="flex justify-between items-baseline">
-              <span className="text-[16px] text-foreground">{t("Uso")}</span>
-              <span className="text-[13px] text-muted-foreground">
-                {t("Últimos 14 días")}
-              </span>
-            </div>
+          <div className="flex flex-col gap-[16px]">
+            <span className="text-[16px] text-foreground">{t("Uso")}</span>
             <UsageChart
-              data={fillSeries(last14Days(), dayUsage, quota.id, carry)}
+              data={view === "cumulative" ? accumulate(series) : series}
               unit={quota.unit}
-              periodLabel={t("Día")}
-              formatLabel={(p) => p.slice(8, 10)}
+              periodLabel={range === "12m" ? t("Mes") : t("Día")}
+              formatLabel={
+                range === "12m"
+                  ? (p) => formatMonth(p, t)
+                  : (p) => p.slice(8, 10)
+              }
+              area={isLevel || view === "cumulative"}
+              references={comparable ? quotaReferences(quota, t) : []}
             />
+            {/* Below the chart: it stays put whether or not a product has
+                the view toggle. */}
+            <div className="flex flex-col gap-[8px]">
+              <PillToggle
+                value={range}
+                onChange={setRange}
+                options={[
+                  { value: "month", label: t("Este mes") },
+                  { value: "30d", label: t("30 días") },
+                  { value: "12m", label: t("12 meses") },
+                ]}
+              />
+              {isMonthlyCounter && (
+                <PillToggle
+                  value={view}
+                  onChange={setSelectedView}
+                  options={[
+                    { value: "period", label: t("Por período") },
+                    {
+                      value: "cumulative",
+                      label: t("Acumulado"),
+                      disabled: range === "12m",
+                      title:
+                        range === "12m"
+                          ? t("Cada mes ya muestra su total")
+                          : undefined,
+                    },
+                  ]}
+                />
+              )}
+            </div>
           </div>
         </div>
       </SectionBody>

@@ -130,11 +130,20 @@ export function useQuotas() {
 
   if (!products || !tierLimits) return undefined;
 
+  // The month usage rows run back in time; only the current one counts toward
+  // the quota. Periods are UTC dates, like the database's current_date.
+  const currentMonth = new Date().toISOString().slice(0, 8) + "01";
+
   return products.flatMap((product) => {
     const tier = tierLimits.find((tl) => tl.product_id === product.id);
     if (!tier) return [];
 
-    const usage = tier.interval === "lifetime" ? lifetimeUsage : monthUsage;
+    const row =
+      tier.interval === "lifetime"
+        ? lifetimeUsage?.find((u) => u.product_id === product.id)
+        : monthUsage?.find(
+            (u) => u.product_id === product.id && u.period === currentMonth,
+          );
 
     return {
       id: product.id,
@@ -142,7 +151,7 @@ export function useQuotas() {
       kind: product.kind,
       unit: product.unit,
       interval: tier.interval,
-      used: usage?.find((u) => u.product_id === product.id)?.quantity ?? 0,
+      used: row?.quantity ?? 0,
       included:
         planProducts?.find((pp) => pp.product_id === product.id)?.included ??
         null,

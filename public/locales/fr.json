@@ -404,5 +404,10 @@
   "Conexiones": "Connexions",
   "Ilimitado": "Illimité",
   "Excedente": "Dépassement",
-  "Límite": "Limite"
+  "Límite": "Limite",
+  "Este mes": "Ce mois-ci",
+  "12 meses": "12 mois",
+  "Por período": "Par période",
+  "Acumulado": "Cumulé",
+  "Cada mes ya muestra su total": "Chaque mois affiche déjà son total"
 }
