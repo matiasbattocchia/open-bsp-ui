@@ -14,6 +14,7 @@ import {
   planTier,
 } from "@/components/plans/plan";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useCurrentAgent } from "@/queries/useAgents";
 import {
   usePlans,
   useProducts,
@@ -34,6 +35,7 @@ function PlanDetail() {
   const { data: products } = useProducts();
   const { data: tiers } = useTiers();
   const { data: subscription } = useSubscription();
+  const { data: agent } = useCurrentAgent();
   // There are no online payments yet: the button tells how to ask for it.
   const [showContact, setShowContact] = useState(false);
 
@@ -50,14 +52,19 @@ function PlanDetail() {
     tiers ?? [],
   );
   const name = planName(plan.id);
+  const price = planPrice(plan, t);
+  const isAdmin = ["admin", "owner"].includes(agent?.role || "");
 
   return (
     <>
       <SectionHeader title={name} />
       <SectionBody>
         <div className="px-[10px] pt-[8px] pb-[16px] flex flex-col gap-[4px]">
-          <span className="text-[28px] text-foreground font-medium">
-            {planPrice(plan, t)}
+          <span className="text-[13px] text-muted-foreground">
+            <span className="text-[28px] text-foreground font-medium">
+              {price.amount}
+            </span>{" "}
+            {price.period}
           </span>
           {isCurrent && (
             <span className="text-[14px] text-primary">{t("Plan actual")}</span>
@@ -109,20 +116,25 @@ function PlanDetail() {
               <p>
                 {t("Escribinos en la comunidad de WhatsApp y lo activamos.")}
               </p>
-              <a
-                href={COMMUNITY_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="font-bold text-primary/90 hover:text-primary w-fit"
+              {/* A button, not a link: antd's global `a` reset would strip
+                  the background, and this matches the Authorize button. */}
+              <button
+                type="button"
+                className="bg-secondary text-secondary-foreground hover:bg-secondary/80 px-4 py-2 rounded-full font-medium transition-colors w-fit text-[14px] flex items-center gap-2"
+                onClick={() =>
+                  window.open(COMMUNITY_URL, "_blank", "noopener,noreferrer")
+                }
               >
                 {t("Ir a la comunidad")}
-              </a>
+              </button>
             </div>
           ) : (
             <Button
               type="button"
               className="primary"
               onClick={() => setShowContact(true)}
+              disabled={!isAdmin}
+              disabledReason={t("Requiere permisos de administrador")}
             >
               {(plan.price > (current?.price ?? 0)
                 ? t("Mejorar a")

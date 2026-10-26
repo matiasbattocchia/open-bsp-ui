@@ -23,13 +23,15 @@ function Plans() {
       <SectionBody>
         {plans?.map((plan) => {
           const isCurrent = plan.id === subscription?.plan_id;
+          const price = planPrice(plan, t);
 
           return (
             <SectionItem
               key={plan.id}
               title={planName(plan.id)}
               description={
-                planPrice(plan, t) + (isCurrent ? ` · ${t("Plan actual")}` : "")
+                [price.amount, price.period].join(" ").trim() +
+                (isCurrent ? ` · ${t("Plan actual")}` : "")
               }
               aside={
                 <div

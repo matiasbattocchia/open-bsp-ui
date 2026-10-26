@@ -1,4 +1,5 @@
 import type { Quota } from "@/queries/useBilling";
+import { formatNumber } from "@/i18n/numbers";
 
 type Translate = (s: string) => string;
 
@@ -54,8 +55,8 @@ export function productExplainer(productId: string, t: Translate) {
 
 export function fmt(n: number, unit: string) {
   if (unit === "usd")
-    return `$${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  return n.toLocaleString(undefined, {
+    return `$${formatNumber(n, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  return formatNumber(n, {
     minimumFractionDigits: n % 1 !== 0 ? 2 : 0,
     maximumFractionDigits: 2,
   });

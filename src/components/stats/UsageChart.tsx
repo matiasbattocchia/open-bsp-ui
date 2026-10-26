@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useTranslation } from "@/hooks/useTranslation";
+import { formatNumber } from "@/i18n/numbers";
 
 type UsageRow = {
   period: string;
@@ -72,7 +73,10 @@ export default function UsageChart({
       >
         <CartesianGrid strokeDasharray="3 3" opacity={0.3} vertical={false} />
         <XAxis dataKey="label" tick={{ fontSize: 11 }} />
-        <YAxis tick={{ fontSize: 11 }} />
+        <YAxis
+          tick={{ fontSize: 11 }}
+          tickFormatter={(v: number) => formatNumber(v)}
+        />
         <Tooltip
           content={({ active, payload, label }) => {
             if (!active || !payload?.length) return null;
@@ -82,7 +86,7 @@ export default function UsageChart({
                 {periodLabel}: {label}
                 <br />
                 <span className="font-medium">
-                  {val.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                  {formatNumber(val, { maximumFractionDigits: 2 })}
                   {unitLabel}
                 </span>
               </div>

@@ -1,4 +1,5 @@
 import { fmt, unitLabel } from "@/components/stats/quota";
+import { formatNumber } from "@/i18n/numbers";
 
 type Translate = (s: string) => string;
 
@@ -17,12 +18,20 @@ export function planName(id: string) {
   return id.charAt(0).toUpperCase() + id.slice(1);
 }
 
+/**
+ * A plan's price as the stats show figures: the amount, then its period
+ * apart ("$5", "/ mes") so it can be set in a quieter style. Whole prices
+ * carry no cents.
+ */
 export function planPrice(
   { price, billing_cycle }: { price: number; billing_cycle: string | null },
   t: Translate,
 ) {
-  if (price <= 0) return t("Gratis");
-  return `${fmt(price, "usd")}${billing_cycle === "month" ? " " + t("por mes") : ""}`;
+  if (price <= 0) return { amount: t("Gratis"), period: "" };
+  return {
+    amount: `$${formatNumber(price, { minimumFractionDigits: price % 1 !== 0 ? 2 : 0, maximumFractionDigits: 2 })}`,
+    period: billing_cycle === "month" ? `/ ${t("mes")}` : "",
+  };
 }
 
 /**
@@ -68,7 +77,7 @@ export function planOffer(
 
   const unitPrice = planProduct?.unit_price ?? null;
   if (unitPrice !== null) {
-    const price = `$${unitPrice.toLocaleString(undefined, { maximumFractionDigits: 4 })}`;
+    const price = `$${formatNumber(unitPrice, { maximumFractionDigits: 4 })}`;
     lines.push(
       `${t("Excedente")}: ${price} ${unit === "count" ? t("c/u") : `${t("por")} ${unit.toUpperCase()}`}`,
     );
