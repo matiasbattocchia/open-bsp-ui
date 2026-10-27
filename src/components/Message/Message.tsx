@@ -477,29 +477,10 @@ export default function Message(props: UIMessage & { message: MessageRow }) {
     text = true;
   } else if (
     props.message.content.type === "data" &&
-    props.message.content.text
+    props.message.content.kind === "media_placeholder"
   ) {
-    content = (
-      <TextMessage
-        header={headerText}
-        body={props.message.content.text}
-        type="markdown"
-        direction={direction}
-        timestamp={props.message.timestamp}
-        status={direction === "outgoing" ? props.message.status : undefined}
-        fixedWidth={fixedWidth}
-      />
-    );
-    text = true;
-  } else if (
-    (props.message.content.type === "data" &&
-      props.message.content.kind === "media_placeholder") ||
-    (props.message.content.type === "file" && !props.message.content.file?.uri)
-  ) {
-    // media_placeholder data parts, and history-imported media (whatsapp-web)
-    // that arrived without a stored file — missing file.uri is the signal, as
-    // history media carries no status.errors unlike live failures. Render as
-    // unavailable media, keeping any caption.
+    // A medium whose bytes were never stored, on any service. Ahead of the
+    // captioned-data branch below, which would show the caption alone.
     content = (
       <TextMessage
         header={headerText}
@@ -509,6 +490,22 @@ export default function Message(props: UIMessage & { message: MessageRow }) {
             ? `\n\n${props.message.content.text}`
             : "")
         }
+        type="markdown"
+        direction={direction}
+        timestamp={props.message.timestamp}
+        status={direction === "outgoing" ? props.message.status : undefined}
+        fixedWidth={fixedWidth}
+      />
+    );
+    text = true;
+  } else if (
+    props.message.content.type === "data" &&
+    props.message.content.text
+  ) {
+    content = (
+      <TextMessage
+        header={headerText}
+        body={props.message.content.text}
         type="markdown"
         direction={direction}
         timestamp={props.message.timestamp}
