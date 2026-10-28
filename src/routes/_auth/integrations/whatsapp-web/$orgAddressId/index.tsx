@@ -10,6 +10,8 @@ import {
 import { useTranslation } from "@/hooks/useTranslation";
 import { useCurrentAgent } from "@/queries/useAgents";
 import { formatPhoneNumber } from "@/utils/FormatUtils";
+import AccountLimitAlert from "@/components/stats/AccountLimitAlert";
+import { useCanConnectAccount } from "@/queries/useBilling";
 
 export const Route = createFileRoute(
   "/_auth/integrations/whatsapp-web/$orgAddressId/",
@@ -25,6 +27,7 @@ function WhatsAppWebDetails() {
   const { data: health } = useWhatsAppWebHealth(orgAddressId);
   const disconnect = useDisconnectWhatsAppWeb();
   const { data: agent } = useCurrentAgent();
+  const canConnect = useCanConnectAccount();
 
   if (!integration) return;
 
@@ -56,6 +59,9 @@ function WhatsAppWebDetails() {
 
       <SectionBody className="pb-[40px]">
         {/* Session-drop warning + re-pair call to action */}
+        {/* Re-pairing a disconnected number connects it anew: the cap counts
+            only connected accounts. */}
+        {!isConnected && <AccountLimitAlert />}
         {!isConnected && (
           <div className="instructions">
             <p className="text-destructive font-medium">
@@ -97,8 +103,12 @@ function WhatsAppWebDetails() {
                   hash: (prevHash) => prevHash!,
                 })
               }
-              disabled={!canManage}
-              disabledReason={t("Requiere permisos de administrador")}
+              disabled={!canManage || !canConnect}
+              disabledReason={
+                !canConnect
+                  ? t("No se pueden conectar más cuentas.")
+                  : t("Requiere permisos de administrador")
+              }
             >
               {t("Volver a vincular")}
             </Button>

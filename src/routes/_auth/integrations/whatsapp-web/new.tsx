@@ -9,6 +9,8 @@ import Spinner from "@/components/Spinner";
 import { useTranslation } from "@/hooks/useTranslation";
 import ScopeToggle from "@/components/ScopeToggle";
 import { useConnectionScope } from "@/hooks/useConnectionScope";
+import AccountLimitAlert from "@/components/stats/AccountLimitAlert";
+import { useCanConnectAccount } from "@/queries/useBilling";
 import {
   useStartWhatsAppWebSession,
   usePendingWhatsAppWebSession,
@@ -25,6 +27,7 @@ function WhatsAppWebNew() {
   const { translate: t } = useTranslation();
   const navigate = useNavigate();
   const { scope, setScope, isAdmin, agentId, allowed } = useConnectionScope();
+  const canConnect = useCanConnectAccount();
 
   const [method, setMethod] = useState<Method>("qr");
   const [phone, setPhone] = useState("");
@@ -88,6 +91,7 @@ function WhatsAppWebNew() {
       <SectionHeader title={t("Vincular dispositivo")} />
 
       <SectionBody>
+        <AccountLimitAlert />
         <form>
           <div className="instructions">
             <p>
@@ -208,10 +212,16 @@ function WhatsAppWebNew() {
             type="button"
             className="primary bg-[#00ADD8] hover:bg-[#00ADD8]/90 text-white w-full"
             disabled={
-              !allowed || (method === "code" && !isValidPhoneNumber(phone))
+              !allowed ||
+              !canConnect ||
+              (method === "code" && !isValidPhoneNumber(phone))
             }
             disabledReason={
-              !allowed ? t("Requiere permisos de administrador") : undefined
+              !canConnect
+                ? t("No se pueden conectar más cuentas.")
+                : !allowed
+                  ? t("Requiere permisos de administrador")
+                  : undefined
             }
             loading={start.isPending}
             onClick={beginPairing}

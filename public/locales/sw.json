@@ -439,5 +439,7 @@
   "Escribinos en la comunidad de WhatsApp y lo activamos.": "Tuandikie kwenye jumuiya ya WhatsApp na tutauwezesha.",
   "Ir a la comunidad": "Nenda kwenye jumuiya",
   "mes": "mwezi",
-  "Token de verificación": "Token ya uthibitisho"
+  "Token de verificación": "Token ya uthibitisho",
+  "Límite de mensajes alcanzado": "Kikomo cha ujumbe kimefikiwa",
+  "Límite de mensajes alcanzado, mejora el plan para seguir enviando": "Kikomo cha ujumbe kimefikiwa, boresha mpango ili kuendelea kutuma"
 }

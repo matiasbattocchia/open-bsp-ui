@@ -14,10 +14,14 @@ export default function WhatsAppIntegration({
   // useConnectionScope. Defaults to allowed for the third-party onboarding
   // flow, which has no member to ask about.
   allowed = true,
+  // Whether the tier's cap leaves room for one more account; see
+  // useCanConnectAccount.
+  canConnect = true,
 }: {
   onSuccess?: (phone_number_id: string) => void;
   signupOptions?: SignupOptions;
   allowed?: boolean;
+  canConnect?: boolean;
 }) {
   const { translate: t } = useTranslation();
   const context = useContext(WhatsAppIntegrationContext);
@@ -46,13 +50,15 @@ export default function WhatsAppIntegration({
         <p className="text-destructive font-medium">{sdkErrorMessage}</p>
       )}
       <Button
-        disabled={!orgId || !allowed || sdkFailed}
+        disabled={!orgId || !allowed || !canConnect || sdkFailed}
         disabledReason={
           sdkFailed
             ? sdkErrorMessage
-            : !allowed
-              ? t("Requiere permisos de administrador")
-              : undefined
+            : !canConnect
+              ? t("No se pueden conectar más cuentas.")
+              : !allowed
+                ? t("Requiere permisos de administrador")
+                : undefined
         }
         loading={loading}
         className="primary bg-[#4267b2] hover:bg-[#4267b2]/90 text-white w-full"

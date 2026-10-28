@@ -8,6 +8,8 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { getInstagramAuthorizeUrl } from "@/queries/useInstagramSignup";
 import ScopeToggle from "@/components/ScopeToggle";
 import { useConnectionScope } from "@/hooks/useConnectionScope";
+import AccountLimitAlert from "@/components/stats/AccountLimitAlert";
+import { useCanConnectAccount } from "@/queries/useBilling";
 
 export const Route = createFileRoute("/_auth/integrations/instagram/new")({
   component: InstagramNew,
@@ -26,6 +28,7 @@ export const IG_OAUTH_AGENT_KEY = "ig_oauth_agent_id";
 function InstagramNew() {
   const { translate: t } = useTranslation();
   const { scope, setScope, isAdmin, agentId, allowed } = useConnectionScope();
+  const canConnect = useCanConnectAccount();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
@@ -61,6 +64,7 @@ function InstagramNew() {
       <SectionHeader title={t("Conectar Instagram")} />
 
       <SectionBody>
+        <AccountLimitAlert />
         <div className="instructions">
           <p>
             {t(
@@ -95,8 +99,12 @@ function InstagramNew() {
       <SectionFooter>
         <Button
           loading={loading}
-          disabled={!allowed}
-          disabledReason={t("Requiere permisos de administrador")}
+          disabled={!allowed || !canConnect}
+          disabledReason={
+            !canConnect
+              ? t("No se pueden conectar más cuentas.")
+              : t("Requiere permisos de administrador")
+          }
           className="primary bg-[#E1306C] hover:bg-[#E1306C]/90 text-white w-full"
           onClick={connect}
         >

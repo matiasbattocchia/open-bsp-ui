@@ -1,4 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { quotaStatus } from "@/components/stats/quota";
 import { supabase } from "@/supabase/client";
 import useBoundStore from "@/stores/useBoundStore";
 import { queryKeys } from "./queryKeys";
@@ -154,6 +155,40 @@ export function useCanConnectAccount() {
     0;
 
   return used + 1 <= cap;
+}
+
+/**
+ * Whether the organization has met a product's cap, by quotaStatus — the rule
+ * billing.check_limit blocks with. False while loading or without a quota:
+ * the database has the final word.
+ */
+export function useQuotaReached(productId: string) {
+  const quota = useQuotas()?.find((q) => q.id === productId);
+  return !!quota && quotaStatus(quota) === "capped";
+}
+
+/**
+ * Refetches the organization's usage, for when the database refused something
+ * the cached usage said had room: the quotas catch up and lock what they cap.
+ */
+export function useRefreshUsage() {
+  const orgId = useBoundStore((state) => state.ui.activeOrgId);
+  const queryClient = useQueryClient();
+
+  return () =>
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.billing.allUsage(orgId),
+    });
+}
+
+/** A refusal by billing.check_limit (HTTP 402), as the database words it. */
+export function isQuotaError(error: unknown) {
+  return (
+    error instanceof Object &&
+    "message" in error &&
+    typeof error.message === "string" &&
+    /Usage limit reached for|Insufficient balance for/.test(error.message)
+  );
 }
 
 /**

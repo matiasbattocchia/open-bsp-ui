@@ -7,6 +7,8 @@ import WhatsAppIntegration from "@/components/WhatsAppIntegration";
 import { useTranslation } from "@/hooks/useTranslation";
 import ScopeToggle from "@/components/ScopeToggle";
 import { useConnectionScope } from "@/hooks/useConnectionScope";
+import AccountLimitAlert from "@/components/stats/AccountLimitAlert";
+import { useCanConnectAccount } from "@/queries/useBilling";
 
 export const Route = createFileRoute("/_auth/integrations/whatsapp/new")({
   component: WhatsAppNew,
@@ -16,6 +18,7 @@ function WhatsAppNew() {
   const { translate: t } = useTranslation();
   const navigate = useNavigate();
   const { scope, setScope, isAdmin, agentId, allowed } = useConnectionScope();
+  const canConnect = useCanConnectAccount();
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [callbackUrl, setCallbackUrl] = useState("");
   const [verifyToken, setVerifyToken] = useState("");
@@ -33,6 +36,7 @@ function WhatsAppNew() {
       <SectionHeader title={t("Conectar WhatsApp")} />
 
       <SectionBody>
+        <AccountLimitAlert />
         <form>
           <div className="instructions">
             <p>
@@ -117,6 +121,7 @@ function WhatsAppNew() {
         <WhatsAppIntegration
           onSuccess={handleSuccess}
           allowed={allowed}
+          canConnect={canConnect}
           signupOptions={{
             callback_url: callbackUrl.trim() || undefined,
             verify_token: verifyToken.trim() || undefined,

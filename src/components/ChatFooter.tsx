@@ -1,4 +1,5 @@
 import { useContext, useEffect, useRef, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { Plus, X } from "lucide-react";
 import {
   newMessage,
@@ -21,6 +22,11 @@ import "dayjs/locale/es";
 import "dayjs/locale/pt";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useCurrentAgent } from "@/queries/useAgents";
+import {
+  isQuotaError,
+  useQuotaReached,
+  useRefreshUsage,
+} from "@/queries/useBilling";
 import { moveCursorToEnd } from "@/utils/UtilityFunctions";
 import { htmlToMarkdown } from "@/utils/htmlToMarkdown";
 import TemplatePicker from "./TemplatePicker";
@@ -147,6 +153,34 @@ export default function ChatFooter() {
     (conv?.service !== "whatsapp" && conv?.service !== "instagram") ||
     tick.isBefore(dayjs(mostRecentIncoming?.timestamp || 0).add(1, "day"));
 
+  // Templates count too: at the messages cap nothing more goes out, whatever
+  // the window.
+  const quotaReached = useQuotaReached("messages");
+  const canSend = inCSWindow && !quotaReached;
+  const refreshUsage = useRefreshUsage();
+  const navigate = useNavigate();
+
+  // A send the database refused for the cap: the usage catches up, and the
+  // footer locks.
+  const onSendError = (error: unknown) => {
+    console.error(error);
+    if (isQuotaError(error)) void refreshUsage();
+  };
+
+  // A locked input leads to what unlocks it: the messages stats at the cap,
+  // a template once WhatsApp's window closed.
+  const onLockedClick = () => {
+    if (quotaReached) {
+      void navigate({
+        to: "/stats/$productId",
+        params: { productId: "messages" },
+        hash: (prevHash) => prevHash!,
+      });
+    } else if (!inCSWindow && conv?.service === "whatsapp") {
+      toggle("templatePicker");
+    }
+  };
+
   // WhatsApp customer service window lasts 24 hours since the last contact's message
   const remaining = tick
     .locale(currentLanguage)
@@ -194,7 +228,7 @@ export default function ChatFooter() {
       return;
     }
 
-    if (!inCSWindow) {
+    if (!canSend) {
       editableDiv.current.textContent = "";
       return;
     }
@@ -210,7 +244,7 @@ export default function ChatFooter() {
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeConvId, fileDrafts]);
+  }, [activeConvId, fileDrafts, canSend]);
 
   // Load the stored draft
   useEffect(() => {
@@ -219,7 +253,7 @@ export default function ChatFooter() {
     }
 
     // Note: draft is the DB stored draft; message (textDraft) is just an UI buffer
-    const shouldLoadDraft = inCSWindow && draft?.text && !message; // do not overwrite a current message
+    const shouldLoadDraft = canSend && draft?.text && !message; // do not overwrite a current message
 
     if (shouldLoadDraft) {
       clearTimeout(timer);
@@ -449,7 +483,7 @@ export default function ChatFooter() {
                   allVarsFilled &&
                   window.matchMedia("(min-width: 768px)").matches
                 ) {
-                  sendTemplateMessage().catch(console.error);
+                  sendTemplateMessage().catch(onSendError);
                 }
               }}
               autoFocus={i === parts.findIndex((p) => typeof p !== "string")}
@@ -470,7 +504,7 @@ export default function ChatFooter() {
             "flex items-end text-foreground p-[5px] rounded-[24px] shadow-[0_0_4px_0px_rgba(0,0,0,0.1)]" +
             (templateDraft
               ? " bg-incoming-chat-bubble"
-              : !inCSWindow
+              : !canSend
                 ? " bg-background"
                 : " bg-incoming-chat-bubble")
           }
@@ -486,10 +520,10 @@ export default function ChatFooter() {
               </button>
             ) : (
               <button
-                disabled={!inCSWindow}
+                disabled={!canSend}
                 className={
                   "p-[8px] rounded-full" +
-                  (!inCSWindow ? "" : " cursor-pointer hover:bg-accent")
+                  (!canSend ? "" : " cursor-pointer hover:bg-accent")
                 }
                 onClick={() => fileInput.current?.click()}
                 title={t("Adjuntar")}
@@ -500,7 +534,7 @@ export default function ChatFooter() {
           </div>
 
           <input
-            disabled={!inCSWindow}
+            disabled={!canSend}
             ref={fileInput}
             type="file"
             multiple={true}
@@ -531,9 +565,9 @@ export default function ChatFooter() {
               <>
                 <div
                   ref={editableDiv}
-                  contentEditable={inCSWindow}
+                  contentEditable={canSend}
                   className={`${
-                    !inCSWindow ? "cursor-pointer" : ""
+                    !canSend ? "cursor-pointer" : ""
                   } outline-none mx-[5px] py-[10px] min-h-[40px] max-h-40 overflow-y-auto text-[15px] leading-[20px] break-words`}
                   onInput={(event) => {
                     if (!(event.target instanceof Element)) {
@@ -559,41 +593,48 @@ export default function ChatFooter() {
                       window.matchMedia("(min-width: 768px)").matches
                     ) {
                       event.preventDefault();
-                      sendTextMessage().catch(console.error);
+                      sendTextMessage().catch(onSendError);
                     }
                   }}
-                  onClick={() =>
-                    !inCSWindow &&
-                    conv.service === "whatsapp" &&
-                    toggle("templatePicker")
-                  }
+                  onClick={onLockedClick}
                   title={
-                    inCSWindow
-                      ? undefined
-                      : conv.service === "whatsapp"
-                        ? t(
-                            "WhatsApp cierra la conversación a las 24 horas del último mensaje recibido. Para abrir la conversación debes utilizar una plantilla.",
-                          )
-                        : t(
-                            "La conversación se cerró 24 horas después del último mensaje del contacto. Esperá a que te escriba de nuevo para responder.",
-                          )
+                    quotaReached
+                      ? t(
+                          "No se envían más mensajes; los recibidos siguen llegando.",
+                        )
+                      : inCSWindow
+                        ? undefined
+                        : conv.service === "whatsapp"
+                          ? t(
+                              "WhatsApp cierra la conversación a las 24 horas del último mensaje recibido. Para abrir la conversación debes utilizar una plantilla.",
+                            )
+                          : t(
+                              "La conversación se cerró 24 horas después del último mensaje del contacto. Esperá a que te escriba de nuevo para responder.",
+                            )
                   }
                 />
-                {!message && (
+                {(!message || !canSend) && (
                   <div
                     className={
                       "absolute bottom-[1px] py-[10px] mx-[5px] max-h-[40px] text-[15px] text-muted-foreground" +
-                      (inCSWindow ? "" : " cursor-pointer")
+                      (canSend ? "" : " cursor-pointer")
                     }
                     onClick={() =>
-                      inCSWindow
-                        ? editableDiv.current?.focus()
-                        : conv.service === "whatsapp"
-                          ? toggle("templatePicker")
-                          : undefined
+                      canSend ? editableDiv.current?.focus() : onLockedClick()
                     }
                   >
-                    {!inCSWindow ? (
+                    {quotaReached ? (
+                      <>
+                        <span className="lg:hidden">
+                          {t("Límite de mensajes alcanzado")}
+                        </span>
+                        <span className="hidden lg:inline">
+                          {t(
+                            "Límite de mensajes alcanzado, mejora el plan para seguir enviando",
+                          )}
+                        </span>
+                      </>
+                    ) : !inCSWindow ? (
                       conv.service === "whatsapp" ? (
                         <>
                           <span className="lg:hidden">
@@ -628,22 +669,28 @@ export default function ChatFooter() {
 
           {/* Send button */}
           <button
-            disabled={templateDraft ? !allVarsFilled : !inCSWindow}
+            disabled={
+              quotaReached || (templateDraft ? !allVarsFilled : !inCSWindow)
+            }
             className={
               "p-[8px] rounded-full bg-primary disabled:opacity-50" +
-              (templateDraft
-                ? allVarsFilled
-                  ? " cursor-pointer"
-                  : ""
-                : !inCSWindow
-                  ? ""
-                  : " cursor-pointer")
+              (quotaReached
+                ? ""
+                : templateDraft
+                  ? allVarsFilled
+                    ? " cursor-pointer"
+                    : ""
+                  : !inCSWindow
+                    ? ""
+                    : " cursor-pointer")
             }
             onClick={() => {
-              if (templateDraft) {
-                allVarsFilled && sendTemplateMessage().catch(console.error);
+              if (quotaReached) {
+                return;
+              } else if (templateDraft) {
+                allVarsFilled && sendTemplateMessage().catch(onSendError);
               } else if (message) {
-                sendTextMessage().catch(console.error);
+                sendTextMessage().catch(onSendError);
               }
             }}
             title={templateDraft ? t("Enviar plantilla") : t("Enviar mensaje")}

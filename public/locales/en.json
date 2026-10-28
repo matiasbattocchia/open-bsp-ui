@@ -439,5 +439,7 @@
   "Escribinos en la comunidad de WhatsApp y lo activamos.": "Write to us in the WhatsApp community and we'll activate it.",
   "Ir a la comunidad": "Go to the community",
   "mes": "month",
-  "Token de verificación": "Verification token"
+  "Token de verificación": "Verification token",
+  "Límite de mensajes alcanzado": "Message limit reached",
+  "Límite de mensajes alcanzado, mejora el plan para seguir enviando": "Message limit reached, upgrade your plan to keep sending"
 }
