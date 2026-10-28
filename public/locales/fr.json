@@ -441,5 +441,7 @@
   "mes": "mois",
   "Token de verificación": "Token de vérification",
   "Límite de mensajes alcanzado": "Limite de messages atteinte",
-  "Límite de mensajes alcanzado, mejora el plan para seguir enviando": "Limite de messages atteinte, passez à un plan supérieur pour continuer à envoyer"
+  "Límite de mensajes alcanzado, mejora el plan para seguir enviando": "Limite de messages atteinte, passez à un plan supérieur pour continuer à envoyer",
+  "La organización alcanzó el límite de cuentas conectadas de su plan.": "L'organisation a atteint la limite de comptes connectés de son plan.",
+  "Avisale a tu proveedor para que amplíe el plan.": "Prévenez votre fournisseur pour qu'il passe à un plan supérieur."
 }

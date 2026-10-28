@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
 import Button from "@/components/Button";
+import OnboardLimitNotice from "@/components/OnboardLimitNotice";
 import type { SignupPayload } from "@/contexts/WhatsAppIntegrationContext";
 
 export const Route = createFileRoute("/onboard/whatsapp/$token")({
@@ -10,13 +11,19 @@ export const Route = createFileRoute("/onboard/whatsapp/$token")({
 
 type TokenValidation =
   | { status: "loading" }
-  | { status: "valid"; organization_name: string }
+  | { status: "valid"; organization_name: string; can_connect: boolean }
   | { status: "invalid" }
   | { status: "success" }
   | { status: "error"; message: string };
 
 /** What GET /whatsapp-management/onboard answers. */
-type OnboardToken = { valid: boolean; organization_name?: string };
+type OnboardToken = {
+  valid: boolean;
+  organization_name?: string;
+  /** Room under the organization's connections cap; absent before the API
+   * answered it, which then has the final word. */
+  can_connect?: boolean;
+};
 
 async function validateToken(token: string): Promise<TokenValidation> {
   const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/whatsapp-management/onboard?token=${token}`;
@@ -28,7 +35,11 @@ async function validateToken(token: string): Promise<TokenValidation> {
   const data = (await res.json()) as OnboardToken;
 
   return data.valid
-    ? { status: "valid", organization_name: data.organization_name ?? "" }
+    ? {
+        status: "valid",
+        organization_name: data.organization_name ?? "",
+        can_connect: data.can_connect ?? true,
+      }
     : { status: "invalid" };
 }
 
@@ -118,10 +129,15 @@ function Onboard() {
             body: JSON.stringify({ token, ...payload }),
           })
             .then((res) => {
+              // The cap filled up since the page loaded: lock it as if it had
+              // been full then.
+              if (res.status === 402) {
+                setState((s) =>
+                  s.status === "valid" ? { ...s, can_connect: false } : s,
+                );
+                return;
+              }
               if (!res.ok) throw new Error("Signup failed");
-              return res.json();
-            })
-            .then(() => {
               setState({ status: "success" });
             })
             .catch((error: Error) => {
@@ -204,6 +220,7 @@ function Onboard() {
             </div>
 
             <div className="flex flex-col gap-2">
+              {!state.can_connect && <OnboardLimitNotice />}
               {sdkFailed && (
                 <p className="text-destructive font-medium">
                   {t(
@@ -212,7 +229,7 @@ function Onboard() {
                 </p>
               )}
               <Button
-                disabled={sdkFailed}
+                disabled={sdkFailed || !state.can_connect}
                 disabledReason={
                   sdkFailed
                     ? t(
@@ -250,6 +267,7 @@ function Onboard() {
                 setState({
                   status: "valid",
                   organization_name: "",
+                  can_connect: true,
                 });
                 // Re-validate token
                 validateToken(token)

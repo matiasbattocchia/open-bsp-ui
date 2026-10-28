@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
 import Button from "@/components/Button";
+import OnboardLimitNotice from "@/components/OnboardLimitNotice";
 import { getInstagramAuthorizeUrl } from "@/queries/useInstagramSignup";
 
 export const Route = createFileRoute("/onboard/instagram/$token")({
@@ -14,11 +15,17 @@ export const IG_ONBOARD_REDIRECT_PATH = "/onboard/instagram/callback";
 
 type TokenValidation =
   | { status: "loading" }
-  | { status: "valid"; organization_name: string }
+  | { status: "valid"; organization_name: string; can_connect: boolean }
   | { status: "invalid" };
 
 /** What GET /instagram-management/onboard answers. */
-type OnboardToken = { valid: boolean; organization_name?: string };
+type OnboardToken = {
+  valid: boolean;
+  organization_name?: string;
+  /** Room under the organization's connections cap; absent before the API
+   * answered it, which then has the final word. */
+  can_connect?: boolean;
+};
 
 async function validateToken(token: string): Promise<TokenValidation> {
   const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/instagram-management/onboard?token=${token}`;
@@ -30,7 +37,11 @@ async function validateToken(token: string): Promise<TokenValidation> {
   const data = (await res.json()) as OnboardToken;
 
   return data.valid
-    ? { status: "valid", organization_name: data.organization_name ?? "" }
+    ? {
+        status: "valid",
+        organization_name: data.organization_name ?? "",
+        can_connect: data.can_connect ?? true,
+      }
     : { status: "invalid" };
 }
 
@@ -94,8 +105,11 @@ function OnboardInstagram() {
               </p>
             </div>
 
+            {!state.can_connect && <OnboardLimitNotice />}
+
             <Button
               loading={loading}
+              disabled={!state.can_connect}
               className="primary bg-[#E1306C] hover:bg-[#E1306C]/90 text-white w-full"
               onClick={handleConnect}
             >

@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
+import OnboardLimitNotice from "@/components/OnboardLimitNotice";
 import { IG_ONBOARD_REDIRECT_PATH } from "./onboard.instagram.$token";
 
 export const Route = createFileRoute("/onboard/instagram/callback")({
@@ -14,6 +15,7 @@ export const Route = createFileRoute("/onboard/instagram/callback")({
 type State =
   | { status: "working" }
   | { status: "success" }
+  | { status: "capped" }
   | { status: "error" };
 
 function OnboardInstagramCallback() {
@@ -44,10 +46,11 @@ function OnboardInstagramCallback() {
       body: JSON.stringify({ token: state, code, redirect_uri }),
     })
       .then((res) => {
+        // The cap filled up between the link page and Instagram's return.
+        if (res.status === 402) return setResult({ status: "capped" });
         if (!res.ok) throw new Error("Onboard failed");
-        return res.json();
+        setResult({ status: "success" });
       })
-      .then(() => setResult({ status: "success" }))
       .catch(() => setResult({ status: "error" }));
   }, [code, state]);
 
@@ -74,6 +77,8 @@ function OnboardInstagramCallback() {
             </p>
           </div>
         )}
+
+        {result.status === "capped" && <OnboardLimitNotice />}
 
         {result.status === "error" && (
           <p className="text-destructive font-medium">

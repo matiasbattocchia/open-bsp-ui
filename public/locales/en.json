@@ -441,5 +441,7 @@
   "mes": "month",
   "Token de verificación": "Verification token",
   "Límite de mensajes alcanzado": "Message limit reached",
-  "Límite de mensajes alcanzado, mejora el plan para seguir enviando": "Message limit reached, upgrade your plan to keep sending"
+  "Límite de mensajes alcanzado, mejora el plan para seguir enviando": "Message limit reached, upgrade your plan to keep sending",
+  "La organización alcanzó el límite de cuentas conectadas de su plan.": "The organization has reached its plan's connected accounts limit.",
+  "Avisale a tu proveedor para que amplíe el plan.": "Let your provider know so they can upgrade the plan."
 }

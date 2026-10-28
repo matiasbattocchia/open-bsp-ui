@@ -441,5 +441,7 @@
   "mes": "mwezi",
   "Token de verificación": "Token ya uthibitisho",
   "Límite de mensajes alcanzado": "Kikomo cha ujumbe kimefikiwa",
-  "Límite de mensajes alcanzado, mejora el plan para seguir enviando": "Kikomo cha ujumbe kimefikiwa, boresha mpango ili kuendelea kutuma"
+  "Límite de mensajes alcanzado, mejora el plan para seguir enviando": "Kikomo cha ujumbe kimefikiwa, boresha mpango ili kuendelea kutuma",
+  "La organización alcanzó el límite de cuentas conectadas de su plan.": "Shirika limefikia kikomo cha akaunti zilizounganishwa cha mpango wake.",
+  "Avisale a tu proveedor para que amplíe el plan.": "Mjulishe mtoa huduma wako ili aboreshe mpango."
 }
