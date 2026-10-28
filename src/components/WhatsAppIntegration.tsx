@@ -17,11 +17,17 @@ export default function WhatsAppIntegration({
   // Whether the tier's cap leaves room for one more account; see
   // useCanConnectAccount.
   canConnect = true,
+  // The button's text and style; a reconnect names itself and takes the
+  // app's primary style.
+  label,
+  className = "primary bg-[#4267b2] hover:bg-[#4267b2]/90 text-white w-full",
 }: {
   onSuccess?: (phone_number_id: string) => void;
   signupOptions?: SignupOptions;
   allowed?: boolean;
   canConnect?: boolean;
+  label?: string;
+  className?: string;
 }) {
   const { translate: t } = useTranslation();
   const context = useContext(WhatsAppIntegrationContext);
@@ -61,7 +67,7 @@ export default function WhatsAppIntegration({
                 : undefined
         }
         loading={loading}
-        className="primary bg-[#4267b2] hover:bg-[#4267b2]/90 text-white w-full"
+        className={className}
         onClick={() =>
           context.launchWhatsAppSignup(
             onSuccess || (() => {}),
@@ -70,7 +76,7 @@ export default function WhatsAppIntegration({
           )
         }
       >
-        {t("Continuar con Facebook")}
+        {label ?? t("Continuar con Facebook")}
       </Button>
     </div>
   );

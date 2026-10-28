@@ -9,7 +9,11 @@ import { formatPhoneNumber } from "@/utils/FormatUtils";
 import type { WhatsAppOrganizationAddressExtra } from "@/supabase/client";
 import { useState } from "react";
 import Button from "@/components/Button";
+import SectionFooter from "@/components/SectionFooter";
 import SectionItem from "@/components/SectionItem";
+import WhatsAppIntegration from "@/components/WhatsAppIntegration";
+import AccountLimitAlert from "@/components/stats/AccountLimitAlert";
+import { useCanConnectAccount } from "@/queries/useBilling";
 import { LayoutTemplate } from "lucide-react";
 
 export const Route = createFileRoute(
@@ -26,6 +30,7 @@ function WhatsAppDetails() {
   const disconnect = useWhatsAppDisconnect();
   const { data: agent } = useCurrentAgent();
   const [showInstructions, setShowInstructions] = useState(false);
+  const canConnect = useCanConnectAccount();
 
   if (!integration) return;
 
@@ -40,6 +45,7 @@ function WhatsAppDetails() {
     | undefined;
   const flowType = extra?.flow_type;
   const isCoexistence = flowType === "existing_phone_number";
+  const isConnected = integration.status === "connected";
 
   const flowTypeLabels: Record<string, string> = {
     new_phone_number: t("Nuevo número de WhatsApp"),
@@ -67,22 +73,32 @@ function WhatsAppDetails() {
     <>
       <SectionHeader title={extra?.verified_name || t("Cuenta de WhatsApp")} />
 
-      <SectionBody className="pb-[40px]">
-        <SectionItem
-          title={t("Plantillas de mensajes")}
-          aside={
-            <div className="p-[8px]">
-              <LayoutTemplate className="w-[24px] h-[24px] text-muted-foreground" />
-            </div>
-          }
-          onClick={() =>
-            navigate({
-              to: "/integrations/whatsapp/$orgAddressId/templates",
-              params: { orgAddressId },
-              hash: (prevHash) => prevHash!,
-            })
-          }
-        />
+      <SectionBody>
+        {/* Connecting again is a new connection: the cap counts only
+            connected accounts. */}
+        {!isConnected && <AccountLimitAlert />}
+        {/* Set apart from the form by its field gap. Templates live at Meta,
+            reached with the account's token: none while disconnected. */}
+        <div className="mb-[20px]">
+          <SectionItem
+            className="bg-accent"
+            title={t("Plantillas de mensajes")}
+            aside={
+              <div className="p-[8px]">
+                <LayoutTemplate className="w-[24px] h-[24px] text-muted-foreground" />
+              </div>
+            }
+            disabled={!isConnected}
+            disabledReason={t("La cuenta está desconectada")}
+            onClick={() =>
+              navigate({
+                to: "/integrations/whatsapp/$orgAddressId/templates",
+                params: { orgAddressId },
+                hash: (prevHash) => prevHash!,
+              })
+            }
+          />
+        </div>
         <form>
           <label>
             <div className="label">{t("Nombre verificado")}</div>
@@ -139,11 +155,7 @@ function WhatsAppDetails() {
             <input
               type="text"
               className="text capitalize"
-              value={
-                integration.status === "connected"
-                  ? t("Conectado")
-                  : t("Desconectado")
-              }
+              value={isConnected ? t("Conectado") : t("Desconectado")}
               readOnly
             />
           </label>
@@ -189,23 +201,14 @@ function WhatsAppDetails() {
               readOnly
             />
           </label>
+        </form>
+      </SectionBody>
 
-          {/* Disconnect button */}
-          {integration.status === "connected" && !showInstructions && (
-            <Button
-              type="button"
-              className="primary bg-destructive text-primary-foreground hover:bg-destructive/80 px-4 py-2 rounded-full font-medium transition-colors w-fit text-[14px]"
-              onClick={handleDisconnect}
-              disabled={!canManage}
-              disabledReason={t("Requiere permisos de administrador")}
-              loading={disconnect.isPending}
-            >
-              {t("Desconectar")}
-            </Button>
-          )}
-
-          {/* Coexistence disconnect instructions */}
-          {showInstructions && (
+      {isConnected && (
+        <SectionFooter>
+          {/* A coexistence account is unlinked from the app, not here: its
+              steps take the button's place, like the plans' contact note. */}
+          {showInstructions ? (
             <div className="instructions">
               <p>
                 {t(
@@ -220,9 +223,45 @@ function WhatsAppDetails() {
                 </li>
               </ol>
             </div>
+          ) : (
+            <Button
+              type="button"
+              className="destructive"
+              onClick={handleDisconnect}
+              disabled={!canManage}
+              disabledReason={t("Requiere permisos de administrador")}
+              loading={disconnect.isPending}
+            >
+              {t("Desconectar")}
+            </Button>
           )}
-        </form>
-      </SectionBody>
+        </SectionFooter>
+      )}
+
+      {/* Connecting again is Embedded Signup again: Meta hands over a fresh
+          token, and the account keeps its owner and webhook overrides. */}
+      {!isConnected && (
+        <SectionFooter>
+          <WhatsAppIntegration
+            label={t("Volver a conectar")}
+            className="primary"
+            allowed={canManage}
+            canConnect={canConnect}
+            signupOptions={{
+              callback_url: extra?.callback_url ?? undefined,
+              verify_token: extra?.verify_token ?? undefined,
+              agent_id: integration.agent_id ?? undefined,
+            }}
+            onSuccess={(phone_number_id) =>
+              navigate({
+                to: "/integrations/whatsapp/$orgAddressId",
+                params: { orgAddressId: phone_number_id || orgAddressId },
+                hash: (prevHash) => prevHash!,
+              })
+            }
+          />
+        </SectionFooter>
+      )}
     </>
   );
 }

@@ -1,6 +1,7 @@
 import SectionBody from "@/components/SectionBody";
 import SectionHeader from "@/components/SectionHeader";
 import Button from "@/components/Button";
+import SectionFooter from "@/components/SectionFooter";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useOrganizationAddress } from "@/queries/useOrganizationsAddresses";
 import {
@@ -12,6 +13,7 @@ import { useCurrentAgent } from "@/queries/useAgents";
 import { formatPhoneNumber } from "@/utils/FormatUtils";
 import AccountLimitAlert from "@/components/stats/AccountLimitAlert";
 import { useCanConnectAccount } from "@/queries/useBilling";
+import { ConnectionIssueCard, isWorking } from "@/components/ConnectionIssue";
 
 export const Route = createFileRoute(
   "/_auth/integrations/whatsapp-web/$orgAddressId/",
@@ -39,7 +41,7 @@ function WhatsAppWebDetails() {
   const isConnected = integration.status === "connected";
 
   // Durable row status is the source of truth; live health refines the label.
-  const statusText = !isConnected
+  const statusText = !isWorking(integration)
     ? t("Desconectado")
     : health
       ? health.connected && health.logged_in
@@ -57,21 +59,16 @@ function WhatsAppWebDetails() {
     <>
       <SectionHeader title={formatPhoneNumber(integration.address)} />
 
-      <SectionBody className="pb-[40px]">
-        {/* Session-drop warning + re-pair call to action */}
+      <SectionBody>
+        {/* What WhatsApp did; the footer reconnects */}
+        {integration.issue && (
+          <div className="mb-[12px]">
+            <ConnectionIssueCard row={integration} />
+          </div>
+        )}
         {/* Re-pairing a disconnected number connects it anew: the cap counts
             only connected accounts. */}
         {!isConnected && <AccountLimitAlert />}
-        {!isConnected && (
-          <div className="instructions">
-            <p className="text-destructive font-medium">
-              {t(
-                "La sesión se cerró (logout o baneo). Volvé a vincular el dispositivo para seguir enviando y recibiendo mensajes.",
-              )}
-            </p>
-          </div>
-        )}
-
         <form>
           <label>
             <div className="label">{t("Número de teléfono")}</div>
@@ -92,40 +89,45 @@ function WhatsAppWebDetails() {
               readOnly
             />
           </label>
-
-          {!isConnected ? (
-            <Button
-              type="button"
-              className="primary bg-[#00ADD8] hover:bg-[#00ADD8]/90 text-white px-4 py-2 rounded-full font-medium w-fit text-[14px]"
-              onClick={() =>
-                navigate({
-                  to: "/integrations/whatsapp-web/new",
-                  hash: (prevHash) => prevHash!,
-                })
-              }
-              disabled={!canManage || !canConnect}
-              disabledReason={
-                !canConnect
-                  ? t("No se pueden conectar más cuentas.")
-                  : t("Requiere permisos de administrador")
-              }
-            >
-              {t("Volver a vincular")}
-            </Button>
-          ) : (
-            <Button
-              type="button"
-              className="primary bg-destructive text-primary-foreground hover:bg-destructive/80 px-4 py-2 rounded-full font-medium w-fit text-[14px]"
-              onClick={handleDisconnect}
-              disabled={!canManage}
-              disabledReason={t("Requiere permisos de administrador")}
-              loading={disconnect.isPending}
-            >
-              {t("Desconectar")}
-            </Button>
-          )}
         </form>
       </SectionBody>
+
+      <SectionFooter>
+        {!isConnected ? (
+          // Pairing again is the QR or code flow again, on its own page,
+          // for the owner the number had.
+          <Button
+            type="button"
+            className="primary"
+            onClick={() =>
+              navigate({
+                to: "/integrations/whatsapp-web/new",
+                search: { reconnect: integration.address },
+                hash: (prevHash) => prevHash!,
+              })
+            }
+            disabled={!canManage || !canConnect}
+            disabledReason={
+              !canConnect
+                ? t("No se pueden conectar más cuentas.")
+                : t("Requiere permisos de administrador")
+            }
+          >
+            {t("Volver a conectar")}
+          </Button>
+        ) : (
+          <Button
+            type="button"
+            className="destructive"
+            onClick={handleDisconnect}
+            disabled={!canManage}
+            disabledReason={t("Requiere permisos de administrador")}
+            loading={disconnect.isPending}
+          >
+            {t("Desconectar")}
+          </Button>
+        )}
+      </SectionFooter>
     </>
   );
 }

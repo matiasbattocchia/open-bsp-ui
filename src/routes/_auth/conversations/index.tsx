@@ -7,7 +7,14 @@ import NoticeCard from "@/components/NoticeCard";
 import Spinner from "@/components/Spinner";
 import { Bell } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
-import { useInvitations, useAnswerInvitation } from "@/queries/useAgents";
+import {
+  useInvitations,
+  useAnswerInvitation,
+  useCurrentAgent,
+} from "@/queries/useAgents";
+import { useOrganizationsAddresses } from "@/queries/useOrganizationsAddresses";
+import { ConnectionIssueCard } from "@/components/ConnectionIssue";
+import type { OrganizationAddressRow } from "@/supabase/client";
 import { useQuotas } from "@/queries/useBilling";
 import QuotaAlert from "@/components/stats/QuotaAlert";
 import { quotaStatus } from "@/components/stats/quota";
@@ -22,11 +29,42 @@ function Conversations() {
   const answerInvitation = useAnswerInvitation();
   const navigate = useNavigate();
   const alerts = useQuotas()?.filter((q) => quotaStatus(q) !== "ok");
+  const { data: agent } = useCurrentAgent();
+  // Accounts the service disconnected: the organization's, which everyone
+  // reads from, and the member's own — a colleague's personal account is
+  // theirs to hear about.
+  const issues = useOrganizationsAddresses().data?.filter(
+    (row) => row.issue && (!row.agent_id || row.agent_id === agent?.id),
+  );
 
   const roles: Record<string, string> = {
     owner: t("Propietario"),
     admin: t("Administrador"),
     member: t("Miembro"),
+  };
+
+  const openConnection = ({ service, address }: OrganizationAddressRow) => {
+    const params = { orgAddressId: address };
+    const hash = (prevHash?: string) => prevHash!;
+    if (service === "whatsapp-web") {
+      void navigate({
+        to: "/integrations/whatsapp-web/$orgAddressId",
+        params,
+        hash,
+      });
+    } else if (service === "instagram") {
+      void navigate({
+        to: "/integrations/instagram/$orgAddressId",
+        params,
+        hash,
+      });
+    } else if (service === "whatsapp") {
+      void navigate({
+        to: "/integrations/whatsapp/$orgAddressId",
+        params,
+        hash,
+      });
+    }
   };
 
   const handleInvitationAction = (
@@ -41,11 +79,11 @@ function Conversations() {
       <Header /> {/* height: 59 px */}
       <ChatSearch /> {/* height: 49 px */}
       <ChatFilter /> {/* height: 43 px */}
-      {/* Invitations and quota alerts head the list and scroll with it, the
-          same gap apart as its items. */}
+      {/* Invitations, quota alerts and disconnected accounts head the list
+          and scroll with it, the same gap apart as its items. */}
       <ChatList
         header={
-          (!!invitations?.length || !!alerts?.length) && (
+          (!!invitations?.length || !!alerts?.length || !!issues?.length) && (
             <>
               {invitations?.map((invitation) => (
                 <NoticeCard
@@ -97,6 +135,13 @@ function Conversations() {
                       hash: (prevHash) => prevHash!,
                     })
                   }
+                />
+              ))}
+              {issues?.map((row) => (
+                <ConnectionIssueCard
+                  key={`${row.service}/${row.address}`}
+                  row={row}
+                  onClick={() => openConnection(row)}
                 />
               ))}
             </>

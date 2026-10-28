@@ -6,9 +6,10 @@ import { useOrganizationsAddresses } from "@/queries/useOrganizationsAddresses";
 import { useTranslation } from "@/hooks/useTranslation";
 import { WhatsAppOutlined } from "@ant-design/icons";
 import { Link, Plus } from "lucide-react";
-import type { JSX } from "react";
 import { formatPhoneNumber } from "@/utils/FormatUtils";
 import ConnectionOwner from "@/components/ConnectionOwner";
+import { ConnectionStatus } from "@/components/ConnectionIssue";
+import WarningBadge from "@/components/WarningBadge";
 
 export const Route = createFileRoute("/_auth/integrations/whatsapp/")({
   component: WhatsAppIndex,
@@ -22,11 +23,6 @@ function WhatsAppIndex() {
   const whatsappIntegrations = integrations?.filter(
     (integration) => integration.service === "whatsapp",
   );
-
-  const statusLabels: Record<string, string | JSX.Element> = {
-    connected: <span className="text-primary">{t("Conectado")}</span>,
-    disconnected: t("Desconectado"),
-  };
 
   return (
     <>
@@ -67,9 +63,11 @@ function WhatsAppIndex() {
               key={integration.address}
               aside={
                 <div className="p-[8px]">
-                  <WhatsAppOutlined
-                    style={{ fontSize: "24px", color: "#25D366" }}
-                  />
+                  <WarningBadge show={!!integration.issue}>
+                    <WhatsAppOutlined
+                      style={{ fontSize: "24px", color: "#25D366" }}
+                    />
+                  </WarningBadge>
                 </div>
               }
               title={formatPhoneNumber(
@@ -78,7 +76,7 @@ function WhatsAppIndex() {
               )}
               description={
                 <>
-                  {statusLabels[integration.status] || integration.status}
+                  <ConnectionStatus row={integration} />
                   <ConnectionOwner agentId={integration.agent_id} />
                 </>
               }

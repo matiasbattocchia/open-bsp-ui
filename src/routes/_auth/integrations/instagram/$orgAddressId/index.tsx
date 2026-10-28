@@ -2,6 +2,11 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import SectionHeader from "@/components/SectionHeader";
 import SectionBody from "@/components/SectionBody";
 import Button from "@/components/Button";
+import SectionFooter from "@/components/SectionFooter";
+import AccountLimitAlert from "@/components/stats/AccountLimitAlert";
+import { useInstagramConnect } from "@/hooks/useInstagramConnect";
+import { useCanConnectAccount } from "@/queries/useBilling";
+import { ConnectionIssueCard, isWorking } from "@/components/ConnectionIssue";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useOrganizationAddress } from "@/queries/useOrganizationsAddresses";
 import { useInstagramDisconnect } from "@/queries/useInstagramSignup";
@@ -21,6 +26,8 @@ function InstagramAddressDetail() {
   const { data: integration } = useOrganizationAddress(orgAddressId);
   const disconnect = useInstagramDisconnect();
   const { data: agent } = useCurrentAgent();
+  const reconnect = useInstagramConnect();
+  const canConnect = useCanConnectAccount();
 
   if (!integration) return;
 
@@ -32,6 +39,7 @@ function InstagramAddressDetail() {
   const extra = integration.extra as
     | InstagramOrganizationAddressExtra
     | undefined;
+  const isConnected = integration.status === "connected";
 
   const handleDisconnect = () => {
     disconnect.mutate(
@@ -52,7 +60,16 @@ function InstagramAddressDetail() {
         }
       />
 
-      <SectionBody className="pb-[40px]">
+      <SectionBody>
+        {/* What Instagram did; the footer reconnects */}
+        {integration.issue && (
+          <div className="mb-[12px]">
+            <ConnectionIssueCard row={integration} />
+          </div>
+        )}
+        {/* Connecting again is a new connection: the cap counts only
+            connected accounts. */}
+        {!isConnected && <AccountLimitAlert />}
         <form>
           {extra?.name && (
             <label>
@@ -99,38 +116,57 @@ function InstagramAddressDetail() {
               type="text"
               className="text capitalize"
               value={
-                integration.status === "connected"
-                  ? t("Conectado")
-                  : t("Desconectado")
+                isWorking(integration) ? t("Conectado") : t("Desconectado")
               }
               readOnly
             />
           </label>
 
-          {extra?.needs_reauth && (
+          {reconnect.error && (
             <div className="instructions">
-              <p className="text-destructive">
-                {t(
-                  "La conexión expiró o fue revocada. Volvé a conectar la cuenta.",
-                )}
+              <p className="text-destructive font-medium">
+                {t("No se pudo conectar la cuenta de Instagram.")}
               </p>
             </div>
           )}
-
-          {integration.status === "connected" && (
-            <Button
-              type="button"
-              className="primary bg-destructive text-primary-foreground hover:bg-destructive/80 px-4 py-2 rounded-full font-medium transition-colors w-fit text-[14px]"
-              onClick={handleDisconnect}
-              disabled={!canManage}
-              disabledReason={t("Requiere permisos de administrador")}
-              loading={disconnect.isPending}
-            >
-              {t("Desconectar")}
-            </Button>
-          )}
         </form>
       </SectionBody>
+
+      <SectionFooter className="gap-[12px]">
+        {/* Connecting again is Instagram's login again, for the same owner:
+            a fresh token for an expired one, still connected, or the account
+            back after a disconnect. Only the latter counts toward the cap.
+            An expired account keeps Disconnect too: its place under the cap
+            is held until someone frees it. */}
+        {!isWorking(integration) && (
+          <Button
+            type="button"
+            className="primary"
+            onClick={() => reconnect.connect(integration.agent_id ?? undefined)}
+            disabled={!canManage || (!isConnected && !canConnect)}
+            disabledReason={
+              !isConnected && !canConnect
+                ? t("No se pueden conectar más cuentas.")
+                : t("Requiere permisos de administrador")
+            }
+            loading={reconnect.loading}
+          >
+            {t("Volver a conectar")}
+          </Button>
+        )}
+        {isConnected && (
+          <Button
+            type="button"
+            className="destructive"
+            onClick={handleDisconnect}
+            disabled={!canManage}
+            disabledReason={t("Requiere permisos de administrador")}
+            loading={disconnect.isPending}
+          >
+            {t("Desconectar")}
+          </Button>
+        )}
+      </SectionFooter>
     </>
   );
 }

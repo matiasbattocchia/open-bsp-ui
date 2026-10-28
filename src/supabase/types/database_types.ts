@@ -18,6 +18,7 @@ import type {
   ContactAddressExtra,
   ConversationExtra,
   OrganizationAddressExtra,
+  OrganizationAddressIssue,
   OrganizationExtra,
 } from "./extra_types";
 import type { ConversationAgentExtra } from "./ui_types";
@@ -84,9 +85,18 @@ export type Database = MergeDeep<
           Update: { extra?: OrganizationExtra | null };
         };
         organizations_addresses: {
-          Row: { extra: OrganizationAddressExtra | null };
-          Insert: { extra?: OrganizationAddressExtra | null };
-          Update: { extra?: OrganizationAddressExtra | null };
+          Row: {
+            extra: OrganizationAddressExtra | null;
+            issue: OrganizationAddressIssue | null;
+          };
+          Insert: {
+            extra?: OrganizationAddressExtra | null;
+            issue?: OrganizationAddressIssue | null;
+          };
+          Update: {
+            extra?: OrganizationAddressExtra | null;
+            issue?: OrganizationAddressIssue | null;
+          };
         };
         conversations: {
           Row: { extra: ConversationExtra | null };

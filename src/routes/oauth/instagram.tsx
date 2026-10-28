@@ -5,7 +5,7 @@ import { useInstagramSignup } from "@/queries/useInstagramSignup";
 import {
   IG_INAPP_REDIRECT_PATH,
   IG_OAUTH_AGENT_KEY,
-} from "@/routes/_auth/integrations/instagram/new";
+} from "@/hooks/useInstagramConnect";
 
 // Standalone (outside the `_auth` layout) so the return page is a bare
 // "connecting" screen instead of the whole app shell.

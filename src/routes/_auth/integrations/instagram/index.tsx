@@ -6,9 +6,10 @@ import { useOrganizationsAddresses } from "@/queries/useOrganizationsAddresses";
 import { useTranslation } from "@/hooks/useTranslation";
 import { InstagramOutlined } from "@ant-design/icons";
 import { Link, Plus } from "lucide-react";
-import type { JSX } from "react";
 import type { InstagramOrganizationAddressExtra } from "@/supabase/client";
 import ConnectionOwner from "@/components/ConnectionOwner";
+import { ConnectionStatus } from "@/components/ConnectionIssue";
+import WarningBadge from "@/components/WarningBadge";
 
 export const Route = createFileRoute("/_auth/integrations/instagram/")({
   component: InstagramIndex,
@@ -22,11 +23,6 @@ function InstagramIndex() {
   const instagramIntegrations = integrations?.filter(
     (integration) => integration.service === "instagram",
   );
-
-  const statusLabels: Record<string, string | JSX.Element> = {
-    connected: <span className="text-primary">{t("Conectado")}</span>,
-    disconnected: t("Desconectado"),
-  };
 
   return (
     <>
@@ -73,15 +69,17 @@ function InstagramIndex() {
                 key={integration.address}
                 aside={
                   <div className="p-[8px]">
-                    <InstagramOutlined
-                      style={{ fontSize: "24px", color: "#E1306C" }}
-                    />
+                    <WarningBadge show={!!integration.issue}>
+                      <InstagramOutlined
+                        style={{ fontSize: "24px", color: "#E1306C" }}
+                      />
+                    </WarningBadge>
                   </div>
                 }
                 title={title}
                 description={
                   <>
-                    {statusLabels[integration.status] || integration.status}
+                    <ConnectionStatus row={integration} />
                     <ConnectionOwner agentId={integration.agent_id} />
                   </>
                 }

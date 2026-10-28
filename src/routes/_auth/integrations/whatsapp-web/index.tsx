@@ -6,9 +6,10 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useOrganizationsAddresses } from "@/queries/useOrganizationsAddresses";
 import { useTranslation } from "@/hooks/useTranslation";
 import { Plus } from "lucide-react";
-import type { JSX } from "react";
 import { formatPhoneNumber } from "@/utils/FormatUtils";
 import ConnectionOwner from "@/components/ConnectionOwner";
+import { ConnectionStatus } from "@/components/ConnectionIssue";
+import WarningBadge from "@/components/WarningBadge";
 
 export const Route = createFileRoute("/_auth/integrations/whatsapp-web/")({
   component: WhatsAppWebIndex,
@@ -22,13 +23,6 @@ function WhatsAppWebIndex() {
   const webIntegrations = integrations?.filter(
     (integration) => integration.service === "whatsapp-web",
   );
-
-  const statusLabels: Record<string, string | JSX.Element> = {
-    connected: <span className="text-primary">{t("Conectado")}</span>,
-    disconnected: (
-      <span className="text-destructive">{t("Requiere re-vincular")}</span>
-    ),
-  };
 
   return (
     <>
@@ -55,13 +49,15 @@ function WhatsAppWebIndex() {
               key={integration.address}
               aside={
                 <div className="p-[8px]">
-                  <ServiceIcon service="whatsapp-web" size={24} />
+                  <WarningBadge show={!!integration.issue}>
+                    <ServiceIcon service="whatsapp-web" size={24} />
+                  </WarningBadge>
                 </div>
               }
               title={formatPhoneNumber(integration.address)}
               description={
                 <>
-                  {statusLabels[integration.status] || integration.status}
+                  <ConnectionStatus row={integration} />
                   <ConnectionOwner agentId={integration.agent_id} />
                 </>
               }

@@ -1,5 +1,4 @@
 import {
-  TriangleAlert,
   Gauge,
   HardDrive,
   MessageSquare,
@@ -8,6 +7,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
+import WarningBadge from "@/components/WarningBadge";
 import type { Quota } from "@/queries/useBilling";
 import { QuotaBar } from "./QuotaBar";
 import {
@@ -66,16 +66,9 @@ export default function QuotaItem({
       {/* Left Pane: Icon */}
       <div className="pl-[10px] pr-[15px] flex items-center">
         <div className="p-[8px]">
-          {/* The badge sits at the icon's bottom right, like the service
-              icon on a conversation's avatar. */}
-          <div className="relative">
+          <WarningBadge show={status !== "ok"}>
             <ProductIcon productId={quota.id} />
-            {status !== "ok" && (
-              <div className="absolute -bottom-[4px] -right-[6px] rounded-full bg-background p-[1px] leading-none">
-                <TriangleAlert className="w-[14px] h-[14px] text-amber-500" />
-              </div>
-            )}
-          </div>
+          </WarningBadge>
         </div>
       </div>
 

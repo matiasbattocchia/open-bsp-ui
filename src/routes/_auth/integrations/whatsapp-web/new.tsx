@@ -11,6 +11,8 @@ import ScopeToggle from "@/components/ScopeToggle";
 import { useConnectionScope } from "@/hooks/useConnectionScope";
 import AccountLimitAlert from "@/components/stats/AccountLimitAlert";
 import { useCanConnectAccount } from "@/queries/useBilling";
+import { useOrganizationAddress } from "@/queries/useOrganizationsAddresses";
+import { useCurrentAgent } from "@/queries/useAgents";
 import {
   useStartWhatsAppWebSession,
   usePendingWhatsAppWebSession,
@@ -18,6 +20,11 @@ import {
 import { isValidPhoneNumber } from "@/utils/FormatUtils";
 
 export const Route = createFileRoute("/_auth/integrations/whatsapp-web/new")({
+  // `reconnect` names a disconnected number to pair again, for the owner it
+  // had: no scope to choose.
+  validateSearch: (search): { reconnect?: string } => ({
+    reconnect: (search.reconnect as string) || undefined,
+  }),
   component: WhatsAppWebNew,
 });
 
@@ -26,11 +33,24 @@ type Method = "qr" | "code";
 function WhatsAppWebNew() {
   const { translate: t } = useTranslation();
   const navigate = useNavigate();
-  const { scope, setScope, isAdmin, agentId, allowed } = useConnectionScope();
+  const { reconnect } = Route.useSearch();
+  const { data: previous } = useOrganizationAddress(reconnect);
+  const { data: agent } = useCurrentAgent();
+  const connectionScope = useConnectionScope();
+  const { scope, setScope, isAdmin } = connectionScope;
   const canConnect = useCanConnectAccount();
 
+  // A reconnect keeps the number's owner, which the member may manage when it
+  // is theirs, and an admin always.
+  const agentId = reconnect
+    ? (previous?.agent_id ?? undefined)
+    : connectionScope.agentId;
+  const allowed = reconnect
+    ? isAdmin || (!!previous?.agent_id && previous.agent_id === agent?.id)
+    : connectionScope.allowed;
+
   const [method, setMethod] = useState<Method>("qr");
-  const [phone, setPhone] = useState("");
+  const [phone, setPhone] = useState(reconnect ? `+${reconnect}` : "");
   const [sessionId, setSessionId] = useState<string | null>(null);
 
   const start = useStartWhatsAppWebSession();
@@ -88,7 +108,9 @@ function WhatsAppWebNew() {
 
   return (
     <>
-      <SectionHeader title={t("Vincular dispositivo")} />
+      <SectionHeader
+        title={reconnect ? t("Volver a conectar") : t("Vincular dispositivo")}
+      />
 
       <SectionBody>
         <AccountLimitAlert />
@@ -109,8 +131,9 @@ function WhatsAppWebNew() {
             </p>
           </div>
 
-          {/* Whose number this is - hidden once pairing is under way */}
-          {!pairedPending && !start.isPending && (
+          {/* Whose number this is - hidden once pairing is under way, and
+              settled already for a reconnect */}
+          {!reconnect && !pairedPending && !start.isPending && (
             <label>
               <div className="label">{t("Número")}</div>
               <ScopeToggle
