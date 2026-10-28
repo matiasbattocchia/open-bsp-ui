@@ -75,6 +75,7 @@ function EditOrganization() {
         deleteDisabled={!isOwner}
         deleteDisabledReason={t("Requiere permisos de propietario")}
         deleteLoading={deleteOrg.isPending}
+        deleteConfirmName={org?.name}
       />
 
       <SectionBody>

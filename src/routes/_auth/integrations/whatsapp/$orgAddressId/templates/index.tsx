@@ -5,6 +5,7 @@ import SectionItem from "@/components/SectionItem";
 import { useTranslation } from "@/hooks/useTranslation";
 import { Plus, LayoutTemplate, LoaderCircle } from "lucide-react";
 import { useTemplates } from "@/queries/useTemplates";
+import { useCurrentAgent } from "@/queries/useAgents";
 
 export const Route = createFileRoute(
   "/_auth/integrations/whatsapp/$orgAddressId/templates/",
@@ -18,6 +19,8 @@ function TemplatesIndex() {
   const { orgAddressId } = Route.useParams();
 
   const { data: templates, isLoading } = useTemplates(orgAddressId);
+  const { data: agent } = useCurrentAgent();
+  const isAdmin = ["admin", "owner"].includes(agent?.role || "");
 
   return (
     <>
@@ -25,6 +28,8 @@ function TemplatesIndex() {
       <SectionBody>
         <SectionItem
           title={t("Crear plantilla")}
+          disabled={!isAdmin}
+          disabledReason={t("Requiere permisos de administrador")}
           aside={
             <div className="p-[8px] bg-primary/10 rounded-full">
               <Plus className="w-[24px] h-[24px] text-primary" />

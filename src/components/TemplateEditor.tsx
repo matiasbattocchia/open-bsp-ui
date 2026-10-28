@@ -11,6 +11,7 @@ import Button from "./Button";
 import SelectField from "./SelectField";
 import { useNavigate } from "@tanstack/react-router";
 import { useCreateTemplate, useUpdateTemplate } from "@/queries/useTemplates";
+import { useCurrentAgent } from "@/queries/useAgents";
 
 interface TemplateFormData {
   name: string;
@@ -37,6 +38,9 @@ export default function TemplateEditor({
   const createMutation = useCreateTemplate();
   const updateMutation = useUpdateTemplate();
   const isPending = createMutation.isPending || updateMutation.isPending;
+  // Members read templates; admin+ sends them to Meta.
+  const { data: agent } = useCurrentAgent();
+  const isAdmin = ["admin", "owner"].includes(agent?.role || "");
 
   const existingHeader = existingTemplate?.components.find(
     (c) => c.type === "HEADER",
@@ -485,6 +489,8 @@ export default function TemplateEditor({
           type="submit"
           form="template-form"
           invalid={!isValid || !isDirty}
+          disabled={!isAdmin}
+          disabledReason={t("Requiere permisos de administrador")}
           loading={isPending}
           className="primary"
         >

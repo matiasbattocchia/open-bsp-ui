@@ -449,5 +449,9 @@
   "WhatsApp bloqueó el número temporalmente.": "WhatsApp temporarily banned the number.",
   "Volvé a conectar el número cuando se levante el bloqueo.": "Reconnect the number once the ban lifts.",
   "El acceso a Instagram expiró o fue revocado, como pasa al cambiar la contraseña.": "Instagram's access expired or was revoked, as happens after a password change.",
-  "No se pueden enviar mensajes hasta volver a conectar la cuenta.": "Messages can't be sent until the account is reconnected."
+  "No se pueden enviar mensajes hasta volver a conectar la cuenta.": "Messages can't be sent until the account is reconnected.",
+  "¿Eliminar?": "Delete?",
+  "¿Desconectar?": "Disconnect?",
+  "Escribí el nombre para confirmar": "Type the name to confirm",
+  "Meta no permite volver a usar el nombre de una plantilla eliminada durante 30 días.": "Meta won't let you reuse a deleted template's name for 30 days."
 }

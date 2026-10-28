@@ -4,6 +4,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import TemplateEditor from "@/components/TemplateEditor";
 import { useTemplates, useDeleteTemplate } from "@/queries/useTemplates";
 import { LoaderCircle } from "lucide-react";
+import { useCurrentAgent } from "@/queries/useAgents";
 
 export const Route = createFileRoute(
   "/_auth/integrations/whatsapp/$orgAddressId/templates/$templateId",
@@ -18,6 +19,10 @@ function EditTemplate() {
 
   const { data: templates, isLoading } = useTemplates(orgAddressId);
   const deleteTemplate = useDeleteTemplate();
+  const { data: agent } = useCurrentAgent();
+  // Templates are the organization's with Meta: admin+ writes them, whoever
+  // the number belongs to.
+  const isAdmin = ["admin", "owner"].includes(agent?.role || "");
 
   if (isLoading) {
     return (
@@ -50,7 +55,12 @@ function EditTemplate() {
             },
           );
         }}
+        deleteDisabled={!isAdmin}
+        deleteDisabledReason={t("Requiere permisos de administrador")}
         deleteLoading={deleteTemplate.isPending}
+        deleteWarning={t(
+          "Meta no permite volver a usar el nombre de una plantilla eliminada durante 30 días.",
+        )}
       />
       <TemplateEditor
         existingTemplate={template}

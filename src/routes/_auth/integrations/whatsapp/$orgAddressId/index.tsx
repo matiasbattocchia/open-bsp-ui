@@ -228,6 +228,7 @@ function WhatsAppDetails() {
               type="button"
               className="destructive"
               onClick={handleDisconnect}
+              confirm={t("¿Desconectar?")}
               disabled={!canManage}
               disabledReason={t("Requiere permisos de administrador")}
               loading={disconnect.isPending}

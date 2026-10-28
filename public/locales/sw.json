@@ -449,5 +449,9 @@
   "WhatsApp bloqueó el número temporalmente.": "WhatsApp imezuia nambari kwa muda.",
   "Volvé a conectar el número cuando se levante el bloqueo.": "Unganisha nambari tena zuio likiondolewa.",
   "El acceso a Instagram expiró o fue revocado, como pasa al cambiar la contraseña.": "Ufikiaji wa Instagram umeisha au umebatilishwa, kama inavyotokea baada ya kubadilisha nenosiri.",
-  "No se pueden enviar mensajes hasta volver a conectar la cuenta.": "Ujumbe hauwezi kutumwa hadi akaunti iunganishwe tena."
+  "No se pueden enviar mensajes hasta volver a conectar la cuenta.": "Ujumbe hauwezi kutumwa hadi akaunti iunganishwe tena.",
+  "¿Eliminar?": "Futa?",
+  "¿Desconectar?": "Tenganisha?",
+  "Escribí el nombre para confirmar": "Andika jina ili kuthibitisha",
+  "Meta no permite volver a usar el nombre de una plantilla eliminada durante 30 días.": "Meta haikuruhusu kutumia tena jina la kiolezo kilichofutwa kwa siku 30."
 }
