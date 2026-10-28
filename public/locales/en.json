@@ -453,5 +453,20 @@
   "¿Eliminar?": "Delete?",
   "¿Desconectar?": "Disconnect?",
   "Escribí el nombre para confirmar": "Type the name to confirm",
-  "Meta no permite volver a usar el nombre de una plantilla eliminada durante 30 días.": "Meta won't let you reuse a deleted template's name for 30 days."
+  "Meta no permite volver a usar el nombre de una plantilla eliminada durante 30 días.": "Meta won't let you reuse a deleted template's name for 30 days.",
+  "No se envían ni reciben mensajes. Se vuelve a conectar sola si Meta restablece la cuenta.": "Messages aren't sent or received. It reconnects by itself if Meta reinstates the account.",
+  "Meta deshabilitó la cuenta de WhatsApp Business por infringir sus políticas.": "Meta disabled the WhatsApp Business account for violating its policies.",
+  "Meta reportó una infracción de sus políticas en la cuenta de WhatsApp Business. Para proteger la plataforma, OpenBSP la desconectó.": "Meta reported a policy violation on the WhatsApp Business account. To protect the platform, OpenBSP disconnected it.",
+  "El acceso que la cuenta le dio a OpenBSP expiró o fue revocado.": "The access the account gave OpenBSP expired or was revoked.",
+  "OpenBSP fue quitado de la configuración de la cuenta de Instagram.": "OpenBSP was removed from the Instagram account's settings.",
+  "No se envían ni reciben mensajes hasta volver a conectar la cuenta.": "Messages aren't sent or received until the account is reconnected.",
+  "La app WhatsApp Business dejó de compartir el número con OpenBSP, por un cambio de teléfono o porque el número se volvió a registrar.": "The WhatsApp Business app stopped sharing the number with OpenBSP, after a change of phone or the number being registered again.",
+  "Mientras tanto no se envían ni reciben mensajes. Se vuelve a conectar sola cuando se configure la app de nuevo.": "Meanwhile messages aren't sent or received. It reconnects by itself once the app is set up again.",
+  "El número o su cuenta de WhatsApp Business se eliminó en Meta.": "The number or its WhatsApp Business account was deleted in Meta.",
+  "Ya no se pueden enviar ni recibir mensajes con este número.": "Messages can no longer be sent or received with this number.",
+  "El número se desconectó de OpenBSP desde la app WhatsApp Business.": "The number was disconnected from OpenBSP in the WhatsApp Business app.",
+  "Se cambió el número en la app WhatsApp Business.": "The number was changed in the WhatsApp Business app.",
+  "La app WhatsApp Business pasó demasiado tiempo sin abrirse en el teléfono.": "The WhatsApp Business app went too long without being opened on the phone.",
+  "El número se volvió a registrar en WhatsApp.": "The number was registered on WhatsApp again.",
+  "Se quitó desde Meta el acceso de OpenBSP a la cuenta de WhatsApp Business.": "OpenBSP's access to the WhatsApp Business account was removed in Meta."
 }

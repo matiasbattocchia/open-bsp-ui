@@ -39,6 +39,28 @@ export function ConnectionStatus({ row }: { row: OrganizationAddressRow }) {
   );
 }
 
+/** Why Meta took a WhatsApp Business account away, as far as it says. */
+function removed(detail: string | undefined, t: Translate) {
+  switch (detail) {
+    case "ACCOUNT_DISCONNECTED":
+      return t(
+        "El número se desconectó de OpenBSP desde la app WhatsApp Business.",
+      );
+    case "CHANGE_NUMBER":
+      return t("Se cambió el número en la app WhatsApp Business.");
+    case "PRIMARY_INACTIVITY":
+      return t(
+        "La app WhatsApp Business pasó demasiado tiempo sin abrirse en el teléfono.",
+      );
+    case "USER_RE_REGISTERED":
+      return t("El número se volvió a registrar en WhatsApp.");
+    default:
+      return t(
+        "Se quitó desde Meta el acceso de OpenBSP a la cuenta de WhatsApp Business.",
+      );
+  }
+}
+
 /** What the service did and what it stopped, by the issue's reason. */
 function cause(
   row: OrganizationAddressRow,
@@ -46,6 +68,9 @@ function cause(
   language: string,
 ): string[] {
   const issue = row.issue!;
+  const reinstated = t(
+    "No se envían ni reciben mensajes. Se vuelve a conectar sola si Meta restablece la cuenta.",
+  );
   switch (issue.reason) {
     case "logged_out":
       return [
@@ -57,6 +82,14 @@ function cause(
         ),
       ];
     case "banned":
+      if (row.service === "whatsapp") {
+        return [
+          t(
+            "Meta deshabilitó la cuenta de WhatsApp Business por infringir sus políticas.",
+          ),
+          reinstated,
+        ];
+      }
       return [
         issue.until
           ? `${t("WhatsApp bloqueó el número temporalmente, hasta el")} ${new Date(
@@ -70,12 +103,48 @@ function cause(
           : t("WhatsApp bloqueó el número temporalmente."),
         t("Volvé a conectar el número cuando se levante el bloqueo."),
       ];
+    case "violation":
+      return [
+        `${t(
+          "Meta reportó una infracción de sus políticas en la cuenta de WhatsApp Business. Para proteger la plataforma, OpenBSP la desconectó.",
+        )}${issue.detail ? ` (${issue.detail.toLowerCase().replaceAll("_", " ")})` : ""}`,
+        reinstated,
+      ];
     case "expired":
       return [
-        t(
-          "El acceso a Instagram expiró o fue revocado, como pasa al cambiar la contraseña.",
-        ),
+        row.service === "instagram"
+          ? t(
+              "El acceso a Instagram expiró o fue revocado, como pasa al cambiar la contraseña.",
+            )
+          : t(
+              "El acceso que la cuenta le dio a OpenBSP expiró o fue revocado.",
+            ),
         t("No se pueden enviar mensajes hasta volver a conectar la cuenta."),
+      ];
+    case "removed":
+      return [
+        row.service === "instagram"
+          ? t(
+              "OpenBSP fue quitado de la configuración de la cuenta de Instagram.",
+            )
+          : removed(issue.detail, t),
+        t(
+          "No se envían ni reciben mensajes hasta volver a conectar la cuenta.",
+        ),
+      ];
+    case "offboarded":
+      return [
+        t(
+          "La app WhatsApp Business dejó de compartir el número con OpenBSP, por un cambio de teléfono o porque el número se volvió a registrar.",
+        ),
+        t(
+          "Mientras tanto no se envían ni reciben mensajes. Se vuelve a conectar sola cuando se configure la app de nuevo.",
+        ),
+      ];
+    case "deleted":
+      return [
+        t("El número o su cuenta de WhatsApp Business se eliminó en Meta."),
+        t("Ya no se pueden enviar ni recibir mensajes con este número."),
       ];
   }
 }
