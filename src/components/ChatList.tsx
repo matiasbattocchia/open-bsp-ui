@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import useBoundStore from "@/stores/useBoundStore";
 import ChatListItem from "./ChatListItem";
 import { type ConversationRow, type MessageRow } from "@/supabase/client";
@@ -27,7 +28,8 @@ function pinnedAscending(
   return aPin && !bPin ? -1 : 1;
 }
 
-const ChatList = () => {
+/** `header` heads the list, inside its scroll: cards that scroll with it. */
+const ChatList = ({ header }: { header?: ReactNode }) => {
   const { translate: t } = useTranslation();
   const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
   const conversations = useBoundStore((state) => state.chat.conversations);
@@ -86,7 +88,10 @@ const ChatList = () => {
   const itemIds = items.map((a) => a.convId);
 
   return (
-    <div className="overflow-y-auto [scrollbar-gutter:stable] w-full h-full pt-[10px] px-[10px]">
+    <div className="overflow-y-auto [scrollbar-gutter:stable] w-full h-full pt-[10px] px-[10px] flex flex-col">
+      {header && (
+        <div className="flex flex-col gap-[4px] pb-[10px]">{header}</div>
+      )}
       {itemIds.length ? (
         <div className="flex flex-col gap-[4px]">
           {itemIds.map((key) => (
@@ -94,7 +99,7 @@ const ChatList = () => {
           ))}
         </div>
       ) : (
-        <div className="h-full flex items-center justify-center flex-col text-foreground text-[15px] mt-[-24px]">
+        <div className="grow flex items-center justify-center flex-col text-foreground text-[15px] mt-[-24px]">
           {t("Nada por aquí")}
           {(searchPattern || filterName !== Filters.ALL) && (
             <button

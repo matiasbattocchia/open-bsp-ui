@@ -1,5 +1,5 @@
 import { TriangleAlert } from "lucide-react";
-import SectionItem from "@/components/SectionItem";
+import NoticeCard from "@/components/NoticeCard";
 import { useTranslation } from "@/hooks/useTranslation";
 import type { Quota } from "@/queries/useBilling";
 import {
@@ -63,41 +63,30 @@ export default function QuotaAlert({
   const colors = statusColors[status];
 
   return (
-    <div className={`${colors.background} rounded-lg`}>
-      <SectionItem
-        // Grows with its lines: h-auto! overrides SectionItem's own h-[72px]
-        // whatever order the two land in, and min-h keeps a row's height.
-        className="h-auto! min-h-[72px] py-[10px]"
-        title={`${translateProductName(quota.name, t)}: ${
-          status === "capped" ? t("Límite alcanzado") : t("Cerca del límite")
-        }`}
-        description={
-          <div className="flex flex-col gap-[2px] w-full whitespace-normal">
-            <p>
-              {status === "capped"
-                ? consequence(quota.id, t)
-                : amount.used + amount.rest}
-            </p>
-            {quota.interval === "month" && <p>{renewal(currentLanguage, t)}</p>}
-            {onUpgrade && (
-              <div className="flex justify-end">
-                <button
-                  onClick={onUpgrade}
-                  className="font-bold text-primary/90 hover:text-primary cursor-pointer"
-                >
-                  {t("Mejorar plan")}
-                </button>
-              </div>
-            )}
-          </div>
-        }
-        aside={
-          <div className="p-[8px]">
-            <TriangleAlert className={`w-[24px] h-[24px] ${colors.icon}`} />
-          </div>
-        }
-        onClick={onClick}
-      />
-    </div>
+    <NoticeCard
+      className={colors.background}
+      icon={<TriangleAlert className={`w-[24px] h-[24px] ${colors.icon}`} />}
+      title={`${translateProductName(quota.name, t)}: ${
+        status === "capped" ? t("Límite alcanzado") : t("Cerca del límite")
+      }`}
+      actions={
+        onUpgrade && (
+          <button
+            onClick={onUpgrade}
+            className="font-bold text-primary/90 hover:text-primary cursor-pointer"
+          >
+            {t("Mejorar plan")}
+          </button>
+        )
+      }
+      onClick={onClick}
+    >
+      <p>
+        {status === "capped"
+          ? consequence(quota.id, t)
+          : amount.used + amount.rest}
+      </p>
+      {quota.interval === "month" && <p>{renewal(currentLanguage, t)}</p>}
+    </NoticeCard>
   );
 }

@@ -3,7 +3,7 @@ import ChatList from "@/components/ChatList";
 import ChatSearch from "@/components/ChatSearch";
 import Header from "@/components/Header";
 import ChatFilter from "@/components/ChatFilter";
-import SectionItem from "@/components/SectionItem";
+import NoticeCard from "@/components/NoticeCard";
 import Spinner from "@/components/Spinner";
 import { Bell } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -41,75 +41,68 @@ function Conversations() {
       <Header /> {/* height: 59 px */}
       <ChatSearch /> {/* height: 49 px */}
       <ChatFilter /> {/* height: 43 px */}
-      {/* Invitations and quota alerts share one stack, so cards of either
-          kind sit the same gap apart. */}
-      {(!!invitations?.length || !!alerts?.length) && (
-        <div className="pt-[10px] pb-[5px] pl-[10px] pr-[20px] flex flex-col gap-[4px]">
-          {invitations?.map((invitation) => (
-            <div key={invitation.id} className="bg-primary/10 rounded-lg">
-              <SectionItem
-                // min-h, not h: it has to override SectionItem's own h-[72px],
-                // and min-height beats height whatever order the two land in.
-                className="min-h-[112px]"
-                title={
-                  invitation.organization_name || t("Invitación pendiente")
-                }
-                description={
-                  <div className="flex flex-col gap-[6px] w-full">
-                    <p>
-                      {t("Te invitaron como")}{" "}
-                      {roles[invitation.role || "member"]}
-                    </p>
-                    <div className="flex gap-[16px] justify-end">
-                      {answerInvitation.isPending ? (
-                        <Spinner size={16} />
-                      ) : (
-                        <>
-                          <button
-                            onClick={() =>
-                              handleInvitationAction(invitation.id, "accepted")
-                            }
-                            className="font-bold text-primary/90 hover:text-primary cursor-pointer"
-                          >
-                            {t("Aceptar")}
-                          </button>
-                          <button
-                            onClick={() =>
-                              handleInvitationAction(invitation.id, "rejected")
-                            }
-                            className="font-bold text-muted-foreground/90 hover:text-muted-foreground cursor-pointer"
-                          >
-                            {t("Rechazar")}
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                }
-                aside={
-                  <div className="p-[8px]">
-                    <Bell className="w-[24px] h-[24px] text-primary" />
-                  </div>
-                }
-              />
-            </div>
-          ))}
-          {alerts?.map((quota) => (
-            <QuotaAlert
-              key={quota.id}
-              quota={quota}
-              onClick={() =>
-                navigate({
-                  to: "/stats/$productId",
-                  params: { productId: quota.id },
-                  hash: (prevHash) => prevHash!,
-                })
-              }
-            />
-          ))}
-        </div>
-      )}
-      <ChatList />
+      {/* Invitations and quota alerts head the list and scroll with it, the
+          same gap apart as its items. */}
+      <ChatList
+        header={
+          (!!invitations?.length || !!alerts?.length) && (
+            <>
+              {invitations?.map((invitation) => (
+                <NoticeCard
+                  key={invitation.id}
+                  className="bg-primary/10"
+                  icon={<Bell className="w-[24px] h-[24px] text-primary" />}
+                  title={
+                    invitation.organization_name || t("Invitación pendiente")
+                  }
+                  actions={
+                    answerInvitation.isPending ? (
+                      <Spinner size={16} />
+                    ) : (
+                      <>
+                        <button
+                          onClick={() =>
+                            handleInvitationAction(invitation.id, "accepted")
+                          }
+                          className="font-bold text-primary/90 hover:text-primary cursor-pointer"
+                        >
+                          {t("Aceptar")}
+                        </button>
+                        <button
+                          onClick={() =>
+                            handleInvitationAction(invitation.id, "rejected")
+                          }
+                          className="font-bold text-muted-foreground/90 hover:text-muted-foreground cursor-pointer"
+                        >
+                          {t("Rechazar")}
+                        </button>
+                      </>
+                    )
+                  }
+                >
+                  <p>
+                    {t("Te invitaron como")}{" "}
+                    {roles[invitation.role || "member"]}
+                  </p>
+                </NoticeCard>
+              ))}
+              {alerts?.map((quota) => (
+                <QuotaAlert
+                  key={quota.id}
+                  quota={quota}
+                  onClick={() =>
+                    navigate({
+                      to: "/stats/$productId",
+                      params: { productId: quota.id },
+                      hash: (prevHash) => prevHash!,
+                    })
+                  }
+                />
+              ))}
+            </>
+          )
+        }
+      />
     </>
   );
 }
