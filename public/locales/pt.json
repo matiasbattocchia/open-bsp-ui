@@ -418,7 +418,7 @@
   "Cada mensaje enviado o recibido por cualquier canal, también los enviados desde el teléfono u otro dispositivo vinculado. Incluye reacciones, notas internas y los registros de los agentes de IA. No cuenta el historial importado.": "Cada mensagem enviada ou recebida por qualquer canal, inclusive as enviadas do celular ou de outro dispositivo vinculado. Inclui reações, notas internas e os registros dos agentes de IA. O histórico importado não conta.",
   "Cada conversación nueva: la primera vez que un contacto y una conexión intercambian un mensaje. El mismo contacto en dos conexiones son dos conversaciones. Cuentan también las que trae el historial importado.": "Cada conversa nova: a primeira vez que um contato e uma conexão trocam uma mensagem. O mesmo contato em duas conexões são duas conversas. As trazidas pelo histórico importado também contam.",
   "Lo que ocupan los archivos guardados: la media enviada o recibida y los archivos subidos. Al borrarse un archivo, se libera su espacio.": "O espaço ocupado pelos arquivos guardados: a mídia enviada ou recebida e os arquivos enviados. Quando um arquivo é apagado, seu espaço é liberado.",
-  "Las cuentas conectadas de WhatsApp, WhatsApp Web e Instagram. Una cuenta desconectada deja de contar.": "As contas conectadas de WhatsApp, WhatsApp Web e Instagram. Uma conta desconectada deixa de contar.",
+  "Las cuentas conectadas de WhatsApp, WhatsApp Web, Instagram y TikTok. Una cuenta desconectada deja de contar.": "As contas conectadas de WhatsApp, WhatsApp Web, Instagram e TikTok. Uma conta desconectada deixa de contar.",
   "Lo que gastan los agentes de IA y el pre-procesamiento de media al usar los modelos de la plataforma. Un agente con clave API propia no consume créditos.": "O que os agentes de IA e o pré-processamento de mídia gastam ao usar os modelos da plataforma. Um agente com chave de API própria não consome créditos.",
   "Planes": "Planos",
   "Mejorar plan": "Melhorar plano",
@@ -468,5 +468,18 @@
   "Se cambió el número en la app WhatsApp Business.": "O número foi alterado no app WhatsApp Business.",
   "La app WhatsApp Business pasó demasiado tiempo sin abrirse en el teléfono.": "O app WhatsApp Business ficou tempo demais sem ser aberto no celular.",
   "El número se volvió a registrar en WhatsApp.": "O número foi registrado de novo no WhatsApp.",
-  "Se quitó desde Meta el acceso de OpenBSP a la cuenta de WhatsApp Business.": "O acesso da OpenBSP à conta do WhatsApp Business foi removido pela Meta."
+  "Se quitó desde Meta el acceso de OpenBSP a la cuenta de WhatsApp Business.": "O acesso da OpenBSP à conta do WhatsApp Business foi removido pela Meta.",
+  "Conexión oficial vía API de TikTok": "Conexão oficial via API do TikTok",
+  "Conectar TikTok": "Conectar TikTok",
+  "Para conectar TikTok a la plataforma, iniciá sesión con la cuenta de TikTok empresa que querés conectar.": "Para conectar o TikTok à plataforma, faça login com a conta empresarial do TikTok que você quer conectar.",
+  "La cuenta debe ser de empresa y aceptar mensajes directos de todos. Las cuentas registradas en el Espacio Económico Europeo, Suiza o el Reino Unido no están disponibles.": "A conta deve ser empresarial e aceitar mensagens diretas de todos. Contas registradas no Espaço Econômico Europeu, na Suíça ou no Reino Unido não estão disponíveis.",
+  "Vas a ser redirigido a TikTok para autorizar y luego volverás a la plataforma.": "Você será redirecionado ao TikTok para autorizar e depois voltará à plataforma.",
+  "Continuar con TikTok": "Continuar com TikTok",
+  "No se pudo conectar la cuenta de TikTok.": "Não foi possível conectar a conta do TikTok.",
+  "Cuenta de TikTok": "Conta do TikTok",
+  "Conectando tu cuenta de TikTok...": "Conectando sua conta do TikTok...",
+  "Tu cuenta de TikTok fue conectada exitosamente.": "Sua conta do TikTok foi conectada com sucesso.",
+  "Conectá tu cuenta de TikTok a": "Conecte sua conta do TikTok a",
+  "Iniciá sesión con la cuenta de TikTok empresa que querés conectar. Vas a ser redirigido a TikTok para autorizar.": "Faça login com a conta empresarial do TikTok que você quer conectar. Você será redirecionado ao TikTok para autorizar.",
+  "Generá un enlace para que un tercero conecte su cuenta de TikTok a tu organización. No necesita tener cuenta en Open BSP ni ser miembro de tu organización.": "Gere um link para que um terceiro conecte a conta do TikTok dele à sua organização. Não é preciso ter conta no Open BSP nem ser membro da sua organização."
 }

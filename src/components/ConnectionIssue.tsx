@@ -5,6 +5,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import type {
   InstagramOrganizationAddressExtra,
   OrganizationAddressRow,
+  TikTokOrganizationAddressExtra,
 } from "@/supabase/client";
 import { formatPhoneNumber } from "@/utils/FormatUtils";
 
@@ -21,8 +22,11 @@ export function isWorking(row: OrganizationAddressRow) {
 
 /** How the account reads: its number, or its @username. */
 export function accountLabel(row: OrganizationAddressRow) {
-  if (row.service === "instagram") {
-    const extra = row.extra as InstagramOrganizationAddressExtra | null;
+  if (row.service === "instagram" || row.service === "tiktok") {
+    const extra = row.extra as
+      | InstagramOrganizationAddressExtra
+      | TikTokOrganizationAddressExtra
+      | null;
     return extra?.username ? `@${extra.username}` : extra?.name || row.address;
   }
   const extra = row.extra as { phone_number?: string } | null;

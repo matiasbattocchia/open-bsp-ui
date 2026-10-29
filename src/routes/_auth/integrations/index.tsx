@@ -72,6 +72,21 @@ function IntegrationsIndex() {
           <SectionItem
             aside={
               <div className="p-[8px]">
+                <ServiceIcon service="tiktok" size={24} />
+              </div>
+            }
+            title="TikTok"
+            description={t("Conexión oficial vía API de TikTok")}
+            onClick={() =>
+              navigate({
+                to: "/integrations/tiktok",
+                hash: (prevHash) => prevHash!,
+              })
+            }
+          />
+          <SectionItem
+            aside={
+              <div className="p-[8px]">
                 <FileText className="w-[24px] h-[24px]" />
               </div>
             }

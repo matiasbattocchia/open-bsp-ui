@@ -58,6 +58,12 @@ function Conversations() {
         params,
         hash,
       });
+    } else if (service === "tiktok") {
+      void navigate({
+        to: "/integrations/tiktok/$orgAddressId",
+        params,
+        hash,
+      });
     } else if (service === "whatsapp") {
       void navigate({
         to: "/integrations/whatsapp/$orgAddressId",

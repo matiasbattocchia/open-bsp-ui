@@ -42,7 +42,7 @@ export function productExplainer(productId: string, t: Translate) {
       );
     case "organizations_addresses":
       return t(
-        "Las cuentas conectadas de WhatsApp, WhatsApp Web e Instagram. Una cuenta desconectada deja de contar.",
+        "Las cuentas conectadas de WhatsApp, WhatsApp Web, Instagram y TikTok. Una cuenta desconectada deja de contar.",
       );
     case "ai_credits":
       return t(

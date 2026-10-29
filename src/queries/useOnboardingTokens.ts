@@ -7,10 +7,10 @@ export type OnboardingTokenRow =
   Database["public"]["Tables"]["onboarding_tokens"]["Row"];
 
 // The `service` enum also includes "local"; onboarding links only target the
-// two external channels.
+// channels connected through the provider's own login.
 export type OnboardingService = Extract<
   Database["public"]["Enums"]["service"],
-  "whatsapp" | "instagram"
+  "whatsapp" | "instagram" | "tiktok"
 >;
 
 export function useOnboardingTokens(service: OnboardingService) {

@@ -418,7 +418,7 @@
   "Cada mensaje enviado o recibido por cualquier canal, también los enviados desde el teléfono u otro dispositivo vinculado. Incluye reacciones, notas internas y los registros de los agentes de IA. No cuenta el historial importado.": "Every message sent or received on any channel, including those sent from the phone or another linked device. Reactions, internal notes and AI agent records count too. Imported history doesn't.",
   "Cada conversación nueva: la primera vez que un contacto y una conexión intercambian un mensaje. El mismo contacto en dos conexiones son dos conversaciones. Cuentan también las que trae el historial importado.": "Every new conversation: the first time a contact and a connection exchange a message. The same contact on two connections is two conversations. Those brought in by imported history count too.",
   "Lo que ocupan los archivos guardados: la media enviada o recibida y los archivos subidos. Al borrarse un archivo, se libera su espacio.": "The space taken by stored files: media sent or received and uploaded files. When a file is deleted, its space is freed.",
-  "Las cuentas conectadas de WhatsApp, WhatsApp Web e Instagram. Una cuenta desconectada deja de contar.": "Connected WhatsApp, WhatsApp Web and Instagram accounts. A disconnected account stops counting.",
+  "Las cuentas conectadas de WhatsApp, WhatsApp Web, Instagram y TikTok. Una cuenta desconectada deja de contar.": "Connected WhatsApp, WhatsApp Web, Instagram and TikTok accounts. A disconnected account stops counting.",
   "Lo que gastan los agentes de IA y el pre-procesamiento de media al usar los modelos de la plataforma. Un agente con clave API propia no consume créditos.": "What AI agents and media preprocessing spend when using the platform's models. An agent with its own API key doesn't consume credits.",
   "Planes": "Plans",
   "Mejorar plan": "Upgrade plan",
@@ -468,5 +468,18 @@
   "Se cambió el número en la app WhatsApp Business.": "The number was changed in the WhatsApp Business app.",
   "La app WhatsApp Business pasó demasiado tiempo sin abrirse en el teléfono.": "The WhatsApp Business app went too long without being opened on the phone.",
   "El número se volvió a registrar en WhatsApp.": "The number was registered on WhatsApp again.",
-  "Se quitó desde Meta el acceso de OpenBSP a la cuenta de WhatsApp Business.": "OpenBSP's access to the WhatsApp Business account was removed in Meta."
+  "Se quitó desde Meta el acceso de OpenBSP a la cuenta de WhatsApp Business.": "OpenBSP's access to the WhatsApp Business account was removed in Meta.",
+  "Conexión oficial vía API de TikTok": "Official connection via TikTok's API",
+  "Conectar TikTok": "Connect TikTok",
+  "Para conectar TikTok a la plataforma, iniciá sesión con la cuenta de TikTok empresa que querés conectar.": "To connect TikTok to the platform, log in with the TikTok business account you want to connect.",
+  "La cuenta debe ser de empresa y aceptar mensajes directos de todos. Las cuentas registradas en el Espacio Económico Europeo, Suiza o el Reino Unido no están disponibles.": "The account must be a business account and accept direct messages from everyone. Accounts registered in the European Economic Area, Switzerland or the United Kingdom are not available.",
+  "Vas a ser redirigido a TikTok para autorizar y luego volverás a la plataforma.": "You will be redirected to TikTok to authorize and then return to the platform.",
+  "Continuar con TikTok": "Continue with TikTok",
+  "No se pudo conectar la cuenta de TikTok.": "The TikTok account could not be connected.",
+  "Cuenta de TikTok": "TikTok account",
+  "Conectando tu cuenta de TikTok...": "Connecting your TikTok account...",
+  "Tu cuenta de TikTok fue conectada exitosamente.": "Your TikTok account was connected successfully.",
+  "Conectá tu cuenta de TikTok a": "Connect your TikTok account to",
+  "Iniciá sesión con la cuenta de TikTok empresa que querés conectar. Vas a ser redirigido a TikTok para autorizar.": "Log in with the TikTok business account you want to connect. You will be redirected to TikTok to authorize.",
+  "Generá un enlace para que un tercero conecte su cuenta de TikTok a tu organización. No necesita tener cuenta en Open BSP ni ser miembro de tu organización.": "Generate a link so a third party can connect their TikTok account to your organization. They don't need an Open BSP account or to be a member of your organization."
 }

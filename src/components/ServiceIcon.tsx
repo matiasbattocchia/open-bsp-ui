@@ -1,4 +1,8 @@
-import { InstagramOutlined, WhatsAppOutlined } from "@ant-design/icons";
+import {
+  InstagramOutlined,
+  TikTokOutlined,
+  WhatsAppOutlined,
+} from "@ant-design/icons";
 
 // Brand colors per service. whatsapp-web (the unofficial whatsmeow bridge) uses
 // the WhatsApp glyph in Go's brand color to set it apart from Cloud-API WhatsApp.
@@ -23,6 +27,12 @@ export default function ServiceIcon({
         style={{ fontSize, color: SERVICE_COLORS.instagram }}
       />
     );
+  }
+
+  // TikTok's mark is black on white: the foreground color keeps it visible in
+  // dark mode.
+  if (service === "tiktok") {
+    return <TikTokOutlined className="text-foreground" style={{ fontSize }} />;
   }
 
   if (service === "whatsapp-web") {

@@ -418,7 +418,7 @@
   "Cada mensaje enviado o recibido por cualquier canal, también los enviados desde el teléfono u otro dispositivo vinculado. Incluye reacciones, notas internas y los registros de los agentes de IA. No cuenta el historial importado.": "Kila ujumbe uliotumwa au kupokelewa kupitia chaneli yoyote, pamoja na ile iliyotumwa kutoka kwenye simu au kifaa kingine kilichounganishwa. Inajumuisha miitikio, maelezo ya ndani na kumbukumbu za mawakala wa AI. Historia iliyoingizwa haihesabiwi.",
   "Cada conversación nueva: la primera vez que un contacto y una conexión intercambian un mensaje. El mismo contacto en dos conexiones son dos conversaciones. Cuentan también las que trae el historial importado.": "Kila mazungumzo mapya: mara ya kwanza mwasiliani na muunganisho wanapobadilishana ujumbe. Mwasiliani mmoja kwenye miunganisho miwili ni mazungumzo mawili. Yanayoletwa na historia iliyoingizwa nayo yanahesabiwa.",
   "Lo que ocupan los archivos guardados: la media enviada o recibida y los archivos subidos. Al borrarse un archivo, se libera su espacio.": "Nafasi inayochukuliwa na faili zilizohifadhiwa: media iliyotumwa au kupokelewa na faili zilizopakiwa. Faili inapofutwa, nafasi yake inaachiliwa.",
-  "Las cuentas conectadas de WhatsApp, WhatsApp Web e Instagram. Una cuenta desconectada deja de contar.": "Akaunti zilizounganishwa za WhatsApp, WhatsApp Web na Instagram. Akaunti iliyotenganishwa haihesabiwi tena.",
+  "Las cuentas conectadas de WhatsApp, WhatsApp Web, Instagram y TikTok. Una cuenta desconectada deja de contar.": "Akaunti zilizounganishwa za WhatsApp, WhatsApp Web, Instagram na TikTok. Akaunti iliyotenganishwa haihesabiwi tena.",
   "Lo que gastan los agentes de IA y el pre-procesamiento de media al usar los modelos de la plataforma. Un agente con clave API propia no consume créditos.": "Kile ambacho mawakala wa AI na uchakataji wa awali wa media hutumia wanapotumia miundo ya jukwaa. Wakala mwenye ufunguo wake wa API hatumii salio.",
   "Planes": "Mipango",
   "Mejorar plan": "Boresha mpango",
@@ -468,5 +468,18 @@
   "Se cambió el número en la app WhatsApp Business.": "Namba imebadilishwa kwenye programu ya WhatsApp Business.",
   "La app WhatsApp Business pasó demasiado tiempo sin abrirse en el teléfono.": "Programu ya WhatsApp Business imekaa muda mrefu mno bila kufunguliwa kwenye simu.",
   "El número se volvió a registrar en WhatsApp.": "Namba imesajiliwa upya kwenye WhatsApp.",
-  "Se quitó desde Meta el acceso de OpenBSP a la cuenta de WhatsApp Business.": "Ruhusa ya OpenBSP kwa akaunti ya WhatsApp Business imeondolewa kwenye Meta."
+  "Se quitó desde Meta el acceso de OpenBSP a la cuenta de WhatsApp Business.": "Ruhusa ya OpenBSP kwa akaunti ya WhatsApp Business imeondolewa kwenye Meta.",
+  "Conexión oficial vía API de TikTok": "Muunganisho rasmi kupitia API ya TikTok",
+  "Conectar TikTok": "Unganisha TikTok",
+  "Para conectar TikTok a la plataforma, iniciá sesión con la cuenta de TikTok empresa que querés conectar.": "Ili kuunganisha TikTok kwenye jukwaa, ingia kwa akaunti ya biashara ya TikTok unayotaka kuunganisha.",
+  "La cuenta debe ser de empresa y aceptar mensajes directos de todos. Las cuentas registradas en el Espacio Económico Europeo, Suiza o el Reino Unido no están disponibles.": "Akaunti lazima iwe ya biashara na ikubali ujumbe wa moja kwa moja kutoka kwa kila mtu. Akaunti zilizosajiliwa katika Eneo la Kiuchumi la Ulaya, Uswisi au Uingereza hazipatikani.",
+  "Vas a ser redirigido a TikTok para autorizar y luego volverás a la plataforma.": "Utaelekezwa kwenye TikTok kuidhinisha kisha utarudi kwenye jukwaa.",
+  "Continuar con TikTok": "Endelea na TikTok",
+  "No se pudo conectar la cuenta de TikTok.": "Akaunti ya TikTok haikuweza kuunganishwa.",
+  "Cuenta de TikTok": "Akaunti ya TikTok",
+  "Conectando tu cuenta de TikTok...": "Inaunganisha akaunti yako ya TikTok...",
+  "Tu cuenta de TikTok fue conectada exitosamente.": "Akaunti yako ya TikTok imeunganishwa kwa mafanikio.",
+  "Conectá tu cuenta de TikTok a": "Unganisha akaunti yako ya TikTok na",
+  "Iniciá sesión con la cuenta de TikTok empresa que querés conectar. Vas a ser redirigido a TikTok para autorizar.": "Ingia kwa akaunti ya biashara ya TikTok unayotaka kuunganisha. Utaelekezwa kwenye TikTok kuidhinisha.",
+  "Generá un enlace para que un tercero conecte su cuenta de TikTok a tu organización. No necesita tener cuenta en Open BSP ni ser miembro de tu organización.": "Tengeneza kiungo ili mtu mwingine aunganishe akaunti yake ya TikTok na shirika lako. Haitaji akaunti ya Open BSP wala kuwa mwanachama wa shirika lako."
 }
