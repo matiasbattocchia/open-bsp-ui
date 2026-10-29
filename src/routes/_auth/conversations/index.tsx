@@ -13,7 +13,7 @@ import {
   useCurrentAgent,
 } from "@/queries/useAgents";
 import { useOrganizationsAddresses } from "@/queries/useOrganizationsAddresses";
-import { ConnectionIssueCard } from "@/components/ConnectionIssue";
+import { activeIssue, ConnectionIssueCard } from "@/components/ConnectionIssue";
 import type { OrganizationAddressRow } from "@/supabase/client";
 import { useQuotas } from "@/queries/useBilling";
 import QuotaAlert from "@/components/stats/QuotaAlert";
@@ -34,7 +34,7 @@ function Conversations() {
   // reads from, and the member's own — a colleague's personal account is
   // theirs to hear about.
   const issues = useOrganizationsAddresses().data?.filter(
-    (row) => row.issue && (!row.agent_id || row.agent_id === agent?.id),
+    (row) => activeIssue(row) && (!row.agent_id || row.agent_id === agent?.id),
   );
 
   const roles: Record<string, string> = {

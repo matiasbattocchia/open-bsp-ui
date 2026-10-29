@@ -8,7 +8,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { Plus } from "lucide-react";
 import { formatPhoneNumber } from "@/utils/FormatUtils";
 import ConnectionOwner from "@/components/ConnectionOwner";
-import { ConnectionStatus } from "@/components/ConnectionIssue";
+import { activeIssue, ConnectionStatus } from "@/components/ConnectionIssue";
 import WarningBadge from "@/components/WarningBadge";
 
 export const Route = createFileRoute("/_auth/integrations/whatsapp-web/")({
@@ -49,7 +49,7 @@ function WhatsAppWebIndex() {
               key={integration.address}
               aside={
                 <div className="p-[8px]">
-                  <WarningBadge show={!!integration.issue}>
+                  <WarningBadge show={!!activeIssue(integration)}>
                     <ServiceIcon service="whatsapp-web" size={24} />
                   </WarningBadge>
                 </div>

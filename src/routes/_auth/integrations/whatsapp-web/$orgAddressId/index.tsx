@@ -13,7 +13,11 @@ import { useCurrentAgent } from "@/queries/useAgents";
 import { formatPhoneNumber } from "@/utils/FormatUtils";
 import AccountLimitAlert from "@/components/stats/AccountLimitAlert";
 import { useCanConnectAccount } from "@/queries/useBilling";
-import { ConnectionIssueCard, isWorking } from "@/components/ConnectionIssue";
+import {
+  activeIssue,
+  ConnectionIssueCard,
+  isWorking,
+} from "@/components/ConnectionIssue";
 
 export const Route = createFileRoute(
   "/_auth/integrations/whatsapp-web/$orgAddressId/",
@@ -61,7 +65,7 @@ function WhatsAppWebDetails() {
 
       <SectionBody>
         {/* What WhatsApp did; the footer reconnects */}
-        {integration.issue && (
+        {activeIssue(integration) && (
           <div className="mb-[12px]">
             <ConnectionIssueCard row={integration} />
           </div>

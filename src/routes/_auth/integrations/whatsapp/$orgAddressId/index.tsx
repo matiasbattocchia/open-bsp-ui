@@ -15,6 +15,12 @@ import WhatsAppIntegration from "@/components/WhatsAppIntegration";
 import AccountLimitAlert from "@/components/stats/AccountLimitAlert";
 import { useCanConnectAccount } from "@/queries/useBilling";
 import { LayoutTemplate } from "lucide-react";
+import {
+  activeIssue,
+  ConnectionIssueCard,
+  isHeldByMeta,
+  MetaReview,
+} from "@/components/ConnectionIssue";
 
 export const Route = createFileRoute(
   "/_auth/integrations/whatsapp/$orgAddressId/",
@@ -46,6 +52,11 @@ function WhatsAppDetails() {
   const flowType = extra?.flow_type;
   const isCoexistence = flowType === "existing_phone_number";
   const isConnected = integration.status === "connected";
+  const issue = activeIssue(integration);
+  // Meta holds it: the signup would be refused, a review at Meta is the way.
+  const held = isHeldByMeta(integration);
+  // A dead token keeps the account connected, and a signup replaces it.
+  const needsSignup = !isConnected || issue?.reason === "expired";
 
   const flowTypeLabels: Record<string, string> = {
     new_phone_number: t("Nuevo número de WhatsApp"),
@@ -74,9 +85,15 @@ function WhatsAppDetails() {
       <SectionHeader title={extra?.verified_name || t("Cuenta de WhatsApp")} />
 
       <SectionBody>
+        {/* What Meta did; the footer reconnects, or says where to appeal */}
+        {issue && (
+          <div className="mb-[12px]">
+            <ConnectionIssueCard row={integration} />
+          </div>
+        )}
         {/* Connecting again is a new connection: the cap counts only
             connected accounts. */}
-        {!isConnected && <AccountLimitAlert />}
+        {!isConnected && !held && <AccountLimitAlert />}
         {/* Set apart from the form by its field gap. Templates live at Meta,
             reached with the account's token: none while disconnected. */}
         <div className="mb-[20px]">
@@ -241,7 +258,17 @@ function WhatsAppDetails() {
 
       {/* Connecting again is Embedded Signup again: Meta hands over a fresh
           token, and the account keeps its owner and webhook overrides. */}
-      {!isConnected && (
+      {(held ||
+        issue?.reason === "restricted" ||
+        issue?.reason === "locked") && (
+        <SectionFooter>
+          <div className="instructions">
+            <MetaReview />
+          </div>
+        </SectionFooter>
+      )}
+
+      {needsSignup && !held && (
         <SectionFooter>
           <WhatsAppIntegration
             label={t("Volver a conectar")}

@@ -6,7 +6,11 @@ import SectionFooter from "@/components/SectionFooter";
 import AccountLimitAlert from "@/components/stats/AccountLimitAlert";
 import { useInstagramConnect } from "@/hooks/useInstagramConnect";
 import { useCanConnectAccount } from "@/queries/useBilling";
-import { ConnectionIssueCard, isWorking } from "@/components/ConnectionIssue";
+import {
+  activeIssue,
+  ConnectionIssueCard,
+  isWorking,
+} from "@/components/ConnectionIssue";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useOrganizationAddress } from "@/queries/useOrganizationsAddresses";
 import { useInstagramDisconnect } from "@/queries/useInstagramSignup";
@@ -62,7 +66,7 @@ function InstagramAddressDetail() {
 
       <SectionBody>
         {/* What Instagram did; the footer reconnects */}
-        {integration.issue && (
+        {activeIssue(integration) && (
           <div className="mb-[12px]">
             <ConnectionIssueCard row={integration} />
           </div>

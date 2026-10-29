@@ -8,7 +8,7 @@ import { InstagramOutlined } from "@ant-design/icons";
 import { Link, Plus } from "lucide-react";
 import type { InstagramOrganizationAddressExtra } from "@/supabase/client";
 import ConnectionOwner from "@/components/ConnectionOwner";
-import { ConnectionStatus } from "@/components/ConnectionIssue";
+import { activeIssue, ConnectionStatus } from "@/components/ConnectionIssue";
 import WarningBadge from "@/components/WarningBadge";
 
 export const Route = createFileRoute("/_auth/integrations/instagram/")({
@@ -69,7 +69,7 @@ function InstagramIndex() {
                 key={integration.address}
                 aside={
                   <div className="p-[8px]">
-                    <WarningBadge show={!!integration.issue}>
+                    <WarningBadge show={!!activeIssue(integration)}>
                       <InstagramOutlined
                         style={{ fontSize: "24px", color: "#E1306C" }}
                       />

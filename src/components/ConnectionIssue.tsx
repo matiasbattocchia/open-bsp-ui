@@ -6,18 +6,55 @@ import type {
   InstagramOrganizationAddressExtra,
   OrganizationAddressRow,
   TikTokOrganizationAddressExtra,
+  SlackOrganizationAddressExtra,
 } from "@/supabase/client";
 import { formatPhoneNumber } from "@/utils/FormatUtils";
 
 type Translate = (s: string) => string;
 
+/** Where to ask OpenBSP about a decision on an account. */
+const COMMUNITY = "https://chat.whatsapp.com/Ch6AwZizSDt5quzHodcYh5";
+
+/** Where Meta reviews what it decided on a WhatsApp Business account. */
+const BUSINESS_SUPPORT = "https://business.facebook.com/business-support-home";
+
+/** The account's issue while it lasts: one whose `until` has passed is over. */
+export function activeIssue(row: OrganizationAddressRow) {
+  const issue = row.issue;
+  if (!issue) return null;
+  return issue.until && new Date(issue.until) < new Date() ? null : issue;
+}
+
+/**
+ * Whether Meta holds the WhatsApp Business account: reported or disabled, it
+ * can't be connected again until Meta reinstates it.
+ */
+export function isHeldByMeta(row: OrganizationAddressRow) {
+  return (
+    row.service === "whatsapp" &&
+    ["violation", "banned"].includes(row.issue?.reason ?? "")
+  );
+}
+
 /**
  * Whether the account works. Facing the user an account is connected or not;
  * an issue (the service's doing) makes it disconnected whatever the row says
  * — an Instagram token that died keeps its row connected, yet it can't send.
+ * A restriction is the exception: it limits the account, which still works.
  */
 export function isWorking(row: OrganizationAddressRow) {
-  return row.status === "connected" && !row.issue;
+  const issue = activeIssue(row);
+  return (
+    row.status === "connected" && (!issue || issue.reason === "restricted")
+  );
+}
+
+/** The account's state in a word: connected, restricted, locked, or not. */
+export function statusLabel(row: OrganizationAddressRow, t: Translate) {
+  const reason = row.status === "connected" && activeIssue(row)?.reason;
+  if (reason === "restricted") return t("Restringido");
+  if (reason === "locked") return t("Bloqueado");
+  return isWorking(row) ? t("Conectado") : t("Desconectado");
 }
 
 /** How the account reads: its number, or its @username. */
@@ -29,6 +66,10 @@ export function accountLabel(row: OrganizationAddressRow) {
       | null;
     return extra?.username ? `@${extra.username}` : extra?.name || row.address;
   }
+  if (row.service === "slack") {
+    const extra = row.extra as SlackOrganizationAddressExtra | null;
+    return extra?.team_name || "Slack";
+  }
   const extra = row.extra as { phone_number?: string } | null;
   return formatPhoneNumber(extra?.phone_number || row.address);
 }
@@ -36,11 +77,36 @@ export function accountLabel(row: OrganizationAddressRow) {
 /** A list item's status: connected, or not. */
 export function ConnectionStatus({ row }: { row: OrganizationAddressRow }) {
   const { translate: t } = useTranslation();
-  return isWorking(row) ? (
+  return isWorking(row) && !activeIssue(row) ? (
     <span className="text-primary">{t("Conectado")}</span>
   ) : (
-    <>{t("Desconectado")}</>
+    <>{statusLabel(row, t)}</>
   );
+}
+
+/** What a restriction stops, by Meta's name for it. */
+function restriction(type: string, t: Translate) {
+  switch (type) {
+    case "RESTRICTED_BIZ_INITIATED_MESSAGING":
+      return t(
+        "no puede iniciar conversaciones, solo responder a quien escribe primero",
+      );
+    case "RESTRICTED_CUSTOMER_INITIATED_MESSAGING":
+      return t("no puede responder a los clientes");
+    case "RESTRICTED_ADD_PHONE_NUMBER_ACTION":
+      return t("no se le pueden agregar números");
+    default:
+      return type.toLowerCase().replaceAll("_", " ");
+  }
+}
+
+function when(iso: string, language: string) {
+  return new Date(iso).toLocaleString(language, {
+    day: "numeric",
+    month: "long",
+    hour: "numeric",
+    minute: "2-digit",
+  });
 }
 
 /** Why Meta took a WhatsApp Business account away, as far as it says. */
@@ -96,14 +162,10 @@ function cause(
       }
       return [
         issue.until
-          ? `${t("WhatsApp bloqueó el número temporalmente, hasta el")} ${new Date(
+          ? `${t("WhatsApp bloqueó el número temporalmente, hasta el")} ${when(
               issue.until,
-            ).toLocaleString(language, {
-              day: "numeric",
-              month: "long",
-              hour: "numeric",
-              minute: "2-digit",
-            })}.`
+              language,
+            )}.`
           : t("WhatsApp bloqueó el número temporalmente."),
         t("Volvé a conectar el número cuando se levante el bloqueo."),
       ];
@@ -113,6 +175,26 @@ function cause(
           "Meta reportó una infracción de sus políticas en la cuenta de WhatsApp Business. Para proteger la plataforma, OpenBSP la desconectó.",
         )}${issue.detail ? ` (${issue.detail.toLowerCase().replaceAll("_", " ")})` : ""}`,
         reinstated,
+      ];
+    case "restricted":
+      return [
+        `${
+          issue.until
+            ? `${t("Meta restringió la cuenta de WhatsApp Business hasta el")} ${when(issue.until, language)}`
+            : t("Meta restringió la cuenta de WhatsApp Business")
+        }: ${(issue.detail ?? "")
+          .split(",")
+          .filter(Boolean)
+          .map((type) => restriction(type, t))
+          .join("; ")}.`,
+        t("Lo demás sigue funcionando, y la restricción se levanta sola."),
+      ];
+    case "locked":
+      return [
+        t(
+          "Meta bloqueó la cuenta de WhatsApp Business, por infringir sus políticas o porque el PIN de verificación en dos pasos no coincide.",
+        ),
+        t("No se pueden enviar mensajes hasta que Meta la desbloquee."),
       ];
     case "expired":
       return [
@@ -131,7 +213,11 @@ function cause(
           ? t(
               "OpenBSP fue quitado de la configuración de la cuenta de Instagram.",
             )
-          : removed(issue.detail, t),
+          : row.service === "slack"
+            ? t(
+                "OpenBSP fue quitado del espacio de trabajo de Slack, o se revocó su acceso.",
+              )
+            : removed(issue.detail, t),
         t(
           "No se envían ni reciben mensajes hasta volver a conectar la cuenta.",
         ),
@@ -154,9 +240,30 @@ function cause(
 }
 
 /**
- * The warning card for an account the service disconnected, shaped like a
- * quota's: the account, what happened, what it stopped. Nothing for an
- * account with no issue — working, or disconnected by a member.
+ * Where to take a decision Meta made on a WhatsApp Business account: a review
+ * at Meta, questions to OpenBSP.
+ */
+export function MetaReview() {
+  const { translate: t } = useTranslation();
+  return (
+    <p>
+      {t("Si creés que es un error, pedí una revisión a Meta en")}{" "}
+      <a href={BUSINESS_SUPPORT} target="_blank" rel="noreferrer">
+        Business Support Home
+      </a>
+      . {t("Para consultas a OpenBSP, escribinos en la")}{" "}
+      <a href={COMMUNITY} target="_blank" rel="noreferrer">
+        {t("comunidad")}
+      </a>
+      .
+    </p>
+  );
+}
+
+/**
+ * The warning card for an account the service broke, shaped like a quota's:
+ * the account, what happened, what it stopped. Nothing for an account with
+ * no issue, or one that's over — working, or disconnected by a member.
  */
 export function ConnectionIssueCard({
   row,
@@ -166,7 +273,7 @@ export function ConnectionIssueCard({
   onClick?: () => void;
 }) {
   const { translate: t, currentLanguage } = useTranslation();
-  if (!row.issue) return null;
+  if (!activeIssue(row)) return null;
 
   return (
     <NoticeCard
@@ -176,7 +283,7 @@ export function ConnectionIssueCard({
           <ServiceIcon service={row.service} size={24} />
         </WarningBadge>
       }
-      title={`${accountLabel(row)}: ${t("Desconectado")}`}
+      title={`${accountLabel(row)}: ${statusLabel(row, t)}`}
       onClick={onClick}
     >
       {cause(row, t, currentLanguage).map((line) => (

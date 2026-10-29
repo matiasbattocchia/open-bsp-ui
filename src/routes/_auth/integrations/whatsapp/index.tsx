@@ -8,7 +8,7 @@ import { WhatsAppOutlined } from "@ant-design/icons";
 import { Link, Plus } from "lucide-react";
 import { formatPhoneNumber } from "@/utils/FormatUtils";
 import ConnectionOwner from "@/components/ConnectionOwner";
-import { ConnectionStatus } from "@/components/ConnectionIssue";
+import { activeIssue, ConnectionStatus } from "@/components/ConnectionIssue";
 import WarningBadge from "@/components/WarningBadge";
 
 export const Route = createFileRoute("/_auth/integrations/whatsapp/")({
@@ -63,7 +63,7 @@ function WhatsAppIndex() {
               key={integration.address}
               aside={
                 <div className="p-[8px]">
-                  <WarningBadge show={!!integration.issue}>
+                  <WarningBadge show={!!activeIssue(integration)}>
                     <WhatsAppOutlined
                       style={{ fontSize: "24px", color: "#25D366" }}
                     />
