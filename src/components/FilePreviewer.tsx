@@ -14,6 +14,7 @@ import { newMessage, pushMessageToStore } from "@/utils/MessageUtils";
 import { saveDraft } from "@/utils/ConversationUtils";
 import { pushConversationToDb } from "@/utils/ConversationUtils";
 import { useCurrentAgent } from "@/queries/useAgents";
+import { textLength, useTextLength } from "@/queries/useTextLimit";
 import { moveCursorToEnd } from "@/utils/UtilityFunctions";
 import { htmlToMarkdown } from "@/utils/htmlToMarkdown";
 
@@ -145,8 +146,17 @@ const FilePreviewer = () => {
     return () => window.removeEventListener("paste", handlePaste);
   }, [activeConvId, addFiles]);
 
+  const previewDraft = drafts && drafts[previewIndex];
+
+  // A caption past the service's limit is refused by the database, and so is
+  // every file after it: none go out until each fits.
+  const caption = useTextLength(conv?.service, "file", previewDraft?.caption);
+  const captionsOver =
+    caption.limit != null &&
+    !!drafts?.some((draft) => textLength(draft.caption) > caption.limit!);
+
   const sendMediaMessages = async () => {
-    if (!activeConvId || !conv || !drafts) {
+    if (!activeConvId || !conv || !drafts || captionsOver) {
       return;
     }
 
@@ -187,8 +197,6 @@ const FilePreviewer = () => {
     draft && saveDraft(conv, "").catch(console.error);
     resetFiles();
   };
-
-  const previewDraft = drafts && drafts[previewIndex];
 
   /**
    * File Picker TODO
@@ -279,6 +287,16 @@ const FilePreviewer = () => {
               </div>
             )}
           </div>
+          {caption.near && (
+            <span
+              className={
+                "shrink-0 ml-[8px] text-[12px] tabular-nums" +
+                (caption.over ? " text-destructive" : " text-muted-foreground")
+              }
+            >
+              {caption.length}/{caption.limit}
+            </span>
+          )}
         </div>
 
         {/* Carousel */}
@@ -353,7 +371,16 @@ const FilePreviewer = () => {
           <div className="mx-4 mt-1">
             <button
               onClick={sendMediaMessages}
-              className="h-[60px] w-[60px] bg-primary rounded-full flex justify-center items-center cursor-pointer shadow-lg"
+              disabled={captionsOver}
+              className={
+                "h-[60px] w-[60px] bg-primary rounded-full flex justify-center items-center shadow-lg disabled:opacity-50" +
+                (captionsOver ? "" : " cursor-pointer")
+              }
+              title={
+                captionsOver
+                  ? t("Demasiado largo: divídelo en varios mensajes")
+                  : undefined
+              }
             >
               <svg className="mb-[1px] ml-[4px] w-[24px] h-[24px] text-primary-foreground transition">
                 <use href="/icons.svg#send" />

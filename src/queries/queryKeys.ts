@@ -58,6 +58,8 @@ export const queryKeys = {
     health: (orgId: NullableId, address: NullableId) =>
       [orgId, "whatsapp_web", "health", address] as const,
   },
+  textLimit: (service: NullableId, type: string) =>
+    ["text_limit", service, type] as const,
   billing: {
     products: () => ["billing", "products"] as const,
     plans: () => ["billing", "plans"] as const,

@@ -27,6 +27,7 @@ import {
   useQuotaReached,
   useRefreshUsage,
 } from "@/queries/useBilling";
+import { useTextLength } from "@/queries/useTextLimit";
 import { moveCursorToEnd } from "@/utils/UtilityFunctions";
 import { htmlToMarkdown } from "@/utils/htmlToMarkdown";
 import TemplatePicker from "./TemplatePicker";
@@ -166,6 +167,9 @@ export default function ChatFooter() {
   const quotaReached = useQuotaReached("messages");
   const canSend = inCSWindow && !quotaReached;
   const refreshUsage = useRefreshUsage();
+  // Past the service's limit the database refuses the message: it has to go
+  // out as several.
+  const text = useTextLength(conv?.service, "text", message);
   const navigate = useNavigate();
 
   // A send the database refused for the cap: the usage catches up, and the
@@ -278,7 +282,7 @@ export default function ChatFooter() {
   }, [activeConvId, draft]);
 
   const sendTextMessage = async () => {
-    if (!activeConvId || !conv || !message) {
+    if (!activeConvId || !conv || !message || text.over) {
       return;
     }
 
@@ -677,10 +681,22 @@ export default function ChatFooter() {
             )}
           </div>
 
+          {!templateDraft && canSend && text.near && (
+            <span
+              className={
+                "shrink-0 self-end mx-[6px] py-[12px] text-[12px] leading-[16px] tabular-nums" +
+                (text.over ? " text-destructive" : " text-muted-foreground")
+              }
+            >
+              {text.length}/{text.limit}
+            </span>
+          )}
+
           {/* Send button */}
           <button
             disabled={
-              quotaReached || (templateDraft ? !allVarsFilled : !inCSWindow)
+              quotaReached ||
+              (templateDraft ? !allVarsFilled : !inCSWindow || text.over)
             }
             className={
               "p-[8px] rounded-full bg-primary disabled:opacity-50" +
@@ -690,7 +706,7 @@ export default function ChatFooter() {
                   ? allVarsFilled
                     ? " cursor-pointer"
                     : ""
-                  : !inCSWindow
+                  : !inCSWindow || text.over
                     ? ""
                     : " cursor-pointer")
             }
@@ -703,7 +719,13 @@ export default function ChatFooter() {
                 sendTextMessage().catch(onSendError);
               }
             }}
-            title={templateDraft ? t("Enviar plantilla") : t("Enviar mensaje")}
+            title={
+              templateDraft
+                ? t("Enviar plantilla")
+                : text.over
+                  ? t("Demasiado largo: divídelo en varios mensajes")
+                  : t("Enviar mensaje")
+            }
           >
             <svg className="w-[24px] h-[24px] transition text-primary-foreground">
               <use href="/icons.svg#send" />
