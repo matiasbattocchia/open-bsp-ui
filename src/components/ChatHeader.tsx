@@ -8,6 +8,7 @@ import { useContactAddress } from "@/queries/useContactsAddresses";
 import {
   contactName,
   type InstagramContactAddressExtra,
+  type TikTokContactAddressExtra,
   peerAddress,
 } from "@/supabase/client";
 
@@ -32,9 +33,13 @@ export default function Header() {
     peer,
   );
 
+  // Instagram and TikTok contacts both read as @username, with a picture.
   const igExtra =
-    service === "instagram"
-      ? (contactAddress?.extra as InstagramContactAddressExtra | null)
+    service === "instagram" || service === "tiktok"
+      ? (contactAddress?.extra as
+          | InstagramContactAddressExtra
+          | TikTokContactAddressExtra
+          | null)
       : null;
 
   // Nearest name first: the address-book entry (saved name over push name,
@@ -93,7 +98,7 @@ export default function Header() {
           {(service === "whatsapp" || service === "whatsapp-web") &&
             peer &&
             formatPhoneNumber(peer)}
-          {service === "instagram" &&
+          {(service === "instagram" || service === "tiktok") &&
             igExtra?.username &&
             `@${igExtra.username}`}
         </div>

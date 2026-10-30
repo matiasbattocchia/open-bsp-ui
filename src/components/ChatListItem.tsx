@@ -6,6 +6,7 @@ import {
   contactName,
   type Draft,
   type InstagramContactAddressExtra,
+  type TikTokContactAddressExtra,
   type MessageRow,
   type OutgoingStatus,
   isInternal,
@@ -25,7 +26,7 @@ dayjs.extend(localizedFormat);
 import { TickContext } from "@/contexts/useTick";
 import { useTranslation } from "@/hooks/useTranslation";
 import { AtSign } from "lucide-react";
-import { mediaCategory } from "./Message/media";
+import { mediaCategory, shareLabel, unsupportedLabel } from "./Message/media";
 
 import { useCurrentAgent, useCurrentAgents } from "@/queries/useAgents";
 import { useContactAddress } from "@/queries/useContactsAddresses";
@@ -281,9 +282,13 @@ export default function ChatListItem({ itemId }: { itemId: string }) {
 
   const isPinned = membershipExtra?.pinned;
 
+  // Instagram and TikTok contacts both read as @username, with a picture.
   const igExtra =
-    conversation?.service === "instagram"
-      ? (contactAddress?.extra as InstagramContactAddressExtra | null)
+    conversation?.service === "instagram" || conversation?.service === "tiktok"
+      ? (contactAddress?.extra as
+          | InstagramContactAddressExtra
+          | TikTokContactAddressExtra
+          | null)
       : null;
 
   // Nearest name first: the address-book entry (saved name over push name,
@@ -424,10 +429,19 @@ export default function ChatListItem({ itemId }: { itemId: string }) {
                       t("Voto retirado")
                     }`}
                   {preview?.content.type === "data" &&
+                    preview.content.kind === "share" &&
+                    shareLabel(preview.content.data.type, t)}
+                  {preview?.content.type === "data" &&
+                    preview.content.kind === "unsupported" &&
+                    unsupportedLabel(preview.content, t)}
+                  {preview?.content.type === "data" &&
                     preview.content.kind !== "media_placeholder" &&
                     preview.content.kind !== "poll" &&
                     preview.content.kind !== "poll_vote" &&
-                    JSON.stringify(preview.content.data)}
+                    preview.content.kind !== "share" &&
+                    preview.content.kind !== "unsupported" &&
+                    (preview.content.text ??
+                      JSON.stringify(preview.content.data))}
                   {(preview?.content.type === "file" ||
                     (preview?.content.type === "data" &&
                       preview.content.kind === "media_placeholder")) &&

@@ -495,5 +495,9 @@
   "Tu cuenta de TikTok fue conectada exitosamente.": "Your TikTok account was connected successfully.",
   "Conectá tu cuenta de TikTok a": "Connect your TikTok account to",
   "Iniciá sesión con la cuenta de TikTok empresa que querés conectar. Vas a ser redirigido a TikTok para autorizar.": "Log in with the TikTok business account you want to connect. You will be redirected to TikTok to authorize.",
-  "Generá un enlace para que un tercero conecte su cuenta de TikTok a tu organización. No necesita tener cuenta en Open BSP ni ser miembro de tu organización.": "Generate a link so a third party can connect their TikTok account to your organization. They don't need an Open BSP account or to be a member of your organization."
+  "Generá un enlace para que un tercero conecte su cuenta de TikTok a tu organización. No necesita tener cuenta en Open BSP ni ser miembro de tu organización.": "Generate a link so a third party can connect their TikTok account to your organization. They don't need an Open BSP account or to be a member of your organization.",
+  "Publicación de TikTok": "TikTok post",
+  "TikTok no comparte los mensajes del Espacio Económico Europeo, Suiza o el Reino Unido.": "TikTok doesn't share messages from the European Economic Area, Switzerland or the United Kingdom.",
+  "Mensaje no compatible": "Unsupported message",
+  "La conversación se cerró 48 horas después del último mensaje del contacto. Esperá a que te escriba de nuevo para responder.": "The conversation closed 48 hours after the contact's last message. Wait for them to write again to reply."
 }

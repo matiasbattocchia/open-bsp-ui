@@ -147,11 +147,19 @@ export default function ChatFooter() {
 
   // Wether or not the user is allowed to send messages to the client.
   // WhatsApp (Cloud API) and Instagram both enforce a 24h customer-service
-  // window since the contact's last message; `local` (internal testing) and
-  // `whatsapp-web` (unofficial bridge) have no window.
-  const inCSWindow =
-    (conv?.service !== "whatsapp" && conv?.service !== "instagram") ||
-    tick.isBefore(dayjs(mostRecentIncoming?.timestamp || 0).add(1, "day"));
+  // window since the contact's last message, TikTok a 48h one; `local`
+  // (internal testing) and `whatsapp-web` (unofficial bridge) have no window.
+  const windowHours =
+    conv?.service === "whatsapp" || conv?.service === "instagram"
+      ? 24
+      : conv?.service === "tiktok"
+        ? 48
+        : undefined;
+  const windowEnd = dayjs(mostRecentIncoming?.timestamp || 0).add(
+    windowHours ?? 0,
+    "hour",
+  );
+  const inCSWindow = windowHours === undefined || tick.isBefore(windowEnd);
 
   // Templates count too: at the messages cap nothing more goes out, whatever
   // the window.
@@ -181,10 +189,8 @@ export default function ChatFooter() {
     }
   };
 
-  // WhatsApp customer service window lasts 24 hours since the last contact's message
-  const remaining = tick
-    .locale(currentLanguage)
-    .to(dayjs(mostRecentIncoming?.timestamp || 0).add(1, "day"), true);
+  // What's left of the customer service window.
+  const remaining = tick.locale(currentLanguage).to(windowEnd, true);
 
   // Template mode: derive from per-conv store
   const templateDraft = templateDraftEntry?.template;
@@ -539,7 +545,8 @@ export default function ChatFooter() {
             type="file"
             multiple={true}
             className="hidden"
-            accept="*/*"
+            // TikTok sends JPG and PNG images, nothing else.
+            accept={conv?.service === "tiktok" ? "image/jpeg,image/png" : "*/*"}
             onChange={(event) => {
               if (!event.target.files?.length) {
                 return;
@@ -608,9 +615,13 @@ export default function ChatFooter() {
                           ? t(
                               "WhatsApp cierra la conversación a las 24 horas del último mensaje recibido. Para abrir la conversación debes utilizar una plantilla.",
                             )
-                          : t(
-                              "La conversación se cerró 24 horas después del último mensaje del contacto. Esperá a que te escriba de nuevo para responder.",
-                            )
+                          : conv.service === "tiktok"
+                            ? t(
+                                "La conversación se cerró 48 horas después del último mensaje del contacto. Esperá a que te escriba de nuevo para responder.",
+                              )
+                            : t(
+                                "La conversación se cerró 24 horas después del último mensaje del contacto. Esperá a que te escriba de nuevo para responder.",
+                              )
                   }
                 />
                 {(!message || !canSend) && (
@@ -649,8 +660,7 @@ export default function ChatFooter() {
                       ) : (
                         <span>{t("Conversación cerrada")}</span>
                       )
-                    ) : conv.service === "whatsapp" ||
-                      conv.service === "instagram" ? (
+                    ) : windowHours !== undefined ? (
                       <>
                         <span className="lg:hidden">{t("Cerrará en")}</span>
                         <span className="hidden lg:inline">

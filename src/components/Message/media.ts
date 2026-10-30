@@ -37,3 +37,32 @@ export function mediaCategory(
   if (mime.startsWith("image/")) return "image";
   return "document";
 }
+
+type Translate = (text: string) => string;
+
+/** What a shared post is, by where it's from. */
+export function shareLabel(type: string, t: Translate): string {
+  switch (type) {
+    case "tiktok_post":
+      return t("Publicación de TikTok");
+    case "ig_reel":
+    case "reel":
+      return t("Reel");
+    default:
+      return t("Publicación");
+  }
+}
+
+/** Why a message can't be shown: the service's region rule, or its type. */
+export function unsupportedLabel(
+  content: { data?: { type?: string }; text?: string },
+  t: Translate,
+): string {
+  if (content.data?.type === "region") {
+    return t(
+      "TikTok no comparte los mensajes del Espacio Económico Europeo, Suiza o el Reino Unido.",
+    );
+  }
+
+  return t("Mensaje no compatible");
+}

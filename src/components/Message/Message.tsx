@@ -11,7 +11,7 @@ import AudioMessage from "./AudioMessage";
 import DocumentMessage from "./DocumentMessage";
 import ImageMessage from "./ImageMessage";
 import VideoMessage from "./VideoMessage";
-import { mediaCategory } from "./media";
+import { mediaCategory, shareLabel, unsupportedLabel } from "./media";
 import StatusIcon from "./StatusIcon";
 import dayjs from "dayjs";
 import { Remarkable } from "remarkable";
@@ -489,6 +489,45 @@ export default function Message(props: UIMessage & { message: MessageRow }) {
           (props.message.content.text
             ? `\n\n${props.message.content.text}`
             : "")
+        }
+        type="markdown"
+        direction={direction}
+        timestamp={props.message.timestamp}
+        status={direction === "outgoing" ? props.message.status : undefined}
+        fixedWidth={fixedWidth}
+      />
+    );
+    text = true;
+  } else if (
+    props.message.content.type === "data" &&
+    props.message.content.kind === "unsupported"
+  ) {
+    // A message the service delivered without its content, or of a type we
+    // don't read: say so, in the reader's language.
+    content = (
+      <TextMessage
+        header={headerText}
+        body={`_${unsupportedLabel(props.message.content, t)}_`}
+        type="markdown"
+        direction={direction}
+        timestamp={props.message.timestamp}
+        status={direction === "outgoing" ? props.message.status : undefined}
+        fixedWidth={fixedWidth}
+      />
+    );
+    text = true;
+  } else if (
+    props.message.content.type === "data" &&
+    props.message.content.kind === "share"
+  ) {
+    // A shared post is a link, not media: its url is a web page.
+    const share = props.message.content.data;
+    content = (
+      <TextMessage
+        header={headerText}
+        body={
+          `🔗 [${shareLabel(share.type, t)}](${share.url})` +
+          (share.title ? `\n\n${share.title}` : "")
         }
         type="markdown"
         direction={direction}
