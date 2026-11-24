@@ -541,15 +541,17 @@ export default function Message(props: UIMessage & { message: MessageRow }) {
     props.message.content.type === "data" &&
     props.message.content.kind === "comment"
   ) {
-    // A comment on a post: the post it is on, then what was said.
-    const { post } = props.message.content.data;
-    const label = shareLabel(post.type, t);
+    // A comment on a post: the post it is on, then what was said. An API
+    // writer may leave the post out of an outgoing one.
+    const post = props.message.content.data?.post;
+    const label = post ? shareLabel(post.type, t) : undefined;
+    const on = post?.url ? `[${label}](${post.url})` : label;
     content = (
       <TextMessage
         header={headerText}
         body={
-          `💬 ${t("Comentario")} · ${post.url ? `[${label}](${post.url})` : label}` +
-          `\n\n${props.message.content.text}`
+          `💬 ${t("Comentario")}${on ? ` · ${on}` : ""}` +
+          `\n\n${props.message.content.text ?? ""}`
         }
         type="markdown"
         direction={direction}
