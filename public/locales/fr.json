@@ -514,5 +514,11 @@
   "usuario@ejemplo.com": "utilisateur@exemple.com",
   "y": "et",
   "Responder en público al comentario": "Répondre publiquement au commentaire",
-  "Demasiado largo para un comentario": "Trop long pour un commentaire"
+  "Demasiado largo para un comentario": "Trop long pour un commentaire",
+  "Bandeja de entrada": "Boîte de réception",
+  "Responder": "Répondre",
+  "Conectar una cuenta": "Connecter un compte",
+  "Consultar la API": "Interroger l'API",
+  "Cambiar a través de la API": "Modifier via l'API",
+  "Referencia de la API": "Référence de l'API"
 }

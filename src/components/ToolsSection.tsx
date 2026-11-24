@@ -1382,6 +1382,14 @@ function OpenBSPMCPClientEditor({
     { value: "send_message", label: t("Enviar mensaje") },
     { value: "list_templates", label: t("Listar plantillas") },
     { value: "fetch_template", label: t("Obtener plantilla") },
+    // Every service, not only WhatsApp: conversations by their id.
+    { value: "status", label: t("Estado") },
+    { value: "inbox", label: t("Bandeja de entrada") },
+    { value: "reply", label: t("Responder") },
+    { value: "connect", label: t("Conectar una cuenta") },
+    { value: "query", label: t("Consultar la API") },
+    { value: "change", label: t("Cambiar a través de la API") },
+    { value: "api_reference", label: t("Referencia de la API") },
   ];
 
   return (

@@ -514,5 +514,11 @@
   "usuario@ejemplo.com": "mtumiaji@mfano.com",
   "y": "na",
   "Responder en público al comentario": "Jibu maoni hadharani",
-  "Demasiado largo para un comentario": "Ni ndefu mno kwa maoni"
+  "Demasiado largo para un comentario": "Ni ndefu mno kwa maoni",
+  "Bandeja de entrada": "Kikasha",
+  "Responder": "Jibu",
+  "Conectar una cuenta": "Unganisha akaunti",
+  "Consultar la API": "Uliza API",
+  "Cambiar a través de la API": "Badilisha kupitia API",
+  "Referencia de la API": "Marejeleo ya API"
 }
