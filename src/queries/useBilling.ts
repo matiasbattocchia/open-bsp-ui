@@ -39,7 +39,9 @@ export function usePlans() {
 /**
  * The models offered on AI credits, by provider, cheapest input first: those
  * with a price in effect in billing.costs. The backend charges by that row and
- * refuses a model without one, so pricing a model is what offers it.
+ * refuses a model without one, so pricing a model is what offers it. A row
+ * with no price withdraws it from its date on; once one is scheduled, the
+ * model is no longer offered, though it is charged until that date.
  */
 export function useCreditModels() {
   return useQuery({
@@ -50,25 +52,35 @@ export function useCreditModels() {
         .from("costs")
         .select("provider, product, effective_at, pricing")
         .eq("unit", "tokens")
-        .lte("effective_at", new Date().toISOString())
         .order("effective_at", { ascending: false })
         .throwOnError(),
     staleTime: 1000 * 60 * 60,
     select: ({ data }) => {
-      // Newest first, so the first row of a model is the price in effect.
+      const now = Date.now();
+      // Newest first, so the first row of a model in effect is its price.
       const current = new Map<string, (typeof data)[number]>();
+      const withdrawing = new Set<string>();
       for (const row of data) {
         const key = `${row.provider}/${row.product}`;
-        if (!current.has(key)) current.set(key, row);
+        if (Date.parse(row.effective_at) > now) {
+          if (!row.pricing) withdrawing.add(key);
+        } else if (!current.has(key)) {
+          current.set(key, row);
+        }
       }
 
       const input = (row: (typeof data)[number]) =>
         (row.pricing as { input?: number } | null)?.input ?? 0;
 
       const models: Record<string, string[]> = {};
-      for (const row of [...current.values()].sort(
-        (a, b) => input(a) - input(b) || a.product.localeCompare(b.product),
-      )) {
+      for (const row of [...current.values()]
+        .filter(
+          (row) =>
+            row.pricing && !withdrawing.has(`${row.provider}/${row.product}`),
+        )
+        .sort(
+          (a, b) => input(a) - input(b) || a.product.localeCompare(b.product),
+        )) {
         (models[row.provider] ??= []).push(row.product);
       }
       return models;
