@@ -64,6 +64,7 @@ export const queryKeys = {
     products: () => ["billing", "products"] as const,
     plans: () => ["billing", "plans"] as const,
     tiers: () => ["billing", "tiers"] as const,
+    models: () => ["billing", "models"] as const,
     allUsage: (orgId: NullableId) => [orgId, "billing", "usage"] as const,
     usage: (orgId: NullableId, interval: string, since?: string) =>
       [orgId, "billing", "usage", interval, since] as const,

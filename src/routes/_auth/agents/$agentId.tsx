@@ -15,13 +15,8 @@ import { type AIAgentRow, type AIAgentUpdate } from "@/supabase/client";
 import { openLocalDirect } from "@/utils/ConversationUtils";
 import { useOrganizationsAddresses } from "@/queries/useOrganizationsAddresses";
 import SectionFooter from "@/components/SectionFooter";
-import {
-  protocols,
-  protocolLabels,
-  defaultModels,
-  creditModels,
-  apiKeyInstructions,
-} from "./new";
+import { protocols, protocolLabels, apiKeyInstructions } from "./new";
+import { useCreditModels } from "@/queries/useBilling";
 import Button from "@/components/Button";
 import SelectField from "@/components/SelectField";
 import TextAreaField from "@/components/TextAreaField";
@@ -43,6 +38,7 @@ function AgentDetail() {
   const updateAgent = useUpdateAgent();
   const activeOrgId = useBoundStore((state) => state.ui.activeOrgId);
   const [provider, setProvider] = useState<keyof typeof protocols>("openai");
+  const { data: creditModels } = useCreditModels();
 
   const localAddress = useOrganizationsAddresses().data?.find(
     (address) => address.service === "local",
@@ -162,7 +158,7 @@ function AgentDetail() {
                 modalClassName="bottom-0"
                 onChange={(val) => {
                   setProvider(val);
-                  setValue("extra.model", defaultModels[val] || "");
+                  setValue("extra.model", creditModels?.[val]?.[0] || "");
 
                   const availableProtocols =
                     protocols[val as keyof typeof protocols];
@@ -256,7 +252,7 @@ function AgentDetail() {
                 />
               </label>
 
-              {provider !== "custom" && creditModels[provider] && (
+              {provider !== "custom" && !!creditModels?.[provider]?.length && (
                 <div className="instructions">
                   <p>
                     {t("Los siguientes modelos funcionan con créditos de IA:")}

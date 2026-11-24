@@ -26,11 +26,8 @@ export type Memory = {
 
 export type PreprocessingConfig = {
   mode?: "active" | "inactive";
-  model?:
-    | "gemini-2.5-flash"
-    | "gemini-3-flash-preview"
-    | "gemini-3.8-flash"
-    | "gemini-3.1-pro-preview";
+  /** A Google model; on our key, one priced in billing.costs (useCreditModels). */
+  model?: string;
   api_key?: string;
   language?: string;
   extra_prompt?: string;

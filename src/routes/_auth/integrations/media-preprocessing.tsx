@@ -8,14 +8,12 @@ import {
   useUpdateCurrentOrganization,
 } from "@/queries/useOrganizations";
 import { useCurrentAgent } from "@/queries/useAgents";
+import { useCreditModels } from "@/queries/useBilling";
 import Button from "@/components/Button";
 import SelectField from "@/components/SelectField";
 import TextAreaField from "@/components/TextAreaField";
 import Switch from "@/components/Switch";
-import {
-  type OrganizationUpdate,
-  type PreprocessingConfig,
-} from "@/supabase/client";
+import { type OrganizationUpdate } from "@/supabase/client";
 import { useForm, Controller } from "react-hook-form";
 import { useMemo } from "react";
 
@@ -30,6 +28,8 @@ function MediaPreprocessingSettings() {
   const { data: org } = useCurrentOrganization();
   const { data: agent } = useCurrentAgent();
   const updateOrg = useUpdateCurrentOrganization();
+  const { data: creditModels } = useCreditModels();
+  const googleModels = creditModels?.google;
 
   const isAdmin = ["admin", "owner"].includes(agent?.role || "");
 
@@ -41,14 +41,21 @@ function MediaPreprocessingSettings() {
         ...org.extra,
         media_preprocessing: {
           mode: "inactive" as "active" | "inactive",
-          model: "gemini-2.5-flash" as NonNullable<
-            PreprocessingConfig["model"]
-          >,
+          // Google's cheapest model on credits, until one is picked.
+          model: googleModels?.[0],
           ...org.extra?.media_preprocessing,
         },
       },
     };
-  }, [org]);
+  }, [org, googleModels]);
+
+  // The org's own model stays listed even when it isn't offered on credits
+  // (one picked for its own API key).
+  const current = org?.extra?.media_preprocessing?.model;
+  const modelOptions = [
+    ...(current && !googleModels?.includes(current) ? [current] : []),
+    ...(googleModels ?? []),
+  ].map((m) => ({ value: m, label: m }));
 
   const {
     register,
@@ -90,12 +97,7 @@ function MediaPreprocessingSettings() {
             control={control}
             name="extra.media_preprocessing.model"
             label={t("Modelo")}
-            options={[
-              { value: "gemini-2.5-flash", label: "Gemini 2.5 Flash" },
-              { value: "gemini-3-flash-preview", label: "Gemini 3 Flash" },
-              { value: "gemini-3.8-flash", label: "Gemini 3.8 Flash" },
-              { value: "gemini-3.1-pro-preview", label: "Gemini 3.1 Pro" },
-            ]}
+            options={modelOptions}
             disabled={!isAdmin}
           />
 

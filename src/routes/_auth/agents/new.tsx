@@ -3,10 +3,11 @@ import SectionHeader from "@/components/SectionHeader";
 import SectionFooter from "@/components/SectionFooter";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useCreateAgent, useCurrentAgent } from "@/queries/useAgents";
+import { useCreditModels } from "@/queries/useBilling";
 import { useForm, useWatch } from "react-hook-form";
 import SectionBody from "@/components/SectionBody";
 import { type AIAgentInsert, type AIAgentExtra } from "@/supabase/client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "@/components/Button";
 import SelectField from "@/components/SelectField";
 import TextAreaField from "@/components/TextAreaField";
@@ -37,38 +38,6 @@ export const protocolLabels: Record<
 > = {
   chat_completions: "Chat Completions",
   responses: "Responses",
-};
-
-export const defaultModels: Record<string, string> = {
-  openai: "gpt-5-mini",
-  anthropic: "claude-sonnet-4-6",
-  google: "gemini-3-flash-preview",
-  groq: "openai/gpt-oss-20b",
-};
-
-export const creditModels: Record<string, string[]> = {
-  openai: [
-    "gpt-5.4-nano",
-    "gpt-5-mini",
-    "gpt-5.4-mini",
-    "gpt-5.3-chat-latest",
-    "gpt-5.4",
-    "gpt-5.5",
-  ],
-  anthropic: [
-    "claude-haiku-4-5",
-    "claude-sonnet-5",
-    "claude-sonnet-4-6",
-    "claude-opus-5",
-  ],
-  google: [
-    "gemini-3.5-flash-lite",
-    "gemini-2.5-flash",
-    "gemini-3-flash-preview",
-    "gemini-3.8-flash",
-    "gemini-3.1-pro-preview",
-  ],
-  groq: ["openai/gpt-oss-20b", "openai/gpt-oss-120b"],
 };
 
 export const apiKeyInstructions: Record<
@@ -106,11 +75,13 @@ function AddAgent() {
   const { data: currentAgent } = useCurrentAgent();
   const isAdmin = ["admin", "owner"].includes(currentAgent?.role || "");
   const [provider, setProvider] = useState<keyof typeof protocols>("groq");
+  const { data: creditModels } = useCreditModels();
 
   const {
     register,
     handleSubmit,
     setValue,
+    getValues,
     control,
     formState: { isValid, isDirty },
   } = useForm<AIAgentInsert>({
@@ -119,13 +90,20 @@ function AddAgent() {
         mode: "active",
         api_url: "groq",
         protocol: "chat_completions",
-        model: "openai/gpt-oss-20b",
+        model: "",
         tools: [],
       },
     },
   });
 
   const model = useWatch({ control, name: "extra.model" });
+
+  // Groq's cheapest model on credits, once the offered models arrive.
+  useEffect(() => {
+    if (!getValues("extra.model") && creditModels?.groq?.[0]) {
+      setValue("extra.model", creditModels.groq[0]);
+    }
+  }, [creditModels, getValues, setValue]);
 
   const onSubmit = (data: AIAgentInsert) => {
     createAgent.mutate(data, {
@@ -196,7 +174,7 @@ function AddAgent() {
                 modalClassName="bottom-0"
                 onChange={(val) => {
                   setProvider(val);
-                  setValue("extra.model", defaultModels[val] || "");
+                  setValue("extra.model", creditModels?.[val]?.[0] || "");
 
                   const availableProtocols =
                     protocols[val as keyof typeof protocols];
@@ -290,7 +268,7 @@ function AddAgent() {
                 />
               </label>
 
-              {provider !== "custom" && creditModels[provider] && (
+              {provider !== "custom" && !!creditModels?.[provider]?.length && (
                 <div className="instructions">
                   <p>
                     {t("Los siguientes modelos funcionan con créditos de IA:")}

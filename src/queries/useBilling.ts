@@ -36,6 +36,46 @@ export function usePlans() {
   });
 }
 
+/**
+ * The models offered on AI credits, by provider, cheapest input first: those
+ * with a price in effect in billing.costs. The backend charges by that row and
+ * refuses a model without one, so pricing a model is what offers it.
+ */
+export function useCreditModels() {
+  return useQuery({
+    queryKey: queryKeys.billing.models(),
+    queryFn: async () =>
+      await supabase
+        .schema("billing")
+        .from("costs")
+        .select("provider, product, effective_at, pricing")
+        .eq("unit", "tokens")
+        .lte("effective_at", new Date().toISOString())
+        .order("effective_at", { ascending: false })
+        .throwOnError(),
+    staleTime: 1000 * 60 * 60,
+    select: ({ data }) => {
+      // Newest first, so the first row of a model is the price in effect.
+      const current = new Map<string, (typeof data)[number]>();
+      for (const row of data) {
+        const key = `${row.provider}/${row.product}`;
+        if (!current.has(key)) current.set(key, row);
+      }
+
+      const input = (row: (typeof data)[number]) =>
+        (row.pricing as { input?: number } | null)?.input ?? 0;
+
+      const models: Record<string, string[]> = {};
+      for (const row of [...current.values()].sort(
+        (a, b) => input(a) - input(b) || a.product.localeCompare(b.product),
+      )) {
+        (models[row.provider] ??= []).push(row.product);
+      }
+      return models;
+    },
+  });
+}
+
 /** The active tiers with their caps, lowest level first. */
 export function useTiers() {
   return useQuery({
