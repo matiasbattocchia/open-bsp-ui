@@ -539,6 +539,28 @@ export default function Message(props: UIMessage & { message: MessageRow }) {
     text = true;
   } else if (
     props.message.content.type === "data" &&
+    props.message.content.kind === "comment"
+  ) {
+    // A comment on a post: the post it is on, then what was said.
+    const { post } = props.message.content.data;
+    const label = shareLabel(post.type, t);
+    content = (
+      <TextMessage
+        header={headerText}
+        body={
+          `💬 ${t("Comentario")} · ${post.url ? `[${label}](${post.url})` : label}` +
+          `\n\n${props.message.content.text}`
+        }
+        type="markdown"
+        direction={direction}
+        timestamp={props.message.timestamp}
+        status={direction === "outgoing" ? props.message.status : undefined}
+        fixedWidth={fixedWidth}
+      />
+    );
+    text = true;
+  } else if (
+    props.message.content.type === "data" &&
     props.message.content.text
   ) {
     content = (
