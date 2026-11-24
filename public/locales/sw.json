@@ -512,5 +512,7 @@
   "URL de webhook (opcional)": "URL ya webhook (hiari)",
   "WhatsApp cierra la conversación a las 24 horas del último mensaje recibido. Para abrir la conversación debes utilizar una plantilla.": "WhatsApp hufunga mazungumzo saa 24 baada ya ujumbe wa mwisho uliopokelewa. Ili kuyafungua, lazima utumie kiolezo.",
   "usuario@ejemplo.com": "mtumiaji@mfano.com",
-  "y": "na"
+  "y": "na",
+  "Responder en público al comentario": "Jibu maoni hadharani",
+  "Demasiado largo para un comentario": "Ni ndefu mno kwa maoni"
 }

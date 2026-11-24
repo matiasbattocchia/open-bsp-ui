@@ -3,16 +3,15 @@ import { supabase, type ConversationRow } from "@/supabase/client";
 import { queryKeys } from "./queryKeys";
 
 type Service = ConversationRow["service"];
+type TextType = "text" | "file" | "comment";
 
 /**
  * The most characters a message of `type` sends on `service` — "file" asks for
- * a caption's. The database's own `text_limit`, which refuses longer outgoing
- * messages at insert; null when the service has none.
+ * a caption's, "comment" a public answer to a comment's. The database's own
+ * `text_limit`, which refuses longer outgoing messages at insert; null when
+ * the service has none.
  */
-export function useTextLimit(
-  service: Service | undefined,
-  type: "text" | "file",
-) {
+export function useTextLimit(service: Service | undefined, type: TextType) {
   return useQuery({
     queryKey: queryKeys.textLimit(service, type),
     queryFn: async () =>
@@ -39,7 +38,7 @@ export function textLength(text: string | undefined) {
  */
 export function useTextLength(
   service: Service | undefined,
-  type: "text" | "file",
+  type: TextType,
   text: string | undefined,
 ) {
   const { data: limit } = useTextLimit(service, type);

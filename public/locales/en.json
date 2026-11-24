@@ -512,5 +512,7 @@
   "URL de webhook (opcional)": "Webhook URL (optional)",
   "WhatsApp cierra la conversación a las 24 horas del último mensaje recibido. Para abrir la conversación debes utilizar una plantilla.": "WhatsApp closes the conversation 24 hours after the last message received. To open it, you must use a template.",
   "usuario@ejemplo.com": "user@example.com",
-  "y": "and"
+  "y": "and",
+  "Responder en público al comentario": "Reply publicly to the comment",
+  "Demasiado largo para un comentario": "Too long for a comment"
 }

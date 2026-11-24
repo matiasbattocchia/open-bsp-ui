@@ -146,14 +146,27 @@ export default function ChatFooter() {
     }
   });
 
+  // TikTok answers a commenter only in public, under the comment: when the
+  // contact last wrote a comment, that is what the composer answers.
+  const commentToAnswer =
+    conv?.service === "tiktok" &&
+    mostRecentIncoming?.content.kind === "comment" &&
+    mostRecentIncoming.external_id
+      ? {
+          id: mostRecentIncoming.external_id,
+          post: mostRecentIncoming.content.data?.post,
+        }
+      : undefined;
+
   // Wether or not the user is allowed to send messages to the client.
   // WhatsApp (Cloud API) and Instagram both enforce a 24h customer-service
-  // window since the contact's last message, TikTok a 48h one; `local`
-  // (internal testing) and `whatsapp-web` (unofficial bridge) have no window.
+  // window since the contact's last message, TikTok a 48h one (none for a
+  // comment); `local` (internal testing) and `whatsapp-web` (unofficial
+  // bridge) have no window.
   const windowHours =
     conv?.service === "whatsapp" || conv?.service === "instagram"
       ? 24
-      : conv?.service === "tiktok"
+      : conv?.service === "tiktok" && !commentToAnswer
         ? 48
         : undefined;
   const windowEnd = dayjs(mostRecentIncoming?.timestamp || 0).add(
@@ -169,7 +182,11 @@ export default function ChatFooter() {
   const refreshUsage = useRefreshUsage();
   // Past the service's limit the database refuses the message: it has to go
   // out as several.
-  const text = useTextLength(conv?.service, "text", message);
+  const text = useTextLength(
+    conv?.service,
+    commentToAnswer ? "comment" : "text",
+    message,
+  );
   const navigate = useNavigate();
 
   // A send the database refused for the cap: the usage catches up, and the
@@ -293,12 +310,21 @@ export default function ChatFooter() {
 
     const record = newMessage(
       conv,
-      {
-        version: "1",
-        type: "text",
-        kind: "text",
-        text: message,
-      },
+      commentToAnswer
+        ? {
+            version: "1",
+            type: "data",
+            kind: "comment",
+            data: { post: commentToAnswer.post! },
+            text: message,
+            re_message_id: commentToAnswer.id,
+          }
+        : {
+            version: "1",
+            type: "text",
+            kind: "text",
+            text: message,
+          },
       agentId,
     );
 
@@ -530,10 +556,15 @@ export default function ChatFooter() {
               </button>
             ) : (
               <button
-                disabled={!canSend}
+                // A comment is answered with text only.
+                disabled={!canSend || !!commentToAnswer}
                 className={
                   "p-[8px] rounded-full" +
-                  (!canSend ? "" : " cursor-pointer hover:bg-accent")
+                  (commentToAnswer
+                    ? " opacity-50"
+                    : !canSend
+                      ? ""
+                      : " cursor-pointer hover:bg-accent")
                 }
                 onClick={() => fileInput.current?.click()}
                 title={t("Adjuntar")}
@@ -664,6 +695,8 @@ export default function ChatFooter() {
                       ) : (
                         <span>{t("Conversación cerrada")}</span>
                       )
+                    ) : commentToAnswer ? (
+                      <span>{t("Responder en público al comentario")}</span>
                     ) : windowHours !== undefined ? (
                       <>
                         <span className="lg:hidden">{t("Cerrará en")}</span>
@@ -723,7 +756,9 @@ export default function ChatFooter() {
               templateDraft
                 ? t("Enviar plantilla")
                 : text.over
-                  ? t("Demasiado largo: divídelo en varios mensajes")
+                  ? commentToAnswer
+                    ? t("Demasiado largo para un comentario")
+                    : t("Demasiado largo: divídelo en varios mensajes")
                   : t("Enviar mensaje")
             }
           >
