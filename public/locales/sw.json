@@ -501,5 +501,16 @@
   "Comentario": "Maoni",
   "TikTok no comparte los mensajes del Espacio Económico Europeo, Suiza o el Reino Unido.": "TikTok haishiriki ujumbe kutoka Eneo la Kiuchumi la Ulaya, Uswisi au Uingereza.",
   "Mensaje no compatible": "Ujumbe usioungwa mkono",
-  "La conversación se cerró 48 horas después del último mensaje del contacto. Esperá a que te escriba de nuevo para responder.": "Mazungumzo yalifungwa saa 48 baada ya ujumbe wa mwisho wa mwasiliani. Subiri akuandikie tena ili ujibu."
+  "La conversación se cerró 48 horas después del último mensaje del contacto. Esperá a que te escriba de nuevo para responder.": "Mazungumzo yalifungwa saa 48 baada ya ujumbe wa mwisho wa mwasiliani. Subiri akuandikie tena ili ujibu.",
+  "Publicación": "Chapisho",
+  "Reel": "Reel",
+  "Historia": "Hadithi",
+  "Mención de historia": "Kutajwa kwenye hadithi",
+  "Respuesta a historia": "Jibu la hadithi",
+  "La conversación se cerró 24 horas después del último mensaje del contacto. Esperá a que te escriba de nuevo para responder.": "Mazungumzo yalifungwa saa 24 baada ya ujumbe wa mwisho wa mwasiliani. Subiri akuandikie tena ili ujibu.",
+  "Si la configurás, los webhooks de mensajes de esta cuenta se envían directo a tu app en vez de a OpenBSP.": "Ukiiweka, webhooks za ujumbe za akaunti hii zitatumwa moja kwa moja kwa programu yako badala ya OpenBSP.",
+  "URL de webhook (opcional)": "URL ya webhook (hiari)",
+  "WhatsApp cierra la conversación a las 24 horas del último mensaje recibido. Para abrir la conversación debes utilizar una plantilla.": "WhatsApp hufunga mazungumzo saa 24 baada ya ujumbe wa mwisho uliopokelewa. Ili kuyafungua, lazima utumie kiolezo.",
+  "usuario@ejemplo.com": "mtumiaji@mfano.com",
+  "y": "na"
 }

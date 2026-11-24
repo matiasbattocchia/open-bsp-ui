@@ -501,5 +501,16 @@
   "Comentario": "Comentário",
   "TikTok no comparte los mensajes del Espacio Económico Europeo, Suiza o el Reino Unido.": "O TikTok não compartilha mensagens do Espaço Econômico Europeu, da Suíça ou do Reino Unido.",
   "Mensaje no compatible": "Mensagem não compatível",
-  "La conversación se cerró 48 horas después del último mensaje del contacto. Esperá a que te escriba de nuevo para responder.": "A conversa foi encerrada 48 horas após a última mensagem do contato. Espere que ele escreva de novo para responder."
+  "La conversación se cerró 48 horas después del último mensaje del contacto. Esperá a que te escriba de nuevo para responder.": "A conversa foi encerrada 48 horas após a última mensagem do contato. Espere que ele escreva de novo para responder.",
+  "Publicación": "Publicação",
+  "Reel": "Reel",
+  "Historia": "Story",
+  "Mención de historia": "Menção no story",
+  "Respuesta a historia": "Resposta ao story",
+  "La conversación se cerró 24 horas después del último mensaje del contacto. Esperá a que te escriba de nuevo para responder.": "A conversa foi encerrada 24 horas após a última mensagem do contato. Aguarde que ele escreva de novo para responder.",
+  "Si la configurás, los webhooks de mensajes de esta cuenta se envían directo a tu app en vez de a OpenBSP.": "Se você a configurar, os webhooks de mensagens desta conta vão direto para o seu app em vez do OpenBSP.",
+  "URL de webhook (opcional)": "URL do webhook (opcional)",
+  "WhatsApp cierra la conversación a las 24 horas del último mensaje recibido. Para abrir la conversación debes utilizar una plantilla.": "O WhatsApp encerra a conversa 24 horas após a última mensagem recebida. Para abri-la, você deve usar um modelo.",
+  "usuario@ejemplo.com": "usuario@exemplo.com",
+  "y": "e"
 }
