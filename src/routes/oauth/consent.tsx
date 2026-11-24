@@ -53,7 +53,10 @@ function OAuthConsent() {
     supabase.auth.oauth
       .getAuthorizationDetails(authorization_id)
       .then(({ data, error }) => {
-        if (error || !data) setInvalid(true);
+        // Consented before: the server answers only where to go back to.
+        const back = (data as { redirect_url?: string } | null)?.redirect_url;
+        if (back) globalThis.location.assign(back);
+        else if (error || !data?.client) setInvalid(true);
         else setDetails(data);
       })
       .catch(() => setInvalid(true));
@@ -83,7 +86,12 @@ function OAuthConsent() {
     globalThis.location.assign(data.redirect_url);
   }
 
-  const host = hostOf(details?.redirect_uri ?? details?.client.client_uri);
+  // Supabase Auth sends the client as { id, name, uri, logo_uri }; the
+  // supabase-js 2.81 types call them client_name and client_uri.
+  const client = details?.client as unknown as
+    | { name?: string; uri?: string }
+    | undefined;
+  const host = hostOf(details?.redirect_uri ?? client?.uri);
   const trusted = TRUSTED_HOSTS.some(
     (h) => host === h || host.endsWith("." + h),
   );
@@ -110,7 +118,7 @@ function OAuthConsent() {
         {!invalid && details && (
           <>
             <div className="text-center">
-              <span className="font-bold">{details.client.client_name}</span>{" "}
+              <span className="font-bold">{client?.name}</span>{" "}
               {t(
                 "quiere conectarse a OpenBSP como tú. Podrá actuar en tu nombre, dentro de tus permisos.",
               )}
