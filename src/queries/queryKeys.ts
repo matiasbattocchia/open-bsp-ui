@@ -75,6 +75,10 @@ export const queryKeys = {
     planProducts: (orgId: NullableId) =>
       [orgId, "billing", "plan_products"] as const,
   },
+  media: {
+    // A stored file by its internal uri, which names its organization.
+    file: (uri: NullableId) => ["media", uri] as const,
+  },
   messages: {
     // A message a reply quotes, by its re_message_id, when the chat has not
     // loaded it.

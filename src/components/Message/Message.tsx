@@ -13,7 +13,7 @@ import ImageMessage from "./ImageMessage";
 import VideoMessage from "./VideoMessage";
 import { mediaCategory, shareLabel, unsupportedLabel } from "./media";
 import StatusIcon from "./StatusIcon";
-import Quote from "./Quote";
+import Quote, { PostQuote } from "./Quote";
 import dayjs from "dayjs";
 import { Remarkable } from "remarkable";
 import {
@@ -498,7 +498,19 @@ export default function Message(props: UIMessage & { message: MessageRow }) {
     : undefined;
 
   const quoted = useQuotedMessage(props.message);
-  const quote = quoted && <Quote message={quoted} />;
+
+  // A comment shows the post it is on, unless it answers one that shows it.
+  // An API writer may leave the post out of an outgoing one.
+  const post =
+    props.message.content.type === "data" &&
+    props.message.content.kind === "comment"
+      ? props.message.content.data?.post
+      : undefined;
+  const quote = quoted ? (
+    <Quote message={quoted} />
+  ) : (
+    post && <PostQuote post={post} />
+  );
 
   const setReplyDraft = useBoundStore(
     (state) => state.chat.setConversationReplyDraft,
@@ -615,18 +627,11 @@ export default function Message(props: UIMessage & { message: MessageRow }) {
     props.message.content.type === "data" &&
     props.message.content.kind === "comment"
   ) {
-    // A comment on a post: the post it is on, then what was said. An API
-    // writer may leave the post out of an outgoing one.
-    const post = props.message.content.data?.post;
-    const label = post ? shareLabel(post.type, t) : undefined;
-    const on = post?.url ? `[${label}](${post.url})` : label;
+    // What was said; the post it is on is quoted atop it.
     content = (
       <TextMessage
         header={headerText}
-        body={
-          `💬 ${t("Comentario")}${on ? ` · ${on}` : ""}` +
-          `\n\n${props.message.content.text ?? ""}`
-        }
+        body={props.message.content.text ?? ""}
         type="markdown"
         direction={direction}
         timestamp={props.message.timestamp}

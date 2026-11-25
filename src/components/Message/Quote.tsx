@@ -1,6 +1,7 @@
-import { type ReactNode, useEffect, useMemo } from "react";
+import { type ReactNode } from "react";
 import { X } from "lucide-react";
 import {
+  type CommentPart,
   type MessageRow,
   contactName,
   isMultiParty,
@@ -8,10 +9,12 @@ import {
   messageDirection,
 } from "@/supabase/client";
 import useBoundStore from "@/stores/useBoundStore";
+import { useObjectUrl } from "@/hooks/useObjectUrl";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useCurrentAgents } from "@/queries/useAgents";
 import { useContactAddress } from "@/queries/useContactsAddresses";
 import { useCurrentOrganization } from "@/queries/useOrganizations";
+import { useStoredImage } from "@/queries/useStoredImage";
 import { formatPhoneNumber } from "@/utils/FormatUtils";
 import { scrollToMessage } from "@/utils/ReplyUtils";
 import { mediaPreview } from "../ChatListItem";
@@ -98,7 +101,7 @@ export default function Quote({
 
   const { icon, text } = summary(message, t);
 
-  // An image shows itself once the chat has it.
+  // An image shows itself once the chat has it; a comment, the post's cover.
   const blob = useBoundStore(
     (state) => state.chat.mediaLoads.get(message.id)?.blob,
   );
@@ -108,21 +111,83 @@ export default function Quote({
       message.content.kind,
       message.content.file.mime_type || "",
     ) === "image";
-  const thumbnail = useMemo(
-    () => (image && blob ? URL.createObjectURL(blob) : undefined),
-    [image, blob],
-  );
-  useEffect(
-    () => () => {
-      if (thumbnail) URL.revokeObjectURL(thumbnail);
-    },
-    [thumbnail],
+  const picture = useObjectUrl(image ? blob : undefined);
+  const cover = useStoredImage(
+    message.content.type === "data" && message.content.kind === "comment"
+      ? message.content.data?.post?.thumbnail
+      : undefined,
   );
 
   return (
-    <div
-      className="flex min-w-0 overflow-hidden rounded-[7.5px] bg-black/5 dark:bg-white/10 cursor-pointer"
+    <QuoteFrame
+      incoming={incoming}
+      title={author}
+      icon={icon}
+      text={text}
+      thumbnail={picture ?? cover}
       onClick={() => scrollToMessage(message.id)}
+      onClose={onClose}
+    />
+  );
+}
+
+/**
+ * The post a comment is on, atop the comment, as a reply quotes a message:
+ * what it is, its caption and its cover. Clicking it opens the post.
+ */
+export function PostQuote({ post }: { post: CommentPart["data"]["post"] }) {
+  const { translate: t } = useTranslation();
+
+  const cover = useStoredImage(post.thumbnail);
+
+  return (
+    <QuoteFrame
+      title={shareLabel(post.type, t)}
+      text={post.title}
+      thumbnail={cover}
+      thumbnailPending={!!post.thumbnail}
+      onClick={
+        post.url
+          ? () => window.open(post.url, "_blank", "noopener,noreferrer")
+          : undefined
+      }
+    />
+  );
+}
+
+/**
+ * A quote's look: a bar in the color of who said it, their name over a line
+ * of it, and a picture of it to the right.
+ */
+function QuoteFrame({
+  incoming,
+  title,
+  icon,
+  text,
+  thumbnail,
+  thumbnailPending,
+  onClick,
+  onClose,
+}: {
+  incoming?: boolean;
+  title: ReactNode;
+  icon?: ReactNode;
+  text?: ReactNode;
+  thumbnail?: string;
+  // The picture is coming: its place is kept.
+  thumbnailPending?: boolean;
+  onClick?: () => void;
+  onClose?: () => void;
+}) {
+  const { translate: t } = useTranslation();
+
+  return (
+    <div
+      className={
+        "flex min-w-0 overflow-hidden rounded-[7.5px] bg-black/5 dark:bg-white/10" +
+        (onClick ? " cursor-pointer" : "")
+      }
+      onClick={onClick}
     >
       <div
         className={
@@ -136,26 +201,32 @@ export default function Quote({
             (incoming ? "text-sky-600 dark:text-sky-400" : "text-primary")
           }
         >
-          {author}
+          {title}
         </div>
-        <div className="flex text-[13px] leading-[18px] text-muted-foreground">
-          {icon}
-          <span
-            className={
-              "break-words min-w-0 " +
-              (onClose ? "line-clamp-2" : "line-clamp-3")
-            }
-          >
-            {text}
-          </span>
-        </div>
+        {text && (
+          <div className="flex text-[13px] leading-[18px] text-muted-foreground">
+            {icon}
+            <span
+              className={
+                "break-words min-w-0 " +
+                (onClose ? "line-clamp-2" : "line-clamp-3")
+              }
+            >
+              {text}
+            </span>
+          </div>
+        )}
       </div>
-      {thumbnail && (
+      {thumbnail ? (
         <img
           src={thumbnail}
           alt=""
-          className="w-[60px] object-cover shrink-0"
+          className="w-[60px] min-h-[60px] object-cover shrink-0"
         />
+      ) : (
+        thumbnailPending && (
+          <div className="w-[60px] min-h-[60px] shrink-0 bg-black/5 dark:bg-white/10" />
+        )
       )}
       {onClose && (
         <button
