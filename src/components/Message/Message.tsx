@@ -320,7 +320,7 @@ function ReplyButton({
       title={t("Responder")}
       onClick={onReply}
       className={
-        "absolute top-1/2 -translate-y-1/2 p-[6px] rounded-full bg-background/80 text-muted-foreground shadow cursor-pointer opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100 hover:text-foreground" +
+        "absolute top-1/2 -translate-y-1/2 p-[6px] rounded-full bg-incoming-chat-bubble text-muted-foreground shadow cursor-pointer opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100 hover:text-foreground" +
         (side === "right" ? " left-full ml-[8px]" : " right-full mr-[8px]")
       }
     >
@@ -536,10 +536,12 @@ export default function Message(props: UIMessage & { message: MessageRow }) {
           message: props.message,
         })
     : undefined;
-  // A comment says so: an answer under one, quoting it, would otherwise look
-  // like a private message answering it.
+  // A comment under a post shows it. One answering another says it is a
+  // comment: it would otherwise look like a private message answering it.
   const label =
-    props.message.content.kind === "comment" ? t("Comentario") : undefined;
+    props.message.content.kind === "comment" && quoted
+      ? t("Comentario")
+      : undefined;
 
   const reply = { messageId: props.message.id, label, quote, onReply };
 
