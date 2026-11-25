@@ -520,5 +520,11 @@
   "Conectar una cuenta": "Connecter un compte",
   "Consultar la API": "Interroger l'API",
   "Cambiar a través de la API": "Modifier via l'API",
-  "Referencia de la API": "Référence de l'API"
+  "Referencia de la API": "Référence de l'API",
+  "Tú": "Vous",
+  "Cancelar respuesta": "Annuler la réponse",
+  "En privado": "En privé",
+  "En público": "En public",
+  "Responder en privado al comentario": "Répondre en privé au commentaire",
+  "Instagram responde en privado una vez por comentario, dentro de los 7 días.": "Instagram permet une seule réponse privée par commentaire, dans les 7 jours."
 }

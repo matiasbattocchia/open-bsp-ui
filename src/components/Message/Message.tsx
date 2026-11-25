@@ -13,9 +13,16 @@ import ImageMessage from "./ImageMessage";
 import VideoMessage from "./VideoMessage";
 import { mediaCategory, shareLabel, unsupportedLabel } from "./media";
 import StatusIcon from "./StatusIcon";
+import Quote from "./Quote";
 import dayjs from "dayjs";
 import { Remarkable } from "remarkable";
-import { type FormEventHandler, type PropsWithChildren, useState } from "react";
+import {
+  type FormEventHandler,
+  type PropsWithChildren,
+  type ReactNode,
+  useState,
+} from "react";
+import { Reply } from "lucide-react";
 import { prettyPrintJson } from "pretty-print-json";
 import { useTranslation } from "@/hooks/useTranslation";
 import AvatarComponent from "@/components/Avatar";
@@ -25,6 +32,8 @@ import { useContactAddress } from "@/queries/useContactsAddresses";
 import { formatPhoneNumber } from "@/utils/FormatUtils";
 import { AVATAR_BG_COLORS, AVATAR_TEXT_COLORS } from "@/utils/colors";
 import type { Json } from "@/supabase/db_types";
+import { useQuotedMessage } from "@/queries/useQuotedMessage";
+import { replyRef } from "@/utils/ReplyUtils";
 
 const md = new Remarkable({
   breaks: true,
@@ -295,19 +304,56 @@ const textMsgMaxWidth = " max-w-[90%] lg:max-w-[65%]";
 
 const msgTailClasses = "w-[8px] h-[13px] absolute top-0";
 
+// Beside the bubble, on the side away from the avatar: shown on hover.
+function ReplyButton({
+  onReply,
+  side,
+}: {
+  onReply: () => void;
+  side: "left" | "right";
+}) {
+  const { translate: t } = useTranslation();
+
+  return (
+    <button
+      type="button"
+      title={t("Responder")}
+      onClick={onReply}
+      className={
+        "absolute top-1/2 -translate-y-1/2 p-[6px] rounded-full bg-background/80 text-muted-foreground shadow cursor-pointer opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100 hover:text-foreground" +
+        (side === "right" ? " left-full ml-[8px]" : " right-full mr-[8px]")
+      }
+    >
+      <Reply className="w-[16px] h-[16px]" />
+    </button>
+  );
+}
+
+// The message answered, atop the answer. A media bubble keeps its own width:
+// the quote fits in it.
+function QuoteSlot({ quote, text }: { quote: ReactNode; text?: boolean }) {
+  return (
+    <div className={"mb-[2px]" + (text ? "" : " w-0 min-w-full")}>{quote}</div>
+  );
+}
+
 export function InMessage({
   text,
   first,
   last,
   avatar,
   senderName,
+  messageId,
+  quote,
+  onReply,
   children,
 }: PropsWithChildren<UIMessage>) {
   return (
     <div
+      id={messageId && `message-${messageId}`}
       className={
         (avatar ? avatarMsgRowClasses : msgRowClasses) +
-        " justify-start" +
+        " group justify-start" +
         (last ? " mb-[12px]" : " mb-[2px]")
       }
     >
@@ -338,7 +384,9 @@ export function InMessage({
             {senderName}
           </div>
         )}
+        {quote && <QuoteSlot quote={quote} text={text} />}
         {children}
+        {onReply && <ReplyButton onReply={onReply} side="right" />}
       </div>
     </div>
   );
@@ -351,12 +399,16 @@ export function OutMessage({
   children,
   avatar,
   internal,
+  messageId,
+  quote,
+  onReply,
 }: PropsWithChildren<UIMessage>) {
   return (
     <div
+      id={messageId && `message-${messageId}`}
       className={
         (avatar ? avatarMsgRowClasses : msgRowClasses) +
-        " justify-end" +
+        " group justify-end" +
         (last ? " mb-[12px]" : " mb-[2px]")
       }
     >
@@ -387,7 +439,9 @@ export function OutMessage({
           </>
         )}
         {!!avatar && first && <Avatar {...avatar} display="name" />}
+        {quote && <QuoteSlot quote={quote} text={text} />}
         {children}
+        {onReply && <ReplyButton onReply={onReply} side="left" />}
       </div>
     </div>
   );
@@ -407,6 +461,12 @@ type UIMessage = {
   // Sender label for incoming messages from a contact, when there is more than
   // one contact it could be.
   senderName?: string;
+  // What the row is found by, to go to it from a quote.
+  messageId?: string;
+  // The message this one answers.
+  quote?: ReactNode;
+  // Makes the next message answer this one, where the service can.
+  onReply?: () => void;
 };
 
 export default function Message(props: UIMessage & { message: MessageRow }) {
@@ -436,6 +496,20 @@ export default function Message(props: UIMessage & { message: MessageRow }) {
     ? contactName(senderContact?.extra) ||
       formatPhoneNumber(props.message.sender_address!)
     : undefined;
+
+  const quoted = useQuotedMessage(props.message);
+  const quote = quoted && <Quote message={quoted} />;
+
+  const setReplyDraft = useBoundStore(
+    (state) => state.chat.setConversationReplyDraft,
+  );
+  const onReply = replyRef(props.message)
+    ? () =>
+        setReplyDraft(props.message.conversation_id, {
+          message: props.message,
+        })
+    : undefined;
+  const reply = { messageId: props.message.id, quote, onReply };
 
   let content;
   let text = false;
@@ -675,7 +749,7 @@ export default function Message(props: UIMessage & { message: MessageRow }) {
   return (
     <>
       {direction === "incoming" && (
-        <InMessage {...{ ...props, text, fixedWidth, senderName }}>
+        <InMessage {...{ ...props, ...reply, text, fixedWidth, senderName }}>
           {content}
         </InMessage>
       )}
@@ -683,6 +757,7 @@ export default function Message(props: UIMessage & { message: MessageRow }) {
         <OutMessage
           {...{
             ...props,
+            ...reply,
             text,
             internal: direction === "internal",
             fixedWidth,

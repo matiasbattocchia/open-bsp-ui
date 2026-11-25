@@ -75,4 +75,15 @@ export const queryKeys = {
     planProducts: (orgId: NullableId) =>
       [orgId, "billing", "plan_products"] as const,
   },
+  messages: {
+    // A message a reply quotes, by its re_message_id, when the chat has not
+    // loaded it.
+    quoted: (
+      orgId: NullableId,
+      organizationAddress: string,
+      service: string,
+      ref: NullableId,
+    ) =>
+      [orgId, "messages", "quoted", organizationAddress, service, ref] as const,
+  },
 };

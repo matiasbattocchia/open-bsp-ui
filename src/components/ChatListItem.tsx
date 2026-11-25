@@ -33,7 +33,10 @@ import { useContactAddress } from "@/queries/useContactsAddresses";
 import { formatPhoneNumber, nameInitials } from "@/utils/FormatUtils";
 import { useNavigate } from "@tanstack/react-router";
 
-function mediaPreview(t: (content: string) => ReactNode, message?: MessageRow) {
+export function mediaPreview(
+  t: (content: string) => ReactNode,
+  message?: MessageRow,
+) {
   let mediaIcon = null;
   let mediaIconClass = "mr-[3px]";
   let mediaPreviewContent: ReactNode = "";

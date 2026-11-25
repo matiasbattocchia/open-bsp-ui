@@ -30,7 +30,11 @@ import {
 import { useTextLength } from "@/queries/useTextLimit";
 import { moveCursorToEnd } from "@/utils/UtilityFunctions";
 import { htmlToMarkdown } from "@/utils/htmlToMarkdown";
+import { replyRef } from "@/utils/ReplyUtils";
+import { useReplyTo } from "@/hooks/useReplyTo";
 import TemplatePicker from "./TemplatePicker";
+import Quote from "./Message/Quote";
+import PillToggle from "./PillToggle";
 
 function TemplateVarInput({
   placeholder,
@@ -126,6 +130,7 @@ export default function ChatFooter() {
 
   const tick = useContext(TickContext); // one-minute ticks
 
+  // A comment opens no window: only what the contact writes in private does.
   const mostRecentIncoming: MessageRow | undefined = useBoundStore((store) => {
     const msgs = store.chat.messages.get(store.ui.activeConvId || "")?.values();
 
@@ -139,41 +144,73 @@ export default function ChatFooter() {
           msg,
           store.chat.ownAgentId,
           isTeamChat(store.chat.conversations.get(msg.conversation_id)),
-        )
+        ) &&
+        msg.content.kind !== "comment"
       ) {
         return msg;
       }
     }
   });
 
-  // TikTok answers a commenter only in public, under the comment: when the
-  // contact last wrote a comment, that is what the composer answers.
-  const commentToAnswer =
-    conv?.service === "tiktok" &&
-    mostRecentIncoming?.content.kind === "comment" &&
-    mostRecentIncoming.external_id
-      ? {
-          id: mostRecentIncoming.external_id,
-          post: mostRecentIncoming.content.data?.post,
-        }
+  const {
+    replyTo,
+    setInPublic,
+    clear: clearReply,
+    close: closeReply,
+  } = useReplyTo(activeConvId);
+  const comment =
+    replyTo?.message.content.type === "data" &&
+    replyTo.message.content.kind === "comment"
+      ? { ...replyTo.message, content: replyTo.message.content }
       : undefined;
+
+  // Instagram answers a comment in private once, within 7 days of it; TikTok
+  // only in public, under it.
+  const answeredInPrivate = useBoundStore((store) => {
+    if (comment?.service !== "instagram") return false;
+
+    for (const msg of store.chat.messages
+      .get(comment.conversation_id)
+      ?.values() || []) {
+      if (
+        msg.sender_address === null &&
+        msg.content.type === "text" &&
+        msg.content.re_message_id === comment.external_id &&
+        !(msg.status as { failed?: string } | null)?.failed
+      ) {
+        return true;
+      }
+    }
+
+    return false;
+  });
+  const canAnswerInPrivate =
+    comment?.service === "instagram" &&
+    !answeredInPrivate &&
+    tick.isBefore(dayjs(comment.timestamp).add(7, "day"));
+  const commentReply = comment
+    ? canAnswerInPrivate && !replyTo?.inPublic
+      ? "private"
+      : "public"
+    : undefined;
 
   // Wether or not the user is allowed to send messages to the client.
   // WhatsApp (Cloud API) and Instagram both enforce a 24h customer-service
-  // window since the contact's last message, TikTok a 48h one (none for a
-  // comment); `local` (internal testing) and `whatsapp-web` (unofficial
-  // bridge) have no window.
+  // window since the contact's last message, TikTok a 48h one; `local`
+  // (internal testing) and `whatsapp-web` (unofficial bridge) have no window.
+  // A comment is answered whatever the window.
   const windowHours =
     conv?.service === "whatsapp" || conv?.service === "instagram"
       ? 24
-      : conv?.service === "tiktok" && !commentToAnswer
+      : conv?.service === "tiktok"
         ? 48
         : undefined;
   const windowEnd = dayjs(mostRecentIncoming?.timestamp || 0).add(
     windowHours ?? 0,
     "hour",
   );
-  const inCSWindow = windowHours === undefined || tick.isBefore(windowEnd);
+  const inCSWindow =
+    !!comment || windowHours === undefined || tick.isBefore(windowEnd);
 
   // Templates count too: at the messages cap nothing more goes out, whatever
   // the window.
@@ -184,7 +221,7 @@ export default function ChatFooter() {
   // out as several.
   const text = useTextLength(
     conv?.service,
-    commentToAnswer ? "comment" : "text",
+    commentReply === "public" ? "comment" : "text",
     message,
   );
   const navigate = useNavigate();
@@ -298,6 +335,20 @@ export default function ChatFooter() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeConvId, draft]);
 
+  // Choosing what to answer is starting to write.
+  useEffect(() => {
+    if (
+      replyTo &&
+      canSend &&
+      editableDiv.current &&
+      window.matchMedia("(min-width: 768px)").matches
+    ) {
+      editableDiv.current.focus();
+      moveCursorToEnd(editableDiv.current);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [replyTo?.message.id]);
+
   const sendTextMessage = async () => {
     if (!activeConvId || !conv || !message || text.over) {
       return;
@@ -308,22 +359,27 @@ export default function ChatFooter() {
     // If the conv has the `updated_at` unset, it means it has not been pushed to the DB yet.
     !conv.updated_at && (await pushConversationToDb(conv));
 
+    const re_message_id = replyTo && replyRef(replyTo.message);
+
+    // A comment answered in public is a comment under it; anything else is a
+    // text, naming what it answers (an Instagram comment's private reply).
     const record = newMessage(
       conv,
-      commentToAnswer
+      comment && commentReply === "public"
         ? {
             version: "1",
             type: "data",
             kind: "comment",
-            data: { post: commentToAnswer.post! },
+            data: comment.content.data,
             text: message,
-            re_message_id: commentToAnswer.id,
+            re_message_id,
           }
         : {
             version: "1",
             type: "text",
             kind: "text",
             text: message,
+            ...(re_message_id && { re_message_id }),
           },
       agentId,
     );
@@ -331,6 +387,7 @@ export default function ChatFooter() {
     pushMessageToStore({ ...record, conversation_id: conv.id });
     await pushMessageToDb(record);
 
+    clearReply();
     setMessage("");
     // TODO: optimization: combine with the updateConvExtra call - cabra 2025-01-16
     draft && saveDraft(conv, "").catch(console.error);
@@ -537,7 +594,10 @@ export default function ChatFooter() {
         {templatePicker && <TemplatePicker />}
         <div
           className={
-            "flex items-end text-foreground p-[5px] rounded-[24px] shadow-[0_0_4px_0px_rgba(0,0,0,0.1)]" +
+            "text-foreground p-[5px] shadow-[0_0_4px_0px_rgba(0,0,0,0.1)]" +
+            (replyTo && !templateDraft
+              ? " rounded-[18px]"
+              : " rounded-[24px]") +
             (templateDraft
               ? " bg-incoming-chat-bubble"
               : !canSend
@@ -545,227 +605,259 @@ export default function ChatFooter() {
                 : " bg-incoming-chat-bubble")
           }
         >
-          <div className="shrink-0">
-            {templateDraft ? (
-              <button
-                className="p-[8px] rounded-full cursor-pointer hover:bg-accent"
-                onClick={() => setTemplateDraft(activeConvId, null)}
-                title={t("Descartar plantilla")}
-              >
-                <X className="w-[24px] h-[24px]" />
-              </button>
-            ) : (
-              <button
-                // A comment is answered with text only.
-                disabled={!canSend || !!commentToAnswer}
-                className={
-                  "p-[8px] rounded-full" +
-                  (commentToAnswer
-                    ? " opacity-50"
-                    : !canSend
-                      ? ""
-                      : " cursor-pointer hover:bg-accent")
-                }
-                onClick={() => fileInput.current?.click()}
-                title={t("Adjuntar")}
-              >
-                <Plus className="w-[24px] h-[24px]" />
-              </button>
-            )}
-          </div>
-
-          <input
-            disabled={!canSend}
-            ref={fileInput}
-            type="file"
-            multiple={true}
-            className="hidden"
-            // TikTok sends JPG and PNG images, nothing else.
-            accept={conv?.service === "tiktok" ? "image/jpeg,image/png" : "*/*"}
-            onChange={(event) => {
-              if (!event.target.files?.length) {
-                return;
-              }
-
-              const drafts = Array.from(event.target.files).map<FileDraft>(
-                (file) => ({
-                  file,
-                }),
-              );
-
-              drafts[0].caption = message;
-
-              setFileDrafts(drafts);
-            }}
-          />
-
-          {/* Text input or template mode */}
-          <div className="relative grow">
-            {templateDraft ? (
-              renderTemplateBody()
-            ) : (
-              <>
-                <div
-                  ref={editableDiv}
-                  contentEditable={canSend}
-                  className={`${
-                    !canSend ? "cursor-pointer" : ""
-                  } outline-none mx-[5px] py-[10px] min-h-[40px] max-h-40 overflow-y-auto text-[15px] leading-[20px] break-words`}
-                  onInput={(event) => {
-                    if (!(event.target instanceof Element)) {
-                      return;
-                    }
-
-                    // Use secure utility to sanitize and convert HTML to Markdown
-                    const message = htmlToMarkdown(
-                      event.currentTarget.innerHTML,
-                    );
-
-                    setMessage(message);
-
-                    if (conv.created_at !== conv.updated_at) {
-                      // no drafts for new convs, sorry!
-                      debounce(() => saveDraft(conv, message), 3000); // milliseconds
-                    }
-                  }}
-                  onKeyDown={(event) => {
-                    if (
-                      event.key === "Enter" &&
-                      !event.shiftKey &&
-                      window.matchMedia("(min-width: 768px)").matches
-                    ) {
-                      event.preventDefault();
-                      sendTextMessage().catch(onSendError);
-                    }
-                  }}
-                  onClick={onLockedClick}
-                  title={
-                    quotaReached
-                      ? t(
-                          "No se envían más mensajes; los recibidos siguen llegando.",
-                        )
-                      : inCSWindow
-                        ? undefined
-                        : conv.service === "whatsapp"
-                          ? t(
-                              "WhatsApp cierra la conversación a las 24 horas del último mensaje recibido. Para abrir la conversación debes utilizar una plantilla.",
-                            )
-                          : conv.service === "tiktok"
-                            ? t(
-                                "La conversación se cerró 48 horas después del último mensaje del contacto. Esperá a que te escriba de nuevo para responder.",
-                              )
-                            : t(
-                                "La conversación se cerró 24 horas después del último mensaje del contacto. Esperá a que te escriba de nuevo para responder.",
-                              )
+          {replyTo && !templateDraft && (
+            <div className="mb-[4px]">
+              <Quote message={replyTo.message} onClose={closeReply} />
+              {comment?.service === "instagram" && (
+                <div className="mt-[4px]">
+                  <PillToggle
+                    options={[
+                      {
+                        value: "private",
+                        label: t("En privado"),
+                        disabled: !canAnswerInPrivate,
+                        title: canAnswerInPrivate
+                          ? undefined
+                          : t(
+                              "Instagram responde en privado una vez por comentario, dentro de los 7 días.",
+                            ),
+                      },
+                      { value: "public", label: t("En público") },
+                    ]}
+                    value={commentReply!}
+                    onChange={(value) => setInPublic(value === "public")}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+          <div className="flex items-end">
+            <div className="shrink-0">
+              {templateDraft ? (
+                <button
+                  className="p-[8px] rounded-full cursor-pointer hover:bg-accent"
+                  onClick={() => setTemplateDraft(activeConvId, null)}
+                  title={t("Descartar plantilla")}
+                >
+                  <X className="w-[24px] h-[24px]" />
+                </button>
+              ) : (
+                <button
+                  // A comment is answered with text only.
+                  disabled={!canSend || !!comment}
+                  className={
+                    "p-[8px] rounded-full" +
+                    (comment
+                      ? " opacity-50"
+                      : !canSend
+                        ? ""
+                        : " cursor-pointer hover:bg-accent")
                   }
-                />
-                {(!message || !canSend) && (
+                  onClick={() => fileInput.current?.click()}
+                  title={t("Adjuntar")}
+                >
+                  <Plus className="w-[24px] h-[24px]" />
+                </button>
+              )}
+            </div>
+
+            <input
+              disabled={!canSend}
+              ref={fileInput}
+              type="file"
+              multiple={true}
+              className="hidden"
+              // TikTok sends JPG and PNG images, nothing else.
+              accept={
+                conv?.service === "tiktok" ? "image/jpeg,image/png" : "*/*"
+              }
+              onChange={(event) => {
+                if (!event.target.files?.length) {
+                  return;
+                }
+
+                const drafts = Array.from(event.target.files).map<FileDraft>(
+                  (file) => ({
+                    file,
+                  }),
+                );
+
+                drafts[0].caption = message;
+
+                setFileDrafts(drafts);
+              }}
+            />
+
+            {/* Text input or template mode */}
+            <div className="relative grow">
+              {templateDraft ? (
+                renderTemplateBody()
+              ) : (
+                <>
                   <div
-                    className={
-                      "absolute bottom-[1px] py-[10px] mx-[5px] max-h-[40px] text-[15px] text-muted-foreground" +
-                      (canSend ? "" : " cursor-pointer")
+                    ref={editableDiv}
+                    contentEditable={canSend}
+                    className={`${
+                      !canSend ? "cursor-pointer" : ""
+                    } outline-none mx-[5px] py-[10px] min-h-[40px] max-h-40 overflow-y-auto text-[15px] leading-[20px] break-words`}
+                    onInput={(event) => {
+                      if (!(event.target instanceof Element)) {
+                        return;
+                      }
+
+                      // Use secure utility to sanitize and convert HTML to Markdown
+                      const message = htmlToMarkdown(
+                        event.currentTarget.innerHTML,
+                      );
+
+                      setMessage(message);
+
+                      if (conv.created_at !== conv.updated_at) {
+                        // no drafts for new convs, sorry!
+                        debounce(() => saveDraft(conv, message), 3000); // milliseconds
+                      }
+                    }}
+                    onKeyDown={(event) => {
+                      if (
+                        event.key === "Enter" &&
+                        !event.shiftKey &&
+                        window.matchMedia("(min-width: 768px)").matches
+                      ) {
+                        event.preventDefault();
+                        sendTextMessage().catch(onSendError);
+                      }
+                    }}
+                    onClick={onLockedClick}
+                    title={
+                      quotaReached
+                        ? t(
+                            "No se envían más mensajes; los recibidos siguen llegando.",
+                          )
+                        : inCSWindow
+                          ? undefined
+                          : conv.service === "whatsapp"
+                            ? t(
+                                "WhatsApp cierra la conversación a las 24 horas del último mensaje recibido. Para abrir la conversación debes utilizar una plantilla.",
+                              )
+                            : conv.service === "tiktok"
+                              ? t(
+                                  "La conversación se cerró 48 horas después del último mensaje del contacto. Esperá a que te escriba de nuevo para responder.",
+                                )
+                              : t(
+                                  "La conversación se cerró 24 horas después del último mensaje del contacto. Esperá a que te escriba de nuevo para responder.",
+                                )
                     }
-                    onClick={() =>
-                      canSend ? editableDiv.current?.focus() : onLockedClick()
-                    }
-                  >
-                    {quotaReached ? (
-                      <>
-                        <span className="lg:hidden">
-                          {t("Límite de mensajes alcanzado")}
-                        </span>
-                        <span className="hidden lg:inline">
-                          {t(
-                            "Límite de mensajes alcanzado, mejora el plan para seguir enviando",
-                          )}
-                        </span>
-                      </>
-                    ) : !inCSWindow ? (
-                      conv.service === "whatsapp" ? (
+                  />
+                  {(!message || !canSend) && (
+                    <div
+                      className={
+                        "absolute bottom-[1px] py-[10px] mx-[5px] max-h-[40px] text-[15px] text-muted-foreground" +
+                        (canSend ? "" : " cursor-pointer")
+                      }
+                      onClick={() =>
+                        canSend ? editableDiv.current?.focus() : onLockedClick()
+                      }
+                    >
+                      {quotaReached ? (
                         <>
                           <span className="lg:hidden">
-                            {t("Conversación cerrada")}
+                            {t("Límite de mensajes alcanzado")}
                           </span>
                           <span className="hidden lg:inline">
                             {t(
-                              "Conversación cerrada, abre la conversación con una plantilla",
+                              "Límite de mensajes alcanzado, mejora el plan para seguir enviando",
                             )}
                           </span>
                         </>
+                      ) : !inCSWindow ? (
+                        conv.service === "whatsapp" ? (
+                          <>
+                            <span className="lg:hidden">
+                              {t("Conversación cerrada")}
+                            </span>
+                            <span className="hidden lg:inline">
+                              {t(
+                                "Conversación cerrada, abre la conversación con una plantilla",
+                              )}
+                            </span>
+                          </>
+                        ) : (
+                          <span>{t("Conversación cerrada")}</span>
+                        )
+                      ) : commentReply === "public" ? (
+                        <span>{t("Responder en público al comentario")}</span>
+                      ) : commentReply === "private" ? (
+                        <span>{t("Responder en privado al comentario")}</span>
+                      ) : windowHours !== undefined ? (
+                        <>
+                          <span className="lg:hidden">{t("Cerrará en")}</span>
+                          <span className="hidden lg:inline">
+                            {t("La conversación cerrará en")}
+                          </span>{" "}
+                          <span>{remaining}</span>
+                        </>
                       ) : (
-                        <span>{t("Conversación cerrada")}</span>
-                      )
-                    ) : commentToAnswer ? (
-                      <span>{t("Responder en público al comentario")}</span>
-                    ) : windowHours !== undefined ? (
-                      <>
-                        <span className="lg:hidden">{t("Cerrará en")}</span>
-                        <span className="hidden lg:inline">
-                          {t("La conversación cerrará en")}
-                        </span>{" "}
-                        <span>{remaining}</span>
-                      </>
-                    ) : (
-                      <span>{t("Escribe un mensaje")}</span>
-                    )}
-                  </div>
-                )}
-              </>
-            )}
-          </div>
+                        <span>{t("Escribe un mensaje")}</span>
+                      )}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
 
-          {!templateDraft && canSend && text.near && (
-            <span
+            {!templateDraft && canSend && text.near && (
+              <span
+                className={
+                  "shrink-0 self-end mx-[6px] py-[12px] text-[12px] leading-[16px] tabular-nums" +
+                  (text.over ? " text-destructive" : " text-muted-foreground")
+                }
+              >
+                {text.length}/{text.limit}
+              </span>
+            )}
+
+            {/* Send button */}
+            <button
+              disabled={
+                quotaReached ||
+                (templateDraft ? !allVarsFilled : !inCSWindow || text.over)
+              }
               className={
-                "shrink-0 self-end mx-[6px] py-[12px] text-[12px] leading-[16px] tabular-nums" +
-                (text.over ? " text-destructive" : " text-muted-foreground")
+                "p-[8px] rounded-full bg-primary disabled:opacity-50" +
+                (quotaReached
+                  ? ""
+                  : templateDraft
+                    ? allVarsFilled
+                      ? " cursor-pointer"
+                      : ""
+                    : !inCSWindow || text.over
+                      ? ""
+                      : " cursor-pointer")
+              }
+              onClick={() => {
+                if (quotaReached) {
+                  return;
+                } else if (templateDraft) {
+                  allVarsFilled && sendTemplateMessage().catch(onSendError);
+                } else if (message) {
+                  sendTextMessage().catch(onSendError);
+                }
+              }}
+              title={
+                templateDraft
+                  ? t("Enviar plantilla")
+                  : text.over
+                    ? commentReply === "public"
+                      ? t("Demasiado largo para un comentario")
+                      : t("Demasiado largo: divídelo en varios mensajes")
+                    : t("Enviar mensaje")
               }
             >
-              {text.length}/{text.limit}
-            </span>
-          )}
-
-          {/* Send button */}
-          <button
-            disabled={
-              quotaReached ||
-              (templateDraft ? !allVarsFilled : !inCSWindow || text.over)
-            }
-            className={
-              "p-[8px] rounded-full bg-primary disabled:opacity-50" +
-              (quotaReached
-                ? ""
-                : templateDraft
-                  ? allVarsFilled
-                    ? " cursor-pointer"
-                    : ""
-                  : !inCSWindow || text.over
-                    ? ""
-                    : " cursor-pointer")
-            }
-            onClick={() => {
-              if (quotaReached) {
-                return;
-              } else if (templateDraft) {
-                allVarsFilled && sendTemplateMessage().catch(onSendError);
-              } else if (message) {
-                sendTextMessage().catch(onSendError);
-              }
-            }}
-            title={
-              templateDraft
-                ? t("Enviar plantilla")
-                : text.over
-                  ? commentToAnswer
-                    ? t("Demasiado largo para un comentario")
-                    : t("Demasiado largo: divídelo en varios mensajes")
-                  : t("Enviar mensaje")
-            }
-          >
-            <svg className="w-[24px] h-[24px] transition text-primary-foreground">
-              <use href="/icons.svg#send" />
-            </svg>
-          </button>
+              <svg className="w-[24px] h-[24px] transition text-primary-foreground">
+                <use href="/icons.svg#send" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     )

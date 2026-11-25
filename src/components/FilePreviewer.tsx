@@ -17,6 +17,8 @@ import { useCurrentAgent } from "@/queries/useAgents";
 import { textLength, useTextLength } from "@/queries/useTextLimit";
 import { moveCursorToEnd } from "@/utils/UtilityFunctions";
 import { htmlToMarkdown } from "@/utils/htmlToMarkdown";
+import { replyRef } from "@/utils/ReplyUtils";
+import { useReplyTo } from "@/hooks/useReplyTo";
 
 const FilePreviewer = () => {
   const { translate: t } = useTranslation();
@@ -45,6 +47,7 @@ const FilePreviewer = () => {
     store.chat.membershipExtras.get(store.ui.activeConvId || ""),
   )?.draft;
   const setMediaLoad = useBoundStore((store) => store.chat.setMediaLoad);
+  const { replyTo, clear: clearReply } = useReplyTo(activeConvId);
 
   const [previewIndex, setPreviewIndex] = useState(0);
 
@@ -163,6 +166,13 @@ const FilePreviewer = () => {
     // If the conv has the `updated_at` unset, it means it has not been pushed to the DB yet.
     !conv.updated_at && (await pushConversationToDb(conv));
 
+    // The first file answers what the composer was answering; a comment is
+    // answered with text only.
+    let re_message_id =
+      replyTo && replyTo.message.content.kind !== "comment"
+        ? replyRef(replyTo.message)
+        : undefined;
+
     for (const draft of drafts) {
       const fileKind = isImage(draft.file.type) ? "image" : "document";
 
@@ -179,6 +189,7 @@ const FilePreviewer = () => {
             size: draft.file.size,
           },
           text: draft.caption, // caption
+          ...(re_message_id && { re_message_id }),
         },
         agentId,
         draft.file,
@@ -191,7 +202,10 @@ const FilePreviewer = () => {
       });
 
       pushMessageToStore(record);
+      re_message_id = undefined;
     }
+
+    if (replyTo && replyTo.message.content.kind !== "comment") clearReply();
 
     setConversationTextDraft(activeConvId, "");
     draft && saveDraft(conv, "").catch(console.error);

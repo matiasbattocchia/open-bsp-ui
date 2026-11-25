@@ -39,6 +39,14 @@ export type FileDraft = {
   caption?: string;
 };
 
+/** The message a conversation's next message answers, chosen with Reply. */
+export type ReplyDraft = {
+  message: MessageRow;
+  // Instagram answers a comment either under it, in public, or in a DM to its
+  // author.
+  inPublic?: boolean;
+};
+
 type MediaLoad = {
   blob?: Blob;
   type: "upload" | "download";
@@ -56,6 +64,10 @@ export type ChatState = {
   messages: Map<string, Map<string, MessageRow>>; // TODO: replace the nested maps with a data structure capable of prefix search (a Trie) - cabra 2024/07/26
   textDrafts: Map<string, string>;
   fileDrafts: Map<string, FileDraft[]>;
+  replyDrafts: Map<string, ReplyDraft>;
+  // Per conversation, the comment the composer proposed answering and the
+  // member closed (see useReplyTo): it is not proposed again.
+  dismissedReplies: Map<string, string>;
   mediaLoads: Map<string, MediaLoad>;
 };
 
@@ -73,6 +85,8 @@ export type ChatActions = {
   setMediaLoad: (messageId: string, mediaLoad: MediaLoad) => void;
   setConversationTextDraft: (convId: string, textDraft: string) => void;
   setConversationFileDrafts: (convId: string, drafts: FileDraft[]) => void;
+  setConversationReplyDraft: (convId: string, draft?: ReplyDraft) => void;
+  dismissReply: (convId: string, messageId: string) => void;
   setConversationFileDraftCaption: (
     convId: string,
     draftIndex: number,
@@ -98,6 +112,8 @@ export const createChatSlice: StateCreator<Partial<AppState>> = (
   messages: new Map(),
   textDrafts: new Map(),
   fileDrafts: new Map(),
+  replyDrafts: new Map(),
+  dismissedReplies: new Map(),
   mediaLoads: new Map(),
   setOwnAgentId: (agentId: string | null) =>
     set((state) => ({ chat: { ...state.chat, ownAgentId: agentId } })),
@@ -238,6 +254,26 @@ export const createChatSlice: StateCreator<Partial<AppState>> = (
           fileDrafts,
         },
       };
+    });
+  },
+  setConversationReplyDraft: (convId: string, draft?: ReplyDraft) => {
+    set((state) => {
+      const replyDrafts = new Map(state.chat.replyDrafts);
+
+      if (draft) {
+        replyDrafts.set(convId, draft);
+      } else {
+        replyDrafts.delete(convId);
+      }
+
+      return { chat: { ...state.chat, replyDrafts } };
+    });
+  },
+  dismissReply: (convId: string, messageId: string) => {
+    set((state) => {
+      const dismissedReplies = new Map(state.chat.dismissedReplies);
+      dismissedReplies.set(convId, messageId);
+      return { chat: { ...state.chat, dismissedReplies } };
     });
   },
   setConversationFileDraftCaption: (

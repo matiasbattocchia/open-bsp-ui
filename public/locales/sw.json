@@ -520,5 +520,11 @@
   "Conectar una cuenta": "Unganisha akaunti",
   "Consultar la API": "Uliza API",
   "Cambiar a través de la API": "Badilisha kupitia API",
-  "Referencia de la API": "Marejeleo ya API"
+  "Referencia de la API": "Marejeleo ya API",
+  "Tú": "Wewe",
+  "Cancelar respuesta": "Ghairi jibu",
+  "En privado": "Kwa faragha",
+  "En público": "Hadharani",
+  "Responder en privado al comentario": "Jibu maoni kwa faragha",
+  "Instagram responde en privado una vez por comentario, dentro de los 7 días.": "Instagram inaruhusu jibu moja la faragha kwa kila maoni, ndani ya siku 7."
 }
