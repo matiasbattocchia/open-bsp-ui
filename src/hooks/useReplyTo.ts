@@ -2,33 +2,44 @@ import useBoundStore from "@/stores/useBoundStore";
 import { type ReplyDraft } from "@/stores/chatSlice";
 import { isIncoming, isInternal, isTeamChat } from "@/supabase/client";
 import { replyRef } from "@/utils/ReplyUtils";
+import { useServiceWindow } from "./useServiceWindow";
 
 /**
  * The message a conversation's next message answers: the one chosen with
- * Reply. On TikTok, with none chosen, the contact's comment when it is the
- * last word: TikTok answers a commenter only in public, under the comment, so
- * that is proposed until someone answers or the member closes it.
+ * Reply. With none chosen, the window closed and a comment the last word
+ * (the contact's, or our answer to it), the contact's latest comment: an
+ * answer under it is then all that can go out, so it is proposed until the
+ * member closes it.
  */
 export function useReplyTo(convId: string | null | undefined) {
   const id = convId || "";
+
+  const { open, privately } = useServiceWindow(convId);
 
   const chosen = useBoundStore((store) => store.chat.replyDrafts.get(id));
   const dismissed = useBoundStore((store) =>
     store.chat.dismissedReplies.get(id),
   );
   const proposed = useBoundStore((store) => {
-    const conv = store.chat.conversations.get(id);
+    if (open || privately) return;
 
-    if (conv?.service !== "tiktok") return;
+    const teamChat = isTeamChat(store.chat.conversations.get(id));
+    let lastWord = true;
 
     for (const msg of store.chat.messages.get(id)?.values() || []) {
-      if (isInternal(msg)) continue;
+      // Notes and reactions are no word in the conversation.
+      if (isInternal(msg) || msg.content.kind === "reaction") continue;
 
-      return isIncoming(msg, store.chat.ownAgentId, isTeamChat(conv)) &&
+      if (lastWord && msg.content.kind !== "comment") return;
+      lastWord = false;
+
+      if (
+        isIncoming(msg, store.chat.ownAgentId, teamChat) &&
         msg.content.kind === "comment" &&
         replyRef(msg)
-        ? msg
-        : undefined;
+      ) {
+        return msg;
+      }
     }
   });
 
@@ -43,9 +54,7 @@ export function useReplyTo(convId: string | null | undefined) {
 
   return {
     replyTo,
-    setInPublic: (inPublic: boolean) =>
-      replyTo && setReplyDraft(id, { ...replyTo, inPublic }),
-    // Sent: what it answered is answered.
+    // Sent: the choice is spent.
     clear: () => setReplyDraft(id, undefined),
     // Closed: neither the choice nor the proposal stays.
     close: () => {

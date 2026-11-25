@@ -522,8 +522,8 @@
   "Referencia de la API": "API reference",
   "Tú": "You",
   "Cancelar respuesta": "Cancel reply",
-  "En privado": "In private",
-  "En público": "In public",
-  "Responder en privado al comentario": "Reply privately to the comment",
-  "Instagram responde en privado una vez por comentario, dentro de los 7 días.": "Instagram allows one private reply per comment, within 7 days."
+  "Comentario": "Comment",
+  "Instagram permite un mensaje privado por comentario, dentro de los 7 días. Para responder en público, responde al comentario.": "Instagram allows one private message per comment, within 7 days. To answer in public, reply to the comment.",
+  "Mensaje privado, cerrará en": "Private message, will close in",
+  "Un mensaje privado a quien comentó, cerrará en": "One private message to the commenter, will close in"
 }

@@ -40,12 +40,7 @@ export type FileDraft = {
 };
 
 /** The message a conversation's next message answers, chosen with Reply. */
-export type ReplyDraft = {
-  message: MessageRow;
-  // Instagram answers a comment either under it, in public, or in a DM to its
-  // author.
-  inPublic?: boolean;
-};
+export type ReplyDraft = { message: MessageRow };
 
 type MediaLoad = {
   blob?: Blob;

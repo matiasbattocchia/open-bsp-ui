@@ -522,8 +522,8 @@
   "Referencia de la API": "Marejeleo ya API",
   "Tú": "Wewe",
   "Cancelar respuesta": "Ghairi jibu",
-  "En privado": "Kwa faragha",
-  "En público": "Hadharani",
-  "Responder en privado al comentario": "Jibu maoni kwa faragha",
-  "Instagram responde en privado una vez por comentario, dentro de los 7 días.": "Instagram inaruhusu jibu moja la faragha kwa kila maoni, ndani ya siku 7."
+  "Comentario": "Maoni",
+  "Instagram permite un mensaje privado por comentario, dentro de los 7 días. Para responder en público, responde al comentario.": "Instagram inaruhusu ujumbe mmoja wa faragha kwa kila maoni, ndani ya siku 7. Ili kujibu hadharani, jibu maoni hayo.",
+  "Mensaje privado, cerrará en": "Ujumbe wa faragha, itafungwa baada ya",
+  "Un mensaje privado a quien comentó, cerrará en": "Ujumbe mmoja wa faragha kwa aliyetoa maoni, itafungwa baada ya"
 }

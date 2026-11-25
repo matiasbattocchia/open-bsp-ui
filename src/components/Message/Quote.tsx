@@ -39,7 +39,9 @@ function summary(
 
   if (content.type === "text") return { text: content.text };
 
-  if (content.kind === "comment") return { text: `💬 ${content.text ?? ""}` };
+  if (content.kind === "comment") {
+    return { text: `${t("Comentario")}: ${content.text ?? ""}` };
+  }
   if (content.kind === "share") {
     return { text: `🔗 ${shareLabel(content.data.type, t)}` };
   }
@@ -133,7 +135,7 @@ export default function Quote({
 
 /**
  * The post a comment is on, atop the comment, as a reply quotes a message:
- * what it is, its caption and its cover. Clicking it opens the post.
+ * what it is, its caption and its cover, linking to the post.
  */
 export function PostQuote({ post }: { post: CommentPart["data"]["post"] }) {
   const { translate: t } = useTranslation();
@@ -146,18 +148,14 @@ export function PostQuote({ post }: { post: CommentPart["data"]["post"] }) {
       text={post.title}
       thumbnail={cover}
       thumbnailPending={!!post.thumbnail}
-      onClick={
-        post.url
-          ? () => window.open(post.url, "_blank", "noopener,noreferrer")
-          : undefined
-      }
+      href={post.url}
     />
   );
 }
 
 /**
  * A quote's look: a bar in the color of who said it, their name over a line
- * of it, and a picture of it to the right.
+ * of it, and a picture of it to the right. A link with `href`, opened apart.
  */
 function QuoteFrame({
   incoming,
@@ -166,6 +164,7 @@ function QuoteFrame({
   text,
   thumbnail,
   thumbnailPending,
+  href,
   onClick,
   onClose,
 }: {
@@ -176,19 +175,18 @@ function QuoteFrame({
   thumbnail?: string;
   // The picture is coming: its place is kept.
   thumbnailPending?: boolean;
+  href?: string;
   onClick?: () => void;
   onClose?: () => void;
 }) {
   const { translate: t } = useTranslation();
 
-  return (
-    <div
-      className={
-        "flex min-w-0 overflow-hidden rounded-[7.5px] bg-black/5 dark:bg-white/10" +
-        (onClick ? " cursor-pointer" : "")
-      }
-      onClick={onClick}
-    >
+  const className =
+    "flex min-w-0 overflow-hidden rounded-[7.5px] bg-black/5 dark:bg-white/10" +
+    (href || onClick ? " cursor-pointer" : "");
+
+  const body = (
+    <>
       <div
         className={
           "w-[4px] shrink-0 " + (incoming ? "bg-sky-500" : "bg-primary")
@@ -241,6 +239,21 @@ function QuoteFrame({
           <X className="w-[20px] h-[20px]" />
         </button>
       )}
+    </>
+  );
+
+  return href ? (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={className}
+    >
+      {body}
+    </a>
+  ) : (
+    <div className={className} onClick={onClick}>
+      {body}
     </div>
   );
 }

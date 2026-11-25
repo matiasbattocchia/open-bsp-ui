@@ -9,15 +9,8 @@ import {
 import useBoundStore from "@/stores/useBoundStore";
 import { pushConversationToDb, saveDraft } from "@/utils/ConversationUtils";
 import { type FileDraft } from "@/stores/chatSlice";
-import {
-  type Draft,
-  type MessageRow,
-  type TemplateMessage,
-  isIncoming,
-  isTeamChat,
-} from "@/supabase/client";
+import { type Draft, type TemplateMessage } from "@/supabase/client";
 import { TickContext } from "@/contexts/useTick";
-import dayjs from "dayjs";
 import "dayjs/locale/es";
 import "dayjs/locale/pt";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -32,9 +25,9 @@ import { moveCursorToEnd } from "@/utils/UtilityFunctions";
 import { htmlToMarkdown } from "@/utils/htmlToMarkdown";
 import { replyRef } from "@/utils/ReplyUtils";
 import { useReplyTo } from "@/hooks/useReplyTo";
+import { useServiceWindow } from "@/hooks/useServiceWindow";
 import TemplatePicker from "./TemplatePicker";
 import Quote from "./Message/Quote";
-import PillToggle from "./PillToggle";
 
 function TemplateVarInput({
   placeholder,
@@ -130,87 +123,24 @@ export default function ChatFooter() {
 
   const tick = useContext(TickContext); // one-minute ticks
 
-  // A comment opens no window: only what the contact writes in private does.
-  const mostRecentIncoming: MessageRow | undefined = useBoundStore((store) => {
-    const msgs = store.chat.messages.get(store.ui.activeConvId || "")?.values();
-
-    if (!msgs) {
-      return;
-    }
-
-    for (const msg of msgs) {
-      if (
-        isIncoming(
-          msg,
-          store.chat.ownAgentId,
-          isTeamChat(store.chat.conversations.get(msg.conversation_id)),
-        ) &&
-        msg.content.kind !== "comment"
-      ) {
-        return msg;
-      }
-    }
-  });
+  const serviceWindow = useServiceWindow(activeConvId);
 
   const {
     replyTo,
-    setInPublic,
     clear: clearReply,
     close: closeReply,
   } = useReplyTo(activeConvId);
+  // A comment is answered in public, under it, whatever the window.
   const comment =
     replyTo?.message.content.type === "data" &&
     replyTo.message.content.kind === "comment"
       ? { ...replyTo.message, content: replyTo.message.content }
       : undefined;
+  // Anything else, with the window closed, is the one private message an
+  // Instagram comment takes.
+  const privately = comment ? undefined : serviceWindow.privately;
 
-  // Instagram answers a comment in private once, within 7 days of it; TikTok
-  // only in public, under it.
-  const answeredInPrivate = useBoundStore((store) => {
-    if (comment?.service !== "instagram") return false;
-
-    for (const msg of store.chat.messages
-      .get(comment.conversation_id)
-      ?.values() || []) {
-      if (
-        msg.sender_address === null &&
-        msg.content.type === "text" &&
-        msg.content.re_message_id === comment.external_id &&
-        !(msg.status as { failed?: string } | null)?.failed
-      ) {
-        return true;
-      }
-    }
-
-    return false;
-  });
-  const canAnswerInPrivate =
-    comment?.service === "instagram" &&
-    !answeredInPrivate &&
-    tick.isBefore(dayjs(comment.timestamp).add(7, "day"));
-  const commentReply = comment
-    ? canAnswerInPrivate && !replyTo?.inPublic
-      ? "private"
-      : "public"
-    : undefined;
-
-  // Wether or not the user is allowed to send messages to the client.
-  // WhatsApp (Cloud API) and Instagram both enforce a 24h customer-service
-  // window since the contact's last message, TikTok a 48h one; `local`
-  // (internal testing) and `whatsapp-web` (unofficial bridge) have no window.
-  // A comment is answered whatever the window.
-  const windowHours =
-    conv?.service === "whatsapp" || conv?.service === "instagram"
-      ? 24
-      : conv?.service === "tiktok"
-        ? 48
-        : undefined;
-  const windowEnd = dayjs(mostRecentIncoming?.timestamp || 0).add(
-    windowHours ?? 0,
-    "hour",
-  );
-  const inCSWindow =
-    !!comment || windowHours === undefined || tick.isBefore(windowEnd);
+  const inCSWindow = !!comment || serviceWindow.open || !!privately;
 
   // Templates count too: at the messages cap nothing more goes out, whatever
   // the window.
@@ -221,7 +151,7 @@ export default function ChatFooter() {
   // out as several.
   const text = useTextLength(
     conv?.service,
-    commentReply === "public" ? "comment" : "text",
+    comment ? "comment" : "text",
     message,
   );
   const navigate = useNavigate();
@@ -247,8 +177,10 @@ export default function ChatFooter() {
     }
   };
 
-  // What's left of the customer service window.
-  const remaining = tick.locale(currentLanguage).to(windowEnd, true);
+  // What's left of the customer service window, or of the private message's.
+  const remaining = tick
+    .locale(currentLanguage)
+    .to(privately?.end ?? serviceWindow.end, true);
 
   // Template mode: derive from per-conv store
   const templateDraft = templateDraftEntry?.template;
@@ -359,13 +291,15 @@ export default function ChatFooter() {
     // If the conv has the `updated_at` unset, it means it has not been pushed to the DB yet.
     !conv.updated_at && (await pushConversationToDb(conv));
 
-    const re_message_id = replyTo && replyRef(replyTo.message);
+    const re_message_id = privately
+      ? privately.comment.external_id!
+      : replyTo && replyRef(replyTo.message);
 
-    // A comment answered in public is a comment under it; anything else is a
-    // text, naming what it answers (an Instagram comment's private reply).
+    // A comment is answered with a comment under it; anything else with a
+    // text naming what it answers (the private message, the comment).
     const record = newMessage(
       conv,
-      comment && commentReply === "public"
+      comment
         ? {
             version: "1",
             type: "data",
@@ -595,8 +529,9 @@ export default function ChatFooter() {
         <div
           className={
             "text-foreground p-[5px] shadow-[0_0_4px_0px_rgba(0,0,0,0.1)]" +
+            // Replying, the top corners are a bubble's: they wrap the quote.
             (replyTo && !templateDraft
-              ? " rounded-[18px]"
+              ? " rounded-t-lg rounded-b-[24px]"
               : " rounded-[24px]") +
             (templateDraft
               ? " bg-incoming-chat-bubble"
@@ -608,27 +543,6 @@ export default function ChatFooter() {
           {replyTo && !templateDraft && (
             <div className="mb-[4px]">
               <Quote message={replyTo.message} onClose={closeReply} />
-              {comment?.service === "instagram" && (
-                <div className="mt-[4px]">
-                  <PillToggle
-                    options={[
-                      {
-                        value: "private",
-                        label: t("En privado"),
-                        disabled: !canAnswerInPrivate,
-                        title: canAnswerInPrivate
-                          ? undefined
-                          : t(
-                              "Instagram responde en privado una vez por comentario, dentro de los 7 días.",
-                            ),
-                      },
-                      { value: "public", label: t("En público") },
-                    ]}
-                    value={commentReply!}
-                    onChange={(value) => setInPublic(value === "public")}
-                  />
-                </div>
-              )}
             </div>
           )}
           <div className="flex items-end">
@@ -643,11 +557,12 @@ export default function ChatFooter() {
                 </button>
               ) : (
                 <button
-                  // A comment is answered with text only.
-                  disabled={!canSend || !!comment}
+                  // A comment is answered with text only, and the private
+                  // message is one.
+                  disabled={!canSend || !!comment || !!privately}
                   className={
                     "p-[8px] rounded-full" +
-                    (comment
+                    (comment || privately
                       ? " opacity-50"
                       : !canSend
                         ? ""
@@ -733,19 +648,23 @@ export default function ChatFooter() {
                         ? t(
                             "No se envían más mensajes; los recibidos siguen llegando.",
                           )
-                        : inCSWindow
-                          ? undefined
-                          : conv.service === "whatsapp"
-                            ? t(
-                                "WhatsApp cierra la conversación a las 24 horas del último mensaje recibido. Para abrir la conversación debes utilizar una plantilla.",
-                              )
-                            : conv.service === "tiktok"
+                        : privately
+                          ? t(
+                              "Instagram permite un mensaje privado por comentario, dentro de los 7 días. Para responder en público, responde al comentario.",
+                            )
+                          : inCSWindow
+                            ? undefined
+                            : conv.service === "whatsapp"
                               ? t(
-                                  "La conversación se cerró 48 horas después del último mensaje del contacto. Esperá a que te escriba de nuevo para responder.",
+                                  "WhatsApp cierra la conversación a las 24 horas del último mensaje recibido. Para abrir la conversación debes utilizar una plantilla.",
                                 )
-                              : t(
-                                  "La conversación se cerró 24 horas después del último mensaje del contacto. Esperá a que te escriba de nuevo para responder.",
-                                )
+                              : conv.service === "tiktok"
+                                ? t(
+                                    "La conversación se cerró 48 horas después del último mensaje del contacto. Esperá a que te escriba de nuevo para responder.",
+                                  )
+                                : t(
+                                    "La conversación se cerró 24 horas después del último mensaje del contacto. Esperá a que te escriba de nuevo para responder.",
+                                  )
                     }
                   />
                   {(!message || !canSend) && (
@@ -784,11 +703,21 @@ export default function ChatFooter() {
                         ) : (
                           <span>{t("Conversación cerrada")}</span>
                         )
-                      ) : commentReply === "public" ? (
+                      ) : comment ? (
                         <span>{t("Responder en público al comentario")}</span>
-                      ) : commentReply === "private" ? (
-                        <span>{t("Responder en privado al comentario")}</span>
-                      ) : windowHours !== undefined ? (
+                      ) : privately ? (
+                        <>
+                          <span className="lg:hidden">
+                            {t("Mensaje privado, cerrará en")}
+                          </span>
+                          <span className="hidden lg:inline">
+                            {t(
+                              "Un mensaje privado a quien comentó, cerrará en",
+                            )}
+                          </span>{" "}
+                          <span>{remaining}</span>
+                        </>
+                      ) : serviceWindow.hours !== undefined ? (
                         <>
                           <span className="lg:hidden">{t("Cerrará en")}</span>
                           <span className="hidden lg:inline">
@@ -847,7 +776,7 @@ export default function ChatFooter() {
                 templateDraft
                   ? t("Enviar plantilla")
                   : text.over
-                    ? commentReply === "public"
+                    ? comment
                       ? t("Demasiado largo para un comentario")
                       : t("Demasiado largo: divídelo en varios mensajes")
                     : t("Enviar mensaje")
