@@ -136,8 +136,8 @@ export default function ChatFooter() {
     replyTo.message.content.kind === "comment"
       ? { ...replyTo.message, content: replyTo.message.content }
       : undefined;
-  // Anything else, with the window closed, is the one private message an
-  // Instagram comment takes.
+  // Anything else, with the window closed, is the one DM an Instagram comment
+  // opens it for.
   const privately = comment ? undefined : serviceWindow.privately;
 
   const inCSWindow = !!comment || serviceWindow.open || !!privately;
@@ -177,7 +177,7 @@ export default function ChatFooter() {
     }
   };
 
-  // What's left of the customer service window, or of the private message's.
+  // What's left of the customer service window, or of the comment's.
   const remaining = tick
     .locale(currentLanguage)
     .to(privately?.end ?? serviceWindow.end, true);
@@ -295,8 +295,9 @@ export default function ChatFooter() {
       ? privately.comment.external_id!
       : replyTo && replyRef(replyTo.message);
 
-    // A comment is answered with a comment under it; anything else with a
-    // text naming what it answers (the private message, the comment).
+    // A comment is answered with a comment under it; anything else is a text
+    // naming what it answers. The DM a comment opens the window for names
+    // the comment too: Instagram addresses it by it.
     const record = newMessage(
       conv,
       comment
@@ -557,8 +558,8 @@ export default function ChatFooter() {
                 </button>
               ) : (
                 <button
-                  // A comment is answered with text only, and the private
-                  // message is one.
+                  // A comment is answered with text only, and the DM a comment
+                  // opens the window for is one.
                   disabled={!canSend || !!comment || !!privately}
                   className={
                     "p-[8px] rounded-full" +

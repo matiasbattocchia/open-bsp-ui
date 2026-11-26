@@ -8,9 +8,9 @@ import { isIncoming, isTeamChat } from "@/supabase/client";
  * How a conversation can be written to now. WhatsApp (Cloud API) and
  * Instagram give a window of 24 hours from the contact's last message, TikTok
  * one of 48; `local` (internal testing) and `whatsapp-web` (unofficial bridge)
- * none. A comment opens no window: only what the contact writes in private
- * does. On Instagram, though, a comment takes one private message within 7
- * days of it: with the window closed, the contact's latest comment's is
+ * none. Only what the contact writes in private opens it; on Instagram, a
+ * comment opens it for one DM, within 7 days of it, which Instagram addresses
+ * by the comment. With the window closed, the contact's latest comment's is
  * `privately`, until it is sent.
  */
 export function useServiceWindow(convId: string | null | undefined) {
@@ -47,8 +47,8 @@ export function useServiceWindow(convId: string | null | undefined) {
       }
     }
   });
-  // A failed one did not answer it.
-  const answeredInPrivate = useBoundStore((store) => {
+  // The DM that went out through it; a failed one did not.
+  const spent = useBoundStore((store) => {
     if (!comment?.external_id) return false;
 
     for (const msg of store.chat.messages.get(id)?.values() || []) {
@@ -76,10 +76,7 @@ export function useServiceWindow(convId: string | null | undefined) {
 
   const privateEnd = dayjs(comment?.timestamp || 0).add(7, "day");
   const privately =
-    !open &&
-    comment?.external_id &&
-    !answeredInPrivate &&
-    tick.isBefore(privateEnd)
+    !open && comment?.external_id && !spent && tick.isBefore(privateEnd)
       ? { comment, end: privateEnd }
       : undefined;
 

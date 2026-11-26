@@ -337,15 +337,6 @@ function QuoteSlot({ quote, text }: { quote: ReactNode; text?: boolean }) {
   );
 }
 
-// What kind of message it is, atop it, as WhatsApp marks a forward.
-function Label({ label }: { label: string }) {
-  return (
-    <div className="text-[12.8px] px-[6px] pt-[4px] text-muted-foreground">
-      {label}
-    </div>
-  );
-}
-
 export function InMessage({
   text,
   first,
@@ -353,7 +344,6 @@ export function InMessage({
   avatar,
   senderName,
   messageId,
-  label,
   quote,
   onReply,
   children,
@@ -394,7 +384,6 @@ export function InMessage({
             {senderName}
           </div>
         )}
-        {label && <Label label={label} />}
         {quote && <QuoteSlot quote={quote} text={text} />}
         {children}
         {onReply && <ReplyButton onReply={onReply} side="right" />}
@@ -411,7 +400,6 @@ export function OutMessage({
   avatar,
   internal,
   messageId,
-  label,
   quote,
   onReply,
 }: PropsWithChildren<UIMessage>) {
@@ -451,7 +439,6 @@ export function OutMessage({
           </>
         )}
         {!!avatar && first && <Avatar {...avatar} display="name" />}
-        {label && <Label label={label} />}
         {quote && <QuoteSlot quote={quote} text={text} />}
         {children}
         {onReply && <ReplyButton onReply={onReply} side="left" />}
@@ -476,8 +463,6 @@ type UIMessage = {
   senderName?: string;
   // What the row is found by, to go to it from a quote.
   messageId?: string;
-  // What kind of message it is, where the bubble alone doesn't tell.
-  label?: string;
   // The message this one answers.
   quote?: ReactNode;
   // Makes the next message answer this one, where the service can.
@@ -512,7 +497,13 @@ export default function Message(props: UIMessage & { message: MessageRow }) {
       formatPhoneNumber(props.message.sender_address!)
     : undefined;
 
-  const quoted = useQuotedMessage(props.message);
+  // A text naming a comment is the DM the comment opened the window for:
+  // Instagram addresses it by the comment, and it answers nothing.
+  const named = useQuotedMessage(props.message);
+  const quoted =
+    named?.content.kind === "comment" && props.message.content.type === "text"
+      ? undefined
+      : named;
 
   // A comment shows the post it is on, unless it answers one that shows it.
   // An API writer may leave the post out of an outgoing one.
@@ -536,14 +527,8 @@ export default function Message(props: UIMessage & { message: MessageRow }) {
           message: props.message,
         })
     : undefined;
-  // A comment under a post shows it. One answering another says it is a
-  // comment: it would otherwise look like a private message answering it.
-  const label =
-    props.message.content.kind === "comment" && quoted
-      ? t("Comentario")
-      : undefined;
 
-  const reply = { messageId: props.message.id, label, quote, onReply };
+  const reply = { messageId: props.message.id, quote, onReply };
 
   let content;
   let text = false;
