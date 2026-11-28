@@ -1,0 +1,5 @@
+# Onboarding links: the app, from an index.html in a neutral voice that link
+# previews read (written by the onboard-pages plugin in vite.config.ts).
+/onboard/whatsapp/* /onboard-whatsapp 200
+/onboard/instagram/* /onboard-instagram 200
+/onboard/tiktok/* /onboard-tiktok 200

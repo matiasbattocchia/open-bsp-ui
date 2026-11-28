@@ -3,6 +3,9 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
 import Button from "@/components/Button";
 import OnboardLimitNotice from "@/components/OnboardLimitNotice";
+import OnboardLayout, {
+  rememberOnboardOrganization,
+} from "@/components/OnboardLayout";
 import { getTikTokAuthorizeUrl } from "@/queries/useTikTokSignup";
 import {
   TT_ONBOARD_STATE_PREFIX,
@@ -59,6 +62,9 @@ function OnboardTikTok() {
 
   const handleConnect = async () => {
     setLoading(true);
+    if (state.status === "valid") {
+      rememberOnboardOrganization(token, state.organization_name);
+    }
     try {
       // TikTok comes back to the app's one redirect URL; the onboarding token
       // rides in `state`, which tells that page this is an onboarding link.
@@ -74,12 +80,13 @@ function OnboardTikTok() {
   };
 
   return (
-    <div className="flex flex-col gap-9 justify-center items-center bg-background text-foreground h-dvh w-screen">
-      <div className="text-primary tracking-tighter font-bold text-[36px]">
-        Open BSP
-      </div>
-
-      <div className="flex flex-col gap-4 w-[320px] text-center">
+    <OnboardLayout
+      service="tiktok"
+      organizationName={
+        state.status === "valid" ? state.organization_name : undefined
+      }
+    >
+      <div className="flex flex-col gap-4 w-full">
         {state.status === "loading" && (
           <p className="text-muted-foreground">{t("Validando enlace...")}</p>
         )}
@@ -123,6 +130,6 @@ function OnboardTikTok() {
           </div>
         )}
       </div>
-    </div>
+    </OnboardLayout>
   );
 }

@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
 import Button from "@/components/Button";
 import OnboardLimitNotice from "@/components/OnboardLimitNotice";
+import OnboardLayout from "@/components/OnboardLayout";
 import type { SignupPayload } from "@/contexts/WhatsAppIntegrationContext";
 
 export const Route = createFileRoute("/onboard/whatsapp/$token")({
@@ -47,6 +48,8 @@ function Onboard() {
   const { token } = Route.useParams();
   const { translate: t } = useTranslation();
   const [state, setState] = useState<TokenValidation>({ status: "loading" });
+  // Heads the page through success and errors too, which forget the token's.
+  const [organizationName, setOrganizationName] = useState<string>();
   const [loading, setLoading] = useState(false);
   // The Facebook SDK loads asynchronously from connect.facebook.net, which is
   // commonly blocked by tracking protection / ad blockers. If it fails to load,
@@ -61,7 +64,12 @@ function Onboard() {
 
   useEffect(() => {
     validateToken(token)
-      .then(setState)
+      .then((validation) => {
+        setState(validation);
+        if (validation.status === "valid" && validation.organization_name) {
+          setOrganizationName(validation.organization_name);
+        }
+      })
       .catch(() => setState({ status: "invalid" }));
   }, [token]);
 
@@ -168,12 +176,8 @@ function Onboard() {
   }, [token, t]);
 
   return (
-    <div className="flex flex-col gap-9 justify-center items-center bg-background text-foreground h-dvh w-screen">
-      <div className="text-primary tracking-tighter font-bold text-[36px]">
-        OpenBSP
-      </div>
-
-      <div className="flex flex-col gap-4 w-[320px] text-center">
+    <OnboardLayout service="whatsapp" organizationName={organizationName}>
+      <div className="flex flex-col gap-4 w-full">
         {state.status === "loading" && (
           <p className="text-muted-foreground">{t("Validando enlace...")}</p>
         )}
@@ -249,7 +253,7 @@ function Onboard() {
 
         {state.status === "success" && (
           <div className="flex flex-col gap-2">
-            <p className="text-primary font-medium text-[18px]">
+            <p className="text-foreground font-medium text-[18px]">
               {t("Tu número de WhatsApp fue conectado exitosamente.")}
             </p>
             <p className="text-muted-foreground text-[14px]">
@@ -280,6 +284,6 @@ function Onboard() {
           </div>
         )}
       </div>
-    </div>
+    </OnboardLayout>
   );
 }

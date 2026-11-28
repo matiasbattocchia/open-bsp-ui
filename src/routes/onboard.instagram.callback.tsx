@@ -2,6 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
 import OnboardLimitNotice from "@/components/OnboardLimitNotice";
+import OnboardLayout, {
+  recallOnboardOrganization,
+} from "@/components/OnboardLayout";
 import { IG_ONBOARD_REDIRECT_PATH } from "./onboard.instagram.$token";
 
 export const Route = createFileRoute("/onboard/instagram/callback")({
@@ -55,12 +58,11 @@ function OnboardInstagramCallback() {
   }, [code, state]);
 
   return (
-    <div className="flex flex-col gap-9 justify-center items-center bg-background text-foreground h-dvh w-screen">
-      <div className="text-primary tracking-tighter font-bold text-[36px]">
-        Open BSP
-      </div>
-
-      <div className="flex flex-col gap-4 w-[320px] text-center">
+    <OnboardLayout
+      service="instagram"
+      organizationName={state ? recallOnboardOrganization(state) : undefined}
+    >
+      <div className="flex flex-col gap-4 w-full">
         {result.status === "working" && (
           <p className="text-muted-foreground">
             {t("Conectando tu cuenta de Instagram...")}
@@ -69,7 +71,7 @@ function OnboardInstagramCallback() {
 
         {result.status === "success" && (
           <div className="flex flex-col gap-2">
-            <p className="text-primary font-medium text-[18px]">
+            <p className="text-foreground font-medium text-[18px]">
               {t("Tu cuenta de Instagram fue conectada exitosamente.")}
             </p>
             <p className="text-muted-foreground text-[14px]">
@@ -86,6 +88,6 @@ function OnboardInstagramCallback() {
           </p>
         )}
       </div>
-    </div>
+    </OnboardLayout>
   );
 }

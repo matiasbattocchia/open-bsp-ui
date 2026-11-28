@@ -3,6 +3,9 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useTikTokSignup } from "@/queries/useTikTokSignup";
 import OnboardLimitNotice from "@/components/OnboardLimitNotice";
+import OnboardLayout, {
+  recallOnboardOrganization,
+} from "@/components/OnboardLayout";
 import {
   TT_OAUTH_AGENT_KEY,
   TT_OAUTH_STATE_KEY,
@@ -164,7 +167,10 @@ function OnboardCallback({ token }: { token: string }) {
   }, [code, token]);
 
   return (
-    <Shell>
+    <OnboardLayout
+      service="tiktok"
+      organizationName={recallOnboardOrganization(token)}
+    >
       {result.status === "working" && (
         <p className="text-muted-foreground">
           {t("Conectando tu cuenta de TikTok...")}
@@ -173,7 +179,7 @@ function OnboardCallback({ token }: { token: string }) {
 
       {result.status === "success" && (
         <div className="flex flex-col gap-2">
-          <p className="text-primary font-medium text-[18px]">
+          <p className="text-foreground font-medium text-[18px]">
             {t("Tu cuenta de TikTok fue conectada exitosamente.")}
           </p>
           <p className="text-muted-foreground text-[14px]">
@@ -189,6 +195,6 @@ function OnboardCallback({ token }: { token: string }) {
           {t("Error al conectar. Intentá de nuevo o contactá al proveedor.")}
         </p>
       )}
-    </Shell>
+    </OnboardLayout>
   );
 }

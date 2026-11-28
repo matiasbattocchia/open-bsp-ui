@@ -16,6 +16,23 @@ import Button from "@/components/Button";
 import SelectField from "@/components/SelectField";
 import { type OrganizationUpdate } from "@/supabase/client";
 
+// The bare hostname the database takes (organizations_domain_check).
+const DOMAIN_PATTERN = /^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/;
+
+// What people paste — "https://www.Acme.com/about" — as that hostname; empty
+// clears it.
+function normalizeDomain(raw: string | null): string | null {
+  const host = (raw ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/^[a-z][a-z0-9+.-]*:\/\//, "")
+    .replace(/[/?#].*$/, "")
+    .replace(/:\d+$/, "")
+    .replace(/\.$/, "")
+    .replace(/^www\./, "");
+  return host || null;
+}
+
 export const Route = createFileRoute("/_auth/settings/organization/")({
   beforeLoad: () => {
     const activeOrgId = useBoundStore.getState().ui.activeOrgId;
@@ -57,7 +74,7 @@ function EditOrganization() {
     register,
     handleSubmit,
     control,
-    formState: { isValid, isDirty },
+    formState: { isValid, isDirty, errors },
   } = useForm<OrganizationUpdate>({ values: normalizedOrg });
 
   return (
@@ -91,6 +108,25 @@ function EditOrganization() {
               disabled={!isAdmin}
               {...register("name", { required: true })}
             />
+          </label>
+
+          <label>
+            <div className="label">{t("Dominio")}</div>
+            <input
+              className="text"
+              placeholder="acme.com"
+              disabled={!isAdmin}
+              {...register("domain", {
+                setValueAs: normalizeDomain,
+                validate: (value) =>
+                  !value || DOMAIN_PATTERN.test(value) || t("Dominio inválido"),
+              })}
+            />
+            {errors.domain?.message && (
+              <div className="text-destructive text-[12px] mt-1">
+                {errors.domain.message}
+              </div>
+            )}
           </label>
 
           <SelectField

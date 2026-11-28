@@ -3,6 +3,9 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
 import Button from "@/components/Button";
 import OnboardLimitNotice from "@/components/OnboardLimitNotice";
+import OnboardLayout, {
+  rememberOnboardOrganization,
+} from "@/components/OnboardLayout";
 import { getInstagramAuthorizeUrl } from "@/queries/useInstagramSignup";
 
 export const Route = createFileRoute("/onboard/instagram/$token")({
@@ -59,6 +62,9 @@ function OnboardInstagram() {
 
   const handleConnect = async () => {
     setLoading(true);
+    if (state.status === "valid") {
+      rememberOnboardOrganization(token, state.organization_name);
+    }
     try {
       const redirect_uri = `${window.location.origin}${IG_ONBOARD_REDIRECT_PATH}`;
       const url = await getInstagramAuthorizeUrl(redirect_uri, token);
@@ -69,12 +75,13 @@ function OnboardInstagram() {
   };
 
   return (
-    <div className="flex flex-col gap-9 justify-center items-center bg-background text-foreground h-dvh w-screen">
-      <div className="text-primary tracking-tighter font-bold text-[36px]">
-        Open BSP
-      </div>
-
-      <div className="flex flex-col gap-4 w-[320px] text-center">
+    <OnboardLayout
+      service="instagram"
+      organizationName={
+        state.status === "valid" ? state.organization_name : undefined
+      }
+    >
+      <div className="flex flex-col gap-4 w-full">
         {state.status === "loading" && (
           <p className="text-muted-foreground">{t("Validando enlace...")}</p>
         )}
@@ -118,6 +125,6 @@ function OnboardInstagram() {
           </div>
         )}
       </div>
-    </div>
+    </OnboardLayout>
   );
 }
